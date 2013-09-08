@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>644</width>
-    <height>424</height>
+    <width>408</width>
+    <height>385</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,15 +16,18 @@
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
     <layout class="QFormLayout" name="formLayout_2">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::ExpandingFieldsGrow</enum>
+     </property>
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="first_name_label">
        <property name="text">
         <string>First Name</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="first_name">
        <property name="minimumSize">
         <size>
          <width>200</width>
@@ -41,7 +44,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_2">
+      <widget class="QLineEdit" name="middle_name">
        <property name="minimumSize">
         <size>
          <width>200</width>
@@ -58,7 +61,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="lineEdit_3">
+      <widget class="QLineEdit" name="last_name">
        <property name="minimumSize">
         <size>
          <width>200</width>
@@ -85,7 +88,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLineEdit" name="lineEdit_5">
+      <widget class="QLineEdit" name="passport">
        <property name="minimumSize">
         <size>
          <width>200</width>
@@ -102,7 +105,7 @@
       </widget>
      </item>
      <item row="5" column="1">
-      <widget class="QLineEdit" name="lineEdit_6">
+      <widget class="QLineEdit" name="license">
        <property name="minimumSize">
         <size>
          <width>200</width>
@@ -113,29 +116,30 @@
      </item>
     </layout>
    </item>
-   <item row="0" column="1" rowspan="4">
-    <widget class="QWebView" name="helpview">
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="maximumSize">
       <size>
-       <width>400</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
-     <property name="url">
-      <url>
-       <string>about:blank</string>
-      </url>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Brain Wallet</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0" colspan="2">
-       <widget class="QLineEdit" name="lineEdit_8"/>
+       <widget class="QLineEdit" name="brainkey">
+        <property name="echoMode">
+         <enum>QLineEdit::PasswordEchoOnEdit</enum>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <spacer name="horizontalSpacer">
@@ -151,7 +155,7 @@
        </spacer>
       </item>
       <item row="1" column="1">
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="generaterandom">
         <property name="text">
          <string>Generate Random Wallet</string>
         </property>
@@ -159,30 +163,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item row="2" column="0">
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>Login Password</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit_4"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_9">
-       <property name="text">
-        <string>Repeat Password</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_7"/>
-     </item>
-    </layout>
    </item>
    <item row="3" column="0">
     <spacer name="verticalSpacer">
@@ -197,15 +177,43 @@
      </property>
     </spacer>
    </item>
+   <item row="2" column="0">
+    <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::ExpandingFieldsGrow</enum>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Login Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="local_password1">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Repeat Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="local_password2">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
