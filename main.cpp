@@ -11,18 +11,9 @@
 
 #include <QApplication>
 #include <QStandardPaths>
+#include <QTimer>
 
-fc::future<void> app_loop;
 
-void process_qt_events()
-{
-   while( !app_loop.canceled() )
-   {
-      QCoreApplication::instance()->sendPostedEvents();
-      QCoreApplication::instance()->processEvents();
-      fc::usleep( fc::microseconds( 1000*20 ) );
-   }
-}
 
 bts::application_config load_config()
 { try {
@@ -43,9 +34,9 @@ bts::application_config load_config()
 void start_profile_creation_wizard(const bts::application_ptr& btsapp);
 void display_login(const bts::application_ptr& btsapp);
 
-void fc_main()
+void startup()
 {
-   auto btsapp     = std::make_shared<bts::application>();
+   auto btsapp     = bts::application::instance();
    auto app_config = load_config();
    btsapp->configure( app_config );
 
@@ -56,10 +47,6 @@ void fc_main()
    else
    {
       start_profile_creation_wizard(btsapp);
-   }
-   while( !app_loop.canceled() )
-   {
-     fc::usleep( fc::microseconds(1000*100) );
    }
 }
 
@@ -72,17 +59,15 @@ int main( int argc, char** argv )
      app.setOrganizationName( "Invictus Innovations, Inc" );
      app.setApplicationName( "Keyhotee" );
 
-     app_loop = fc::async( [=]{ fc_main(); } );
+     startup();
 
-     app.connect( &app, &QCoreApplication::aboutToQuit, [](){ app_loop.cancel(); } );
+     qApp->connect( qApp, &QApplication::aboutToQuit, [=](){ bts::application::instance()->quit(); } );
 
-     while( !app_loop.ready() )
-     {
-        QCoreApplication::instance()->sendPostedEvents();
-        QCoreApplication::instance()->processEvents();
-        fc::usleep( fc::microseconds( 1000*20 ) );
-     }
-     return 0;
+     QTimer fc_exec;
+     QObject::connect( &fc_exec, &QTimer::timeout, []() { fc::usleep( fc::microseconds(30*1000) ); }  );
+     fc_exec.start(5);
+
+     return app.exec();
   } 
   catch ( const fc::exception& e )
   {
@@ -94,7 +79,8 @@ int main( int argc, char** argv )
 void start_profile_creation_wizard( const bts::application_ptr& btsapp )
 {
    // TODO: figure out memory management here..
-   auto pro_wiz = new ProfileWizard(nullptr, btsapp);  
+   auto pro_wiz = new ProfileWizard(nullptr);  
+   pro_wiz->resize( QSize( 640, 525 ) );
    pro_wiz->show();
 }
 

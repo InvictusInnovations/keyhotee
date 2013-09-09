@@ -4,12 +4,15 @@
 
 namespace Ui {
     class IntroPage;
-    class ProfileEditPage;
 } // namespace Ui
+
+class NymPage;
+class ProfileEditPage;
+
 class ProfileWizard : public QWizard
 {
    public:
-     ProfileWizard( QWidget* parent, const bts::application_ptr& app );
+     ProfileWizard( QWidget* parent );
      ~ProfileWizard();
 
      enum Pages
@@ -19,8 +22,12 @@ class ProfileWizard : public QWizard
         Page_FirstNym
      };
 
-   private:
-     Ui::IntroPage*        _profile_intro_ui;
-     Ui::ProfileEditPage*  _profile_edit_ui;
+   public slots:
+     void showHelp();
+     void createProfile( int result );
 
+   private:
+     NymPage*              _nym_page;
+     ProfileEditPage*      _profile_edit;
+     Ui::IntroPage*        _profile_intro_ui;
 };
