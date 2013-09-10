@@ -209,7 +209,17 @@ void ProfileWizard::createProfile( int result )
 {
    if( _profile_edit->isComplete() )
    {
+      bts::profile_config conf;
+      conf.firstname   = _profile_edit->ui.first_name->text().toStdString();
+      conf.middlename  = _profile_edit->ui.middle_name->text().toStdString();
+      conf.lastname    = _profile_edit->ui.last_name->text().toStdString();
+      conf.brainkey    = _profile_edit->ui.brainkey->text().toStdString();
+
+      std::string password = _profile_edit->ui.local_password1->text().toStdString();
+
+      auto bapp = bts::application::instance();
       
+      bapp->create_profile( conf, password );
    }
 }
 

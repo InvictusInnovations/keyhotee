@@ -14,13 +14,15 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
     qt5_wrap_ui( profile_wizard/UiProfileEditPage  profile_wizard/ProfileEditPage.ui )
     qt5_wrap_ui( profile_wizard/UiProfileIntroPage profile_wizard/ProfileIntroPage.ui )
     qt5_wrap_ui( profile_wizard/UiNymPage          profile_wizard/ProfileNymPage.ui )
-
+    qt5_wrap_ui( UiLoginDialog                     LoginDialog.ui )
 
     set( sources  
          profile_wizard/ProfileEditPage.ui 
          profile_wizard/ProfileIntroPage.ui 
          profile_wizard/ProfileNymPage.ui 
          profile_wizard/ProfileWizard.cpp
+         LoginDialog.ui 
+         LoginDialog.cpp
          main.cpp )
 
     add_executable( keyhotee MACOSX_BUNDLE WIN32 ${sources} )

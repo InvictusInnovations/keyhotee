@@ -8,6 +8,7 @@
 #include <fc/reflect/variant.hpp>
 
 #include "profile_wizard/ProfileWizard.hpp"
+#include "LoginDialog.hpp"
 
 #include <QApplication>
 #include <QStandardPaths>
@@ -25,14 +26,16 @@ bts::application_config load_config()
      if( !fc::exists( config_file ) )
      {
         fc::ofstream out( config_file );
-        out << fc::json::to_pretty_string( bts::application_config() );
+        bts::application_config default_cfg;
+        default_cfg.data_dir = data_dir / "data";
+        out << fc::json::to_pretty_string( default_cfg );
      }
      return fc::json::from_file( config_file ).as<bts::application_config>();
 } FC_RETHROW_EXCEPTIONS( warn, "") }
 
 
 void start_profile_creation_wizard(const bts::application_ptr& btsapp);
-void display_login(const bts::application_ptr& btsapp);
+void display_login();
 
 void startup()
 {
@@ -42,7 +45,7 @@ void startup()
 
    if( btsapp->has_profile() )
    {
-      display_login(btsapp);
+      display_login();
    }
    else
    {
@@ -59,7 +62,7 @@ int main( int argc, char** argv )
      app.setOrganizationName( "Invictus Innovations, Inc" );
      app.setApplicationName( "Keyhotee" );
 
-     startup();
+     fc::async( &startup );
 
      qApp->connect( qApp, &QApplication::aboutToQuit, [=](){ bts::application::instance()->quit(); } );
 
@@ -84,6 +87,8 @@ void start_profile_creation_wizard( const bts::application_ptr& btsapp )
    pro_wiz->show();
 }
 
-void display_login(const bts::application_ptr& btsapp)
+void display_login()
 {
+    LoginDialog* login = new LoginDialog();
+    login->show();
 }
