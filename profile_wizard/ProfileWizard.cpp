@@ -7,6 +7,7 @@
 
 #include <fc/log/logger.hpp>
 
+void display_main_window();
 class NymPage : public QWizardPage
 {
     public:
@@ -219,7 +220,14 @@ void ProfileWizard::createProfile( int result )
 
       auto bapp = bts::application::instance();
       
-      bapp->create_profile( conf, password );
+      auto pro = bapp->create_profile( conf, password );
+      assert( pro != nullptr );
+      
+      bts::identity new_ident;
+      new_ident.bit_id = _nym_page->_profile_nym_ui.keyhotee_id->text().toStdString();
+      pro->store_identity( new_ident );
+
+      display_main_window();
    }
 }
 

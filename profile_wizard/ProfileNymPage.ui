@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
-    <height>310</height>
+    <width>361</width>
+    <height>258</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,7 +48,10 @@
     </spacer>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout">
+    <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::ExpandingFieldsGrow</enum>
+     </property>
      <item row="0" column="0">
       <widget class="QLabel" name="keyhotee_id_label">
        <property name="text">
@@ -59,8 +62,14 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="keyhotee_id"/>
      </item>
-     <item row="1" column="0" colspan="2">
+     <item row="1" column="1">
       <widget class="QLabel" name="id_warning">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>This name is unavailable.</string>
        </property>
@@ -69,6 +78,38 @@
        </property>
        <property name="wordWrap">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QToolButton" name="avatar_button">
+       <property name="minimumSize">
+        <size>
+         <width>64</width>
+         <height>64</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Avatar</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>64</width>
+         <height>64</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>false</bool>
+       </property>
+       <property name="arrowType">
+        <enum>Qt::NoArrow</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="keyhotee_id_label_2">
+       <property name="text">
+        <string>Avatar</string>
        </property>
       </widget>
      </item>

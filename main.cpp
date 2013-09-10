@@ -9,6 +9,7 @@
 
 #include "profile_wizard/ProfileWizard.hpp"
 #include "LoginDialog.hpp"
+#include "KeyhoteeMainWindow.hpp"
 
 #include <QApplication>
 #include <QStandardPaths>
@@ -87,8 +88,21 @@ void start_profile_creation_wizard( const bts::application_ptr& btsapp )
    pro_wiz->show();
 }
 
+void display_main_window()
+{
+  KeyhoteeMainWindow* mainwindow = new KeyhoteeMainWindow();
+  mainwindow->show();
+}
+
 void display_login()
 {
     LoginDialog* login = new LoginDialog();
+    login->connect( login, &QDialog::accepted,
+                    [=](){ 
+                        login->deleteLater();
+                        display_main_window(); 
+                    } );
     login->show();
 }
+
+
