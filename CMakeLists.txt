@@ -17,8 +17,11 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
     qt5_wrap_ui( UiLoginDialog                     LoginDialog.ui )
     qt5_wrap_ui( UiEditContactDialog               EditContactDialog.ui )
     qt5_wrap_ui( UiKeyhoteeMainWindow              KeyhoteeMainWindow.ui )
+   QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
 
     set( sources  
+         Keyhotee.qrc 
+
          profile_wizard/ProfileEditPage.ui 
          profile_wizard/ProfileIntroPage.ui 
          profile_wizard/ProfileNymPage.ui 
