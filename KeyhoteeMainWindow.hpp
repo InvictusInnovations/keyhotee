@@ -10,6 +10,8 @@ class KeyhoteeMainWindow  : public QMainWindow
       KeyhoteeMainWindow();
       ~KeyhoteeMainWindow();
 
+      void addContact();
+
   private:
       std::unique_ptr<Ui::KeyhoteeMainWindow> ui;
 };

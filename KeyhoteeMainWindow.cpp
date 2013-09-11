@@ -1,4 +1,5 @@
-#include <ui_KeyhoteeMainWindow.h>
+#include "ui_KeyhoteeMainWindow.h"
+#include "EditContactDialog.hpp"
 #include "KeyhoteeMainWindow.hpp"
 #include <bts/application.hpp>
 
@@ -26,6 +27,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui.reset( new Ui::KeyhoteeMainWindow() );
     ui->setupUi(this);
 
+    connect( ui->actionNew_Contact, &QAction::triggered, this, &KeyhoteeMainWindow::addContact );
+
     ui->side_bar->topLevelItem(TopLevelItemIndexes::Mailboxes)->setExpanded(true);
     auto space1     = ui->side_bar->topLevelItem(TopLevelItemIndexes::Space1);
     auto space2     = ui->side_bar->topLevelItem(TopLevelItemIndexes::Space2);
@@ -50,4 +53,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
 {
+}
+
+void KeyhoteeMainWindow::addContact()
+{
+   EditContactDialog* editcon = new EditContactDialog(this);
+   editcon->show();
 }
