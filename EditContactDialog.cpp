@@ -67,4 +67,20 @@ void EditContactDialog::lookupId()
    }
 }
 
+void EditContactDialog::setContact( const bts::addressbook::contact& con )
+{
+   _contact = con;
+   ui->contact_id->setText( _contact.bitname_id.c_str() );
+   ui->firstname->setText( _contact.first_name.c_str() );
+   ui->lastname->setText( _contact.last_name.c_str() );
+}
+
+bts::addressbook::contact EditContactDialog::getContact()const
+{
+   bts::addressbook::contact tmp = _contact;
+   tmp.bitname_id = ui->contact_id->text().toStdString();
+   tmp.first_name = ui->firstname->text().toStdString();
+   tmp.last_name  = ui->lastname->text().toStdString();
+   return tmp;
+}
 

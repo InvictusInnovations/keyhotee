@@ -17,31 +17,36 @@
 
 
 
-bts::application_config load_config()
+bts::application_config load_config( const std::string& profile_name )
 { try {
      auto qdatadir     = QStandardPaths::writableLocation( QStandardPaths::DataLocation );
-     auto data_dir     = fc::path( qdatadir.toStdString() );
+     auto data_dir     = fc::path( qdatadir.toStdString() ) / profile_name;
      fc::create_directories(data_dir);
      auto config_file  = data_dir / "config.json";
      ilog( "config_file: ${file}", ("file",config_file) );
      if( !fc::exists( config_file ) )
      {
-        fc::ofstream out( config_file );
         bts::application_config default_cfg;
         default_cfg.data_dir = data_dir / "data";
+
+        fc::ofstream out( config_file );
         out << fc::json::to_pretty_string( default_cfg );
      }
-     return fc::json::from_file( config_file ).as<bts::application_config>();
+
+     auto conf = fc::json::from_file( config_file ).as<bts::application_config>();
+     fc::ofstream out( config_file );
+     out << fc::json::to_pretty_string( conf );
+     return conf;
 } FC_RETHROW_EXCEPTIONS( warn, "") }
 
 
 void start_profile_creation_wizard(const bts::application_ptr& btsapp);
 void display_login();
 
-void startup()
+void startup( const std::string& profile_name )
 {
    auto btsapp     = bts::application::instance();
-   auto app_config = load_config();
+   auto app_config = load_config( profile_name );
    btsapp->configure( app_config );
 
    if( btsapp->has_profile() )
@@ -63,7 +68,14 @@ int main( int argc, char** argv )
      app.setOrganizationName( "Invictus Innovations, Inc" );
      app.setApplicationName( "Keyhotee" );
 
-     fc::async( &startup );
+     std::string profile_name = "default";
+
+     if( argc > 1 ) 
+     { 
+        profile_name = std::string(argv[1]); 
+     }
+
+     fc::async( [=](){ startup( profile_name ); } );
 
      qApp->connect( qApp, &QApplication::aboutToQuit, [=](){ bts::application::instance()->quit(); } );
 
