@@ -24,6 +24,9 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
          profile_wizard/ProfileNymPage.ui 
          profile_wizard/ProfileWizard.cpp
 
+         AddressBook/AddressBookModel.hpp
+         AddressBook/AddressBookModel.cpp
+
          LoginDialog.ui 
          LoginDialog.cpp
 
