@@ -15,7 +15,8 @@
 #include <QStandardPaths>
 #include <QTimer>
 
-
+#include <QFile>
+#include <QDebug>
 
 bts::application_config load_config( const std::string& profile_name )
 { try {
@@ -69,6 +70,11 @@ int main( int argc, char** argv )
      app.setApplicationName( "Keyhotee" );
 
      std::string profile_name = "default";
+
+     QFile file(":/index.htm");
+     QByteArray dump = file.readAll();
+     qDebug() << "contents: " << dump;
+     qDebug() << "error status: " << file.error();
 
      if( argc > 1 ) 
      { 

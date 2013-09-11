@@ -17,10 +17,12 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
     qt5_wrap_ui( UiLoginDialog                     LoginDialog.ui )
     qt5_wrap_ui( UiEditContactDialog               EditContactDialog.ui )
     qt5_wrap_ui( UiKeyhoteeMainWindow              KeyhoteeMainWindow.ui )
-   QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
+    qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
+    QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
 
     set( sources  
          Keyhotee.qrc 
+         qrc_Keyhotee.cpp
 
          profile_wizard/ProfileEditPage.ui 
          profile_wizard/ProfileIntroPage.ui 
@@ -29,6 +31,9 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
 
          AddressBook/AddressBookModel.hpp
          AddressBook/AddressBookModel.cpp
+         AddressBook/ContactsTable.ui
+         AddressBook/ContactsTable.hpp
+         AddressBook/ContactsTable.cpp
 
          LoginDialog.ui 
          LoginDialog.cpp

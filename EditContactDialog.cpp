@@ -26,7 +26,6 @@ void EditContactDialog::validateId( const QString& id )
    */
    {
       _complete = false;
-      //completeChanged();
       _last_validate = fc::time_point::now();
       ui->id_status->setText( tr( "Looking up id..." ) );
       fc::async( [=](){ 
@@ -53,8 +52,8 @@ void EditContactDialog::lookupId()
        if( opt_name_rec )
        {
             ui->id_status->setText( tr( "Valid ID" ) );
+            _contact.send_msg_address = fc::ecc::public_key(opt_name_rec->pub_key);
             _complete = true;
-       //     completeChanged();
        }
        else
        {

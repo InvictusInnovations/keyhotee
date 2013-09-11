@@ -92,6 +92,10 @@
        <property name="text">
         <string>Avatar</string>
        </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../images/contact_icon.png</normaloff>../images/contact_icon.png</iconset>
+       </property>
        <property name="iconSize">
         <size>
          <width>64</width>

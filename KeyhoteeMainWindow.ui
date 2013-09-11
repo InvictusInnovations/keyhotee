@@ -103,10 +103,16 @@
       </property>
       <widget class="QTreeWidget" name="side_bar">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
-         <horstretch>1</horstretch>
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+         <horstretch>10</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>0</height>
+        </size>
        </property>
        <property name="palette">
         <palette>
@@ -306,7 +312,28 @@
        <widget class="QWidget" name="page">
         <layout class="QGridLayout" name="gridLayout_2"/>
        </widget>
-       <widget class="QWidget" name="page_2"/>
+       <widget class="QWidget" name="contacts_page">
+        <layout class="QGridLayout" name="gridLayout_3">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="ContactsTable" name="widget" native="true"/>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -365,7 +392,17 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>ContactsTable</class>
+   <extends>QWidget</extends>
+   <header>AddressBook/ContactsTable.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="Keyhotee.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>new_message_button</sender>

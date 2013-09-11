@@ -249,6 +249,10 @@
      <property name="text">
       <string>Avatar</string>
      </property>
+     <property name="icon">
+      <iconset resource="Keyhotee.qrc">
+       <normaloff>:/images/contact_icon.png</normaloff>:/images/contact_icon.png</iconset>
+     </property>
      <property name="iconSize">
       <size>
        <width>64</width>
@@ -296,7 +300,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="Keyhotee.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

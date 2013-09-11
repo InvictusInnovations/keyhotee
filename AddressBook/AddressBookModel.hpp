@@ -7,7 +7,7 @@ namespace Detail { class AddressBookModelImpl; }
 class AddressBookModel : public QAbstractTableModel
 {
   public:
-    AddressBookModel( bts::addressbook::addressbook_ptr abook );
+    AddressBookModel( QObject* parent, bts::addressbook::addressbook_ptr abook );
     ~AddressBookModel();
 
     enum Columns

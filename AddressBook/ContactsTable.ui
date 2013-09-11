@@ -58,6 +58,15 @@
       <number>9</number>
      </property>
      <widget class="QTableView" name="contact_table">
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
       <property name="sortingEnabled">
        <bool>true</bool>
       </property>

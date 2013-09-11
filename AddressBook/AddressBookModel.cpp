@@ -14,8 +14,8 @@ namespace Detail
 
 
 
-AddressBookModel::AddressBookModel( bts::addressbook::addressbook_ptr abook )
-:my( new Detail::AddressBookModelImpl() )
+AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbook_ptr abook )
+:QAbstractTableModel(parent),my( new Detail::AddressBookModelImpl() )
 {
    my->_abook = abook;
    auto known = abook->get_known_bitnames();
@@ -106,6 +106,7 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
        case NumColumns:
           return QVariant();
     }
+    return QVariant();
 }
 
 void AddressBookModel::storeContact( const bts::addressbook::contact& new_contact )
