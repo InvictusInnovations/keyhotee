@@ -149,7 +149,10 @@
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="mail_contact">
+       <widget class="QToolButton" name="mail_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="maximumSize">
          <size>
           <width>64</width>
@@ -175,7 +178,10 @@
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="chat_contact">
+       <widget class="QToolButton" name="chat_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>56</width>
@@ -217,6 +223,9 @@
       </item>
       <item>
        <widget class="QToolButton" name="info_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>56</width>
@@ -257,15 +266,15 @@
        </widget>
       </item>
      </layout>
-     <zorder>chat_contact</zorder>
-     <zorder>mail_contact</zorder>
+     <zorder>chat_button</zorder>
+     <zorder>mail_button</zorder>
      <zorder>info_button</zorder>
      <zorder>icon_view</zorder>
      <zorder>widget</zorder>
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QStackedWidget" name="stackedWidget">
+    <widget class="QStackedWidget" name="contact_pages">
      <property name="currentIndex">
       <number>1</number>
      </property>
@@ -330,9 +339,9 @@
        <item row="0" column="1">
         <widget class="QStackedWidget" name="info_stack">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
-         <widget class="QWidget" name="status">
+         <widget class="QWidget" name="info_status">
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
             <widget class="QWidget" name="widget_4" native="true">
@@ -539,7 +548,7 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>166</width>
+                  <width>107</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -549,7 +558,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLineEdit" name="keyhotee_id_edit">
+            <widget class="QLineEdit" name="id_edit">
              <property name="placeholderText">
               <string>Keyhotee ID</string>
              </property>
@@ -576,7 +585,7 @@
              <item row="0" column="0">
               <widget class="QLabel" name="label_7">
                <property name="text">
-                <string>Security Level</string>
+                <string>Privacy Level</string>
                </property>
               </widget>
              </item>
@@ -584,12 +593,12 @@
               <widget class="QComboBox" name="comboBox">
                <item>
                 <property name="text">
-                 <string extracomment="No one should know you have ever communicated with this individual.">Hidden Relationship</string>
+                 <string>Blocked</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Blocked</string>
+                 <string extracomment="No one should know you have ever communicated with this individual.">Hidden Relationship</string>
                 </property>
                </item>
                <item>
@@ -665,7 +674,7 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>254</width>
+                  <width>174</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -680,6 +689,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="save_button">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Save</string>
                 </property>
