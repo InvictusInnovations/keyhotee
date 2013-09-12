@@ -37,7 +37,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui->setupUi(this);
 
 #ifdef Q_OS_MAC
-    QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
+    //QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
     ui->side_bar->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
