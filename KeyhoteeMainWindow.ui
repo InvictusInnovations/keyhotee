@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>581</width>
-    <height>506</height>
+    <width>549</width>
+    <height>602</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,6 +40,9 @@
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="handleWidth">
+       <number>0</number>
       </property>
       <widget class="QTreeWidget" name="side_bar">
        <property name="sizePolicy">
@@ -160,15 +163,27 @@
          <property name="text">
           <string>Inbox</string>
          </property>
+         <property name="icon">
+          <iconset resource="Keyhotee.qrc">
+           <normaloff>:/images/inbox.png</normaloff>:/images/inbox.png</iconset>
+         </property>
         </item>
         <item>
          <property name="text">
           <string>Drafts</string>
          </property>
+         <property name="icon">
+          <iconset resource="Keyhotee.qrc">
+           <normaloff>:/images/inbox.png</normaloff>:/images/inbox.png</iconset>
+         </property>
         </item>
         <item>
          <property name="text">
           <string>Sent</string>
+         </property>
+         <property name="icon">
+          <iconset resource="Keyhotee.qrc">
+           <normaloff>:/images/inbox.png</normaloff>:/images/inbox.png</iconset>
          </property>
         </item>
        </item>
@@ -214,13 +229,13 @@
       </widget>
       <widget class="QStackedWidget" name="widget_stack">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>40</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="inbox_page">
         <layout class="QGridLayout" name="gridLayout_2"/>
@@ -256,7 +271,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>581</width>
+     <width>549</width>
      <height>22</height>
     </rect>
    </property>

@@ -6,5 +6,10 @@
       <file>images/add_address.png</file>
       <file>images/address_book.png</file>
       <file>images/search24x16.png</file>
+      <file>images/inbox.png</file>
+      <file>images/chat.png</file>
+      <file>images/info_user.png</file>
+      <file>images/new_mail.png</file>
+      <file>images/user.png</file>
  </qresource>
  </RCC>
