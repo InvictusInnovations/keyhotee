@@ -1,6 +1,10 @@
  <!DOCTYPE RCC><RCC version="1.0">
  <qresource prefix="/">
       <file>images/contact_icon.png</file>
-      <file>docs/index.html</file>
+      <file>images/email_compose.png</file>
+      <file>images/add_contact.png</file>
+      <file>images/add_address.png</file>
+      <file>images/address_book.png</file>
+      <file>images/search24x16.png</file>
  </qresource>
  </RCC>

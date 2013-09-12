@@ -10,6 +10,10 @@ class ContactView : public QWidget
      ContactView( QWidget* parent = nullptr );
      ~ContactView();
 
+     void onEdit();
+     void onSave();
+     void onCancel();
+
   private:
      std::unique_ptr<Ui::ContactView> ui;
 };
