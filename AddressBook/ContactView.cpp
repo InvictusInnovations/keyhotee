@@ -4,9 +4,11 @@
 #include <bts/application.hpp>
 #include <fc/thread/thread.hpp>
 
+#include "AddressBookModel.hpp"
 ContactView::ContactView( QWidget* parent )
 :QWidget(parent),ui( new Ui::ContactView() )
 {
+   _address_book = nullptr;
    _complete = false;
    ui->setupUi(this);
    connect( ui->save_button, &QPushButton::clicked, this, &ContactView::onSave );
@@ -28,12 +30,23 @@ void ContactView::onEdit()
 }
 void ContactView::onSave()
 {
+    _current_contact.first_name = ui->firstname->text();
+    _current_contact.last_name = ui->lastname->text();
+    _address_book->storeContact( _current_contact );
     ui->info_stack->setCurrentWidget(ui->info_status);
+    ui->chat_button->setEnabled(true);
+    ui->mail_button->setEnabled(true);
+    ui->info_button->setEnabled(true);
+    ui->info_button->setChecked(true);
 }
 
 void ContactView::onCancel()
 {
     ui->info_stack->setCurrentWidget(ui->info_status);
+    ui->firstname->setText( _current_contact.first_name );
+    ui->lastname->setText( _current_contact.last_name );
+    ui->id_edit->setText( _current_contact.bit_id );
+    updateNameLabel();
 }
 
 void ContactView::onChat()
@@ -179,7 +192,8 @@ void ContactView::lookupId()
        if( _current_record )
        {
             ui->id_status->setText( tr( "Valid ID" ) );
-            ui->save_button->setEnabled(true);
+            if( _address_book != nullptr )
+               ui->save_button->setEnabled(true);
             _complete = true;
        }
        else
@@ -193,4 +207,11 @@ void ContactView::lookupId()
       ui->id_status->setText( e.to_string().c_str() );
    }
 }
-
+void  ContactView::setAddressBook( AddressBookModel* addressbook )
+{
+    _address_book = addressbook;
+}
+AddressBookModel* ContactView::getAddressBook()const
+{
+    return _address_book;
+}

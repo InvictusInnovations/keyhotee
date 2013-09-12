@@ -109,8 +109,10 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
     return QVariant();
 }
 
-void AddressBookModel::storeContact( const bts::addressbook::contact& new_contact )
+int AddressBookModel::storeContact( const Contact& contact_to_store )
 {
+   return 0;
+   /*
    auto num_contacts = my->_contacts.size();
    if( num_contacts > 0 )
    {
@@ -119,5 +121,7 @@ void AddressBookModel::storeContact( const bts::addressbook::contact& new_contac
       endInsertRows();
       my->_abook->store_contact( new_contact );
    }
+   */
 }
+
 

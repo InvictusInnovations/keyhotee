@@ -1,6 +1,7 @@
 #pragma once
 #include <QtGui>
 #include <bts/addressbook/addressbook.hpp>
+#include "Contact.hpp"
 
 namespace Detail { class AddressBookModelImpl; }
 
@@ -19,7 +20,12 @@ class AddressBookModel : public QAbstractTableModel
         Repute,
         NumColumns
     };
-    void storeContact( const bts::addressbook::contact& new_contact );
+    //void storeContact( const bts::addressbook::contact& new_contact );
+
+    /**
+     *  @return the id assigned to this contact.
+     */
+    int  storeContact( const Contact& new_contact );
 
     virtual int rowCount( const QModelIndex& parent = QModelIndex() )const;
     virtual int columnCount( const QModelIndex& parent = QModelIndex() )const;

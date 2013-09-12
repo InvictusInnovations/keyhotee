@@ -13,6 +13,8 @@ class ContactsTable  : public QWidget
     ContactsTable( QWidget* parent = nullptr );
     ~ContactsTable();
 
+    void setAddressBook( AddressBookModel* abook_model );
+
   private:
     std::unique_ptr<Ui::ContactsTable> ui;
     AddressBookModel*                  _addressbook_model;

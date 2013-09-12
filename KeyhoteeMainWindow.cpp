@@ -1,6 +1,6 @@
 #include "ui_KeyhoteeMainWindow.h"
-#include "EditContactDialog.hpp"
 #include "KeyhoteeMainWindow.hpp"
+#include "AddressBook/AddressBookModel.hpp"
 #include <bts/application.hpp>
 #include <QLineEdit>
 
@@ -89,6 +89,14 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     auto app    = bts::application::instance();
     auto pro    = app->get_profile();
     auto idents = pro->identities();
+
+
+    _addressbook_model  = new AddressBookModel( this, pro->get_addressbook() );
+    ui->contacts_page->setAddressBook(_addressbook_model);
+
+    ui->new_contact->setAddressBook(_addressbook_model);
+
+
     wlog( "idents: ${idents}", ("idents",idents) );
 
     /*

@@ -6,12 +6,15 @@
 #include <bts/application.hpp>
 
 namespace Ui { class ContactView; }
-
+class AddressBookModel;
 class ContactView : public QWidget
 {
   public:
      ContactView( QWidget* parent = nullptr );
      ~ContactView();
+
+     void              setAddressBook( AddressBookModel* addressbook );
+     AddressBookModel* getAddressBook()const;
 
      void setContact( const Contact& current_contact );
      Contact getContact()const;
@@ -36,5 +39,6 @@ class ContactView : public QWidget
      fc::time_point                            _last_validate;
      Contact                                   _current_contact;
      fc::optional<bts::bitname::name_record>   _current_record;
+     AddressBookModel*                         _address_book;
      std::unique_ptr<Ui::ContactView>          ui;
 };
