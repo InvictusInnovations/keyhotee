@@ -4,6 +4,10 @@
 #include <bts/application.hpp>
 #include <QLineEdit>
 
+#ifdef Q_OS_MAC
+#include <qmacnativetoolbar.h>
+#endif
+
 #include <fc/reflect/variant.hpp>
 #include <fc/log/logger.hpp>
 
@@ -33,7 +37,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui->setupUi(this);
 
 #ifdef Q_OS_MAC
-    setUnifiedTitleAndToolBarOnMac(true);
+    QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
     ui->side_bar->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif

@@ -50,6 +50,6 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
          main.cpp )
 
     add_executable( Keyhotee MACOSX_BUNDLE WIN32 ${sources} )
-    target_link_libraries( Keyhotee upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets Qt5::WebKitWidgets)
+    target_link_libraries( Keyhotee upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets Qt5::WebKitWidgets ${QtMacExtras} ${APPKIT_LIBRARY})
 
 ENDIF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
