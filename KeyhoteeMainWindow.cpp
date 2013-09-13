@@ -1,6 +1,7 @@
 #include "ui_KeyhoteeMainWindow.h"
 #include "KeyhoteeMainWindow.hpp"
 #include "AddressBook/AddressBookModel.hpp"
+#include "MailEditor/MailEditor.hpp"
 #include <bts/application.hpp>
 #include <QLineEdit>
 
@@ -70,6 +71,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui->toolbar->addWidget(empty2);
     
 
+    connect( ui->actionNew_Message, &QAction::triggered, this, &KeyhoteeMainWindow::newMessage );
     connect( ui->actionNew_Contact, &QAction::triggered, this, &KeyhoteeMainWindow::addContact );
     connect( ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts );
 
@@ -219,3 +221,10 @@ void KeyhoteeMainWindow::showContacts()
   ui->side_bar->setCurrentItem( _contacts_root );
   ui->widget_stack->setCurrentWidget( ui->contacts_page );
 }
+
+void KeyhoteeMainWindow::newMessage()
+{
+  auto msg_window = new MailEditor(this);
+  msg_window->show();
+}
+

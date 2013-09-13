@@ -13,6 +13,7 @@ class KeyhoteeMainWindow  : public QMainWindow
       KeyhoteeMainWindow();
       ~KeyhoteeMainWindow();
 
+      void newMessage();
       void addContact();
       void showContacts();
       void onSidebarSelectionChanged();

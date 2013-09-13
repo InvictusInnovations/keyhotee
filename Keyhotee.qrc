@@ -6,11 +6,20 @@
       <file>images/add_address.png</file>
       <file>images/address_book.png</file>
       <file>images/search24x16.png</file>
+      <file>images/format_text.png</file>
       <file>images/inbox.png</file>
       <file>images/chat.png</file>
       <file>images/info_user.png</file>
       <file>images/new_mail.png</file>
       <file>images/user.png</file>
       <file>images/shield1024.png</file>
+      <file>images/mac/textbold.png</file>
+      <file>images/mac/textcenter.png</file>
+      <file>images/mac/textitalic.png</file>
+      <file>images/mac/textjustify.png</file>
+      <file>images/mac/textleft.png</file>
+      <file>images/mac/textright.png</file>
+      <file>images/mac/textunder.png</file>
+      <file>images/128x128/send_mail.png</file>
  </qresource>
  </RCC>
