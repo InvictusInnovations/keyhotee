@@ -217,4 +217,19 @@ int AddressBookModel::storeContact( const Contact& contact_to_store )
    }
 }
 
+const Contact& AddressBookModel::getContactById( int contact_id )
+{
+   for( uint32_t i = 0; i < my->_contacts.size(); ++i )
+   {
+        if( my->_contacts[i].wallet_account_index == contact_id )
+        {
+            return my->_contacts[i];
+        }
+   }
+}
+const Contact& AddressBookModel::getContact( const QModelIndex& index  )
+{
+   FC_ASSERT(index.row() < (int)my->_contacts.size() );
+   return my->_contacts[index.row()];
+}
 

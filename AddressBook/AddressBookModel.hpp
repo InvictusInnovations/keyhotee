@@ -27,6 +27,8 @@ class AddressBookModel : public QAbstractTableModel
      *  @return the id assigned to this contact.
      */
     int  storeContact( const Contact& new_contact );
+    const Contact& getContactById( int contact_id );
+    const Contact& getContact( const QModelIndex& index  );
 
     virtual int rowCount( const QModelIndex& parent = QModelIndex() )const;
     virtual int columnCount( const QModelIndex& parent = QModelIndex() )const;

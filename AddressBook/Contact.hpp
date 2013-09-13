@@ -11,6 +11,23 @@ class Contact
    public:
       Contact():wallet_account_index(-1),privacy_setting(bts::addressbook::secret_contact){}
 
+      QString getLabel()const
+      {
+          QString label = first_name + " " + last_name;
+          if( label == " " )
+          {
+              if( bit_id != QString() )
+              {
+                 label = bit_id;
+              }
+              else
+              {
+                 label = fc::variant(public_key).as_string().substr(8).c_str();
+              }
+          }
+          return label;
+      }
+
       /// the account index used in our wallet.
       int32_t                    wallet_account_index;
       QIcon                      icon;

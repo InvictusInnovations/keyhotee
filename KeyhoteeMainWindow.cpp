@@ -12,6 +12,11 @@
 #include <fc/reflect/variant.hpp>
 #include <fc/log/logger.hpp>
 
+enum SidebarItemRoles
+{
+    ContactIdRole = Qt::UserRole
+};
+
 enum TopLevelItemIndexes
 {
     Mailboxes,
@@ -37,6 +42,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui.reset( new Ui::KeyhoteeMainWindow() );
     ui->setupUi(this);
     setWindowIcon( QIcon( ":/images/shield1024.png" ) );
+
+    connect( ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContact );
 
 #ifdef Q_OS_MAC
     //QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
@@ -177,7 +184,8 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
    {
       if( selected_items[0]->type() == ContactItem )
       {
-          selectContactItem( selected_items[0] );
+          auto con_id = selected_items[0]->data(0, ContactIdRole ).toInt();
+          openContact(con_id);
       }
       else if( selected_items[0]->type() == IdentityItem )
       {
@@ -185,7 +193,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       }
       else if( selected_items[0] == _contacts_root )
       {
-
+          showContacts();
       }
       else if( selected_items[0] == _mailboxes_root )
       {
@@ -226,5 +234,42 @@ void KeyhoteeMainWindow::newMessage()
 {
   auto msg_window = new MailEditor(this);
   msg_window->show();
+}
+void KeyhoteeMainWindow::openContact( int contact_id )
+{
+    if( contact_id == -1 ) // TODO: define -1 as AddressBookID
+    {
+        showContacts();
+        return;
+    }
+    else
+    {
+        auto itr = _contact_widgets.find(contact_id);
+        if( itr != _contact_widgets.end() )
+        {
+           ui->side_bar->setCurrentItem( itr->second.tree_item );
+           ui->widget_stack->setCurrentWidget( itr->second.view );
+        }
+        else
+        {
+           auto new_contact_item = new QTreeWidgetItem(_contacts_root, 
+                                                       (QTreeWidgetItem::ItemType)ContactItem );
+           new_contact_item->setData( 0, ContactIdRole, contact_id );
+
+           const Contact& con = _addressbook_model->getContactById( contact_id );
+           new_contact_item->setText( 0, con.getLabel() );
+           ContactWidgets con_widgets;
+           con_widgets.tree_item = new_contact_item;
+
+           con_widgets.view = new ContactView( ui->widget_stack );
+           con_widgets.view->setAddressBook( _addressbook_model );
+           con_widgets.view->setContact(con);
+
+           ui->widget_stack->addWidget( con_widgets.view );
+           _contact_widgets[contact_id] = con_widgets;
+
+           openContact(contact_id);
+        }
+    }
 }
 

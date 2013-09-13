@@ -15,9 +15,10 @@ class ContactsTable  : public QWidget
     ~ContactsTable();
 
     void setAddressBook( AddressBookModel* abook_model );
+    void openContact( const QModelIndex& index );
 
   Q_SIGNALS:
-    void openContact( int contact_id );
+    void contactOpened( int contact_id );
 
   private:
     std::unique_ptr<Ui::ContactsTable> ui;
