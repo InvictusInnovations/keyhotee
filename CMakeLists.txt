@@ -36,6 +36,10 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
     qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
     QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
 
+    set( library_sources
+         AddressBook/AddressBookModel.hpp
+         AddressBook/AddressBookModel.cpp )
+
     set( sources  
          Keyhotee.qrc 
          images/shield.icns 
@@ -46,8 +50,6 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
          profile_wizard/ProfileNymPage.ui 
          profile_wizard/ProfileWizard.cpp
 
-         AddressBook/AddressBookModel.hpp
-         AddressBook/AddressBookModel.cpp
          AddressBook/ContactsTable.ui
          AddressBook/ContactsTable.hpp
          AddressBook/ContactsTable.cpp
@@ -71,9 +73,11 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
 
 
 
+    add_library( keyhotee_library ${library_sources} )
+    target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets Qt5::WebKitWidgets ${QtMacExtras} ${APPKIT_LIBRARY})
 
     add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
-    target_link_libraries( Keyhotee upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets Qt5::WebKitWidgets ${QtMacExtras} ${APPKIT_LIBRARY})
+    target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets Qt5::WebKitWidgets ${QtMacExtras} ${APPKIT_LIBRARY})
 
 
 ENDIF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
