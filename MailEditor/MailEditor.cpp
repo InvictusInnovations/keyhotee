@@ -106,7 +106,6 @@ MailEditor::MailEditor(QWidget *parent)
     //setCentralWidget(textEdit);
     //layout()->addWidget(textEdit);
     textEdit->setFocus();
-    setCurrentFileName(QString());
 
     fontChanged(textEdit->font());
     colorChanged(textEdit->textColor());
@@ -164,6 +163,14 @@ void MailEditor::closeEvent(QCloseEvent *e)
 
 void MailEditor::subjectChanged( const QString& subject )
 {
+   if( subject == QString() )
+   {
+      setWindowTitle( tr("(No Subject)") );
+   }
+   else
+   {
+      setWindowTitle( subject );
+   }
 }
 
 void MailEditor::setupMailActions()
@@ -248,7 +255,7 @@ void MailEditor::setupAddressBar()
    bcc_field = new QLineEdit(address_bar);
    from_field = new QComboBox(address_bar);
    subject_field = new QLineEdit(address_bar);
-    
+   setWindowTitle( tr( "New Message" ) ); 
    updateAddressBarLayout();
 
    connect( actionToggleCc, &QAction::toggled,  [=](bool state) { updateAddressBarLayout(); } );
@@ -292,6 +299,7 @@ void MailEditor::updateAddressBarLayout()
    subject_field = new QLineEdit(address_bar);
    subject_field->setText(subject_text);
    address_layout->addRow( "Subject:",  subject_field);
+   connect( subject_field, &QLineEdit::textChanged, this, &MailEditor::subjectChanged );
 
    from_field = new QComboBox(address_bar);
   // from_field->setText( from_text );
@@ -357,7 +365,7 @@ void MailEditor::setupTextActions()
     auto tb = format_tb = new QToolBar(this);
     tb->setIconSize( QSize( 16,16 ) );
     layout->addWidget( tb, 2, 0 );
-    tb->setWindowTitle(tr("Format Actions"));
+//    tb->setWindowTitle(tr("Format Actions"));
     //addToolBar(tb);
 
     QMenu *menu = new QMenu(tr("F&ormat"), this);
@@ -501,7 +509,6 @@ bool MailEditor::load(const QString &f)
         textEdit->setPlainText(str);
     }
 
-    setCurrentFileName(f);
     return true;
 }
 
@@ -523,26 +530,11 @@ bool MailEditor::maybeSave()
     return true;
 }
 
-void MailEditor::setCurrentFileName(const QString &fileName)
-{
-    this->fileName = fileName;
-    textEdit->document()->setModified(false);
-
-    QString shownName;
-    if (fileName.isEmpty())
-        shownName = "untitled.txt";
-    else
-        shownName = QFileInfo(fileName).fileName();
-
-    setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("Rich Text")));
-    setWindowModified(false);
-}
 
 void MailEditor::fileNew()
 {
     if (maybeSave()) {
         textEdit->clear();
-        setCurrentFileName(QString());
     }
 }
 
@@ -578,7 +570,6 @@ bool MailEditor::fileSaveAs()
           || fn.endsWith(".html", Qt::CaseInsensitive))) {
         fn += ".odt"; // default
     }
-    setCurrentFileName(fn);
     return fileSave();
 }
 
