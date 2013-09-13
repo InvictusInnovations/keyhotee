@@ -9,11 +9,15 @@ class QSortFilterProxyModel;
 
 class ContactsTable  : public QWidget
 {
+  Q_OBJECT
   public:
     ContactsTable( QWidget* parent = nullptr );
     ~ContactsTable();
 
     void setAddressBook( AddressBookModel* abook_model );
+
+  Q_SIGNALS:
+    void openContact( int contact_id );
 
   private:
     std::unique_ptr<Ui::ContactsTable> ui;

@@ -14,7 +14,7 @@ enum PrivacyLevel
 class Contact
 {
    public:
-      Contact():privacy_level(Secret),wallet_account_index(0){}
+      Contact():privacy_level(Secret),wallet_account_index(-1){}
 
       QIcon                      icon;
       QString                    first_name;

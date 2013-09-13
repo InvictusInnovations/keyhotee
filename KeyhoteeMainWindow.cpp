@@ -35,11 +35,15 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
 {
     ui.reset( new Ui::KeyhoteeMainWindow() );
     ui->setupUi(this);
+    setWindowIcon( QIcon( ":/images/shield1024.png" ) );
 
 #ifdef Q_OS_MAC
     //QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
     ui->side_bar->setAttribute(Qt::WA_MacShowFocusRect, 0);
+    QApplication::setWindowIcon( QIcon( ":/images/shield1024.icns" ) );
+#else
+    QApplication::setWindowIcon( QIcon( ":/images/shield1024.png" ) );
 #endif
 
     QWidget* empty = new QWidget();
@@ -159,6 +163,7 @@ void KeyhoteeMainWindow::addContact()
         editcon->deleteLater();
      });
    */
+  ui->new_contact->setContact( Contact() );
   ui->widget_stack->setCurrentWidget( ui->new_contact );
 }
 void KeyhoteeMainWindow::onSidebarSelectionChanged()
@@ -209,5 +214,6 @@ void KeyhoteeMainWindow::selectIdentityItem( QTreeWidgetItem* item )
 
 void KeyhoteeMainWindow::showContacts()
 {
+  ui->side_bar->setCurrentItem( _contacts_root );
   ui->widget_stack->setCurrentWidget( ui->contacts_page );
 }

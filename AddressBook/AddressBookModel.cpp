@@ -1,5 +1,7 @@
 #include "AddressBookModel.hpp"
+#include <QIcon>
 
+#include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
 
 namespace Detail 
@@ -7,7 +9,8 @@ namespace Detail
     class AddressBookModelImpl
     {
        public:
-          std::vector<bts::addressbook::contact>  _contacts;
+          QIcon                                   _default_icon;
+          std::vector<Contact>                    _contacts;
           bts::addressbook::addressbook_ptr       _abook;
     };
 }
@@ -18,6 +21,8 @@ AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbo
 :QAbstractTableModel(parent),my( new Detail::AddressBookModelImpl() )
 {
    my->_abook = abook;
+   my->_default_icon.addFile(QStringLiteral(":/images/user.png"), QSize(), QIcon::Normal, QIcon::Off);
+   /*
    auto known = abook->get_known_bitnames();
    my->_contacts.reserve(known.size());
    for( auto itr = known.begin(); itr != known.end(); ++itr )
@@ -32,6 +37,7 @@ AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbo
           my->_contacts.push_back( *opt_contact );
        }
    }
+   */
 }
 AddressBookModel::~AddressBookModel()
 {
@@ -58,6 +64,14 @@ QVariant AddressBookModel::headerData( int section, Qt::Orientation orientation,
     {
        switch( role )
        {
+          case Qt::DecorationRole:
+             switch( (Columns)section )
+             {
+                case UserIcon:
+                    return my->_default_icon;
+                default:
+                   return QVariant();
+             }
           case Qt::DisplayRole:
           {
               switch( (Columns)section )
@@ -72,56 +86,95 @@ QVariant AddressBookModel::headerData( int section, Qt::Orientation orientation,
                      return tr("Age");
                  case Repute:
                      return tr("Repute");
+                 case UserIcon:
                  case NumColumns:
                      break;
               }
           }
+          case Qt::SizeHintRole:
+              switch( (Columns)section )
+              {
+                  case UserIcon:
+                      return QSize( 32, 16 );
+                  default:
+                      return QVariant();
+              }
        }
     }
     else
     {
-
     }
     return QVariant();
 }
 
 QVariant AddressBookModel::data( const QModelIndex& index, int role )const
 {
-    if( !index.isValid() || role != Qt::DisplayRole ) return QVariant();
+    if( !index.isValid() ) return QVariant();
 
-    const bts::addressbook::contact& current_contact = my->_contacts[index.row()];
-    switch( (Columns)index.column() )
+    const Contact& current_contact = my->_contacts[index.row()];
+    switch( role )
     {
-       case FirstName:
-           return current_contact.first_name.c_str();
-       case LastName:
-           return current_contact.last_name.c_str();
-       case Id:
-           return current_contact.bitname_id.c_str();
-       case Age:
-           return 0;
-       case Repute:
-           return 0;
+       case Qt::SizeHintRole:
+           switch( (Columns)index.column() )
+           {
+               case UserIcon:
+                   return QSize( 48, 48 );
+               default:
+                   return QVariant();
+           }
+       case Qt::DecorationRole:
+          switch( (Columns)index.column() )
+          {
+             case UserIcon:
+                 if( current_contact.icon.isNull() ) 
+                    return my->_default_icon;
+                 return current_contact.icon;
+             default:
+                return QVariant();
+          }
+       case Qt::DisplayRole:
+          switch( (Columns)index.column() )
+          {
+             case FirstName:
+                 return current_contact.first_name;
+             case LastName:
+                 return current_contact.last_name;
+             case Id:
+                 return current_contact.bit_id;
+             case Age:
+                 return 0;
+             case Repute:
+                 return 0;
 
-       case NumColumns:
-          return QVariant();
+             case UserIcon:
+             case NumColumns:
+                return QVariant();
+          }
     }
     return QVariant();
 }
 
 int AddressBookModel::storeContact( const Contact& contact_to_store )
 {
-   return 0;
-   /*
-   auto num_contacts = my->_contacts.size();
-   if( num_contacts > 0 )
+   if( contact_to_store.wallet_account_index == -1 )
    {
-      beginInsertRows( QModelIndex(), num_contacts, num_contacts );
-      my->_contacts.push_back(new_contact);
-      endInsertRows();
-      my->_abook->store_contact( new_contact );
+       auto num_contacts = my->_contacts.size();
+       beginInsertRows( QModelIndex(), num_contacts, num_contacts );
+          my->_contacts.push_back(contact_to_store);
+          my->_contacts.back().wallet_account_index =  my->_contacts.size()-1;
+       endInsertRows();
+       // TODO: store to disk...
+       return my->_contacts.back().wallet_account_index;
    }
-   */
+   else
+   {
+       FC_ASSERT( contact_to_store.wallet_account_index < int(my->_contacts.size()) );
+       auto row = contact_to_store.wallet_account_index;
+       my->_contacts[row] = contact_to_store;
+
+       Q_EMIT dataChanged( index( row, 0 ), index( row, NumColumns - 1) );
+       return contact_to_store.wallet_account_index;
+   }
 }
 
 

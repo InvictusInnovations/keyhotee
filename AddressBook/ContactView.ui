@@ -276,7 +276,7 @@
    <item row="1" column="0">
     <widget class="QStackedWidget" name="contact_pages">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="chat_page">
       <layout class="QGridLayout" name="gridLayout">

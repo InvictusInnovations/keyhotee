@@ -5,6 +5,7 @@
 #include <bts/profile.hpp>
 
 #include <QSortFilterProxyModel>
+#include <QHeaderView>
 
 ContactsTable::ContactsTable( QWidget* parent )
 :QWidget(parent), ui( new Ui::ContactsTable() )
@@ -25,4 +26,6 @@ void ContactsTable::setAddressBook( AddressBookModel* abook_model )
      _sorted_addressbook_model->setDynamicSortFilter(true);
      ui->contact_table->setModel( _sorted_addressbook_model );
   }
+  ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }

@@ -81,12 +81,18 @@ void    ContactView::setContact( const Contact& current_contact )
         ui->chat_button->setEnabled(false);
         ui->mail_button->setEnabled(false);
         ui->save_button->setEnabled(false);
+        ui->info_button->setEnabled(false);
+        ui->info_button->setChecked(true);
+        ui->info_stack->setCurrentWidget( ui->info_edit );
+        ui->contact_pages->setCurrentWidget( ui->info_page );
+
         ui->id_status->setText( tr( "Please provide a valid ID" ) );
 
         if( _current_contact.first_name == QString() &&
             _current_contact.last_name == QString() )
         {
             ui->name_label->setText( tr( "New Contact" ) );
+            ui->id_edit->setText( QString() );
         }
     }
     else
