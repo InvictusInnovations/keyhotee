@@ -103,9 +103,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
 
     wlog( "idents: ${idents}", ("idents",idents) );
 
-    /*
     for( size_t i = 0; i < idents.size(); ++i )
     {
+    /*
         auto new_ident_item = new QTreeWidgetItem(_identities_root, (QTreeWidgetItem::ItemType)IdentityItem );
 
         auto id_rec = app->lookup_name( idents[i].bit_id );
@@ -117,12 +117,11 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
         {
            new_ident_item->setText( 0, (idents[i].bit_id + " [" + std::to_string(id_rec->repute)+"]" ).c_str() );
         }
-
+    */
         app->mine_name( idents[i].bit_id, 
                         pro->get_keychain().get_identity_key( idents[i].bit_id ).get_public_key(), 
                         idents[i].mining_effort );
     }
-    */
     auto abook  = pro->get_addressbook();
     auto contacts = abook->get_known_bitnames();
     for( auto itr = contacts.begin(); itr != contacts.end(); ++itr )

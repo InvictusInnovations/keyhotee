@@ -14,11 +14,14 @@ enum PrivacyLevel
 class Contact
 {
    public:
-      Contact():privacy_level(Secret),wallet_account_index(-1){}
+      Contact():wallet_account_index(-1),privacy_level(Secret){}
 
+      /// the account index used in our wallet.
+      int32_t                    wallet_account_index;
       QIcon                      icon;
       QString                    first_name;
       QString                    last_name;
+      QString                    company;
       QString                    bit_id;
       /// the public key currently associated with bit_id...
       fc::ecc::public_key_data   bit_id_public_key; 
@@ -33,6 +36,4 @@ class Contact
       PrivacyLevel               privacy_level;
       QString                    email_address;
       QString                    phone_number;
-      /// the account index used in our wallet.
-      int32_t                    wallet_account_index;
 };
