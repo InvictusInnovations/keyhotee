@@ -1,8 +1,13 @@
 #include "AddressBookModel.hpp"
 #include <QIcon>
+#include <QPixmap>
+#include <QImage>
 
+#include <fc/reflect/variant.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/io/raw.hpp>
+
 
 namespace Detail 
 {
@@ -12,6 +17,49 @@ namespace Detail
           QIcon                                   _default_icon;
           std::vector<Contact>                    _contacts;
           bts::addressbook::addressbook_ptr       _abook;
+
+          Contact convert_contact( const bts::addressbook::contact& bts_contact )
+          {
+              Contact new_contact;
+              if( bts_contact.icon_png.size() )
+              {
+                  QImage img;
+                  if( img.loadFromData( (unsigned char*)bts_contact.icon_png.data(), bts_contact.icon_png.size() ) )
+                  {
+                    new_contact.icon = QIcon( QPixmap::fromImage(img) );
+                  }
+                  else
+                  {
+                      wlog( "unable to load icon for contact ${c}", ("c",bts_contact) );
+                  }
+              }
+              new_contact.first_name           = bts_contact.first_name.c_str();
+              new_contact.last_name            = bts_contact.last_name.c_str();
+              new_contact.company              = bts_contact.company.c_str();
+              new_contact.phone_number         = bts_contact.phone_number.c_str();
+              new_contact.email_address        = bts_contact.email_address.c_str();
+              new_contact.bit_id               = bts_contact.bit_id.c_str();
+              new_contact.public_key           = bts_contact.send_msg_address;
+              new_contact.known_since.setMSecsSinceEpoch( bts_contact.known_since.time_since_epoch().count()/1000 );
+              new_contact.privacy_setting      = bts_contact.privacy_setting;
+              new_contact.wallet_account_index = bts_contact.wallet_account_index;
+
+              return new_contact;
+          }
+          bts::addressbook::contact convert_contact( const Contact& con )
+          {
+              bts::addressbook::contact new_contact;
+              if( !con.icon.isNull() )
+              {
+                  QImage image;
+                  QByteArray ba;
+                  QBuffer buffer(&ba);
+                  buffer.open(QIODevice::WriteOnly);
+                  image.save(&buffer, "PNG"); // writes image into ba in PNG format
+              }
+
+              return new_contact;
+          }
     };
 }
 
@@ -22,23 +70,15 @@ AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbo
 {
    my->_abook = abook;
    my->_default_icon.addFile(QStringLiteral(":/images/user.png"), QSize(), QIcon::Normal, QIcon::Off);
-   /*
-   auto known = abook->get_known_bitnames();
-   my->_contacts.reserve(known.size());
-   for( auto itr = known.begin(); itr != known.end(); ++itr )
+
+   const std::unordered_map<uint32_t,bts::addressbook::contact>& loaded_contacts = abook->get_contacts();
+   my->_contacts.reserve( loaded_contacts.size() );
+   for( auto itr = loaded_contacts.begin(); itr != loaded_contacts.end(); ++itr )
    {
-       auto opt_contact = my->_abook->get_contact_by_bitname( *itr );
-       if( !opt_contact )
-       {
-          wlog( "broken addressbook, unable to find ${name} ", ("name",*itr) );
-       }
-       else
-       {
-          my->_contacts.push_back( *opt_contact );
-       }
+      my->_contacts.push_back( my->convert_contact( itr->second ) );
    }
-   */
 }
+
 AddressBookModel::~AddressBookModel()
 {
 }

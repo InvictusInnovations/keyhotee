@@ -4,17 +4,12 @@
 #include <QIcon>
 #include <fc/crypto/elliptic.hpp>
 
-enum PrivacyLevel
-{
-    Blocked,
-    Secret,
-    Public
-};
+#include <bts/addressbook/contact.hpp>
 
 class Contact
 {
    public:
-      Contact():wallet_account_index(-1),privacy_level(Secret){}
+      Contact():wallet_account_index(-1),privacy_setting(bts::addressbook::secret_contact){}
 
       /// the account index used in our wallet.
       int32_t                    wallet_account_index;
@@ -31,9 +26,9 @@ class Contact
       //  the bid_id and associated public key may change in which case
       //  the bit_id becomes invalid and we must alert the user that
       //  the bit_id no longer matches the key.
-      fc::ecc::public_key_data   public_key;
-      QDate                      known_since;
-      PrivacyLevel               privacy_level;
-      QString                    email_address;
-      QString                    phone_number;
+      fc::ecc::public_key_data          public_key;
+      QDateTime                         known_since;
+      bts::addressbook::privacy_level   privacy_setting;
+      QString                           email_address;
+      QString                           phone_number;
 };

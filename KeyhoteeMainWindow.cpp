@@ -122,6 +122,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
                         pro->get_keychain().get_identity_key( idents[i].bit_id ).get_public_key(), 
                         idents[i].mining_effort );
     }
+
+    /*
     auto abook  = pro->get_addressbook();
     auto contacts = abook->get_known_bitnames();
     for( auto itr = contacts.begin(); itr != contacts.end(); ++itr )
@@ -138,6 +140,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
            new_contact_item->setText( 0, (*itr + " [" + std::to_string(id_rec->repute)+"]" ).c_str() );
         }
     }
+    */
 
     connect( ui->side_bar, &QTreeWidget::itemSelectionChanged, this, &KeyhoteeMainWindow::onSidebarSelectionChanged );
 }
