@@ -162,6 +162,10 @@ void MailEditor::closeEvent(QCloseEvent *e)
         e->ignore();
 }
 
+void MailEditor::subjectChanged( const QString& subject )
+{
+}
+
 void MailEditor::setupMailActions()
 {
     QToolBar *tb = new QToolBar(this);
@@ -198,6 +202,21 @@ void MailEditor::setupMailActions()
     a->setEnabled(false);
     tb->addAction(a);
 
+    QWidget* spacer = new QWidget(tb);
+    spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    tb->addWidget(spacer);
+
+    fieldsMenu = new QMenu( tr("Mail Fields") );
+    actionToggleCc = fieldsMenu->addAction( "Cc:" );
+    actionToggleBcc = fieldsMenu->addAction( "Bcc:" );
+    actionToggleCc->setCheckable(true);
+    actionToggleBcc->setCheckable(true);
+
+    fieldsButton = new QToolButton();
+    fieldsButton->setIcon(QIcon( ":/images/gear.png" ) );
+    fieldsButton->setMenu( fieldsMenu );
+    fieldsButton->setPopupMode( QToolButton::InstantPopup );
+    tb->addWidget( fieldsButton );
 
     actionSave = a = new QAction(QIcon::fromTheme("mail-format", QIcon(":/images/format_text.png")),
                                  tr("&Format"), this);
@@ -223,27 +242,69 @@ void MailEditor::setupMailActions()
 void MailEditor::setupAddressBar()
 {
    address_bar = new QWidget(this);
+   address_layout = new QFormLayout(address_bar);
    to_field = new QLineEdit(address_bar);
    cc_field = new QLineEdit(address_bar);
    bcc_field = new QLineEdit(address_bar);
    from_field = new QComboBox(address_bar);
    subject_field = new QLineEdit(address_bar);
+    
+   updateAddressBarLayout();
 
+   connect( actionToggleCc, &QAction::toggled,  [=](bool state) { updateAddressBarLayout(); } );
+   connect( actionToggleBcc, &QAction::toggled,  [=](bool state) { updateAddressBarLayout(); } );
+}
+void MailEditor::updateAddressBarLayout()
+{
+   QString to_text      = to_field->text();
+   QString cc_text      = cc_field ? cc_field->text() : QString();
+   QString bcc_text     = bcc_field ? bcc_field->text(): QString();
+   QString subject_text = subject_field->text();
+
+   delete address_bar;
+
+   to_field = nullptr; 
+   from_field = nullptr; 
+   subject_field = nullptr; 
+   cc_field = nullptr;
+   bcc_field = nullptr;
+
+   address_bar    = new QWidget(this);
    address_layout = new QFormLayout(address_bar);
-   address_layout->addRow( "To:",  to_field );
-   address_layout->addRow( "Cc:",  cc_field );
-   address_layout->addRow( "Bcc:",  bcc_field );
-   address_layout->addRow( "Subject:",  subject_field);
-   address_layout->addRow( "From:", from_field );
-   address_layout->setFieldGrowthPolicy( QFormLayout::ExpandingFieldsGrow );
 
+   to_field = new QLineEdit(address_bar);
+   address_layout->addRow( "To:",  to_field );
+   to_field->setText(to_text);
+
+   if( actionToggleCc->isChecked() )
+   {
+      cc_field = new QLineEdit(address_bar);
+      cc_field->setText( cc_text );
+      address_layout->addRow( "Cc:",  cc_field );
+   }
+
+   if( actionToggleBcc->isChecked() )
+   {
+      bcc_field = new QLineEdit(address_bar);
+      bcc_field->setText(bcc_text);
+      address_layout->addRow( "Bcc:",  bcc_field );
+   }
+   subject_field = new QLineEdit(address_bar);
+   subject_field->setText(subject_text);
+   address_layout->addRow( "Subject:",  subject_field);
+
+   from_field = new QComboBox(address_bar);
+  // from_field->setText( from_text );
+   address_layout->addRow( "From:", from_field );
+
+   address_layout->setFieldGrowthPolicy( QFormLayout::ExpandingFieldsGrow );
    layout->addWidget( address_bar, 1, 0 );
 }
 
 void MailEditor::enableFormat(bool show_format)
 {
     format_tb->setVisible(show_format);
-    style_tb->setVisible(show_format);
+   // style_tb->setVisible(show_format);
 }
 
 void MailEditor::setupEditActions()
@@ -293,8 +354,8 @@ void MailEditor::setupEditActions()
 
 void MailEditor::setupTextActions()
 {
-    QToolBar *tb = new QToolBar(this);
-    style_tb = tb;
+    auto tb = format_tb = new QToolBar(this);
+    tb->setIconSize( QSize( 16,16 ) );
     layout->addWidget( tb, 2, 0 );
     tb->setWindowTitle(tr("Format Actions"));
     //addToolBar(tb);
@@ -396,31 +457,13 @@ void MailEditor::setupTextActions()
     tb->addAction(actionTextColor);
     menu->addAction(actionTextColor);
 
-    format_tb = tb = new QToolBar(this);
-    layout->addWidget( tb, 3, 0 );
-    tb->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
-    tb->setWindowTitle(tr("Format Actions"));
+    //format_tb = tb = new QToolBar(this);
+    //layout->addWidget( tb, 3, 0 );
+    //tb->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
+    //tb->setWindowTitle(tr("Format Actions"));
     //addToolBarBreak(Qt::TopToolBarArea);
     //addToolBar(tb);
 
-    /*
-    comboStyle = new QComboBox(tb);
-    tb->addWidget(comboStyle);
-    comboStyle->addItem("Standard");
-    comboStyle->addItem("Bullet List (Disc)");
-    comboStyle->addItem("Bullet List (Circle)");
-    comboStyle->addItem("Bullet List (Square)");
-    comboStyle->addItem("Ordered List (Decimal)");
-    comboStyle->addItem("Ordered List (Alpha lower)");
-    comboStyle->addItem("Ordered List (Alpha upper)");
-    comboStyle->addItem("Ordered List (Roman lower)");
-    comboStyle->addItem("Ordered List (Roman upper)");
-    connect(comboStyle, SIGNAL(activated(int)), this, SLOT(textStyle(int)));
-    */
-
-    comboFont = new QFontComboBox(tb);
-    tb->addWidget(comboFont);
-    connect(comboFont, SIGNAL(activated(QString)), this, SLOT(textFamily(QString)));
 
     comboSize = new QComboBox(tb);
     comboSize->setObjectName("comboSize");
@@ -434,6 +477,10 @@ void MailEditor::setupTextActions()
     connect(comboSize, SIGNAL(activated(QString)), this, SLOT(textSize(QString)));
     comboSize->setCurrentIndex(comboSize->findText(QString::number(QApplication::font()
                                                                    .pointSize())));
+
+    comboFont = new QFontComboBox(tb);
+    tb->addWidget(comboFont);
+    connect(comboFont, SIGNAL(activated(QString)), this, SLOT(textFamily(QString)));
 }
 
 bool MailEditor::load(const QString &f)

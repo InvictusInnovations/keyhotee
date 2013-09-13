@@ -21,5 +21,6 @@
       <file>images/mac/textright.png</file>
       <file>images/mac/textunder.png</file>
       <file>images/128x128/send_mail.png</file>
+      <file>images/gear.png</file>
  </qresource>
  </RCC>

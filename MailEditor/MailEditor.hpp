@@ -49,6 +49,9 @@
 #include <QGridLayout>
 #include <QFormLayout>
 #include <QLineEdit>
+#include <QToolButton>
+#include <QWidgetAction>
+#include <QPushButton>
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -104,6 +107,8 @@ private slots:
     void about();
     void printPreview(QPrinter *);
 
+    void subjectChanged( const QString& subject );
+
 private:
     void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
     void fontChanged(const QFont &f);
@@ -111,6 +116,7 @@ private:
     void alignmentChanged(Qt::Alignment a);
 
     void setupAddressBar();
+    void updateAddressBarLayout();
 
     QWidget*      address_bar;
     QLineEdit*    to_field;
@@ -121,6 +127,11 @@ private:
     QFormLayout*  address_layout;
 
     QGridLayout*  layout;
+
+    QAction*     actionToggleCc;
+    QAction*     actionToggleBcc;
+    QMenu*       fieldsMenu;
+    QToolButton* fieldsButton;
 
     QAction *actionSave;
     QAction *actionTextBold;
@@ -142,7 +153,7 @@ private:
     QComboBox *comboSize;
 
     QToolBar* format_tb;
-    QToolBar* style_tb;
+    //QToolBar* style_tb;
 
     //QToolBar *tb;
     QString fileName;
