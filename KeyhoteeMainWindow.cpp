@@ -1,7 +1,7 @@
 #include "ui_KeyhoteeMainWindow.h"
 #include "KeyhoteeMainWindow.hpp"
 #include "AddressBook/AddressBookModel.hpp"
-#include "MailEditor/MailEditor.hpp"
+#include "Mail/MailEditor.hpp"
 #include <bts/application.hpp>
 #include <QLineEdit>
 #include <bts/bitchat/bitchat_private_message.hpp>

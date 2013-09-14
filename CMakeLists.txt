@@ -34,6 +34,9 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
     qt5_wrap_ui( UiKeyhoteeMainWindow              KeyhoteeMainWindow.ui )
     qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
     qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
+    qt5_wrap_ui( UiMailInbox                       Mail/MailInbox.ui )
+    qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
+
     QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
 
     set( library_sources
@@ -57,8 +60,9 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
          AddressBook/ContactView.hpp
          AddressBook/ContactView.cpp
 
-         MailEditor/MailEditor.hpp
-         MailEditor/MailEditor.cpp
+         Mail/MailInbox.ui
+         Mail/MailEditor.hpp
+         Mail/MailEditor.cpp
 
          LoginDialog.ui 
          LoginDialog.cpp
