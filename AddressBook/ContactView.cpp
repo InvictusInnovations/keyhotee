@@ -1,10 +1,13 @@
 #include "ContactView.hpp"
 #include "ui_ContactView.h"
+#include "AddressBookModel.hpp"
 
 #include <bts/application.hpp>
-#include <fc/thread/thread.hpp>
 
-#include "AddressBookModel.hpp"
+#include <fc/thread/thread.hpp>
+#include <fc/log/logger.hpp>
+
+
 ContactView::ContactView( QWidget* parent )
 :QWidget(parent),ui( new Ui::ContactView() )
 {
@@ -32,6 +35,25 @@ void ContactView::onSave()
 {
     _current_contact.first_name = ui->firstname->text();
     _current_contact.last_name = ui->lastname->text();
+    _current_contact.bit_id    = ui->id_edit->text();
+    if( _current_record )
+    {
+       //_current_contact.bit_id_hash = _current_record->name_hash;
+       if( _current_contact.public_key != fc::ecc::public_key_data() )
+       {
+            _current_contact.public_key = _current_record->pub_key;
+       }
+       // TODO: lookup block id / timestamp that registered this ID
+       // _current_contact.known_since.setMSecsSinceEpoch( );
+    }
+    else if( !_current_record ) /// note: user is entering manual public key
+    {
+       if( _current_contact.known_since == QDateTime() )
+       {
+           _current_contact.known_since = QDateTime::currentDateTime();
+       }
+    }
+
     _address_book->storeContact( _current_contact );
     ui->info_stack->setCurrentWidget(ui->info_status);
     ui->chat_button->setEnabled(true);
@@ -77,6 +99,7 @@ void    ContactView::setContact( const Contact& current_contact )
     _current_contact = current_contact;
     if( _current_contact.public_key == fc::ecc::public_key_data() )
     {
+        wlog( "null public key!" );
         ui->save_button->setEnabled(false);
         ui->chat_button->setEnabled(false);
         ui->mail_button->setEnabled(false);
@@ -102,6 +125,9 @@ void    ContactView::setContact( const Contact& current_contact )
         /// changes.
         ui->id_edit->setEnabled(false);
         ui->save_button->setEnabled(true);
+        ui->chat_button->setEnabled(true);
+        ui->mail_button->setEnabled(true);
+        ui->info_button->setEnabled(true);
 
         if( _current_contact.bit_id_public_key != _current_contact.public_key  )
         {
@@ -114,6 +140,7 @@ void    ContactView::setContact( const Contact& current_contact )
     ui->lastname->setText( _current_contact.last_name );
     ui->email->setText( _current_contact.email_address );
     ui->phone->setText( _current_contact.phone_number );
+    ui->id_edit->setText( _current_contact.bit_id );
 
     if( !_current_contact.icon.isNull() )
     {

@@ -33,16 +33,16 @@ namespace Detail
                       wlog( "unable to load icon for contact ${c}", ("c",bts_contact) );
                   }
               }
-              new_contact.first_name           = bts_contact.first_name.c_str();
-              new_contact.last_name            = bts_contact.last_name.c_str();
-              new_contact.company              = bts_contact.company.c_str();
-              new_contact.phone_number         = bts_contact.phone_number.c_str();
-              new_contact.email_address        = bts_contact.email_address.c_str();
-              new_contact.bit_id               = bts_contact.bit_id.c_str();
-              new_contact.public_key           = bts_contact.send_msg_address;
+              new_contact.first_name             = bts_contact.first_name.c_str();
+              new_contact.last_name              = bts_contact.last_name.c_str();
+              new_contact.company                = bts_contact.company.c_str();
+              new_contact.phone_number           = bts_contact.phone_number.c_str();
+              new_contact.email_address          = bts_contact.email_address.c_str();
+              new_contact.bit_id                 = bts_contact.bit_id.c_str();
+              new_contact.public_key             = bts_contact.send_msg_address;
               new_contact.known_since.setMSecsSinceEpoch( bts_contact.known_since.time_since_epoch().count()/1000 );
-              new_contact.privacy_setting      = bts_contact.privacy_setting;
-              new_contact.wallet_account_index = bts_contact.wallet_account_index;
+              new_contact.privacy_setting        = bts_contact.privacy_setting;
+              new_contact.wallet_account_index   = bts_contact.wallet_account_index;
 
               return new_contact;
           }
@@ -56,7 +56,20 @@ namespace Detail
                   QBuffer buffer(&ba);
                   buffer.open(QIODevice::WriteOnly);
                   image.save(&buffer, "PNG"); // writes image into ba in PNG format
+
+                  new_contact.icon_png.resize( ba.size() );
+                  memcpy( new_contact.icon_png.data(), ba.data(), ba.size() );
               }
+              new_contact.wallet_account_index = con.wallet_account_index;
+              new_contact.first_name           = con.first_name.toStdString();
+              new_contact.last_name            = con.last_name.toStdString();
+              new_contact.bit_id               = con.bit_id.toStdString();
+              new_contact.send_msg_address     = con.public_key;
+              new_contact.phone_number         = con.phone_number.toStdString();
+              new_contact.email_address        = con.email_address.toStdString();
+              new_contact.known_since          += fc::microseconds( con.known_since.toMSecsSinceEpoch()*1000) ;
+              new_contact.privacy_setting      = con.privacy_setting;
+              new_contact.company              = con.company.toStdString();
 
               return new_contact;
           }
@@ -75,6 +88,7 @@ AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbo
    my->_contacts.reserve( loaded_contacts.size() );
    for( auto itr = loaded_contacts.begin(); itr != loaded_contacts.end(); ++itr )
    {
+      ilog( "loading contacts..." );
       my->_contacts.push_back( my->convert_contact( itr->second ) );
    }
 }
@@ -203,18 +217,17 @@ int AddressBookModel::storeContact( const Contact& contact_to_store )
           my->_contacts.push_back(contact_to_store);
           my->_contacts.back().wallet_account_index =  my->_contacts.size()-1;
        endInsertRows();
-       // TODO: store to disk...
+       my->_abook->store_contact( my->convert_contact( my->_contacts.back() ) );
        return my->_contacts.back().wallet_account_index;
    }
-   else
-   {
-       FC_ASSERT( contact_to_store.wallet_account_index < int(my->_contacts.size()) );
-       auto row = contact_to_store.wallet_account_index;
-       my->_contacts[row] = contact_to_store;
 
-       Q_EMIT dataChanged( index( row, 0 ), index( row, NumColumns - 1) );
-       return contact_to_store.wallet_account_index;
-   }
+   FC_ASSERT( contact_to_store.wallet_account_index < int(my->_contacts.size()) );
+   auto row = contact_to_store.wallet_account_index;
+   my->_contacts[row] = contact_to_store;
+   my->_abook->store_contact( my->convert_contact( my->_contacts[row] ) );
+
+   Q_EMIT dataChanged( index( row, 0 ), index( row, NumColumns - 1) );
+   return contact_to_store.wallet_account_index;
 }
 
 const Contact& AddressBookModel::getContactById( int contact_id )
@@ -226,6 +239,8 @@ const Contact& AddressBookModel::getContactById( int contact_id )
             return my->_contacts[i];
         }
    }
+   FC_ASSERT( !"invalid contact id" ); 
+   //FC_ASSERT( !"invalid contact id ${id}", ("id",contact_id) );
 }
 const Contact& AddressBookModel::getContact( const QModelIndex& index  )
 {
