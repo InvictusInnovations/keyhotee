@@ -35,7 +35,7 @@ void ContactsTable::setAddressBook( AddressBookModel* abook_model )
 }
 void ContactsTable::openContact( const QModelIndex& index )
 {
-   auto contact_id = _addressbook_model->getContact(index).wallet_account_index;
+   auto contact_id = _addressbook_model->getContact(index).wallet_index;
 
    Q_EMIT contactOpened( contact_id );
 }

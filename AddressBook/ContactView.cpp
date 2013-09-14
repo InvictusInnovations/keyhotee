@@ -33,13 +33,12 @@ void ContactView::onEdit()
 }
 void ContactView::onSave()
 {
-    _current_contact.first_name = ui->firstname->text();
-    _current_contact.last_name = ui->lastname->text();
-    _current_contact.bit_id    = ui->id_edit->text();
+    _current_contact.label = (ui->firstname->text()).toStdString();// + " " + ui->lastname.text()).toStdString();
+    _current_contact.dac_id_string    = ui->id_edit->text().toStdString();
     if( _current_record )
     {
        //_current_contact.bit_id_hash = _current_record->name_hash;
-       if( _current_contact.public_key != fc::ecc::public_key_data() )
+       if( _current_contact.public_key != fc::ecc::public_key() )
        {
             _current_contact.public_key = _current_record->pub_key;
        }
@@ -48,10 +47,12 @@ void ContactView::onSave()
     }
     else if( !_current_record ) /// note: user is entering manual public key
     {
+       /*
        if( _current_contact.known_since == QDateTime() )
        {
            _current_contact.known_since = QDateTime::currentDateTime();
        }
+       */
     }
 
     _address_book->storeContact( _current_contact );
@@ -65,9 +66,9 @@ void ContactView::onSave()
 void ContactView::onCancel()
 {
     ui->info_stack->setCurrentWidget(ui->info_status);
-    ui->firstname->setText( _current_contact.first_name );
-    ui->lastname->setText( _current_contact.last_name );
-    ui->id_edit->setText( _current_contact.bit_id );
+    ui->firstname->setText( _current_contact.label.c_str() );
+   // ui->lastname->setText();// _current_contact.last_name );
+    ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
     updateNameLabel();
 }
 
@@ -111,8 +112,7 @@ void    ContactView::setContact( const Contact& current_contact )
 
         ui->id_status->setText( tr( "Please provide a valid ID" ) );
 
-        if( _current_contact.first_name == QString() &&
-            _current_contact.last_name == QString() )
+        if( _current_contact.label == std::string() )
         {
             ui->name_label->setText( tr( "New Contact" ) );
             ui->id_edit->setText( QString() );
@@ -129,30 +129,22 @@ void    ContactView::setContact( const Contact& current_contact )
         ui->mail_button->setEnabled(true);
         ui->info_button->setEnabled(true);
 
+         /** TODO... restore this kind of check
         if( _current_contact.bit_id_public_key != _current_contact.public_key  )
         {
             ui->id_status->setText( 
                  tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
         }
+        */
     }
 
-    ui->firstname->setText( _current_contact.first_name );
-    ui->lastname->setText( _current_contact.last_name );
-    ui->email->setText( _current_contact.email_address );
-    ui->phone->setText( _current_contact.phone_number );
-    ui->id_edit->setText( _current_contact.bit_id );
+    ui->firstname->setText( _current_contact.label.c_str() );
+   // ui->lastname->setText( _current_contact.last_name );
+   // ui->email->setText( _current_contact.email_address );
+   // ui->phone->setText( _current_contact.phone_number );
+    ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
 
-    if( !_current_contact.icon.isNull() )
-    {
-      ui->icon_view->setIcon( _current_contact.icon );
-    }
-    else
-    {
-      QIcon icon;
-      icon.addFile(QStringLiteral(":/images/user.png"), QSize(), QIcon::Normal, QIcon::Off);
-      ui->icon_view->setIcon(icon);
-    }
-
+    ui->icon_view->setIcon( _current_contact.getIcon() );
 }
 
 Contact ContactView::getContact()const

@@ -9,6 +9,56 @@
 #include <fc/io/raw.hpp>
 
 
+
+const QIcon& Contact::getIcon()const
+{
+    return icon;
+}
+
+Contact::Contact( const bts::addressbook::wallet_contact& c )
+:bts::addressbook::wallet_contact(c)
+{
+   if( c.icon_png.size() )
+   {
+        QImage img;
+        if( img.loadFromData( (unsigned char*)icon_png.data(), icon_png.size() ) )
+        {
+            icon = QIcon( QPixmap::fromImage(img) );
+        }
+        else
+        {
+            wlog( "unable to load icon for contact ${c}", ("c",c) );
+        }
+   }
+   else
+   {
+      icon.addFile(QStringLiteral(":/images/user.png"), QSize(), QIcon::Normal, QIcon::Off);
+   }
+}
+
+
+
+void Contact::setIcon( const QIcon& icon )
+{
+   this->icon = icon;
+   if( !icon.isNull() )
+   {
+       QImage image;
+       QByteArray ba;
+       QBuffer buffer(&ba);
+       buffer.open(QIODevice::WriteOnly);
+       image.save(&buffer, "PNG"); // writes image into ba in PNG format
+   
+       icon_png.resize( ba.size() );
+       memcpy( icon_png.data(), ba.data(), ba.size() );
+   }
+   else
+   {
+        icon_png.resize(0);
+   }
+}
+
+
 namespace Detail 
 {
     class AddressBookModelImpl
@@ -17,62 +67,6 @@ namespace Detail
           QIcon                                   _default_icon;
           std::vector<Contact>                    _contacts;
           bts::addressbook::addressbook_ptr       _abook;
-
-          Contact convert_contact( const bts::addressbook::contact& bts_contact )
-          {
-              Contact new_contact;
-              if( bts_contact.icon_png.size() )
-              {
-                  QImage img;
-                  if( img.loadFromData( (unsigned char*)bts_contact.icon_png.data(), bts_contact.icon_png.size() ) )
-                  {
-                    new_contact.icon = QIcon( QPixmap::fromImage(img) );
-                  }
-                  else
-                  {
-                      wlog( "unable to load icon for contact ${c}", ("c",bts_contact) );
-                  }
-              }
-              new_contact.first_name             = bts_contact.first_name.c_str();
-              new_contact.last_name              = bts_contact.last_name.c_str();
-              new_contact.company                = bts_contact.company.c_str();
-              new_contact.phone_number           = bts_contact.phone_number.c_str();
-              new_contact.email_address          = bts_contact.email_address.c_str();
-              new_contact.bit_id                 = bts_contact.bit_id.c_str();
-              new_contact.public_key             = bts_contact.send_msg_address;
-              new_contact.known_since.setMSecsSinceEpoch( bts_contact.known_since.time_since_epoch().count()/1000 );
-              new_contact.privacy_setting        = bts_contact.privacy_setting;
-              new_contact.wallet_account_index   = bts_contact.wallet_account_index;
-
-              return new_contact;
-          }
-          bts::addressbook::contact convert_contact( const Contact& con )
-          {
-              bts::addressbook::contact new_contact;
-              if( !con.icon.isNull() )
-              {
-                  QImage image;
-                  QByteArray ba;
-                  QBuffer buffer(&ba);
-                  buffer.open(QIODevice::WriteOnly);
-                  image.save(&buffer, "PNG"); // writes image into ba in PNG format
-
-                  new_contact.icon_png.resize( ba.size() );
-                  memcpy( new_contact.icon_png.data(), ba.data(), ba.size() );
-              }
-              new_contact.wallet_account_index = con.wallet_account_index;
-              new_contact.first_name           = con.first_name.toStdString();
-              new_contact.last_name            = con.last_name.toStdString();
-              new_contact.bit_id               = con.bit_id.toStdString();
-              new_contact.send_msg_address     = con.public_key;
-              new_contact.phone_number         = con.phone_number.toStdString();
-              new_contact.email_address        = con.email_address.toStdString();
-              new_contact.known_since          += fc::microseconds( con.known_since.toMSecsSinceEpoch()*1000) ;
-              new_contact.privacy_setting      = con.privacy_setting;
-              new_contact.company              = con.company.toStdString();
-
-              return new_contact;
-          }
     };
 }
 
@@ -84,12 +78,12 @@ AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbo
    my->_abook = abook;
    my->_default_icon.addFile(QStringLiteral(":/images/user.png"), QSize(), QIcon::Normal, QIcon::Off);
 
-   const std::unordered_map<uint32_t,bts::addressbook::contact>& loaded_contacts = abook->get_contacts();
+   const std::unordered_map<uint32_t,bts::addressbook::wallet_contact>& loaded_contacts = abook->get_contacts();
    my->_contacts.reserve( loaded_contacts.size() );
    for( auto itr = loaded_contacts.begin(); itr != loaded_contacts.end(); ++itr )
    {
       ilog( "loading contacts..." );
-      my->_contacts.push_back( my->convert_contact( itr->second ) );
+      my->_contacts.push_back( Contact(itr->second) );
    }
 }
 
@@ -180,9 +174,7 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
           switch( (Columns)index.column() )
           {
              case UserIcon:
-                 if( current_contact.icon.isNull() ) 
-                    return my->_default_icon;
-                 return current_contact.icon;
+                 return current_contact.getIcon();
              default:
                 return QVariant();
           }
@@ -190,11 +182,11 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
           switch( (Columns)index.column() )
           {
              case FirstName:
-                 return current_contact.first_name;
+                 return current_contact.label.c_str();
              case LastName:
-                 return current_contact.last_name;
+                 return current_contact.label.c_str();
              case Id:
-                 return current_contact.bit_id;
+                 return current_contact.dac_id_string.c_str();
              case Age:
                  return 0;
              case Repute:
@@ -210,31 +202,31 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
 
 int AddressBookModel::storeContact( const Contact& contact_to_store )
 {
-   if( contact_to_store.wallet_account_index == -1 )
+   if( contact_to_store.wallet_index == WALLET_INVALID_INDEX )
    {
        auto num_contacts = my->_contacts.size();
        beginInsertRows( QModelIndex(), num_contacts, num_contacts );
           my->_contacts.push_back(contact_to_store);
-          my->_contacts.back().wallet_account_index =  my->_contacts.size()-1;
+          my->_contacts.back().wallet_index =  my->_contacts.size()-1;
        endInsertRows();
-       my->_abook->store_contact( my->convert_contact( my->_contacts.back() ) );
-       return my->_contacts.back().wallet_account_index;
+       my->_abook->store_contact( my->_contacts.back() );
+       return my->_contacts.back().wallet_index;
    }
 
-   FC_ASSERT( contact_to_store.wallet_account_index < int(my->_contacts.size()) );
-   auto row = contact_to_store.wallet_account_index;
+   FC_ASSERT( contact_to_store.wallet_index < int(my->_contacts.size()) );
+   auto row = contact_to_store.wallet_index;
    my->_contacts[row] = contact_to_store;
-   my->_abook->store_contact( my->convert_contact( my->_contacts[row] ) );
+   my->_abook->store_contact(  my->_contacts[row]  );
 
    Q_EMIT dataChanged( index( row, 0 ), index( row, NumColumns - 1) );
-   return contact_to_store.wallet_account_index;
+   return contact_to_store.wallet_index;
 }
 
 const Contact& AddressBookModel::getContactById( int contact_id )
 {
    for( uint32_t i = 0; i < my->_contacts.size(); ++i )
    {
-        if( my->_contacts[i].wallet_account_index == contact_id )
+        if( my->_contacts[i].wallet_index == contact_id )
         {
             return my->_contacts[i];
         }
