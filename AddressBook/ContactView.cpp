@@ -7,6 +7,50 @@
 #include <fc/thread/thread.hpp>
 #include <fc/log/logger.hpp>
 
+#include <QWebFrame>
+
+bool ContactView::eventFilter(QObject *obj, QEvent *event)
+{
+  if (event->type() == QEvent::KeyPress) 
+  {
+     QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+     switch(keyEvent->key()) 
+     {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+           sendChatMessage();
+           return true;
+        default:
+           break;
+     }
+  }
+  return QObject::eventFilter(obj, event);
+}
+void ContactView::sendChatMessage()
+{
+    auto msg = ui->chat_input->toPlainText();
+    if( msg.size() != 0 )
+    {
+        auto app = bts::application::instance();
+        auto pro = app->get_profile();
+        auto  idents = pro->identities();
+        bts::bitchat::private_text_message txt_msg( msg.toStdString() );
+        if( idents.size() )
+        {
+           fc::ecc::private_key my_priv_key = pro->get_keychain().get_identity_key( idents[0].bit_id );
+           app->send_text_message( txt_msg, _current_contact.public_key, my_priv_key );
+           appendChatMessage( msg );
+        }
+
+        ui->chat_input->setPlainText(QString());
+    }
+}
+void ContactView::appendChatMessage( const QString& msg )
+{
+    wlog( "append... ${msg}", ("msg",msg.toStdString() ) );
+    ui->chat_conversation->append( msg + "\n" );//page()->mainFrame()->evaluateJavaScript("document.body.innerHTML += '"+msg+"<br/>'");
+}
+
 
 ContactView::ContactView( QWidget* parent )
 :QWidget(parent),ui( new Ui::ContactView() )
@@ -14,6 +58,7 @@ ContactView::ContactView( QWidget* parent )
    _address_book = nullptr;
    _complete = false;
    ui->setupUi(this);
+   //ui->chat_conversation->setHtml( "<html><head></head><body>Hello World<br/></body></html>" );
    connect( ui->save_button, &QPushButton::clicked, this, &ContactView::onSave );
    connect( ui->cancel_button, &QPushButton::clicked, this, &ContactView::onCancel );
    connect( ui->edit_button, &QPushButton::clicked, this, &ContactView::onEdit );
@@ -24,6 +69,8 @@ ContactView::ContactView( QWidget* parent )
    connect( ui->lastname, &QLineEdit::textChanged, this, &ContactView::lastNameChanged );
    connect( ui->id_edit, &QLineEdit::textChanged, this, &ContactView::keyhoteeIdChanged );
 
+   ui->chat_input->installEventFilter(this);
+
    setContact( Contact() );
 }
 
@@ -32,21 +79,24 @@ void ContactView::onEdit()
     ui->info_stack->setCurrentWidget(ui->info_edit);
 }
 void ContactView::onSave()
-{
-    _current_contact.label = (ui->firstname->text()).toStdString();// + " " + ui->lastname.text()).toStdString();
-    _current_contact.dac_id_string    = ui->id_edit->text().toStdString();
+{ try {
+    _current_contact.first_name     = ui->firstname->text().toStdString();
+    _current_contact.last_name      = ui->lastname->text().toStdString();
+    _current_contact.dac_id_string  = ui->id_edit->text().toStdString();
     if( _current_record )
     {
        //_current_contact.bit_id_hash = _current_record->name_hash;
-       if( _current_contact.public_key != fc::ecc::public_key() )
+       if( !_current_contact.public_key.valid() )
        {
             _current_contact.public_key = _current_record->pub_key;
+            FC_ASSERT( _current_contact.public_key.valid() );
        }
        // TODO: lookup block id / timestamp that registered this ID
        // _current_contact.known_since.setMSecsSinceEpoch( );
     }
     else if( !_current_record ) /// note: user is entering manual public key
     {
+       elog( "!current record??\n" );
        /*
        if( _current_contact.known_since == QDateTime() )
        {
@@ -54,6 +104,7 @@ void ContactView::onSave()
        }
        */
     }
+    _current_contact.privacy_setting = bts::addressbook::secret_contact;
 
     _address_book->storeContact( _current_contact );
     ui->info_stack->setCurrentWidget(ui->info_status);
@@ -61,13 +112,13 @@ void ContactView::onSave()
     ui->mail_button->setEnabled(true);
     ui->info_button->setEnabled(true);
     ui->info_button->setChecked(true);
-}
+} FC_RETHROW_EXCEPTIONS( warn, "onSave" ) }
 
 void ContactView::onCancel()
 {
     ui->info_stack->setCurrentWidget(ui->info_status);
-    ui->firstname->setText( _current_contact.label.c_str() );
-   // ui->lastname->setText();// _current_contact.last_name );
+    ui->firstname->setText( _current_contact.first_name.c_str() );
+    ui->lastname->setText( _current_contact.last_name.c_str() );
     ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
     updateNameLabel();
 }
@@ -96,11 +147,11 @@ ContactView::~ContactView()
 {
 }
 void    ContactView::setContact( const Contact& current_contact )
-{
+{ try {
     _current_contact = current_contact;
     if( _current_contact.public_key == fc::ecc::public_key_data() )
     {
-        wlog( "null public key!" );
+        elog( "********* null public key!" );
         ui->save_button->setEnabled(false);
         ui->chat_button->setEnabled(false);
         ui->mail_button->setEnabled(false);
@@ -112,7 +163,7 @@ void    ContactView::setContact( const Contact& current_contact )
 
         ui->id_status->setText( tr( "Please provide a valid ID" ) );
 
-        if( _current_contact.label == std::string() )
+        if( _current_contact.first_name == std::string() && _current_contact.last_name == std::string() )
         {
             ui->name_label->setText( tr( "New Contact" ) );
             ui->id_edit->setText( QString() );
@@ -138,14 +189,13 @@ void    ContactView::setContact( const Contact& current_contact )
         */
     }
 
-    ui->firstname->setText( _current_contact.label.c_str() );
-   // ui->lastname->setText( _current_contact.last_name );
+    ui->firstname->setText( _current_contact.first_name.c_str() );
+    ui->lastname->setText( _current_contact.last_name.c_str() );
    // ui->email->setText( _current_contact.email_address );
    // ui->phone->setText( _current_contact.phone_number );
     ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
-
     ui->icon_view->setIcon( _current_contact.getIcon() );
-}
+} FC_RETHROW_EXCEPTIONS( warn, "" ) }
 
 Contact ContactView::getContact()const
 {

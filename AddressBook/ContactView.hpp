@@ -34,6 +34,12 @@ class ContactView : public QWidget
 
      void lookupId();
 
+     void sendChatMessage();
+     void appendChatMessage( const QString& msg );
+
+  protected:
+      bool eventFilter(QObject *obj, QEvent *event);
+
   private:
      bool                                      _complete;
      fc::time_point                            _last_validate;

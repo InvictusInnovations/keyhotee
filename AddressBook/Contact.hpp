@@ -16,7 +16,7 @@ class Contact : public bts::addressbook::wallet_contact
       Contact(){}
       Contact( const bts::addressbook::wallet_contact& );
 
-      QString getLabel()const { return label.c_str(); }
+      QString getLabel()const;
       const QIcon& getIcon()const;
       void setIcon( const QIcon& icon );
     

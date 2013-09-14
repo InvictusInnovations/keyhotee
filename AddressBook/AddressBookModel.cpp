@@ -58,6 +58,16 @@ void Contact::setIcon( const QIcon& icon )
    }
 }
 
+QString Contact::getLabel()const
+{
+   QString label = (first_name + " " + last_name).c_str();
+   if( label == " " )
+   {
+        return dac_id_string.c_str();
+   }
+   return label;
+}
+
 
 namespace Detail 
 {
@@ -182,9 +192,9 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
           switch( (Columns)index.column() )
           {
              case FirstName:
-                 return current_contact.label.c_str();
+                 return current_contact.first_name.c_str();
              case LastName:
-                 return current_contact.label.c_str();
+                 return current_contact.last_name.c_str();
              case Id:
                  return current_contact.dac_id_string.c_str();
              case Age:

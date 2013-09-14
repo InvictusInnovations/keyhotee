@@ -108,7 +108,7 @@
            <x>0</x>
            <y>0</y>
            <width>313</width>
-           <height>72</height>
+           <height>64</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -300,21 +300,15 @@
          <property name="childrenCollapsible">
           <bool>false</bool>
          </property>
-         <widget class="QWebView" name="webView">
-          <property name="url">
-           <url>
-            <string>about:blank</string>
-           </url>
+         <widget class="QTextBrowser" name="chat_conversation">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>10</verstretch>
+           </sizepolicy>
           </property>
          </widget>
-         <widget class="QPlainTextEdit" name="plainTextEdit">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>24</height>
-           </size>
-          </property>
-         </widget>
+         <widget class="QPlainTextEdit" name="chat_input"/>
         </widget>
        </item>
       </layout>
@@ -710,13 +704,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../Keyhotee.qrc"/>
  </resources>
