@@ -1,6 +1,7 @@
 #include "ui_KeyhoteeMainWindow.h"
 #include "KeyhoteeMainWindow.hpp"
 #include "AddressBook/AddressBookModel.hpp"
+#include "AddressBook/ContactView.hpp"
 #include "Mail/MailEditor.hpp"
 #include <bts/application.hpp>
 #include <QLineEdit>

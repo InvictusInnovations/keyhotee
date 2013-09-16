@@ -16,16 +16,21 @@ class ContactListEdit : public QTextEdit
       void setCompleter( QCompleter* c );
       QCompleter* getCompleter();
 
+      QSize sizeHint() const;
+      QSize maximumSizeHint() const { return sizeHint(); }
    protected:
        void keyPressEvent( QKeyEvent* e );
        void focusInEvent( QFocusEvent* e );
+       void resizeEvent( QResizeEvent* e );
    
    private Q_SLOTS:
        void insertCompletion( const QString& completion );
+       void fitHeightToDocument();
 
    private:
        QString textUnderCursor()const;
 
    private:
+      int         _fitted_height;
       QCompleter* _completer;
 };

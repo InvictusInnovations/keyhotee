@@ -66,6 +66,7 @@
 #include <QPrinter>
 #include <QPrintPreviewDialog>
 #endif
+#include "../ContactListEdit.hpp"
 
 #include "MailEditor.hpp"
 
@@ -250,7 +251,7 @@ void MailEditor::setupAddressBar()
 {
    address_bar = new QWidget(this);
    address_layout = new QFormLayout(address_bar);
-   to_field = new QLineEdit(address_bar);
+   to_field = new ContactListEdit(address_bar);
    cc_field = new QLineEdit(address_bar);
    bcc_field = new QLineEdit(address_bar);
    from_field = new QComboBox(address_bar);
@@ -263,7 +264,7 @@ void MailEditor::setupAddressBar()
 }
 void MailEditor::updateAddressBarLayout()
 {
-   QString to_text      = to_field->text();
+   QString to_text      = to_field->toHtml();
    QString cc_text      = cc_field ? cc_field->text() : QString();
    QString bcc_text     = bcc_field ? bcc_field->text(): QString();
    QString subject_text = subject_field->text();
@@ -279,9 +280,9 @@ void MailEditor::updateAddressBarLayout()
    address_bar    = new QWidget(this);
    address_layout = new QFormLayout(address_bar);
 
-   to_field = new QLineEdit(address_bar);
+   to_field = new ContactListEdit(address_bar);
    address_layout->addRow( "To:",  to_field );
-   to_field->setText(to_text);
+   to_field->setHtml(to_text);
 
    if( actionToggleCc->isChecked() )
    {

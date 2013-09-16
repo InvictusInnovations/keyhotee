@@ -63,6 +63,8 @@ class QMenu;
 class QPrinter;
 QT_END_NAMESPACE
 
+class ContactListEdit;
+
 class MailEditor : public QDialog
 {
     Q_OBJECT
@@ -119,7 +121,8 @@ private:
     void updateAddressBarLayout();
 
     QWidget*      address_bar;
-    QLineEdit*    to_field;
+    ContactListEdit* to_field; 
+    //QLineEdit*    to_field;
     QLineEdit*    cc_field;
     QLineEdit*    bcc_field;
     QLineEdit*    subject_field;

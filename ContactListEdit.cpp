@@ -4,10 +4,21 @@
 #include <QKeyEvent>
 #include <QScrolLBar>
 
+#include <fc/log/logger.hpp>
+
 ContactListEdit::ContactListEdit( QWidget* parent )
 :QTextEdit(parent)
 {
    _completer = nullptr;
+
+   connect( this, &QTextEdit::textChanged, this, &ContactListEdit::fitHeightToDocument ); 
+
+   setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
+   fitHeightToDocument();
+
+   setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+   setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 }
 
 ContactListEdit::~ContactListEdit()
@@ -25,11 +36,12 @@ void ContactListEdit::setCompleter( QCompleter* completer )
    if( !_completer ) return;
 
    _completer->setWidget(this);
-   //_completer->setCompletionMode();
+   _completer->setCompletionMode( QCompleter::PopupCompletion );
    _completer->setCaseSensitivity(Qt::CaseInsensitive);
-   
-   QObject::connect(_completer, SIGNAL(activated(QString)),
-                    this, SLOT(insertCompletion(QString)));
+  
+   connect(_completer, SIGNAL(activated(QString)),
+           this, SLOT(insertCompletion(QString)));
+
 }
 
 
@@ -43,6 +55,15 @@ void ContactListEdit::insertCompletion( const QString& completion )
 {
   // remove existing text
   // create image, attach meta data for on-click menus
+
+    if (_completer->widget() != this)
+        return;
+    QTextCursor tc = textCursor();
+    int extra = completion.length() - _completer->completionPrefix().length();
+    tc.movePosition(QTextCursor::Left);
+    tc.movePosition(QTextCursor::EndOfWord);
+    tc.insertText(completion.right(extra));
+    setTextCursor(tc);
 }
 
 //! [5]
@@ -114,3 +135,24 @@ void ContactListEdit::keyPressEvent(QKeyEvent *e)
 
 
 
+QSize ContactListEdit::sizeHint() const 
+{
+     QSize sizehint = QTextEdit::sizeHint();
+//     sizehint.setHeight(_fitted_height);
+     return sizehint;
+}
+
+void ContactListEdit::fitHeightToDocument() 
+{
+     document()->setTextWidth(width());
+     QSize document_size(document()->size().toSize());
+ //    _fitted_height = document_size.height();
+
+     setMaximumHeight(document_size.height());
+     updateGeometry();
+}
+void ContactListEdit::resizeEvent( QResizeEvent* e )
+{
+    fitHeightToDocument();
+    QTextEdit::resizeEvent(e);
+}
