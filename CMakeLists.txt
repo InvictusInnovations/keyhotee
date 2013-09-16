@@ -67,6 +67,9 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
          LoginDialog.ui 
          LoginDialog.cpp
 
+         ContactListEdit.hpp
+         ContactListEdit.cpp
+
          KeyhoteeMainWindow.ui 
          KeyhoteeMainWindow.cpp 
          main.cpp )
