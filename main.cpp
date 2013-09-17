@@ -1,3 +1,8 @@
+#ifdef WIN32
+#include <Windows.h>
+#include <wincon.h>
+#endif
+
 #include <bts/application.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
@@ -17,6 +22,7 @@
 
 #include <QFile>
 #include <QDebug>
+
 
 bts::application_config load_config( const std::string& profile_name )
 { try {
@@ -62,6 +68,13 @@ void startup( const std::string& profile_name )
 
 int main( int argc, char** argv )
 {
+  #ifdef WIN32
+  bool consoleOk = AllocConsole();
+  freopen( "CONOUT$", "wb", stdout);
+  freopen( "CONOUT$", "wb", stderr);
+  printf("testing stdout\n");
+  fprintf(stderr,"testing stderr\n");
+  #endif
   try {
      QApplication app(argc,argv); 
 
@@ -89,7 +102,12 @@ int main( int argc, char** argv )
      QObject::connect( &fc_exec, &QTimer::timeout, []() { fc::usleep( fc::microseconds(30*1000) ); }  );
      fc_exec.start(5);
 
-     return app.exec();
+     int result = app.exec(); 
+     #ifdef WIN32
+     fclose(stdout);
+     FreeConsole();
+     #endif
+     return result;
   } 
   catch ( const fc::exception& e )
   {

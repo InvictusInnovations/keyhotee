@@ -10,6 +10,7 @@ LoginDialog::LoginDialog( QWidget* parent )
 {
     ui.reset( new Ui::LoginDialog() );
     ui->setupUi(this);
+    ui->password->setFocus();
     connect( ui->login, &QPushButton::clicked, this, &LoginDialog::onLogin );
     connect( ui->quit, &QPushButton::clicked, this, &LoginDialog::onQuit );
 }
