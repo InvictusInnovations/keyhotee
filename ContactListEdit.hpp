@@ -9,6 +9,7 @@ class QCompleter;
  */
 class ContactListEdit : public QTextEdit
 {
+   Q_OBJECT
    public:
       ContactListEdit( QWidget* parent = nullptr );
       ~ContactListEdit();

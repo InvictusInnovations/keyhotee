@@ -4,7 +4,6 @@
 #include "AddressBook/ContactView.hpp"
 #include "Mail/MailEditor.hpp"
 #include <bts/application.hpp>
-#include <QLineEdit>
 #include <bts/bitchat/bitchat_private_message.hpp>
 
 #ifdef Q_OS_MAC
@@ -13,6 +12,9 @@
 
 #include <fc/reflect/variant.hpp>
 #include <fc/log/logger.hpp>
+
+#include <QLineEdit>
+#include <QCompleter>
 
 enum SidebarItemRoles
 {
@@ -77,6 +79,30 @@ class ApplicationDelegate : public bts::application_delegate
      }
 };
 
+QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer)
+{
+   QFile file(fileName);
+   if (!file.open(QFile::ReadOnly))
+      return new QStringListModel(completer);
+
+#ifndef QT_NO_CURSOR
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+#endif
+   QStringList words;
+
+   while (!file.atEnd()) 
+   {
+      QByteArray line = file.readLine();
+      if (!line.isEmpty())
+         words << line.trimmed();
+   }
+
+#ifndef QT_NO_CURSOR
+   QApplication::restoreOverrideCursor();
+#endif
+   return new QStringListModel(words, completer);
+}
+
 KeyhoteeMainWindow::KeyhoteeMainWindow()
 :QMainWindow()
 {
@@ -86,6 +112,12 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     setWindowIcon( QIcon( ":/images/shield1024.png" ) );
 
     connect( ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContact );
+
+    _contact_completer = new QCompleter(this);
+    _contact_completer->setModel( modelFromFile( "words.txt", _contact_completer) );
+    _contact_completer->setModelSorting( QCompleter::CaseInsensitivelySortedModel );
+    _contact_completer->setCaseSensitivity( Qt::CaseInsensitive);
+    _contact_completer->setWrapAround(true);
 
 #ifdef Q_OS_MAC
     //QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
@@ -302,7 +334,7 @@ void KeyhoteeMainWindow::showContacts()
 
 void KeyhoteeMainWindow::newMessage()
 {
-  auto msg_window = new MailEditor(this);
+  auto msg_window = new MailEditor(this, _contact_completer);
   msg_window->show();
 }
 ContactView* KeyhoteeMainWindow::getContactView( int contact_id )

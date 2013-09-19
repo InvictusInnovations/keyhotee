@@ -3,6 +3,7 @@
 #include <QAbstractItemView>
 #include <QKeyEvent>
 #include <QScrolLBar>
+#include <QPainter>
 
 #include <fc/log/logger.hpp>
 
@@ -39,8 +40,8 @@ void ContactListEdit::setCompleter( QCompleter* completer )
    _completer->setCompletionMode( QCompleter::PopupCompletion );
    _completer->setCaseSensitivity(Qt::CaseInsensitive);
   
-   connect(_completer, SIGNAL(activated(QString)),
-           this, SLOT(insertCompletion(QString)));
+   connect(_completer, SIGNAL(activated(const QString&)),
+           this, SLOT(insertCompletion(const QString&)));
 
 }
 
@@ -53,16 +54,51 @@ QCompleter* ContactListEdit::getCompleter()
 
 void ContactListEdit::insertCompletion( const QString& completion )
 {
+   ilog( "insertCompletion ${c}", ("c", completion.toStdString() ) );
   // remove existing text
   // create image, attach meta data for on-click menus
 
     if (_completer->widget() != this)
         return;
+    QFont        default_font;
+    default_font.setPointSize( default_font.pointSize() - 2 );
+    QFontMetrics font_metrics(default_font);
+    QRect        bounding = font_metrics.boundingRect( completion );
+    int          comp_width = font_metrics.width( completion );
+    int          comp_height = bounding.height();
+
+    comp_width += 20;
+
+    QImage completion_image( comp_width, comp_height+4, QImage::Format_ARGB32 );
+    completion_image.fill( QColor( 0,0,0,0 ) );
+    QPainter painter;
+    painter.begin(&completion_image);
+    painter.setFont(default_font);
+    painter.setRenderHint( QPainter::Antialiasing );
+
+    QBrush brush(Qt::SolidPattern);
+    brush.setColor( QColor( 205, 220, 241 ) );
+    QPen pen;
+    pen.setColor( QColor( 105,110,180 ) );
+
+    painter.setBrush( brush );
+    painter.setPen(pen);
+    painter.drawRoundedRect( 0, 0, comp_width-1, completion_image.height()-1, 8, 8, Qt::AbsoluteSize );
+    painter.setPen(QPen());
+    painter.drawText( QPoint( 10, comp_height - 2 ), completion );
+
     QTextCursor tc = textCursor();
-    int extra = completion.length() - _completer->completionPrefix().length();
-    tc.movePosition(QTextCursor::Left);
-    tc.movePosition(QTextCursor::EndOfWord);
-    tc.insertText(completion.right(extra));
+    uint32_t prefix_len =  _completer->completionPrefix().length();
+    for( uint32_t i = 0; i < prefix_len; ++i )
+    {
+        tc.deletePreviousChar();
+    }
+   // int extra = completion.length() -
+   // tc.movePosition(QTextCursor::Left);
+   // tc.movePosition(QTextCursor::EndOfWord);
+   // tc.insertText(completion.right(extra));
+    tc.insertImage( completion_image, completion );
+    tc.insertText(" ");
     setTextCursor(tc);
 }
 
@@ -116,7 +152,7 @@ void ContactListEdit::keyPressEvent(QKeyEvent *e)
     bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
     QString completionPrefix = textUnderCursor();
 
-    if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 3
+    if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() == 0
                       || eow.contains(e->text().right(1)))) {
         _completer->popup()->hide();
         return;

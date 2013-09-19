@@ -9,6 +9,7 @@ class QTreeWidgetItem;
 class ContactView;
 class AddressBookModel;
 class ApplicationDelegate;
+class QCompleter;
 
 struct ContactWidgets
 {
@@ -34,6 +35,7 @@ class KeyhoteeMainWindow  : public QMainWindow
   private:
       friend class ApplicationDelegate;
       void addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right, const QVector<int>& roles );
+      QCompleter*                             _contact_completer;
       QTreeWidgetItem*                        _identities_root;
       QTreeWidgetItem*                        _mailboxes_root;
       QTreeWidgetItem*                        _contacts_root;

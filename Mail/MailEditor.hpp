@@ -70,7 +70,7 @@ class MailEditor : public QDialog
     Q_OBJECT
 
 public:
-    MailEditor(QWidget *parent = 0);
+    MailEditor(QWidget *parent = nullptr, QCompleter* contact_completer = nullptr );
 
 protected:
     virtual void closeEvent(QCloseEvent *e);
@@ -122,6 +122,7 @@ private:
 
     QWidget*      address_bar;
     ContactListEdit* to_field; 
+    QTextDocument* to_values;
     //QLineEdit*    to_field;
     QLineEdit*    cc_field;
     QLineEdit*    bcc_field;
@@ -161,6 +162,8 @@ private:
     //QToolBar *tb;
     QString fileName;
     QTextEdit *textEdit;
+
+    QCompleter* _contact_completer;
 };
 
 #endif // TEXTEDIT_H
