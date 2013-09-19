@@ -69,6 +69,7 @@
 #include "../ContactListEdit.hpp"
 
 #include "MailEditor.hpp"
+#include <fc/log/logger.hpp>
 
 #ifdef Q_OS_MAC
 const QString rsrcPath = ":/images/mac";
@@ -80,6 +81,8 @@ MailEditor::MailEditor(QWidget *parent, QCompleter* contact_comp)
 : QDialog(parent),_contact_completer(contact_comp)
 {
     to_values = new QTextDocument(this);
+    cc_values = new QTextDocument(this);
+    bcc_values = new QTextDocument(this);
 
 //    setToolButtonStyle(Qt::ToolButtonFollowStyle);
     layout = new QGridLayout(this);
@@ -145,14 +148,6 @@ MailEditor::MailEditor(QWidget *parent, QCompleter* contact_comp)
     connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(clipboardDataChanged()));
 #endif
 
-    QString initialFile = ":/example.html";
-    const QStringList args = QCoreApplication::arguments();
-    if (args.count() == 2)
-        initialFile = args.at(1);
-
-    if (!load(initialFile))
-        fileNew();
-    
     enableFormat(false);
 }
 
@@ -251,13 +246,13 @@ void MailEditor::setupMailActions()
 
 void MailEditor::setupAddressBar()
 {
-   address_bar = new QWidget(this);
-   address_layout = new QFormLayout(address_bar);
-   to_field = new ContactListEdit(address_bar);
-   to_field->setCompleter(_contact_completer);
-   to_field->setDocument(to_values);
-   cc_field = new QLineEdit(address_bar);
-   bcc_field = new QLineEdit(address_bar);
+   address_bar = nullptr;//new QWidget(this);
+   address_layout = nullptr;//new QFormLayout(address_bar);
+   to_field = nullptr; //new ContactListEdit(address_bar);
+   //to_field->setCompleter(_contact_completer);
+   //to_field->setDocument(to_values);
+   cc_field = nullptr; //new QLineEdit(address_bar);
+   bcc_field = nullptr; //new QLineEdit(address_bar);
    from_field = new QComboBox(address_bar);
    subject_field = new QLineEdit(address_bar);
    setWindowTitle( tr( "New Message" ) ); 
@@ -268,8 +263,6 @@ void MailEditor::setupAddressBar()
 }
 void MailEditor::updateAddressBarLayout()
 {
-   QString cc_text      = cc_field ? cc_field->text() : QString();
-   QString bcc_text     = bcc_field ? bcc_field->text(): QString();
    QString subject_text = subject_field->text();
 
    delete address_bar;
@@ -290,15 +283,17 @@ void MailEditor::updateAddressBarLayout()
 
    if( actionToggleCc->isChecked() )
    {
-      cc_field = new QLineEdit(address_bar);
-      cc_field->setText( cc_text );
+      cc_field = new ContactListEdit(address_bar);
+      cc_field->setCompleter(_contact_completer);
+      cc_field->setDocument(cc_values);
       address_layout->addRow( "Cc:",  cc_field );
    }
 
    if( actionToggleBcc->isChecked() )
    {
-      bcc_field = new QLineEdit(address_bar);
-      bcc_field->setText(bcc_text);
+      bcc_field = new ContactListEdit(address_bar);
+      bcc_field->setCompleter(_contact_completer);
+      bcc_field->setDocument(bcc_values);
       address_layout->addRow( "Bcc:",  bcc_field );
    }
    subject_field = new QLineEdit(address_bar);
@@ -521,8 +516,6 @@ bool MailEditor::maybeSave()
 {
     if (!textEdit->document()->isModified())
         return true;
-    if (fileName.startsWith(QLatin1String(":/")))
-        return true;
     QMessageBox::StandardButton ret;
     ret = QMessageBox::warning(this, tr("Application"),
                                tr("The document has been modified.\n"
@@ -536,21 +529,6 @@ bool MailEditor::maybeSave()
 }
 
 
-void MailEditor::fileNew()
-{
-    if (maybeSave()) {
-        textEdit->clear();
-    }
-}
-
-void MailEditor::fileOpen()
-{
-    QString fn = QFileDialog::getOpenFileName(this, tr("Open File..."),
-                                              QString(), tr("HTML-Files (*.htm *.html);;All Files (*)"));
-    if (!fn.isEmpty())
-        load(fn);
-}
-
 bool MailEditor::fileSave()
 {
     if (fileName.isEmpty())
@@ -560,6 +538,10 @@ bool MailEditor::fileSave()
     bool success = writer.write(textEdit->document());
     if (success)
         textEdit->document()->setModified(false);
+    else
+    {
+        elog( "error writing document!" );
+    }
     return success;
 }
 
@@ -573,8 +555,9 @@ bool MailEditor::fileSaveAs()
     if (!(fn.endsWith(".odt", Qt::CaseInsensitive)
           || fn.endsWith(".htm", Qt::CaseInsensitive)
           || fn.endsWith(".html", Qt::CaseInsensitive))) {
-        fn += ".odt"; // default
+        fn += ".html"; // default
     }
+    fileName = fn;
     return fileSave();
 }
 

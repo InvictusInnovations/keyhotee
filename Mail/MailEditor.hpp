@@ -85,8 +85,6 @@ private:
 
 private slots:
     void enableFormat(bool show_format );
-    void fileNew();
-    void fileOpen();
     bool fileSave();
     bool fileSaveAs();
     void filePrint();
@@ -121,11 +119,12 @@ private:
     void updateAddressBarLayout();
 
     QWidget*      address_bar;
-    ContactListEdit* to_field; 
-    QTextDocument* to_values;
-    //QLineEdit*    to_field;
-    QLineEdit*    cc_field;
-    QLineEdit*    bcc_field;
+    ContactListEdit*  to_field; 
+    ContactListEdit*  cc_field;
+    ContactListEdit*  bcc_field;
+    QTextDocument*    to_values;
+    QTextDocument*    cc_values;
+    QTextDocument*    bcc_values;
     QLineEdit*    subject_field;
     QComboBox*    from_field;
     QFormLayout*  address_layout;

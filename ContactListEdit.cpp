@@ -20,6 +20,8 @@ ContactListEdit::ContactListEdit( QWidget* parent )
    setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
    setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+   setTabChangesFocus(true);
 }
 
 ContactListEdit::~ContactListEdit()
@@ -120,6 +122,15 @@ void ContactListEdit::focusInEvent(QFocusEvent *e)
 }
 //! [6]
 
+bool ContactListEdit::focusNextPrevChild(bool next)
+{
+   if ( _completer && _completer->popup()->isVisible()) 
+   {
+      return false;
+   }
+   return QTextEdit::focusNextPrevChild(next);
+}
+
 //! [7]
 void ContactListEdit::keyPressEvent(QKeyEvent *e)
 {
@@ -137,7 +148,6 @@ void ContactListEdit::keyPressEvent(QKeyEvent *e)
            break;
        }
     }
-
     bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
     if (!_completer || !isShortcut) // do not process the shortcut when we have a completer
         QTextEdit::keyPressEvent(e);

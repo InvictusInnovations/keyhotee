@@ -19,6 +19,7 @@ class ContactListEdit : public QTextEdit
 
       QSize sizeHint() const;
       QSize maximumSizeHint() const { return sizeHint(); }
+      bool focusNextPrevChild(bool);
    protected:
        void keyPressEvent( QKeyEvent* e );
        void focusInEvent( QFocusEvent* e );
