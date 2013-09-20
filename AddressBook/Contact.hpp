@@ -16,11 +16,13 @@ class Contact : public bts::addressbook::wallet_contact
       Contact(){}
       Contact( const bts::addressbook::wallet_contact& );
 
-      QString getLabel()const;
-      const QIcon& getIcon()const;
-      void setIcon( const QIcon& icon );
+      QString        getLabel()const;
+      const QIcon&   getIcon()const;
+      void           setIcon( const QIcon& icon );
     
    private:
       /// cache the icon we want to use.
       QIcon   icon;
 };
+
+typedef std::shared_ptr<Contact> ContactPtr;

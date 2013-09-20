@@ -63,6 +63,8 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
          Mail/MailInbox.ui
          Mail/MailEditor.hpp
          Mail/MailEditor.cpp
+         Mail/InboxModel.hpp
+         Mail/InboxModel.cpp
 
          LoginDialog.ui 
          LoginDialog.cpp
