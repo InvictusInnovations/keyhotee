@@ -52,6 +52,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QTextCodec>
+#include <QLabel>
 #include <QTextEdit>
 #include <QToolBar>
 #include <QTextCursor>
@@ -93,6 +94,7 @@ MailEditor::MailEditor(QWidget *parent, QCompleter* contact_comp)
     setupMailActions();
     setupEditActions();
     setupTextActions();
+    setupMoneyToolBar();
     setupAddressBar();
 
     {
@@ -223,13 +225,23 @@ void MailEditor::setupMailActions()
     fieldsButton->setPopupMode( QToolButton::InstantPopup );
     tb->addWidget( fieldsButton );
 
-    actionSave = a = new QAction(QIcon::fromTheme("mail-format", QIcon(":/images/format_text.png")),
+    a = new QAction(QIcon::fromTheme("mail-format", QIcon(":/images/format_text.png")),
                                  tr("&Format"), this);
  //   a->setShortcut(QKeySequence::Save);
     connect(a, &QAction::toggled, this, &MailEditor::enableFormat);
     a->setCheckable(true);
     a->setEnabled(true);
     tb->addAction(a);
+
+
+    actionAttachMoney = a = new QAction(QIcon::fromTheme("mail-format", QIcon(":/images/money-in-envelope.png")),
+                                 tr("&Format"), this);
+ //   a->setShortcut(QKeySequence::Save);
+    connect(a, &QAction::toggled, this, &MailEditor::enableSendMoney );
+    a->setCheckable(true);
+    a->setEnabled(true);
+    tb->addAction(a);
+
     //menu->addAction(a);
 
 //    a = new QAction(tr("Save &As..."), this);
@@ -314,6 +326,11 @@ void MailEditor::enableFormat(bool show_format)
     format_tb->setVisible(show_format);
    // style_tb->setVisible(show_format);
 }
+void MailEditor::enableSendMoney(bool show_send_money )
+{
+    money_tb->setVisible(show_send_money);
+   // style_tb->setVisible(show_format);
+}
 
 void MailEditor::setupEditActions()
 {
@@ -359,12 +376,55 @@ void MailEditor::setupEditActions()
         actionPaste->setEnabled(md->hasText());
 #endif
 }
+void MailEditor::setupMoneyToolBar()
+{
+    auto tb = money_tb = new QToolBar(this);
+    tb->hide();
+    tb->setIconSize( QSize( 16,16 ) );
+    layout->addWidget( tb, 3, 0 );
+
+    money_amount = new QLineEdit(tb);
+    money_amount->setPlaceholderText( "0.00" );
+    money_unit   = new QComboBox(tb);
+    money_unit->insertItem( 0, QIcon::fromTheme("currency-bitcoin", QIcon( ":/images/bitcoin.jpeg" ) ), QString("BTC") );
+    money_unit->insertItem( 1, QIcon::fromTheme("currency-bitusd", QIcon( ":/images/bitusd.png" ) ), QString("BitUSD") );
+
+    connect( money_unit, SIGNAL(currentIndexChanged(int)), this, SLOT(moneyUnitChanged(int)) );
+    
+    money_balance = new QLabel("Balance: 0.00 BTC",tb );
+
+    QWidget* spacer = new QWidget(tb);
+    QWidget* spacer2 = new QWidget(tb);
+    spacer->setMaximumWidth(10);
+    tb->addWidget(spacer);
+    tb->addWidget(money_amount);
+    tb->addWidget(money_unit);
+    tb->addWidget(spacer2);
+    tb->addWidget(money_balance);
+
+    money_amount->setMaximumWidth(120);
+}
+
+void MailEditor::moneyUnitChanged( int index )
+{
+    switch( index )
+    {
+       case 0:
+          money_balance->setText( "Balance: 0.00 BTC" );
+          break;
+       case 1:
+          money_balance->setText( "Balance: 0.00 BitUSD" );
+          break;
+    }
+}
 
 void MailEditor::setupTextActions()
 {
     auto tb = format_tb = new QToolBar(this);
     tb->setIconSize( QSize( 16,16 ) );
     layout->addWidget( tb, 2, 0 );
+
+
 //    tb->setWindowTitle(tr("Format Actions"));
     //addToolBar(tb);
 

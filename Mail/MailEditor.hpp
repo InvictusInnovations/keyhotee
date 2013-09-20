@@ -61,6 +61,7 @@ class QTextEdit;
 class QTextCharFormat;
 class QMenu;
 class QPrinter;
+class QLabel;
 QT_END_NAMESPACE
 
 class ContactListEdit;
@@ -82,8 +83,10 @@ private:
     bool load(const QString &f);
     bool maybeSave();
     void setCurrentFileName(const QString &fileName);
+    void enableSendMoney(bool);
 
 private slots:
+    void moneyUnitChanged(int index);
     void enableFormat(bool show_format );
     bool fileSave();
     bool fileSaveAs();
@@ -114,6 +117,7 @@ private:
     void fontChanged(const QFont &f);
     void colorChanged(const QColor &c);
     void alignmentChanged(Qt::Alignment a);
+    void setupMoneyToolBar();
 
     void setupAddressBar();
     void updateAddressBarLayout();
@@ -136,6 +140,10 @@ private:
     QMenu*       fieldsMenu;
     QToolButton* fieldsButton;
 
+    QLineEdit* money_amount;
+    QComboBox* money_unit;
+    QLabel*    money_balance;
+
     QAction *actionSave;
     QAction *actionTextBold;
     QAction *actionTextUnderline;
@@ -150,12 +158,14 @@ private:
     QAction *actionCut;
     QAction *actionCopy;
     QAction *actionPaste;
+    QAction *actionAttachMoney;
 
     QComboBox *comboStyle;
     QFontComboBox *comboFont;
     QComboBox *comboSize;
 
     QToolBar* format_tb;
+    QToolBar* money_tb;
     //QToolBar* style_tb;
 
     //QToolBar *tb;
