@@ -10,6 +10,7 @@ class ContactView;
 class AddressBookModel;
 class ApplicationDelegate;
 class QCompleter;
+class InboxView;
 
 struct ContactWidgets
 {
@@ -38,10 +39,12 @@ class KeyhoteeMainWindow  : public QMainWindow
       QCompleter*                             _contact_completer;
       QTreeWidgetItem*                        _identities_root;
       QTreeWidgetItem*                        _mailboxes_root;
+      QTreeWidgetItem*                        _wallets_root;
       QTreeWidgetItem*                        _contacts_root;
       QTreeWidgetItem*                        _inbox_root;
       QTreeWidgetItem*                        _drafts_root;
       QTreeWidgetItem*                        _sent_root;
+
       AddressBookModel*                       _addressbook_model;
       bts::addressbook::addressbook_ptr       _addressbook;
       std::unordered_map<int,ContactWidgets>  _contact_widgets;

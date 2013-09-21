@@ -25,6 +25,8 @@ enum TopLevelItemIndexes
 {
     Mailboxes,
     Space2,
+    Wallets,
+    Space3,
     Contacts
 };
 enum MailboxChildren
@@ -158,13 +160,16 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     connect( ui->splitter, &QSplitter::splitterMoved, this, &KeyhoteeMainWindow::sideBarSplitterMoved );
 
     auto space2     = ui->side_bar->topLevelItem(TopLevelItemIndexes::Space2);
+    auto space3     = ui->side_bar->topLevelItem(TopLevelItemIndexes::Space3);
     auto space_flags = space2->flags() & (~ Qt::ItemFlags(Qt::ItemIsSelectable) );
     space_flags |= Qt::ItemNeverHasChildren;
     space2->setFlags( space_flags );
+    space3->setFlags( space_flags );
 
     //_identities_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Identities);
     _mailboxes_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Mailboxes);
     _contacts_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Contacts);
+    _wallets_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Wallets);
 
     _contacts_root->setExpanded(true);
     //_identities_root->setExpanded(true);
@@ -173,6 +178,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     _drafts_root  = _mailboxes_root->child(Drafts);
     _sent_root    = _mailboxes_root->child(Sent);
 
+    _wallets_root->setExpanded(true);
 
     auto app    = bts::application::instance();
     app->set_application_delegate( _app_delegate.get() );
@@ -307,13 +313,15 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       */
       else if( selected_items[0] == _inbox_root )
       {
+          ui->widget_stack->setCurrentWidget( ui->inbox_page );
       }
       else if( selected_items[0] == _drafts_root )
       {
+          ui->widget_stack->setCurrentWidget( ui->draft_box_page );
       }
       else if( selected_items[0] == _sent_root )
       {
-
+          ui->widget_stack->setCurrentWidget( ui->sent_box_page );
       }
    }
 }

@@ -60,11 +60,19 @@ IF( NOT Qt5Widgets_DIR MATCHES Qt5Widgets_DIR-NOTFOUND )
          AddressBook/ContactView.hpp
          AddressBook/ContactView.cpp
 
-         Mail/MailInbox.ui
          Mail/MailEditor.hpp
          Mail/MailEditor.cpp
+
          Mail/InboxModel.hpp
          Mail/InboxModel.cpp
+
+         Mail/MailInbox.ui
+         Mail/MailInbox.hpp
+         Mail/MailInbox.cpp
+
+         Mail/MailViewer.ui
+         Mail/MailViewer.hpp
+         Mail/MailViewer.cpp
 
          LoginDialog.ui 
          LoginDialog.cpp

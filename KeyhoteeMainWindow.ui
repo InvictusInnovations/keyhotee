@@ -138,6 +138,11 @@
          <string>Name</string>
         </property>
        </column>
+       <column>
+        <property name="text">
+         <string>Count</string>
+        </property>
+       </column>
        <item>
         <property name="text">
          <string>MAILBOXES</string>
@@ -189,6 +194,57 @@
        </item>
        <item>
         <property name="text">
+         <string> </string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>WALLETS</string>
+        </property>
+        <property name="font">
+         <font>
+          <family>Georgia</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="foreground">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>91</red>
+           <green>91</green>
+           <blue>91</blue>
+          </color>
+         </brush>
+        </property>
+        <item>
+         <property name="text">
+          <string>Bitcoin</string>
+         </property>
+         <property name="icon">
+          <iconset resource="Keyhotee.qrc">
+           <normaloff>:/images/bitcoin.jpeg</normaloff>:/images/bitcoin.jpeg</iconset>
+         </property>
+         <property name="text">
+          <string>3.1415</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BitUSD</string>
+         </property>
+         <property name="icon">
+          <iconset resource="Keyhotee.qrc">
+           <normaloff>:/images/bitusd.png</normaloff>:/images/bitusd.png</iconset>
+         </property>
+         <property name="text">
+          <string>0.00</string>
+         </property>
+        </item>
+       </item>
+       <item>
+        <property name="text">
          <string/>
         </property>
        </item>
@@ -235,11 +291,13 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>4</number>
        </property>
-       <widget class="QWidget" name="inbox_page">
+       <widget class="MailInbox" name="inbox_page">
         <layout class="QGridLayout" name="gridLayout_2"/>
        </widget>
+       <widget class="MailInbox" name="draft_box_page"/>
+       <widget class="MailInbox" name="sent_box_page"/>
        <widget class="ContactsTable" name="contacts_page">
         <layout class="QGridLayout" name="gridLayout_3">
          <property name="leftMargin">
@@ -259,7 +317,6 @@
          </property>
         </layout>
        </widget>
-       <widget class="QWidget" name="page_2"/>
        <widget class="ContactView" name="new_contact"/>
       </widget>
      </widget>
@@ -372,6 +429,12 @@
    <class>ContactsTable</class>
    <extends>QWidget</extends>
    <header>AddressBook/ContactsTable.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MailInbox</class>
+   <extends>QWidget</extends>
+   <header>Mail/MailInbox.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
