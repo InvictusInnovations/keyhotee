@@ -23,7 +23,9 @@
       <file>images/128x128/send_mail.png</file>
       <file>images/gear.png</file>
       <file>images/money-in-envelope.png</file>
-      <file>images/bitcoin.jpeg</file>
+      <file>images/bitcoin.png</file>
       <file>images/bitusd.png</file>
+      <file>images/bitshares.png</file>
+      <file>images/litecoin128.png</file>
  </qresource>
  </RCC>

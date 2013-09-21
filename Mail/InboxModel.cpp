@@ -87,7 +87,15 @@ QVariant InboxModel::headerData( int section, Qt::Orientation orientation, int r
                   case Money:
                   case Attachment:
                   case Chat:
-                      return QSize( 16, 16 );
+                      return QSize( 12, 12 );
+                 case From:
+                      return QSize( 120, 12 );
+                 case Subject:
+                      return QSize( 300, 12 );
+                 case DateReceived:
+                    return QSize( 120, 12 );
+                 case To:
+                    return QSize( 120, 12 );
                   default:
                       return QVariant();
               }

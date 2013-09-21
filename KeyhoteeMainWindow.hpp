@@ -11,6 +11,7 @@ class AddressBookModel;
 class ApplicationDelegate;
 class QCompleter;
 class InboxView;
+class InboxModel;
 
 struct ContactWidgets
 {
@@ -45,6 +46,7 @@ class KeyhoteeMainWindow  : public QMainWindow
       QTreeWidgetItem*                        _drafts_root;
       QTreeWidgetItem*                        _sent_root;
 
+      InboxModel*                             _inbox;
       AddressBookModel*                       _addressbook_model;
       bts::addressbook::addressbook_ptr       _addressbook;
       std::unordered_map<int,ContactWidgets>  _contact_widgets;

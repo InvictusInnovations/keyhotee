@@ -3,6 +3,7 @@
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/ContactView.hpp"
 #include "Mail/MailEditor.hpp"
+#include "Mail/InboxModel.hpp"
 #include <bts/application.hpp>
 #include <bts/bitchat/bitchat_private_message.hpp>
 
@@ -185,13 +186,14 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     auto pro    = app->get_profile();
     auto idents = pro->identities();
 
+    _inbox = new InboxModel(this,pro->get_inbox());
 
     _addressbook_model  = new AddressBookModel( this, pro->get_addressbook() );
     connect( _addressbook_model, &QAbstractItemModel::dataChanged, this, &KeyhoteeMainWindow::addressBookDataChanged );
 
     ui->contacts_page->setAddressBook(_addressbook_model);
-
     ui->new_contact->setAddressBook(_addressbook_model);
+    ui->inbox_page->setModel(_inbox);
 
 
     wlog( "idents: ${idents}", ("idents",idents) );
