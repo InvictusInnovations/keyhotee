@@ -3,6 +3,9 @@
 
 namespace Ui { class MailViewer; }
 
+class QToolBar;
+class QAction;
+
 class MailViewer : public QWidget
 {
    Q_OBJECT
@@ -11,5 +14,10 @@ class MailViewer : public QWidget
       ~MailViewer();
 
    private:
+      QToolBar*                       message_tools;
+      QAction*                        reply_all;
+      QAction*                        reply;
+      QAction*                        forward;
+      QAction*                        delete_mail;
       std::unique_ptr<Ui::MailViewer> ui;
 };

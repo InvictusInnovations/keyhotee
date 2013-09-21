@@ -12,6 +12,7 @@
       <file>images/info_user.png</file>
       <file>images/new_mail.png</file>
       <file>images/user.png</file>
+      <file>images/add_user.png</file>
       <file>images/shield1024.png</file>
       <file>images/mac/textbold.png</file>
       <file>images/mac/textcenter.png</file>
@@ -27,5 +28,11 @@
       <file>images/bitusd.png</file>
       <file>images/bitshares.png</file>
       <file>images/litecoin128.png</file>
+      <file>images/paperclip-icon.png</file>
+      <file>images/read-icon.png</file>
+      <file>images/mail_reply.png</file>
+      <file>images/mail_forward.png</file>
+      <file>images/mail_reply_all.png</file>
+      <file>images/delete_icon.png</file>
  </qresource>
  </RCC>

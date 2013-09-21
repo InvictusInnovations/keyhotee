@@ -234,11 +234,19 @@ void MailEditor::setupMailActions()
     tb->addAction(a);
 
 
-    actionAttachMoney = a = new QAction(QIcon::fromTheme("mail-format", QIcon(":/images/money-in-envelope.png")),
-                                 tr("&Format"), this);
+    actionAttachMoney = a = new QAction(QIcon::fromTheme("mail-money", QIcon(":/images/money-in-envelope.png")),
+                                 tr("&Attach Money"), this);
  //   a->setShortcut(QKeySequence::Save);
     connect(a, &QAction::toggled, this, &MailEditor::enableSendMoney );
     a->setCheckable(true);
+    a->setEnabled(true);
+    tb->addAction(a);
+
+    actionAttachFile = a = new QAction(QIcon::fromTheme("mail-file", QIcon(":/images/paperclip-icon.png")),
+                                 tr("&Attach File"), this);
+ //   a->setShortcut(QKeySequence::Save);
+    connect(a, &QAction::toggled, this, &MailEditor::showAttachFileDialog );
+ //   a->setCheckable(true);
     a->setEnabled(true);
     tb->addAction(a);
 
@@ -329,6 +337,11 @@ void MailEditor::enableFormat(bool show_format)
 void MailEditor::enableSendMoney(bool show_send_money )
 {
     money_tb->setVisible(show_send_money);
+   // style_tb->setVisible(show_format);
+}
+void MailEditor::showAttachFileDialog(bool show_send_money )
+{
+   // money_tb->setVisible(show_send_money);
    // style_tb->setVisible(show_format);
 }
 

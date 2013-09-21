@@ -15,6 +15,10 @@ namespace Detail
        public:
           bts::bitchat::message_db_ptr  _msg_db;
           std::vector<MessageHeader>    _headers;
+          QIcon                         _attachment_icon;
+          QIcon                         _chat_icon;
+          QIcon                         _read_icon;
+          QIcon                         _money_icon;
     };
 }
 
@@ -22,6 +26,10 @@ InboxModel::InboxModel( QObject* parent, const bts::bitchat::message_db_ptr& msg
 :QAbstractTableModel(parent),my( new Detail::InboxModelImpl() )
 {
    my->_msg_db = msg_db;
+   my->_attachment_icon = QIcon( ":/images/paperclip-icon.png" );
+   my->_chat_icon = QIcon( ":/images/chat.png" );
+   my->_money_icon = QIcon( ":/images/bitcoin.png" );
+   my->_read_icon = QIcon( ":/images/read-icon.png" );
 }
 
 InboxModel::~InboxModel()
@@ -52,8 +60,14 @@ QVariant InboxModel::headerData( int section, Qt::Orientation orientation, int r
           case Qt::DecorationRole:
              switch( (Columns)section )
              {
-          //      case UserIcon:
-          //          return my->_default_icon;
+                case Read:
+                   return my->_read_icon;
+                case Money:
+                   return my->_money_icon;
+                case Attachment:
+                   return my->_attachment_icon;
+                case Chat:
+                   return my->_chat_icon;
                 default:
                    return QVariant();
              }

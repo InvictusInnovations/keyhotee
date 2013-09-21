@@ -84,6 +84,7 @@ private:
     bool maybeSave();
     void setCurrentFileName(const QString &fileName);
     void enableSendMoney(bool);
+    void showAttachFileDialog(bool);
 
 private slots:
     void moneyUnitChanged(int index);
@@ -159,6 +160,7 @@ private:
     QAction *actionCopy;
     QAction *actionPaste;
     QAction *actionAttachMoney;
+    QAction *actionAttachFile;
 
     QComboBox *comboStyle;
     QFontComboBox *comboFont;

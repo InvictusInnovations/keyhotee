@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>807</width>
-    <height>699</height>
+    <width>1094</width>
+    <height>736</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -342,7 +342,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>807</width>
+     <width>1094</width>
      <height>22</height>
     </rect>
    </property>
@@ -409,7 +409,7 @@
   <action name="actionNew_Contact">
    <property name="icon">
     <iconset resource="Keyhotee.qrc">
-     <normaloff>:/images/add_address.png</normaloff>:/images/add_address.png</iconset>
+     <normaloff>:/images/add_user.png</normaloff>:/images/add_user.png</iconset>
    </property>
    <property name="text">
     <string>New Contact</string>
