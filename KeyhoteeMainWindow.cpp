@@ -215,8 +215,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
            new_ident_item->setText( 0, (idents[i].bit_id + " [" + std::to_string(id_rec->repute)+"]" ).c_str() );
         }
     */
-        app->mine_name( idents[i].bit_id, 
-                        pro->get_keychain().get_identity_key( idents[i].bit_id ).get_public_key(), 
+        app->mine_name( idents[i].dac_id, 
+                        pro->get_keychain().get_identity_key( idents[i].dac_id ).get_public_key(), 
                         idents[i].mining_effort );
     }
     _addressbook = pro->get_addressbook();

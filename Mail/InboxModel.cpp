@@ -121,6 +121,7 @@ QVariant InboxModel::headerData( int section, Qt::Orientation orientation, int r
                  case DateSent:
                     return tr("Date Sent");
                  case Status:
+                    return tr("Status");
                     
                  case NumColumns:
                      break;
@@ -133,17 +134,19 @@ QVariant InboxModel::headerData( int section, Qt::Orientation orientation, int r
                   case Money:
                   case Attachment:
                   case Chat:
-                      return QSize( 12, 12 );
+                      return QSize( 8, 8 );
                  case From:
-                      return QSize( 120, 12 );
+                      return QSize( 120, 24 );
                  case Subject:
-                      return QSize( 300, 12 );
+                      return QSize( 300, 24 );
                  case DateReceived:
                     return QSize( 120, 12 );
                  case To:
                     return QSize( 120, 12 );
-                  default:
-                      return QVariant();
+                 case Status:
+                    return QSize( 120, 12 );
+                 default:
+                    return QSize( 16, 16);
               }
        }
     }

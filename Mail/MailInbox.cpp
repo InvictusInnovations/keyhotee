@@ -23,12 +23,23 @@ void MailInbox::setModel( QAbstractItemModel* m, InboxType type )
    ui->inbox_table->horizontalHeader()->resizeSection( InboxModel::DateSent, 120 );
    if( _type == Inbox )
    {
+      ui->inbox_table->horizontalHeader()->hideSection( InboxModel::Status );
+      ui->inbox_table->horizontalHeader()->hideSection( InboxModel::DateSent );
    }
    if( _type == Sent )
    {
       ui->inbox_table->horizontalHeader()->swapSections( InboxModel::To, InboxModel::From );
       ui->inbox_table->horizontalHeader()->swapSections( InboxModel::DateReceived, InboxModel::DateSent );
+      ui->inbox_table->horizontalHeader()->hideSection( InboxModel::DateReceived );
    }
+   if( _type == Drafts )
+   {
+      ui->inbox_table->horizontalHeader()->swapSections( InboxModel::To, InboxModel::From );
+      ui->inbox_table->horizontalHeader()->swapSections( InboxModel::DateReceived, InboxModel::DateSent );
+      ui->inbox_table->horizontalHeader()->hideSection( InboxModel::DateReceived );
+      ui->inbox_table->horizontalHeader()->hideSection( InboxModel::Status );
+   }
+
    ui->inbox_table->horizontalHeader()->setSectionsMovable(true);
    ui->inbox_table->horizontalHeader()->setSortIndicatorShown(false);
    ui->inbox_table->horizontalHeader()->setSectionsClickable(true);

@@ -224,7 +224,7 @@ void ProfileWizard::createProfile( int result )
       assert( pro != nullptr );
       
       bts::identity new_ident;
-      new_ident.bit_id = _nym_page->_profile_nym_ui.keyhotee_id->text().toStdString();
+      new_ident.dac_id = _nym_page->_profile_nym_ui.keyhotee_id->text().toStdString();
       pro->store_identity( new_ident );
 
       display_main_window();

@@ -37,7 +37,7 @@ void ContactView::sendChatMessage()
         bts::bitchat::private_text_message txt_msg( msg.toStdString() );
         if( idents.size() )
         {
-           fc::ecc::private_key my_priv_key = pro->get_keychain().get_identity_key( idents[0].bit_id );
+           fc::ecc::private_key my_priv_key = pro->get_keychain().get_identity_key( idents[0].dac_id );
            app->send_text_message( txt_msg, _current_contact.public_key, my_priv_key );
            appendChatMessage( msg );
         }
