@@ -186,14 +186,16 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     auto pro    = app->get_profile();
     auto idents = pro->identities();
 
-    _inbox = new InboxModel(this,pro->get_inbox());
+    _inbox  = new InboxModel(this,pro);
 
     _addressbook_model  = new AddressBookModel( this, pro->get_addressbook() );
     connect( _addressbook_model, &QAbstractItemModel::dataChanged, this, &KeyhoteeMainWindow::addressBookDataChanged );
 
     ui->contacts_page->setAddressBook(_addressbook_model);
     ui->new_contact->setAddressBook(_addressbook_model);
-    ui->inbox_page->setModel(_inbox);
+    ui->inbox_page->setModel(_inbox, MailInbox::Inbox);
+    ui->draft_box_page->setModel(_inbox, MailInbox::Drafts);
+    ui->sent_box_page->setModel(_inbox, MailInbox::Sent);
 
 
     wlog( "idents: ${idents}", ("idents",idents) );

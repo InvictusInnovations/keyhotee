@@ -5,6 +5,7 @@
 
 #include <fc/reflect/variant.hpp>
 #include <fc/exception/exception.hpp>
+#include <bts/bitchat/bitchat_message_db.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/io/raw.hpp>
 
@@ -13,7 +14,7 @@ namespace Detail
     class InboxModelImpl
     {
        public:
-          bts::bitchat::message_db_ptr  _msg_db;
+          bts::profile_ptr              _user_profile;
           std::vector<MessageHeader>    _headers;
           QIcon                         _attachment_icon;
           QIcon                         _chat_icon;
@@ -22,14 +23,43 @@ namespace Detail
     };
 }
 
-InboxModel::InboxModel( QObject* parent, const bts::bitchat::message_db_ptr& msg_db )
+QDateTime toQDateTime( const fc::time_point_sec& sec )
+{
+   return QDateTime();
+}
+
+InboxModel::InboxModel( QObject* parent, const bts::profile_ptr& user_profile )
 :QAbstractTableModel(parent),my( new Detail::InboxModelImpl() )
 {
-   my->_msg_db = msg_db;
+   my->_user_profile = user_profile;
    my->_attachment_icon = QIcon( ":/images/paperclip-icon.png" );
    my->_chat_icon = QIcon( ":/images/chat.png" );
    my->_money_icon = QIcon( ":/images/bitcoin.png" );
    my->_read_icon = QIcon( ":/images/read-icon.png" );
+
+   std::vector<bts::bitchat::message_header>  headers = user_profile->get_inbox()->fetch_headers( 
+                                                                                     bts::bitchat::private_email_message::type );
+   my->_headers.resize(headers.size());
+
+   auto abook = user_profile->get_addressbook();
+   for( uint32_t i = 0; i < headers.size(); ++i )
+   {
+      my->_headers[i].digest          = headers[i].digest;
+      my->_headers[i].date_received   = toQDateTime( headers[i].received_time );
+      auto to_contact                 = abook->get_contact_by_public_key( headers[i].to_key );
+      auto from_contact               = abook->get_contact_by_public_key( headers[i].from_key );
+      if( to_contact )
+      {
+          my->_headers[i].to   =  to_contact->dac_id_string.c_str();
+      }
+
+      if( from_contact )
+      {
+          my->_headers[i].from =  from_contact->dac_id_string.c_str();
+      }
+//      my->_headers[i].date_sent     = toQDateTime( headers[i].
+      my->_headers[i].read_mark       = headers[i].read_mark;
+   }
 }
 
 InboxModel::~InboxModel()
@@ -90,6 +120,8 @@ QVariant InboxModel::headerData( int section, Qt::Orientation orientation, int r
                     return tr("To");
                  case DateSent:
                     return tr("Date Sent");
+                 case Status:
+                    
                  case NumColumns:
                      break;
               }
@@ -152,6 +184,7 @@ QVariant InboxModel::data( const QModelIndex& index, int role )const
              case DateReceived:
              case To:
              case DateSent:
+             case Status:
              case NumColumns:
                 return QVariant();
           }

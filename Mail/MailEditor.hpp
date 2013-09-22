@@ -138,6 +138,7 @@ private:
 
     QAction*     actionToggleCc;
     QAction*     actionToggleBcc;
+    QAction*     actionToggleFrom;
     QMenu*       fieldsMenu;
     QToolButton* fieldsButton;
 

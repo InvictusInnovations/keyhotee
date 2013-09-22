@@ -216,8 +216,10 @@ void MailEditor::setupMailActions()
     fieldsMenu = new QMenu( tr("Mail Fields") );
     actionToggleCc = fieldsMenu->addAction( "Cc:" );
     actionToggleBcc = fieldsMenu->addAction( "Bcc:" );
+    actionToggleFrom = fieldsMenu->addAction( "From:" );
     actionToggleCc->setCheckable(true);
     actionToggleBcc->setCheckable(true);
+    actionToggleFrom->setCheckable(true);
 
     fieldsButton = new QToolButton();
     fieldsButton->setIcon(QIcon( ":/images/gear.png" ) );
@@ -280,6 +282,7 @@ void MailEditor::setupAddressBar()
 
    connect( actionToggleCc, &QAction::toggled,  [=](bool state) { updateAddressBarLayout(); } );
    connect( actionToggleBcc, &QAction::toggled,  [=](bool state) { updateAddressBarLayout(); } );
+   connect( actionToggleFrom, &QAction::toggled,  [=](bool state) { updateAddressBarLayout(); } );
 }
 void MailEditor::updateAddressBarLayout()
 {
@@ -321,10 +324,12 @@ void MailEditor::updateAddressBarLayout()
    address_layout->addRow( "Subject:",  subject_field);
    connect( subject_field, &QLineEdit::textChanged, this, &MailEditor::subjectChanged );
 
-   from_field = new QComboBox(address_bar);
-  // from_field->setText( from_text );
-   address_layout->addRow( "From:", from_field );
-
+   if( actionToggleFrom->isChecked() )
+   {
+      from_field = new QComboBox(address_bar);
+     // from_field->setText( from_text );
+      address_layout->addRow( "From:", from_field );
+   }
    address_layout->setFieldGrowthPolicy( QFormLayout::ExpandingFieldsGrow );
    layout->addWidget( address_bar, 1, 0 );
 }
@@ -399,12 +404,13 @@ void MailEditor::setupMoneyToolBar()
     money_amount = new QLineEdit(tb);
     money_amount->setPlaceholderText( "0.00" );
     money_unit   = new QComboBox(tb);
-    money_unit->insertItem( 0, QIcon::fromTheme("currency-bitcoin", QIcon( ":/images/bitcoin.jpeg" ) ), QString("BTC") );
-    money_unit->insertItem( 1, QIcon::fromTheme("currency-bitusd", QIcon( ":/images/bitusd.png" ) ), QString("BitUSD") );
+    money_unit->insertItem( 0, QIcon::fromTheme("currency-bitcoin", QIcon( ":/images/bitcoin.png" ) ), QString("BTC") );
+    money_unit->insertItem( 1, QIcon::fromTheme("currency-litecoin", QIcon( ":/images/litecoin128.png" ) ), QString("LTC") );
+    money_unit->insertItem( 2, QIcon::fromTheme("currency-bitusd", QIcon( ":/images/bitusd.png" ) ), QString("BitUSD") );
 
     connect( money_unit, SIGNAL(currentIndexChanged(int)), this, SLOT(moneyUnitChanged(int)) );
     
-    money_balance = new QLabel("Balance: 0.00 BTC",tb );
+    money_balance = new QLabel("Balance: 17.76 BTC",tb );
 
     QWidget* spacer = new QWidget(tb);
     QWidget* spacer2 = new QWidget(tb);
@@ -423,9 +429,12 @@ void MailEditor::moneyUnitChanged( int index )
     switch( index )
     {
        case 0:
-          money_balance->setText( "Balance: 0.00 BTC" );
+          money_balance->setText( "Balance: 17.76 BTC" );
           break;
        case 1:
+          money_balance->setText( "Balance: 0.00 LTC" );
+          break;
+       case 2:
           money_balance->setText( "Balance: 0.00 BitUSD" );
           break;
     }

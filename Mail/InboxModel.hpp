@@ -1,18 +1,32 @@
 #pragma once
 #include <QtGui>
-#include <bts/bitchat/bitchat_message_db.hpp>
+#include <bts/profile.hpp>
 
 namespace Detail { class InboxModelImpl; }
 
 class MessageHeader
 {
     public:
+       MessageHeader():read_mark(false),attachment(false),money_amount(0){}
+
+       QString     from;
+       QIcon       from_icon;
+       QString     to;
+       QString     subject;
+       QDateTime   date_received;
+       QDateTime   date_sent;
+       bool        read_mark;
+       bool        attachment;
+       QIcon       money_type;
+       double      money_amount;
+
+       fc::uint256  digest;
 };
 
 class InboxModel : public QAbstractTableModel
 {
   public:
-    InboxModel( QObject* parent, const bts::bitchat::message_db_ptr& msg_db );
+    InboxModel( QObject* parent, const bts::profile_ptr& user_profile );
     ~InboxModel();
 
     enum Columns
@@ -26,6 +40,7 @@ class InboxModel : public QAbstractTableModel
         DateReceived,
         To,
         DateSent,
+        Status,
         NumColumns
     };
 
