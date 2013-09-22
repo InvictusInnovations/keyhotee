@@ -3,6 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include <bts/addressbook/addressbook.hpp>
+#include "Mail/DraftMessage.hpp"
 
 namespace Ui { class KeyhoteeMainWindow; }
 class QTreeWidgetItem;
@@ -12,6 +13,7 @@ class ApplicationDelegate;
 class QCompleter;
 class InboxView;
 class InboxModel;
+class DraftMessage;
 
 struct ContactWidgets
 {
@@ -25,15 +27,23 @@ class KeyhoteeMainWindow  : public QMainWindow
       KeyhoteeMainWindow();
       ~KeyhoteeMainWindow();
 
-      void newMessage();
-      void addContact();
-      void showContacts();
-      void onSidebarSelectionChanged();
-      void selectContactItem( QTreeWidgetItem* item );
-      void selectIdentityItem( QTreeWidgetItem* item );
-      void openContact( int contact_id );
-      void sideBarSplitterMoved( int pos, int index );
+      void         newMessage();
+      void         addContact();
+      void         showContacts();
+      void         onSidebarSelectionChanged();
+      void         selectContactItem( QTreeWidgetItem* item );
+      void         selectIdentityItem( QTreeWidgetItem* item );
+      void         openContact( int contact_id );
+      void         sideBarSplitterMoved( int pos, int index );
       ContactView* getContactView( int contact_id );
+
+      void         openDraft( int draft_id  );
+      void         openMail( int message_id );
+      void         openSent( int message_id );
+
+      void         saveDraft( const DraftMessage& draft );
+      void         sendMessage( const DraftMessage& draft );
+     
   private:
       friend class ApplicationDelegate;
       void addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right, const QVector<int>& roles );
