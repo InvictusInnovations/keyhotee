@@ -396,18 +396,5 @@ void KeyhoteeMainWindow::openContact( int contact_id )
     }
 }
 
-void KeyhoteeMainWindow::saveDraft( const DraftMessage& draft )
-{
-  // auto data = fc::raw::pack(draft);
-   //bts::application::instance()->save_draft( draft );
-}
-
-void KeyhoteeMainWindow::sendMessage( const DraftMessage& draft )
-{ try {
-  // FC_ASSERT( draft.to );
-
-   
-
-} FC_RETHROW_EXCEPTIONS( warn, "", ("Draft",draft) ) }
 
 

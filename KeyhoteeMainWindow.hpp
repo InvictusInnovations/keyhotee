@@ -3,7 +3,6 @@
 #include <memory>
 #include <unordered_map>
 #include <bts/addressbook/addressbook.hpp>
-#include "Mail/DraftMessage.hpp"
 
 namespace Ui { class KeyhoteeMainWindow; }
 class QTreeWidgetItem;
@@ -13,7 +12,6 @@ class ApplicationDelegate;
 class QCompleter;
 class InboxView;
 class InboxModel;
-class DraftMessage;
 
 struct ContactWidgets
 {
@@ -41,8 +39,6 @@ class KeyhoteeMainWindow  : public QMainWindow
       void         openMail( int message_id );
       void         openSent( int message_id );
 
-      void         saveDraft( const DraftMessage& draft );
-      void         sendMessage( const DraftMessage& draft );
      
   private:
       friend class ApplicationDelegate;
