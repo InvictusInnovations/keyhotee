@@ -2,6 +2,7 @@
 #include "ui_ContactView.h"
 #include "AddressBookModel.hpp"
 
+#include <KeyhoteeMainWindow.hpp>
 #include <bts/application.hpp>
 
 #include <fc/thread/thread.hpp>
@@ -26,6 +27,13 @@ bool ContactView::eventFilter(QObject *obj, QEvent *event)
   }
   return QObject::eventFilter(obj, event);
 }
+
+bool ContactView::isChatSelected()
+{
+    return (ui->contact_pages->currentWidget() == ui->chat_page);
+}
+
+
 void ContactView::sendChatMessage()
 {
     auto msg = ui->chat_input->toPlainText();
@@ -39,16 +47,33 @@ void ContactView::sendChatMessage()
         {
            fc::ecc::private_key my_priv_key = pro->get_keychain().get_identity_key( idents[0].dac_id );
            app->send_text_message( txt_msg, _current_contact.public_key, my_priv_key );
-           appendChatMessage( msg );
+           appendChatMessage( "me", msg );
         }
 
         ui->chat_input->setPlainText(QString());
     }
 }
-void ContactView::appendChatMessage( const QString& msg )
-{
+void ContactView::appendChatMessage( const QString& from, const QString& msg, const QDateTime& dateTime )
+{ //DLNFIX2 improve formatting later
     wlog( "append... ${msg}", ("msg",msg.toStdString() ) );
-    ui->chat_conversation->append( msg + "\n" );//page()->mainFrame()->evaluateJavaScript("document.body.innerHTML += '"+msg+"<br/>'");
+    QString formatted_msg = dateTime.toString("hh:mm ap") + " "+ from + ": " + msg;
+    #if 1
+    QColor color;
+    if (from == "me")
+      color = "grey";
+    else
+      color = "black";
+    ui->chat_conversation->setTextColor(color);
+    ui->chat_conversation->append(formatted_msg);
+    #else //this doesn't start new paragraphs, probably not worth spending
+    //time on as we'll like junk in favor of somethng else later
+    QTextCursor cursor = ui->chat_conversation->textCursor();
+    QString colorName = (from == "me") ? "grey" : "black";
+    formatted_msg = QString("<font color=\"%1\">%2</font>").arg(colorName).arg(formatted_msg);
+    ui->chat_conversation->insertHtml(formatted_msg);
+    cursor.movePosition(QTextCursor::NextBlock);
+    ui->chat_conversation->setTextCursor(cursor);
+    #endif
 }
 
 
@@ -62,6 +87,7 @@ ContactView::ContactView( QWidget* parent )
    connect( ui->save_button, &QPushButton::clicked, this, &ContactView::onSave );
    connect( ui->cancel_button, &QPushButton::clicked, this, &ContactView::onCancel );
    connect( ui->edit_button, &QPushButton::clicked, this, &ContactView::onEdit );
+   connect( ui->mail_button, &QAbstractButton::clicked, this, &ContactView::onMail );
    connect( ui->chat_button, &QAbstractButton::clicked, this, &ContactView::onChat );
    connect( ui->info_button, &QAbstractButton::clicked, this, &ContactView::onInfo );
 
@@ -72,12 +98,15 @@ ContactView::ContactView( QWidget* parent )
    ui->chat_input->installEventFilter(this);
 
    setContact( Contact() );
+
 }
 
 void ContactView::onEdit()
 {
+    ui->contact_pages->setCurrentWidget( ui->info_page );
     ui->info_stack->setCurrentWidget(ui->info_edit);
 }
+
 void ContactView::onSave()
 { try {
     _current_contact.first_name     = ui->firstname->text().toStdString();
@@ -126,6 +155,12 @@ void ContactView::onCancel()
 void ContactView::onChat()
 {
     ui->contact_pages->setCurrentWidget( ui->chat_page );
+    //clear unread message count on display of chat window
+    //DLNFIX maybe getMainWindow can be removed via some connect magic or similar observer notification?
+    ContactGui* contact_gui = GetKeyhoteeWindow()->getContactGui(_current_contact.wallet_index);
+    if (contact_gui)
+        contact_gui->setUnreadMsgCount(0);
+    ui->chat_input->setFocus();
 }
 
 void ContactView::onInfo()
@@ -146,10 +181,13 @@ void ContactView::onDelete()
 ContactView::~ContactView()
 {
 }
-void    ContactView::setContact( const Contact& current_contact )
+
+void ContactView::setContact( const Contact& current_contact,
+                              ContactDisplay contact_display )
 { try {
     _current_contact = current_contact;
-    if( _current_contact.public_key == fc::ecc::public_key_data() )
+    bool has_null_public_key = _current_contact.public_key == fc::ecc::public_key_data();
+    if ( has_null_public_key )
     {
         elog( "********* null public key!" );
         ui->save_button->setEnabled(false);
@@ -158,8 +196,7 @@ void    ContactView::setContact( const Contact& current_contact )
         ui->save_button->setEnabled(false);
         ui->info_button->setEnabled(false);
         ui->info_button->setChecked(true);
-        ui->info_stack->setCurrentWidget( ui->info_edit );
-        ui->contact_pages->setCurrentWidget( ui->info_page );
+        onEdit();
 
         ui->id_status->setText( tr( "Please provide a valid ID" ) );
 
@@ -180,11 +217,22 @@ void    ContactView::setContact( const Contact& current_contact )
         ui->mail_button->setEnabled(true);
         ui->info_button->setEnabled(true);
 
-         /** TODO... restore this kind of check
+        if (contact_display == chat)
+        {
+            ui->chat_button->setChecked(true);
+            onChat();
+        }
+        else
+        {
+            ui->info_button->setChecked(true);
+            onInfo();
+
+        }
+            /** TODO... restore this kind of check
         if( _current_contact.bit_id_public_key != _current_contact.public_key  )
         {
             ui->id_status->setText( 
-                 tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
+                    tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
         }
         */
     }
@@ -201,6 +249,7 @@ Contact ContactView::getContact()const
 {
     return _current_contact;
 }
+
 void ContactView::firstNameChanged( const QString& /*name*/ )
 {
     updateNameLabel();

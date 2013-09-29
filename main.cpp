@@ -80,8 +80,7 @@ int main( int argc, char** argv )
 
      app.setOrganizationDomain( "invictus-innovations.com" );
      app.setOrganizationName( "Invictus Innovations, Inc" );
-     app.setApplicationName( "Keyhotee" );
-
+     std::string application_name = "Keyhotee";
      std::string profile_name = "default";
 
      QFile file(":/index.htm");
@@ -92,7 +91,10 @@ int main( int argc, char** argv )
      if( argc > 1 ) 
      { 
         profile_name = std::string(argv[1]); 
+        //application_name += " " + profile_name;
      }
+
+     app.setApplicationName( application_name.c_str() );
 
      fc::async( [=](){ startup( profile_name ); } );
 
@@ -126,7 +128,7 @@ void start_profile_creation_wizard( const bts::application_ptr& btsapp )
 
 void display_main_window()
 {
-  KeyhoteeMainWindow* mainwindow = new KeyhoteeMainWindow();
+  KeyhoteeMainWindow* mainwindow = GetKeyhoteeWindow();
   mainwindow->show();
 }
 

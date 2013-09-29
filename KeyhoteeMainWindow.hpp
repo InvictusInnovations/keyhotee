@@ -12,11 +12,32 @@ class ApplicationDelegate;
 class QCompleter;
 class InboxView;
 class InboxModel;
+class KeyhoteeMainWindow;
 
-struct ContactWidgets
+/**
+ *  GUI widgets and GUI state for a contact.
+ *  Not all contacts have this, only contacts "active" in GUI.
+ */
+class ContactGui
 {
-    QTreeWidgetItem* tree_item;
-    ContactView*     view;
+
+friend KeyhoteeMainWindow;
+
+private:
+    unsigned int     _unreadMsgCount;
+    QTreeWidgetItem* _tree_item;
+    ContactView*     _view;
+
+public:
+         ContactGui() {}
+         ContactGui(QTreeWidgetItem* tree_item, ContactView* view)
+         : _tree_item(tree_item), _view(view), _unreadMsgCount(0) {}
+
+    void updateTreeItemDisplay();
+    void setUnreadMsgCount(unsigned int count);
+    bool isChatVisible();
+    void receiveChatMessage( const QString& from, const QString& msg, const QDateTime& dateTime);
+private:
 };
 
 class KeyhoteeMainWindow  : public QMainWindow 
@@ -31,9 +52,13 @@ class KeyhoteeMainWindow  : public QMainWindow
       void         onSidebarSelectionChanged();
       void         selectContactItem( QTreeWidgetItem* item );
       void         selectIdentityItem( QTreeWidgetItem* item );
-      void         openContact( int contact_id );
       void         sideBarSplitterMoved( int pos, int index );
-      ContactView* getContactView( int contact_id );
+
+      void         openContactGui( int contact_id );
+      ContactGui*  getContactGui( int contact_id );
+      ContactGui*  createContactGuiIfNecessary( int contact_id );
+      bool         isSelectedContactGui(ContactGui* contactGui);
+
 
       void         openDraft( int draft_id  );
       void         openMail( int message_id );
@@ -43,6 +68,10 @@ class KeyhoteeMainWindow  : public QMainWindow
   private:
       friend class ApplicationDelegate;
       void addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right, const QVector<int>& roles );
+
+      void    createContactGui( int contact_id );
+      void    showContactGui( ContactGui& contact_gui );
+
       QCompleter*                             _contact_completer;
       QTreeWidgetItem*                        _identities_root;
       QTreeWidgetItem*                        _mailboxes_root;
@@ -55,7 +84,9 @@ class KeyhoteeMainWindow  : public QMainWindow
       InboxModel*                             _inbox;
       AddressBookModel*                       _addressbook_model;
       bts::addressbook::addressbook_ptr       _addressbook;
-      std::unordered_map<int,ContactWidgets>  _contact_widgets;
+      std::unordered_map<int,ContactGui>      _contact_guis;
       std::unique_ptr<Ui::KeyhoteeMainWindow> ui;
       std::unique_ptr<ApplicationDelegate>    _app_delegate;
 };
+
+KeyhoteeMainWindow* GetKeyhoteeWindow();

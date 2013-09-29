@@ -7,16 +7,19 @@
 
 namespace Ui { class ContactView; }
 class AddressBookModel;
+
+
 class ContactView : public QWidget
 {
   public:
+     enum ContactDisplay { chat, info, edit };
      ContactView( QWidget* parent = nullptr );
      ~ContactView();
 
      void              setAddressBook( AddressBookModel* addressbook );
      AddressBookModel* getAddressBook()const;
 
-     void setContact( const Contact& current_contact );
+     void setContact( const Contact& current_contact, ContactDisplay contact_display = chat );
      Contact getContact()const;
 
      void onChat();
@@ -34,8 +37,9 @@ class ContactView : public QWidget
 
      void lookupId();
 
+     bool isChatSelected();
      void sendChatMessage();
-     void appendChatMessage( const QString& msg );
+     void appendChatMessage( const QString& from, const QString& msg, const QDateTime& dateTime = QDateTime::currentDateTime() );
 
   protected:
       bool eventFilter(QObject *obj, QEvent *event);
