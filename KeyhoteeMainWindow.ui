@@ -189,7 +189,7 @@
        </item>
        <item>
         <property name="text">
-         <string> </string>
+         <string/>
         </property>
        </item>
        <item>
@@ -343,18 +343,20 @@
      <x>0</x>
      <y>0</y>
      <width>1094</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionEnable_Mining"/>
    </widget>
    <widget class="QMenu" name="menuMail">
     <property name="title">
@@ -431,6 +433,22 @@
    </property>
    <property name="text">
     <string>Show Contacts</string>
+   </property>
+  </action>
+  <action name="actionEnable_Mining">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Enable Mining</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
    </property>
   </action>
  </widget>

@@ -53,7 +53,7 @@ enum SidebarItemTypes
 
 void ContactGui::setUnreadMsgCount(unsigned int count)
 {
-    _unreadMsgCount = count;
+    _unread_msg_count = count;
     updateTreeItemDisplay();
 }
 
@@ -67,7 +67,7 @@ void ContactGui::receiveChatMessage( const QString& from, const QString& msg, co
     _view->appendChatMessage(from,msg,dateTime);
     if (!isChatVisible())
       {
-      setUnreadMsgCount(_unreadMsgCount+1);
+      setUnreadMsgCount(_unread_msg_count+1);
       }
 }
 
@@ -75,8 +75,8 @@ void ContactGui::updateTreeItemDisplay()
 {
     QString displayText;
     QString name = _view->getContact().getLabel();
-    if (_unreadMsgCount)
-      displayText = QString("%1 (%2)").arg(name).arg(_unreadMsgCount);
+    if (_unread_msg_count)
+      displayText = QString("%1 (%2)").arg(name).arg(_unread_msg_count);
     else
       displayText = name;
     _tree_item->setText(0,displayText);
@@ -187,8 +187,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     empty->resize( QSize(10,10) );
     ui->toolbar->addWidget(empty2);
     
-
+    connect( ui->actionExit, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionExit_triggered );
     connect( ui->actionNew_Message, &QAction::triggered, this, &KeyhoteeMainWindow::newMessage );
+    connect( ui->actionEnable_Mining, &QAction::toggled, this, &KeyhoteeMainWindow::enableMining_toggled );    
     connect( ui->actionNew_Contact, &QAction::triggered, this, &KeyhoteeMainWindow::addContact );
     connect( ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts );
     connect( ui->splitter, &QSplitter::splitterMoved, this, &KeyhoteeMainWindow::sideBarSplitterMoved );
@@ -232,8 +233,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui->sent_box_page->setModel(_inbox, MailInbox::Sent);
 
 
+    ui->actionEnable_Mining->setChecked(app->get_mining_intensity() != 0);
     wlog( "idents: ${idents}", ("idents",idents) );
-
     for( size_t i = 0; i < idents.size(); ++i )
     {
     /*
@@ -379,6 +380,18 @@ void KeyhoteeMainWindow::selectContactItem( QTreeWidgetItem* item )
 
 void KeyhoteeMainWindow::selectIdentityItem( QTreeWidgetItem* item )
 {
+}
+
+void KeyhoteeMainWindow::on_actionExit_triggered()
+{
+    qApp->closeAllWindows();
+}
+
+
+void KeyhoteeMainWindow::enableMining_toggled(bool enabled)
+{
+    auto app    = bts::application::instance();
+    app->set_mining_intensity(enabled ? 100 : 0);
 }
 
 void KeyhoteeMainWindow::showContacts()

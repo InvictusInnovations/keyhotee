@@ -24,14 +24,14 @@ class ContactGui
 friend KeyhoteeMainWindow;
 
 private:
-    unsigned int     _unreadMsgCount;
+    unsigned int     _unread_msg_count;
     QTreeWidgetItem* _tree_item;
     ContactView*     _view;
 
 public:
          ContactGui() {}
          ContactGui(QTreeWidgetItem* tree_item, ContactView* view)
-         : _tree_item(tree_item), _view(view), _unreadMsgCount(0) {}
+         : _tree_item(tree_item), _view(view), _unread_msg_count(0) {}
 
     void updateTreeItemDisplay();
     void setUnreadMsgCount(unsigned int count);
@@ -45,6 +45,12 @@ class KeyhoteeMainWindow  : public QMainWindow
   public:
       KeyhoteeMainWindow();
       ~KeyhoteeMainWindow();
+
+      //file menu responses
+      void on_actionExit_triggered();
+
+      //edit menu responses
+      void         enableMining_toggled(bool enabled);
 
       void         newMessage();
       void         addContact();
