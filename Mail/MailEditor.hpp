@@ -31,22 +31,22 @@ class MailEditor : public QDialog
     Q_OBJECT
 
 public:
-    MailEditor(QWidget *parent = nullptr, QCompleter* contact_completer = nullptr );
+    MailEditor(QWidget* parent = nullptr, QCompleter* contact_completer = nullptr );
 
 Q_SIGNALS:
     void  saveDraft( const DraftMessage& message );
     void  sendMessage( const DraftMessage& message );
 
 protected:
-    virtual void closeEvent(QCloseEvent *e);
+    virtual void closeEvent(QCloseEvent* close_event);
 
 private:
     void setupMailActions();
     void setupEditActions();
     void setupTextActions();
-    bool load(const QString &f);
+    bool load(const QString& fileName);
     bool maybeSave();
-    void setCurrentFileName(const QString &fileName);
+    void setCurrentFileName(const QString& fileName);
     void enableSendMoney(bool);
     void showAttachFileDialog(bool);
 
@@ -62,26 +62,26 @@ private slots:
     void textBold();
     void textUnderline();
     void textItalic();
-    void textFamily(const QString &f);
-    void textSize(const QString &p);
-    void textStyle(int styleIndex);
+    void textFamily(const QString& family);
+    void textSize(const QString& point_size);
+    void textStyle(int style_index);
     void textColor();
-    void textAlign(QAction *a);
+    void textAlign(QAction* a);
 
-    void currentCharFormatChanged(const QTextCharFormat &format);
+    void currentCharFormatChanged(const QTextCharFormat& format);
     void cursorPositionChanged();
 
     void clipboardDataChanged();
     void about();
-    void printPreview(QPrinter *);
+    void printPreview(QPrinter*);
 
     void subjectChanged( const QString& subject );
 
 private:
-    void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
-    void fontChanged(const QFont &f);
-    void colorChanged(const QColor &c);
-    void alignmentChanged(Qt::Alignment a);
+    void mergeFormatOnWordOrSelection(const QTextCharFormat& format);
+    void fontChanged(const QFont& new_font);
+    void colorChanged(const QColor& new_color);
+    void alignmentChanged(Qt::Alignment alignment);
     void setupMoneyToolBar();
 
     void setupAddressBar();
@@ -110,34 +110,34 @@ private:
     QComboBox* money_unit;
     QLabel*    money_balance;
 
-    QAction *actionSave;
-    QAction *actionTextBold;
-    QAction *actionTextUnderline;
-    QAction *actionTextItalic;
-    QAction *actionTextColor;
-    QAction *actionAlignLeft;
-    QAction *actionAlignCenter;
-    QAction *actionAlignRight;
-    QAction *actionAlignJustify;
-    QAction *actionUndo;
-    QAction *actionRedo;
-    QAction *actionCut;
-    QAction *actionCopy;
-    QAction *actionPaste;
-    QAction *actionAttachMoney;
-    QAction *actionAttachFile;
+    QAction* actionSave;
+    QAction* actionTextBold;
+    QAction* actionTextUnderline;
+    QAction* actionTextItalic;
+    QAction* actionTextColor;
+    QAction* actionAlignLeft;
+    QAction* actionAlignCenter;
+    QAction* actionAlignRight;
+    QAction* actionAlignJustify;
+    QAction* actionUndo;
+    QAction* actionRedo;
+    QAction* actionCut;
+    QAction* actionCopy;
+    QAction* actionPaste;
+    QAction* actionAttachMoney;
+    QAction* actionAttachFile;
 
     QComboBox *comboStyle;
     QFontComboBox *comboFont;
     QComboBox *comboSize;
 
-    QToolBar* format_tb;
-    QToolBar* money_tb;
+    QToolBar* format_tool_bar;
+    QToolBar* money_tool_bar;
     //QToolBar* style_tb;
 
-    //QToolBar *tb;
+    //QToolBar *tool_bar;
     QString fileName;
-    QTextEdit *textEdit;
+    QTextEdit* textEdit;
 
     QCompleter* _contact_completer;
 };

@@ -40,8 +40,9 @@ const QString rsrcPath = ":/images/mac";
 const QString rsrcPath = ":/images/win";
 #endif
 
-MailEditor::MailEditor(QWidget *parent, QCompleter* contact_comp)
-: QDialog(parent),_contact_completer(contact_comp)
+MailEditor::MailEditor(QWidget *parent, QCompleter* contact_completer)
+: QDialog(parent),
+  _contact_completer(contact_completer)
 {
     to_values = new QTextDocument(this);
     cc_values = new QTextDocument(this);
@@ -60,7 +61,7 @@ MailEditor::MailEditor(QWidget *parent, QCompleter* contact_comp)
     setupAddressBar();
 
     {
-        //QMenu *helpMenu = new QMenu(tr("Help"), this);
+        //QMenu* helpMenu = new QMenu(tr("Help"), this);
         //menuBar()->addMenu(helpMenu);
         //helpMenu->addAction(tr("About"), this, SLOT(about()));
         //helpMenu->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()));
@@ -115,12 +116,12 @@ MailEditor::MailEditor(QWidget *parent, QCompleter* contact_comp)
     enableFormat(false);
 }
 
-void MailEditor::closeEvent(QCloseEvent *e)
+void MailEditor::closeEvent(QCloseEvent* closeEvent)
 {
     if (maybeSave())
-        e->accept();
+        closeEvent->accept();
     else
-        e->ignore();
+        closeEvent->ignore();
 }
 
 void MailEditor::subjectChanged( const QString& subject )
@@ -137,43 +138,43 @@ void MailEditor::subjectChanged( const QString& subject )
 
 void MailEditor::setupMailActions()
 {
-    QToolBar *tb = new QToolBar(this);
-    layout->addWidget( tb, 0, 0 );
- //   tb->setWindowTitle(tr("File Actions"));
- //   addToolBar(tb);
+    QToolBar* tool_bar = new QToolBar(this);
+    layout->addWidget( tool_bar, 0, 0 );
+ //   tool_bar->setWindowTitle(tr("File Actions"));
+ //   addToolBar(tool_bar);
 
-    //QMenu *menu = new QMenu(tr("&File"), this);
+    //QMenu* menu = new QMenu(tr("&File"), this);
     //menuBar()->addMenu(menu);
 
-    QAction *a;
+    QAction* action;
 
 //    QIcon newIcon = QIcon::fromTheme("mail-send", QIcon(rsrcPath + "/filenew.png"));
  //   a = new QAction( newIcon, tr("&Send"), this);
   //  a->setPriority(QAction::LowPriority);
    // a->setShortcut(QKeySequence::Save);
     //connect(a, SIGNAL(triggered()), this, SLOT(fileNew()));
-    //tb->addAction(a);
+    //tool_bar->addAction(a);
     //menu->addAction(a);
 
 //    a = new QAction(QIcon::fromTheme("document-open", QIcon(rsrcPath + "/fileopen.png")),
  //                   tr("&Open..."), this);
 //    a->setShortcut(QKeySequence::Open);
 //    connect(a, SIGNAL(triggered()), this, SLOT(fileOpen()));
- //   tb->addAction(a);
+ //   tool_bar->addAction(a);
     //menu->addAction(a);
 
     //menu->addSeparator();
 
-    actionSave = a = new QAction(QIcon::fromTheme("mail-send", QIcon(":/images/128x128/send_mail.png")),
+    actionSave = action = new QAction(QIcon::fromTheme("mail-send", QIcon(":/images/128x128/send_mail.png")),
                                  tr("&Send"), this);
-    a->setShortcut(QKeySequence::Save);
-    connect(a, SIGNAL(triggered()), this, SLOT(fileSave()));
-    a->setEnabled(false);
-    tb->addAction(a);
+    action->setShortcut(QKeySequence::Save);
+    connect(action, SIGNAL(triggered()), this, SLOT(fileSave()));
+    action->setEnabled(false);
+    tool_bar->addAction(action);
 
-    QWidget* spacer = new QWidget(tb);
+    QWidget* spacer = new QWidget(tool_bar);
     spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-    tb->addWidget(spacer);
+    tool_bar->addWidget(spacer);
 
     fieldsMenu = new QMenu( tr("Mail Fields") );
     actionToggleCc = fieldsMenu->addAction( "Cc:" );
@@ -187,45 +188,45 @@ void MailEditor::setupMailActions()
     fieldsButton->setIcon(QIcon( ":/images/gear.png" ) );
     fieldsButton->setMenu( fieldsMenu );
     fieldsButton->setPopupMode( QToolButton::InstantPopup );
-    tb->addWidget( fieldsButton );
+    tool_bar->addWidget( fieldsButton );
 
-    a = new QAction(QIcon::fromTheme("mail-format", QIcon(":/images/format_text.png")),
+    action = new QAction(QIcon::fromTheme("mail-format", QIcon(":/images/format_text.png")),
                                  tr("&Format"), this);
  //   a->setShortcut(QKeySequence::Save);
-    connect(a, &QAction::toggled, this, &MailEditor::enableFormat);
-    a->setCheckable(true);
-    a->setEnabled(true);
-    tb->addAction(a);
+    connect(action, &QAction::toggled, this, &MailEditor::enableFormat);
+    action->setCheckable(true);
+    action->setEnabled(true);
+    tool_bar->addAction(action);
 
 
-    actionAttachMoney = a = new QAction(QIcon::fromTheme("mail-money", QIcon(":/images/money-in-envelope.png")),
+    actionAttachMoney = action = new QAction(QIcon::fromTheme("mail-money", QIcon(":/images/money-in-envelope.png")),
                                  tr("&Attach Money"), this);
  //   a->setShortcut(QKeySequence::Save);
-    connect(a, &QAction::toggled, this, &MailEditor::enableSendMoney );
-    a->setCheckable(true);
-    a->setEnabled(true);
-    tb->addAction(a);
+    connect(action, &QAction::toggled, this, &MailEditor::enableSendMoney );
+    action->setCheckable(true);
+    action->setEnabled(true);
+    tool_bar->addAction(action);
 
-    actionAttachFile = a = new QAction(QIcon::fromTheme("mail-file", QIcon(":/images/paperclip-icon.png")),
+    actionAttachFile = action = new QAction(QIcon::fromTheme("mail-file", QIcon(":/images/paperclip-icon.png")),
                                  tr("&Attach File"), this);
  //   a->setShortcut(QKeySequence::Save);
-    connect(a, &QAction::toggled, this, &MailEditor::showAttachFileDialog );
+    connect(action, &QAction::toggled, this, &MailEditor::showAttachFileDialog );
  //   a->setCheckable(true);
-    a->setEnabled(true);
-    tb->addAction(a);
+    action->setEnabled(true);
+    tool_bar->addAction(action);
 
     //menu->addAction(a);
 
-//    a = new QAction(tr("Save &As..."), this);
- //   a->setPriority(QAction::LowPriority);
-  //  connect(a, SIGNAL(triggered()), this, SLOT(fileSaveAs()));
-    //menu->addAction(a);
+//    action = new QAction(tr("Save &As..."), this);
+ //   action->setPriority(QAction::LowPriority);
+  //  connect(action, SIGNAL(triggered()), this, SLOT(fileSaveAs()));
+    //menu->addAction(action);
     //menu->addSeparator();
 
-//    a = new QAction(tr("&Quit"), this);
- //   a->setShortcut(Qt::CTRL + Qt::Key_Q);
-  //  connect(a, SIGNAL(triggered()), this, SLOT(close()));
-    //menu->addAction(a);
+//    action = new QAction(tr("&Quit"), this);
+ //   action->setShortcut(Qt::CTRL + Qt::Key_Q);
+  //  connect(action, SIGNAL(triggered()), this, SLOT(close()));
+    //menu->addAction(action);
 }
 
 void MailEditor::setupAddressBar()
@@ -312,90 +313,90 @@ void MailEditor::updateAddressBarLayout()
 
 void MailEditor::enableFormat(bool show_format)
 {
-    format_tb->setVisible(show_format);
+    format_tool_bar->setVisible(show_format);
    // style_tb->setVisible(show_format);
 }
 void MailEditor::enableSendMoney(bool show_send_money )
 {
-    money_tb->setVisible(show_send_money);
+    money_tool_bar->setVisible(show_send_money);
    // style_tb->setVisible(show_format);
 }
 void MailEditor::showAttachFileDialog(bool show_send_money )
 {
-   // money_tb->setVisible(show_send_money);
+   // money_tool_bar->setVisible(show_send_money);
    // style_tb->setVisible(show_format);
 }
 
 void MailEditor::setupEditActions()
 {
-//    QToolBar *tb = new QToolBar(this);
-//    tb->setWindowTitle(tr("Edit Actions"));
- //   addToolBar(tb);
-    QMenu *menu = new QMenu(tr("&Edit"), this);
+//    QToolBar *tool_bar = new QToolBar(this);
+//    tool_bar->setWindowTitle(tr("Edit Actions"));
+ //   addToolBar(tool_bar);
+    QMenu* menu = new QMenu(tr("&Edit"), this);
     //menuBar()->addMenu(menu);
 
-    QAction *a;
-    a = actionUndo = new QAction(QIcon::fromTheme("edit-undo", QIcon(rsrcPath + "/editundo.png")),
+    QAction* action;
+    action = actionUndo = new QAction(QIcon::fromTheme("edit-undo", QIcon(rsrcPath + "/editundo.png")),
                                               tr("&Undo"), this);
-    a->setShortcut(QKeySequence::Undo);
-//    tb->addAction(a);
-    menu->addAction(a);
-    a = actionRedo = new QAction(QIcon::fromTheme("edit-redo", QIcon(rsrcPath + "/editredo.png")),
+    action->setShortcut(QKeySequence::Undo);
+//    tool_bar->addAction(a);
+    menu->addAction(action);
+    action = actionRedo = new QAction(QIcon::fromTheme("edit-redo", QIcon(rsrcPath + "/editredo.png")),
                                               tr("&Redo"), this);
-    a->setPriority(QAction::LowPriority);
-    a->setShortcut(QKeySequence::Redo);
-//    tb->addAction(a);
-    menu->addAction(a);
+    action->setPriority(QAction::LowPriority);
+    action->setShortcut(QKeySequence::Redo);
+//    tool_bar->addAction(a);
+    menu->addAction(action);
     menu->addSeparator();
-    a = actionCut = new QAction(QIcon::fromTheme("edit-cut", QIcon(rsrcPath + "/editcut.png")),
+    action = actionCut = new QAction(QIcon::fromTheme("edit-cut", QIcon(rsrcPath + "/editcut.png")),
                                              tr("Cu&t"), this);
-    a->setPriority(QAction::LowPriority);
-    a->setShortcut(QKeySequence::Cut);
-//    tb->addAction(a);
-    menu->addAction(a);
-    a = actionCopy = new QAction(QIcon::fromTheme("edit-copy", QIcon(rsrcPath + "/editcopy.png")),
+    action->setPriority(QAction::LowPriority);
+    action->setShortcut(QKeySequence::Cut);
+//    tool_bar->addAction(a);
+    menu->addAction(action);
+    action = actionCopy = new QAction(QIcon::fromTheme("edit-copy", QIcon(rsrcPath + "/editcopy.png")),
                                  tr("&Copy"), this);
-    a->setPriority(QAction::LowPriority);
-    a->setShortcut(QKeySequence::Copy);
-//    tb->addAction(a);
-    menu->addAction(a);
-    a = actionPaste = new QAction(QIcon::fromTheme("edit-paste", QIcon(rsrcPath + "/editpaste.png")),
+    action->setPriority(QAction::LowPriority);
+    action->setShortcut(QKeySequence::Copy);
+//    tool_bar->addAction(a);
+    menu->addAction(action);
+    action = actionPaste = new QAction(QIcon::fromTheme("edit-paste", QIcon(rsrcPath + "/editpaste.png")),
                                   tr("&Paste"), this);
-    a->setPriority(QAction::LowPriority);
-    a->setShortcut(QKeySequence::Paste);
-//    tb->addAction(a);
-    menu->addAction(a);
+    action->setPriority(QAction::LowPriority);
+    action->setShortcut(QKeySequence::Paste);
+//    tool_bar->addAction(a);
+    menu->addAction(action);
 #ifndef QT_NO_CLIPBOARD
-    if (const QMimeData *md = QApplication::clipboard()->mimeData())
-        actionPaste->setEnabled(md->hasText());
+    if (const QMimeData* mime_data = QApplication::clipboard()->mimeData())
+        actionPaste->setEnabled(mime_data->hasText());
 #endif
 }
 void MailEditor::setupMoneyToolBar()
 {
-    auto tb = money_tb = new QToolBar(this);
-    tb->hide();
-    tb->setIconSize( QSize( 16,16 ) );
-    layout->addWidget( tb, 3, 0 );
+    auto tool_bar = money_tool_bar = new QToolBar(this);
+    tool_bar->hide();
+    tool_bar->setIconSize( QSize( 16,16 ) );
+    layout->addWidget( tool_bar, 3, 0 );
 
-    money_amount = new QLineEdit(tb);
+    money_amount = new QLineEdit(tool_bar);
     money_amount->setPlaceholderText( "0.00" );
-    money_unit   = new QComboBox(tb);
+    money_unit   = new QComboBox(tool_bar);
     money_unit->insertItem( 0, QIcon::fromTheme("currency-bitcoin", QIcon( ":/images/bitcoin.png" ) ), QString("BTC") );
     money_unit->insertItem( 1, QIcon::fromTheme("currency-litecoin", QIcon( ":/images/litecoin128.png" ) ), QString("LTC") );
     money_unit->insertItem( 2, QIcon::fromTheme("currency-bitusd", QIcon( ":/images/bitusd.png" ) ), QString("BitUSD") );
 
     connect( money_unit, SIGNAL(currentIndexChanged(int)), this, SLOT(moneyUnitChanged(int)) );
     
-    money_balance = new QLabel("Balance: 17.76 BTC",tb );
+    money_balance = new QLabel("Balance: 17.76 BTC",tool_bar );
 
-    QWidget* spacer = new QWidget(tb);
-    QWidget* spacer2 = new QWidget(tb);
+    QWidget* spacer = new QWidget(tool_bar);
+    QWidget* spacer2 = new QWidget(tool_bar);
     spacer->setMaximumWidth(10);
-    tb->addWidget(spacer);
-    tb->addWidget(money_amount);
-    tb->addWidget(money_unit);
-    tb->addWidget(spacer2);
-    tb->addWidget(money_balance);
+    tool_bar->addWidget(spacer);
+    tool_bar->addWidget(money_amount);
+    tool_bar->addWidget(money_unit);
+    tool_bar->addWidget(spacer2);
+    tool_bar->addWidget(money_balance);
 
     money_amount->setMaximumWidth(120);
 }
@@ -418,15 +419,15 @@ void MailEditor::moneyUnitChanged( int index )
 
 void MailEditor::setupTextActions()
 {
-    auto tb = format_tb = new QToolBar(this);
-    tb->setIconSize( QSize( 16,16 ) );
-    layout->addWidget( tb, 2, 0 );
+    auto tool_bar = format_tool_bar = new QToolBar(this);
+    tool_bar->setIconSize( QSize( 16,16 ) );
+    layout->addWidget( tool_bar, 2, 0 );
 
 
-//    tb->setWindowTitle(tr("Format Actions"));
-    //addToolBar(tb);
+//    tool_bar->setWindowTitle(tr("Format Actions"));
+    //addToolBar(tool_bar);
 
-    QMenu *menu = new QMenu(tr("F&ormat"), this);
+    QMenu* menu = new QMenu(tr("F&ormat"), this);
     //menuBar()->addMenu(menu);
 
     actionTextBold = new QAction(QIcon::fromTheme("format-text-bold", QIcon(rsrcPath + "/textbold.png")),
@@ -437,7 +438,7 @@ void MailEditor::setupTextActions()
     bold.setBold(true);
     actionTextBold->setFont(bold);
     connect(actionTextBold, SIGNAL(triggered()), this, SLOT(textBold()));
-    tb->addAction(actionTextBold);
+    tool_bar->addAction(actionTextBold);
     menu->addAction(actionTextBold);
     actionTextBold->setCheckable(true);
 
@@ -450,7 +451,7 @@ void MailEditor::setupTextActions()
     italic.setItalic(true);
     actionTextItalic->setFont(italic);
     connect(actionTextItalic, SIGNAL(triggered()), this, SLOT(textItalic()));
-    tb->addAction(actionTextItalic);
+    tool_bar->addAction(actionTextItalic);
     menu->addAction(actionTextItalic);
     actionTextItalic->setCheckable(true);
 
@@ -463,7 +464,7 @@ void MailEditor::setupTextActions()
     underline.setUnderline(true);
     actionTextUnderline->setFont(underline);
     connect(actionTextUnderline, SIGNAL(triggered()), this, SLOT(textUnderline()));
-    tb->addAction(actionTextUnderline);
+    tool_bar->addAction(actionTextUnderline);
     menu->addAction(actionTextUnderline);
     actionTextUnderline->setCheckable(true);
 
@@ -511,7 +512,7 @@ void MailEditor::setupTextActions()
     actionAlignJustify->setCheckable(true);
     actionAlignJustify->setPriority(QAction::LowPriority);
 
-    tb->addActions(grp->actions());
+    tool_bar->addActions(grp->actions());
     menu->addActions(grp->actions());
 
     menu->addSeparator();
@@ -520,20 +521,20 @@ void MailEditor::setupTextActions()
     pix.fill(Qt::black);
     actionTextColor = new QAction(pix, tr("&Color..."), this);
     connect(actionTextColor, SIGNAL(triggered()), this, SLOT(textColor()));
-    tb->addAction(actionTextColor);
+    tool_bar->addAction(actionTextColor);
     menu->addAction(actionTextColor);
 
-    //format_tb = tb = new QToolBar(this);
-    //layout->addWidget( tb, 3, 0 );
-    //tb->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
-    //tb->setWindowTitle(tr("Format Actions"));
+    //format_tool_bar = tool_bar = new QToolBar(this);
+    //layout->addWidget( tool_bar, 3, 0 );
+    //tool_bar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
+    //tool_bar->setWindowTitle(tr("Format Actions"));
     //addToolBarBreak(Qt::TopToolBarArea);
-    //addToolBar(tb);
+    //addToolBar(tool_bar);
 
 
-    comboSize = new QComboBox(tb);
+    comboSize = new QComboBox(tool_bar);
     comboSize->setObjectName("comboSize");
-    tb->addWidget(comboSize);
+    tool_bar->addWidget(comboSize);
     comboSize->setEditable(true);
 
     QFontDatabase db;
@@ -544,8 +545,8 @@ void MailEditor::setupTextActions()
     comboSize->setCurrentIndex(comboSize->findText(QString::number(QApplication::font()
                                                                    .pointSize())));
 
-    comboFont = new QFontComboBox(tb);
-    tb->addWidget(comboFont);
+    comboFont = new QFontComboBox(tool_bar);
+    tool_bar->addWidget(comboFont);
     connect(comboFont, SIGNAL(activated(QString)), this, SLOT(textFamily(QString)));
 }
 
@@ -782,7 +783,7 @@ void MailEditor::textColor()
     colorChanged(col);
 }
 
-void MailEditor::textAlign(QAction *a)
+void MailEditor::textAlign(QAction* a)
 {
     if (a == actionAlignLeft)
         textEdit->setAlignment(Qt::AlignLeft | Qt::AlignAbsolute);
@@ -794,7 +795,7 @@ void MailEditor::textAlign(QAction *a)
         textEdit->setAlignment(Qt::AlignJustify);
 }
 
-void MailEditor::currentCharFormatChanged(const QTextCharFormat &format)
+void MailEditor::currentCharFormatChanged(const QTextCharFormat& format)
 {
     fontChanged(format.font());
     colorChanged(format.foreground().color());
@@ -829,31 +830,31 @@ void MailEditor::mergeFormatOnWordOrSelection(const QTextCharFormat &format)
     textEdit->mergeCurrentCharFormat(format);
 }
 
-void MailEditor::fontChanged(const QFont &f)
+void MailEditor::fontChanged(const QFont& new_font)
 {
-    comboFont->setCurrentIndex(comboFont->findText(QFontInfo(f).family()));
-    comboSize->setCurrentIndex(comboSize->findText(QString::number(f.pointSize())));
-    actionTextBold->setChecked(f.bold());
-    actionTextItalic->setChecked(f.italic());
-    actionTextUnderline->setChecked(f.underline());
+    comboFont->setCurrentIndex(comboFont->findText(QFontInfo(new_font).family()));
+    comboSize->setCurrentIndex(comboSize->findText(QString::number(new_font.pointSize())));
+    actionTextBold->setChecked(new_font.bold());
+    actionTextItalic->setChecked(new_font.italic());
+    actionTextUnderline->setChecked(new_font.underline());
 }
 
-void MailEditor::colorChanged(const QColor &c)
+void MailEditor::colorChanged(const QColor& new_color)
 {
-    QPixmap pix(16, 16);
-    pix.fill(c);
-    actionTextColor->setIcon(pix);
+    QPixmap pixmap(16, 16);
+    pixmap.fill(new_color);
+    actionTextColor->setIcon(pixmap);
 }
 
-void MailEditor::alignmentChanged(Qt::Alignment a)
+void MailEditor::alignmentChanged(Qt::Alignment alignment)
 {
-    if (a & Qt::AlignLeft)
+    if (alignment & Qt::AlignLeft)
         actionAlignLeft->setChecked(true);
-    else if (a & Qt::AlignHCenter)
+    else if (alignment & Qt::AlignHCenter)
         actionAlignCenter->setChecked(true);
-    else if (a & Qt::AlignRight)
+    else if (alignment & Qt::AlignRight)
         actionAlignRight->setChecked(true);
-    else if (a & Qt::AlignJustify)
+    else if (alignment & Qt::AlignJustify)
         actionAlignJustify->setChecked(true);
 }
 

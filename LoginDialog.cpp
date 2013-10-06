@@ -23,8 +23,8 @@ void LoginDialog::onLogin()
 {
     try {
        password = ui->password->text().toStdString();
-       auto pro = bts::application::instance()->load_profile(password);
-       if( pro )
+       auto profile = bts::application::instance()->load_profile(password);
+       if( profile )
        {
            accept();
        }

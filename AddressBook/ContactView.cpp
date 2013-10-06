@@ -10,12 +10,12 @@
 
 #include <QWebFrame>
 
-bool ContactView::eventFilter(QObject *obj, QEvent *event)
+bool ContactView::eventFilter(QObject* object, QEvent* event)
 {
   if (event->type() == QEvent::KeyPress) 
   {
-     QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-     switch(keyEvent->key()) 
+     QKeyEvent* key_event = static_cast<QKeyEvent*>(event);
+     switch(key_event->key()) 
      {
         case Qt::Key_Enter:
         case Qt::Key_Return:
@@ -25,7 +25,7 @@ bool ContactView::eventFilter(QObject *obj, QEvent *event)
            break;
      }
   }
-  return QObject::eventFilter(obj, event);
+  return QObject::eventFilter(object, event);
 }
 
 bool ContactView::isChatSelected()
@@ -40,23 +40,23 @@ void ContactView::sendChatMessage()
     if( msg.size() != 0 )
     {
         auto app = bts::application::instance();
-        auto pro = app->get_profile();
-        auto  idents = pro->identities();
-        bts::bitchat::private_text_message txt_msg( msg.toStdString() );
+        auto profile = app->get_profile();
+        auto  idents = profile->identities();
+        bts::bitchat::private_text_message text_msg( msg.toStdString() );
         if( idents.size() )
         {
-           fc::ecc::private_key my_priv_key = pro->get_keychain().get_identity_key( idents[0].dac_id );
-           app->send_text_message( txt_msg, _current_contact.public_key, my_priv_key );
+           fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key( idents[0].dac_id );
+           app->send_text_message( text_msg, _current_contact.public_key, my_priv_key );
            appendChatMessage( "me", msg );
         }
 
         ui->chat_input->setPlainText(QString());
     }
 }
-void ContactView::appendChatMessage( const QString& from, const QString& msg, const QDateTime& dateTime )
+void ContactView::appendChatMessage( const QString& from, const QString& msg, const QDateTime& date_time )
 { //DLNFIX2 improve formatting later
     wlog( "append... ${msg}", ("msg",msg.toStdString() ) );
-    QString formatted_msg = dateTime.toString("hh:mm ap") + " "+ from + ": " + msg;
+    QString formatted_msg = date_time.toString("hh:mm ap") + " "+ from + ": " + msg;
     #if 1
     QColor color;
     if (from == "me")
@@ -67,18 +67,19 @@ void ContactView::appendChatMessage( const QString& from, const QString& msg, co
     ui->chat_conversation->append(formatted_msg);
     #else //this doesn't start new paragraphs, probably not worth spending
     //time on as we'll like junk in favor of somethng else later
-    QTextCursor cursor = ui->chat_conversation->textCursor();
+    QTextCursor text_cursor = ui->chat_conversation->textCursor();
     QString colorName = (from == "me") ? "grey" : "black";
     formatted_msg = QString("<font color=\"%1\">%2</font>").arg(colorName).arg(formatted_msg);
     ui->chat_conversation->insertHtml(formatted_msg);
     cursor.movePosition(QTextCursor::NextBlock);
-    ui->chat_conversation->setTextCursor(cursor);
+    ui->chat_conversation->setTextCursor(text_cursor);
     #endif
 }
 
 
 ContactView::ContactView( QWidget* parent )
-:QWidget(parent),ui( new Ui::ContactView() )
+: QWidget(parent),
+  ui( new Ui::ContactView() )
 {
    _address_book = nullptr;
    _complete = false;

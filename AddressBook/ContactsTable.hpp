@@ -14,7 +14,7 @@ class ContactsTable  : public QWidget
     ContactsTable( QWidget* parent = nullptr );
     ~ContactsTable();
 
-    void setAddressBook( AddressBookModel* abook_model );
+    void setAddressBook( AddressBookModel* addressbook_model );
     void openContact( const QModelIndex& index );
 
   Q_SIGNALS:

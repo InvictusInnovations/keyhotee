@@ -29,7 +29,8 @@ QDateTime toQDateTime( const fc::time_point_sec& sec )
 }
 
 InboxModel::InboxModel( QObject* parent, const bts::profile_ptr& user_profile )
-:QAbstractTableModel(parent),my( new Detail::InboxModelImpl() )
+: QAbstractTableModel(parent),
+  my( new Detail::InboxModelImpl() )
 {
    my->_user_profile = user_profile;
    my->_attachment_icon = QIcon( ":/images/paperclip-icon.png" );

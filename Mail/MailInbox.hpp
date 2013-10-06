@@ -17,7 +17,7 @@ class MailInbox : public QWidget
        MailInbox( QWidget* parent = nullptr );
       ~MailInbox();
 
-      void setModel( QAbstractItemModel* m, InboxType type = Inbox );
+      void setModel( QAbstractItemModel* model, InboxType type = Inbox );
 
    private:
       std::unique_ptr<Ui::MailInbox> ui;

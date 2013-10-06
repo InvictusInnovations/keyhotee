@@ -16,7 +16,7 @@ class ContactView : public QWidget
      ContactView( QWidget* parent = nullptr );
      ~ContactView();
 
-     void              setAddressBook( AddressBookModel* addressbook );
+     void              setAddressBook( AddressBookModel* address_book );
      AddressBookModel* getAddressBook()const;
 
      void setContact( const Contact& current_contact, ContactDisplay contact_display = chat );
@@ -39,7 +39,7 @@ class ContactView : public QWidget
 
      bool isChatSelected();
      void sendChatMessage();
-     void appendChatMessage( const QString& from, const QString& msg, const QDateTime& dateTime = QDateTime::currentDateTime() );
+     void appendChatMessage( const QString& from, const QString& msg, const QDateTime& date_time = QDateTime::currentDateTime() );
 
   protected:
       bool eventFilter(QObject *obj, QEvent *event);

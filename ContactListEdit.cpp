@@ -66,12 +66,12 @@ void ContactListEdit::insertCompletion( const QString& completion )
     default_font.setPointSize( default_font.pointSize() - 2 );
     QFontMetrics font_metrics(default_font);
     QRect        bounding = font_metrics.boundingRect( completion );
-    int          comp_width = font_metrics.width( completion );
-    int          comp_height = bounding.height();
+    int          completion_width = font_metrics.width( completion );
+    int          completion_height = bounding.height();
 
-    comp_width += 20;
+    completion_width += 20;
 
-    QImage completion_image( comp_width, comp_height+4, QImage::Format_ARGB32 );
+    QImage completion_image( completion_width, completion_height+4, QImage::Format_ARGB32 );
     completion_image.fill( QColor( 0,0,0,0 ) );
     QPainter painter;
     painter.begin(&completion_image);
@@ -85,40 +85,40 @@ void ContactListEdit::insertCompletion( const QString& completion )
 
     painter.setBrush( brush );
     painter.setPen(pen);
-    painter.drawRoundedRect( 0, 0, comp_width-1, completion_image.height()-1, 8, 8, Qt::AbsoluteSize );
+    painter.drawRoundedRect( 0, 0, completion_width-1, completion_image.height()-1, 8, 8, Qt::AbsoluteSize );
     painter.setPen(QPen());
-    painter.drawText( QPoint( 10, comp_height - 2 ), completion );
+    painter.drawText( QPoint( 10, completion_height - 2 ), completion );
 
-    QTextCursor tc = textCursor();
+    QTextCursor text_cursor = textCursor();
     uint32_t prefix_len =  _completer->completionPrefix().length();
     for( uint32_t i = 0; i < prefix_len; ++i )
     {
-        tc.deletePreviousChar();
+        text_cursor.deletePreviousChar();
     }
    // int extra = completion.length() -
    // tc.movePosition(QTextCursor::Left);
    // tc.movePosition(QTextCursor::EndOfWord);
    // tc.insertText(completion.right(extra));
-    tc.insertImage( completion_image, completion );
-    tc.insertText(" ");
-    setTextCursor(tc);
+    text_cursor.insertImage( completion_image, completion );
+    text_cursor.insertText(" ");
+    setTextCursor(text_cursor);
 }
 
 //! [5]
 QString ContactListEdit::textUnderCursor() const
 {
-    QTextCursor tc = textCursor();
-    tc.select(QTextCursor::WordUnderCursor);
-    return tc.selectedText();
+    QTextCursor text_cursor = textCursor();
+    text_cursor.select(QTextCursor::WordUnderCursor);
+    return text_cursor.selectedText();
 }
 //! [5]
 
 //! [6]
-void ContactListEdit::focusInEvent(QFocusEvent *e)
+void ContactListEdit::focusInEvent(QFocusEvent* focus_event)
 {
     if (_completer)
         _completer->setWidget(this);
-    QTextEdit::focusInEvent(e);
+    QTextEdit::focusInEvent(focus_event);
 }
 //! [6]
 
@@ -132,38 +132,38 @@ bool ContactListEdit::focusNextPrevChild(bool next)
 }
 
 //! [7]
-void ContactListEdit::keyPressEvent(QKeyEvent *e)
+void ContactListEdit::keyPressEvent(QKeyEvent* key_event)
 {
     if ( _completer && _completer->popup()->isVisible()) {
         // The following keys are forwarded by the completer to the widget
-       switch (e->key()) {
+       switch (key_event->key()) {
        case Qt::Key_Enter:
        case Qt::Key_Return:
        case Qt::Key_Escape:
        case Qt::Key_Tab:
        case Qt::Key_Backtab:
-            e->ignore();
+            key_event->ignore();
             return; // let the completer do default behavior
        default:
            break;
        }
     }
-    bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
+    bool isShortcut = ((key_event->modifiers() & Qt::ControlModifier) && key_event->key() == Qt::Key_E); // CTRL+E
     if (!_completer || !isShortcut) // do not process the shortcut when we have a completer
-        QTextEdit::keyPressEvent(e);
+        QTextEdit::keyPressEvent(key_event);
 //! [7]
 
 //! [8]
-    const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
-    if (!_completer || (ctrlOrShift && e->text().isEmpty()))
+    const bool ctrlOrShift = key_event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+    if (!_completer || (ctrlOrShift && key_event->text().isEmpty()))
         return;
 
     static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-="); // end of word
-    bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
+    bool hasModifier = (key_event->modifiers() != Qt::NoModifier) && !ctrlOrShift;
     QString completionPrefix = textUnderCursor();
 
-    if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() == 0
-                      || eow.contains(e->text().right(1)))) {
+    if (!isShortcut && (hasModifier || key_event->text().isEmpty()|| completionPrefix.length() == 0
+                      || eow.contains(key_event->text().right(1)))) {
         _completer->popup()->hide();
         return;
     }
@@ -178,8 +178,6 @@ void ContactListEdit::keyPressEvent(QKeyEvent *e)
     _completer->complete(cr); // popup it up!
 }
 //! [8]
-
-
 
 QSize ContactListEdit::sizeHint() const 
 {
@@ -197,8 +195,9 @@ void ContactListEdit::fitHeightToDocument()
      setMaximumHeight(document_size.height());
      updateGeometry();
 }
-void ContactListEdit::resizeEvent( QResizeEvent* e )
+
+void ContactListEdit::resizeEvent( QResizeEvent* resize_event )
 {
     fitHeightToDocument();
-    QTextEdit::resizeEvent(e);
+    QTextEdit::resizeEvent(resize_event);
 }

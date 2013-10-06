@@ -51,7 +51,7 @@ class InboxModel : public QAbstractTableModel
 
     virtual bool removeRows( int row, int count, const QModelIndex& parent = QModelIndex() );
 
-    virtual QVariant headerData( int section, Qt::Orientation o, int role = Qt::DisplayRole )const;
+    virtual QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole )const;
     virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole )const;
 
   private:

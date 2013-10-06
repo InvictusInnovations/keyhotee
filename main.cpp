@@ -40,10 +40,10 @@ bts::application_config load_config( const std::string& profile_name )
         out << fc::json::to_pretty_string( default_cfg );
      }
 
-     auto conf = fc::json::from_file( config_file ).as<bts::application_config>();
+     auto app_config = fc::json::from_file( config_file ).as<bts::application_config>();
      fc::ofstream out( config_file );
-     out << fc::json::to_pretty_string( conf );
-     return conf;
+     out << fc::json::to_pretty_string( app_config );
+     return app_config;
 } FC_RETHROW_EXCEPTIONS( warn, "") }
 
 
@@ -69,7 +69,7 @@ void startup( const std::string& profile_name )
 int main( int argc, char** argv )
 {
   #ifdef WIN32
-  bool consoleOk = AllocConsole();
+  bool console_ok = AllocConsole();
   freopen( "CONOUT$", "wb", stdout);
   freopen( "CONOUT$", "wb", stderr);
   printf("testing stdout\n");
@@ -118,29 +118,29 @@ int main( int argc, char** argv )
   return -1;
 }
 
-void start_profile_creation_wizard( const bts::application_ptr& btsapp )
+void start_profile_creation_wizard( const bts::application_ptr& /*btsapp*/)
 {
    // TODO: figure out memory management here..
-   auto pro_wiz = new ProfileWizard(nullptr);  
-   pro_wiz->resize( QSize( 640, 525 ) );
-   pro_wiz->show();
+   auto profile_wizard = new ProfileWizard(nullptr);  
+   profile_wizard->resize( QSize( 640, 525 ) );
+   profile_wizard->show();
 }
 
 void display_main_window()
 {
-  KeyhoteeMainWindow* mainwindow = GetKeyhoteeWindow();
-  mainwindow->show();
+  KeyhoteeMainWindow* main_window = GetKeyhoteeWindow();
+  main_window->show();
 }
 
 void display_login()
 {
-    LoginDialog* login = new LoginDialog();
-    login->connect( login, &QDialog::accepted,
+    LoginDialog* login_dialog = new LoginDialog();
+    login_dialog->connect( login_dialog, &QDialog::accepted,
                     [=](){ 
-                        login->deleteLater();
+                        login_dialog->deleteLater();
                         display_main_window(); 
                     } );
-    login->show();
+    login_dialog->show();
 }
 
 

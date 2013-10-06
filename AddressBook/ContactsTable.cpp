@@ -8,17 +8,17 @@
 #include <QHeaderView>
 
 ContactsTable::ContactsTable( QWidget* parent )
-:QWidget(parent), ui( new Ui::ContactsTable() )
+: QWidget(parent), 
+  ui( new Ui::ContactsTable() )
 {
   ui->setupUi(this); 
 }
 
-
 ContactsTable::~ContactsTable(){}
 
-void ContactsTable::setAddressBook( AddressBookModel* abook_model )
+void ContactsTable::setAddressBook( AddressBookModel* addressbook_model )
 {
-  _addressbook_model = abook_model;
+  _addressbook_model = addressbook_model;
   if( _addressbook_model )
   {
      _sorted_addressbook_model = new QSortFilterProxyModel( this );
@@ -30,9 +30,9 @@ void ContactsTable::setAddressBook( AddressBookModel* abook_model )
   ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-  connect( ui->contact_table, &QAbstractItemView::activated, 
-           this, &ContactsTable::openContact );
+  connect( ui->contact_table, &QAbstractItemView::activated, this, &ContactsTable::openContact );
 }
+
 void ContactsTable::openContact( const QModelIndex& index )
 {
    auto contact_id = _addressbook_model->getContact(index).wallet_index;

@@ -4,7 +4,7 @@
 #include <QToolBar>
 
 MailViewer::MailViewer( QWidget* parent )
-:ui( new Ui::MailViewer() )
+: ui( new Ui::MailViewer() )
 {
    ui->setupUi( this );
 
@@ -24,11 +24,11 @@ MailViewer::MailViewer( QWidget* parent )
 
    message_tools->addAction( delete_mail );
 
-   QGridLayout* l = new QGridLayout(ui->toolbar_container);
-   l->setContentsMargins( 0,0,0,0);
-   l->setSpacing(0);
-   ui->toolbar_container->setLayout(l);
-   l->addWidget(message_tools,0,0);
+   QGridLayout* grid_layout = new QGridLayout(ui->toolbar_container);
+   grid_layout->setContentsMargins( 0,0,0,0);
+   grid_layout->setSpacing(0);
+   ui->toolbar_container->setLayout(grid_layout);
+   grid_layout->addWidget(message_tools,0,0);
 }
 
 MailViewer::~MailViewer()

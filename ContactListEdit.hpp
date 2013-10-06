@@ -14,16 +14,16 @@ class ContactListEdit : public QTextEdit
       ContactListEdit( QWidget* parent = nullptr );
       ~ContactListEdit();
 
-      void setCompleter( QCompleter* c );
+      void setCompleter( QCompleter* completer );
       QCompleter* getCompleter();
 
       QSize sizeHint() const;
       QSize maximumSizeHint() const { return sizeHint(); }
       bool focusNextPrevChild(bool);
    protected:
-       void keyPressEvent( QKeyEvent* e );
-       void focusInEvent( QFocusEvent* e );
-       void resizeEvent( QResizeEvent* e );
+       void keyPressEvent( QKeyEvent* key_event );
+       void focusInEvent( QFocusEvent* focus_event );
+       void resizeEvent( QResizeEvent* resize_event );
    
    private Q_SLOTS:
        void insertCompletion( const QString& completion );

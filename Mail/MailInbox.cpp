@@ -3,7 +3,8 @@
 #include "InboxModel.hpp"
 
 MailInbox::MailInbox( QWidget* parent )
-:ui( new Ui::MailInbox() ),_type(Inbox)
+: ui( new Ui::MailInbox() ),
+  _type(Inbox)
 {
    ui->setupUi( this );
 }
@@ -11,10 +12,11 @@ MailInbox::MailInbox( QWidget* parent )
 MailInbox::~MailInbox()
 {
 }
-void MailInbox::setModel( QAbstractItemModel* m, InboxType type )
+
+void MailInbox::setModel( QAbstractItemModel* model, InboxType type )
 {
    _type = type;
-   ui->inbox_table->setModel(m);
+   ui->inbox_table->setModel(model);
 
    ui->inbox_table->horizontalHeader()->resizeSection( InboxModel::To, 120 );
    ui->inbox_table->horizontalHeader()->resizeSection( InboxModel::Subject, 300 );

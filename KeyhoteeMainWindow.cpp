@@ -73,28 +73,28 @@ void ContactGui::receiveChatMessage( const QString& from, const QString& msg, co
 
 void ContactGui::updateTreeItemDisplay()
 {
-    QString displayText;
+    QString display_text;
     QString name = _view->getContact().getLabel();
     if (_unread_msg_count)
-      displayText = QString("%1 (%2)").arg(name).arg(_unread_msg_count);
+      display_text = QString("%1 (%2)").arg(name).arg(_unread_msg_count);
     else
-      displayText = name;
-    _tree_item->setText(0,displayText);
+      display_text = name;
+    _tree_item->setText(0,display_text);
 }
 
 
 class ApplicationDelegate : public bts::application_delegate
 {
     public:
-     KeyhoteeMainWindow& _mainwindow;
+     KeyhoteeMainWindow& _main_window;
      ApplicationDelegate( KeyhoteeMainWindow& window )
-     :_mainwindow(window)
+     :_main_window(window)
      {
      }
 
      virtual void received_text( const bts::bitchat::decrypted_message& msg)
      {
-        auto opt_contact = _mainwindow._addressbook->get_contact_by_public_key( *(msg.from_key) );
+        auto opt_contact = _main_window._addressbook->get_contact_by_public_key( *(msg.from_key) );
         if( !opt_contact )
         {
             elog( "Recieved text from unknown contact!" );
@@ -102,7 +102,7 @@ class ApplicationDelegate : public bts::application_delegate
         else
         {
             wlog( "Received text from known contact!" );
-            auto contact_gui = _mainwindow.createContactGuiIfNecessary( opt_contact->wallet_index );
+            auto contact_gui = _main_window.createContactGuiIfNecessary( opt_contact->wallet_index );
             auto text = msg.as<bts::bitchat::private_text_message>();
             QDateTime dateTime;
             dateTime.setTime_t(msg.sig_time.sec_since_epoch());
@@ -218,12 +218,12 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
 
     auto app    = bts::application::instance();
     app->set_application_delegate( _app_delegate.get() );
-    auto pro    = app->get_profile();
-    auto idents = pro->identities();
+    auto profile    = app->get_profile();
+    auto idents = profile->identities();
 
-    _inbox  = new InboxModel(this,pro);
+    _inbox  = new InboxModel(this,profile);
 
-    _addressbook_model  = new AddressBookModel( this, pro->get_addressbook() );
+    _addressbook_model  = new AddressBookModel( this, profile->get_addressbook() );
     connect( _addressbook_model, &QAbstractItemModel::dataChanged, this, &KeyhoteeMainWindow::addressBookDataChanged );
 
     ui->contacts_page->setAddressBook(_addressbook_model);
@@ -251,13 +251,13 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
         }
     */
         app->mine_name( idents[i].dac_id, 
-                        pro->get_keychain().get_identity_key( idents[i].dac_id ).get_public_key(), 
+                        profile->get_keychain().get_identity_key( idents[i].dac_id ).get_public_key(), 
                         idents[i].mining_effort );
     }
-    _addressbook = pro->get_addressbook();
+    _addressbook = profile->get_addressbook();
 
     /*
-    auto abook  = pro->get_addressbook();
+    auto abook  = profile->get_addressbook();
     auto contacts = abook->get_known_bitnames();
     for( auto itr = contacts.begin(); itr != contacts.end(); ++itr )
     {
@@ -290,8 +290,8 @@ void KeyhoteeMainWindow::addContact()
         if( result == QDialog::Accepted )
         {
            auto app    = bts::application::instance();
-           auto pro    = app->get_profile();
-           auto abook  = pro->get_addressbook();
+           auto profile    = app->get_profile();
+           auto abook  = profile->get_addressbook();
            abook->store_contact( editcon->getContact() );
         }
         editcon->deleteLater();
@@ -456,8 +456,8 @@ void KeyhoteeMainWindow::createContactGui( int contact_id )
     _contact_guis[contact_id] = contact_gui;
 
     view->setAddressBook( _addressbook_model );
-    const Contact& con = _addressbook_model->getContactById( contact_id );
-    view->setContact(con);
+    const Contact& contact = _addressbook_model->getContactById( contact_id );
+    view->setContact(contact);
     ui->widget_stack->addWidget( view );
 
 }

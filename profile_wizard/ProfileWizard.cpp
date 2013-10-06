@@ -12,20 +12,16 @@ class NymPage : public QWizardPage
 {
     public:
         NymPage( QWidget* parent )
-        :QWizardPage(parent),_complete(false)
+        : QWizardPage(parent),
+         _complete(false)
         {
           setTitle( tr( "Create your Keyhotee ID" ) );
           _profile_nym_ui.setupUi(this);
 
-          connect( _profile_nym_ui.keyhotee_id, &QLineEdit::textEdited,
-                  this, &NymPage::validateId );
+          connect( _profile_nym_ui.keyhotee_id, &QLineEdit::textEdited, this, &NymPage::validateId );
         }
 
-        virtual bool isComplete()const
-        {
-            return _complete;
-        }
-
+        virtual bool isComplete() const { return _complete; }
 
         /** starts a lookup timer that will send a query one second
          * after the most recent edit unless another character is
@@ -49,9 +45,9 @@ class NymPage : public QWizardPage
         void lookupId()
         {
             try {
-                auto cur_id = _profile_nym_ui.keyhotee_id->text().toStdString();
-                auto opt_name_rec = bts::application::instance()->lookup_name( cur_id );
-                if( opt_name_rec )
+                auto current_id = _profile_nym_ui.keyhotee_id->text().toStdString();
+                auto opt_name_record = bts::application::instance()->lookup_name( current_id );
+                if( opt_name_record )
                 {
                      _profile_nym_ui.id_warning->setText( tr( "This ID has been taken by another user" ) );
                 }
@@ -78,35 +74,26 @@ class ProfileEditPage : public QWizardPage
 {
    public:
       ProfileEditPage( QWidget* parent )
-      :QWizardPage(parent)
+      : QWizardPage(parent)
       {
           setTitle( tr( "Create your Keyhotee Profile" ) );
           ui.setupUi(this);
-
-
-          connect( ui.generaterandom, &QPushButton::clicked,
-                   this, &ProfileEditPage::generateSeed );
-          
-          connect( ui.brainkey, &QLineEdit::textChanged,
-                   this, &ProfileEditPage::brainKeyEdited );
-          
-          connect( ui.local_password1, &QLineEdit::textEdited,
-                   this, &ProfileEditPage::loginPasswordEdited );
-          
-          connect( ui.local_password2, &QLineEdit::textEdited,
-                   this, &ProfileEditPage::loginPasswordCheckEdited );
+          connect( ui.generaterandom, &QPushButton::clicked, this, &ProfileEditPage::generateSeed );          
+          connect( ui.brainkey, &QLineEdit::textChanged, this, &ProfileEditPage::brainKeyEdited );          
+          connect( ui.local_password1, &QLineEdit::textEdited, this, &ProfileEditPage::loginPasswordEdited );          
+          connect( ui.local_password2, &QLineEdit::textEdited, this, &ProfileEditPage::loginPasswordCheckEdited );
       }
 
       void generateSeed()
       {
-         auto key = fc::ecc::private_key::generate();
-         ui.brainkey->setText( std::string(key.get_secret()).c_str() );
+         auto private_key = fc::ecc::private_key::generate();
+         ui.brainkey->setText( std::string(private_key.get_secret()).c_str() );
          completeChanged();
       }
 
-      void brainKeyEdited( const QString& key )
+      void brainKeyEdited( const QString& brain_key )
       {
-         if( key.size() < 32 )
+         if( brain_key.size() < 32 )
          {
             ui.brainkey_warning->setText( tr( "Your Brain Key must be at least 32 characters" ) ); 
          }
@@ -146,6 +133,7 @@ class ProfileEditPage : public QWizardPage
          }
          completeChanged();
       }
+
       virtual bool isComplete()const
       {
           if( ui.brainkey->text().size() < 32 ) return false;
@@ -160,7 +148,7 @@ class ProfileEditPage : public QWizardPage
 
 
 ProfileWizard::ProfileWizard( QWidget* parent )
-:QWizard(parent)
+: QWizard(parent)
 {          
    setAttribute( Qt::WA_DeleteOnClose );
    setOption(HaveHelpButton, true);
@@ -173,11 +161,8 @@ ProfileWizard::ProfileWizard( QWidget* parent )
    _nym_page        = new NymPage(this);
    _profile_edit    = new ProfileEditPage(this);
 
-
    connect( this, &ProfileWizard::helpRequested, this, &ProfileWizard::showHelp );
-
    connect( this, &ProfileWizard::finished, this, &ProfileWizard::createProfile );
-
 
    setPage( Page_Intro, intro_page );
    setPage( Page_Profile, _profile_edit );
@@ -218,14 +203,13 @@ void ProfileWizard::createProfile( int result )
 
       std::string password = _profile_edit->ui.local_password1->text().toStdString();
 
-      auto bapp = bts::application::instance();
-      
-      auto pro = bapp->create_profile( conf, password );
-      assert( pro != nullptr );
+      auto app = bts::application::instance();      
+      auto profile = app->create_profile( conf, password );
+      assert( profile != nullptr );
       
       bts::identity new_ident;
       new_ident.dac_id = _nym_page->_profile_nym_ui.keyhotee_id->text().toStdString();
-      pro->store_identity( new_ident );
+      profile->store_identity( new_ident );
 
       display_main_window();
    }
