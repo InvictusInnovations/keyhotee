@@ -10,24 +10,21 @@
 
 
 
-const QIcon& Contact::getIcon()const
-{
-    return icon;
-}
+const QIcon& Contact::getIcon() const {return icon; }
 
-Contact::Contact( const bts::addressbook::wallet_contact& c )
-:bts::addressbook::wallet_contact(c)
+Contact::Contact( const bts::addressbook::wallet_contact& contact )
+: bts::addressbook::wallet_contact(contact)
 {
-   if( c.icon_png.size() )
+   if( contact.icon_png.size() )
    {
-        QImage img;
-        if( img.loadFromData( (unsigned char*)icon_png.data(), icon_png.size() ) )
+        QImage image;
+        if( image.loadFromData( (unsigned char*)icon_png.data(), icon_png.size() ) )
         {
-            icon = QIcon( QPixmap::fromImage(img) );
+            icon = QIcon( QPixmap::fromImage(image) );
         }
         else
         {
-            wlog( "unable to load icon for contact ${c}", ("c",c) );
+            wlog( "unable to load icon for contact ${c}", ("c",contact) );
         }
    }
    else
@@ -44,13 +41,13 @@ void Contact::setIcon( const QIcon& icon )
    if( !icon.isNull() )
    {
        QImage image;
-       QByteArray ba;
-       QBuffer buffer(&ba);
+       QByteArray byte_array;
+       QBuffer buffer(&byte_array);
        buffer.open(QIODevice::WriteOnly);
        image.save(&buffer, "PNG"); // writes image into ba in PNG format
    
-       icon_png.resize( ba.size() );
-       memcpy( icon_png.data(), ba.data(), ba.size() );
+       icon_png.resize( byte_array.size() );
+       memcpy( icon_png.data(), byte_array.data(), byte_array.size() );
    }
    else
    {
@@ -76,19 +73,19 @@ namespace Detail
        public:
           QIcon                                   _default_icon;
           std::vector<Contact>                    _contacts;
-          bts::addressbook::addressbook_ptr       _abook;
+          bts::addressbook::addressbook_ptr       _address_book;
     };
 }
 
 
 
-AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbook_ptr abook )
+AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbook_ptr address_book )
 :QAbstractTableModel(parent),my( new Detail::AddressBookModelImpl() )
 {
-   my->_abook = abook;
+   my->_address_book = address_book;
    my->_default_icon.addFile(QStringLiteral(":/images/user.png"), QSize(), QIcon::Normal, QIcon::Off);
 
-   const std::unordered_map<uint32_t,bts::addressbook::wallet_contact>& loaded_contacts = abook->get_contacts();
+   const std::unordered_map<uint32_t,bts::addressbook::wallet_contact>& loaded_contacts = address_book->get_contacts();
    my->_contacts.reserve( loaded_contacts.size() );
    for( auto itr = loaded_contacts.begin(); itr != loaded_contacts.end(); ++itr )
    {
@@ -219,14 +216,14 @@ int AddressBookModel::storeContact( const Contact& contact_to_store )
           my->_contacts.push_back(contact_to_store);
           my->_contacts.back().wallet_index =  my->_contacts.size()-1;
        endInsertRows();
-       my->_abook->store_contact( my->_contacts.back() );
+       my->_address_book->store_contact( my->_contacts.back() );
        return my->_contacts.back().wallet_index;
    }
 
    FC_ASSERT( contact_to_store.wallet_index < int(my->_contacts.size()) );
    auto row = contact_to_store.wallet_index;
    my->_contacts[row] = contact_to_store;
-   my->_abook->store_contact(  my->_contacts[row]  );
+   my->_address_book->store_contact(  my->_contacts[row]  );
 
    Q_EMIT dataChanged( index( row, 0 ), index( row, NumColumns - 1) );
    return contact_to_store.wallet_index;
