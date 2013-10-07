@@ -305,15 +305,15 @@ void ContactView::keyhoteeIdChanged( const QString& id )
 void ContactView::lookupId()
 {
    try {
-       auto cur_id = ui->id_edit->text().toStdString();
-       if( cur_id == std::string() )
+       auto current_id = ui->id_edit->text().toStdString();
+       if( current_id == std::string() )
        {
             ui->id_status->setText( QString() );
             ui->save_button->setEnabled(false);
             _complete = false;
             return;
        }
-       _current_record = bts::application::instance()->lookup_name( cur_id );
+       _current_record = bts::application::instance()->lookup_name( current_id );
        if( _current_record )
        {
             ui->id_status->setText( tr( "Valid ID" ) );

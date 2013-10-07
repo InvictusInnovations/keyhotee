@@ -32,7 +32,7 @@ else(WIN32)
 endif(WIN32)
 
 #Note: bitshares repo should be checked out under keyhotee dir or path here should be changed
-set(BITSHARES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bitshares)
+set(BITSHARES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BitShares)
 message(${BITSHARES_DIR})
 include_directories(${BITSHARES_DIR}/include)
 include_directories(${BITSHARES_DIR}/fc/include)
