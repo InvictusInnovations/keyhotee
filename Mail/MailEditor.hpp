@@ -53,6 +53,7 @@ private:
 private slots:
     void moneyUnitChanged(int index);
     void enableFormat(bool show_format );
+    void sendMailMessage();
     bool fileSave();
     bool fileSaveAs();
     void filePrint();
@@ -136,7 +137,7 @@ private:
     //QToolBar* style_tb;
 
     //QToolBar *tool_bar;
-    QString fileName;
+    QString _fileName;
     QTextEdit* textEdit;
 
     QCompleter* _contact_completer;

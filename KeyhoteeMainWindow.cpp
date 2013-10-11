@@ -17,6 +17,9 @@
 #include <QLineEdit>
 #include <QCompleter>
 
+extern std::string gApplication_name;
+extern std::string gProfile_name;
+
 KeyhoteeMainWindow* GetKeyhoteeWindow()
 {
     static KeyhoteeMainWindow* keyhoteeMainWindow = 0;
@@ -140,12 +143,17 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
 }
 
 KeyhoteeMainWindow::KeyhoteeMainWindow()
-:QMainWindow()
+ : QMainWindow()
 {
     _app_delegate.reset( new ApplicationDelegate(*this) );
     ui.reset( new Ui::KeyhoteeMainWindow() );
     ui->setupUi(this);
     setWindowIcon( QIcon( ":/images/shield1024.png" ) );
+    if (gProfile_name != "default")
+    {
+      QString title =QString("%1 (%2)").arg(gApplication_name.c_str()).arg(gProfile_name.c_str());
+      setWindowTitle( title );
+    }
 
     connect( ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui );
 
@@ -188,7 +196,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui->toolbar->addWidget(empty2);
     
     connect( ui->actionExit, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionExit_triggered );
-    connect( ui->actionNew_Message, &QAction::triggered, this, &KeyhoteeMainWindow::newMessage );
+    connect( ui->actionNew_Message, &QAction::triggered, this, &KeyhoteeMainWindow::newMailMessage );
     connect( ui->actionEnable_Mining, &QAction::toggled, this, &KeyhoteeMainWindow::enableMining_toggled );    
     connect( ui->actionNew_Contact, &QAction::triggered, this, &KeyhoteeMainWindow::addContact );
     connect( ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts );
@@ -400,7 +408,7 @@ void KeyhoteeMainWindow::showContacts()
   ui->widget_stack->setCurrentWidget( ui->contacts_page );
 }
 
-void KeyhoteeMainWindow::newMessage()
+void KeyhoteeMainWindow::newMailMessage(int contactId)
 {
   auto msg_window = new MailEditor(this, _contact_completer);
   msg_window->show();

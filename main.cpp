@@ -23,6 +23,9 @@
 #include <QFile>
 #include <QDebug>
 
+std::string gApplication_name = "Keyhotee";
+std::string gProfile_name = "default";
+
 
 bts::application_config load_config( const std::string& profile_name )
 { try {
@@ -80,8 +83,6 @@ int main( int argc, char** argv )
 
      app.setOrganizationDomain( "invictus-innovations.com" );
      app.setOrganizationName( "Invictus Innovations, Inc" );
-     std::string application_name = "Keyhotee";
-     std::string profile_name = "default";
 
      QFile file(":/index.htm");
      QByteArray dump = file.readAll();
@@ -90,13 +91,12 @@ int main( int argc, char** argv )
 
      if( argc > 1 ) 
      { 
-        profile_name = std::string(argv[1]); 
-        //application_name += " " + profile_name;
+        gProfile_name = std::string(argv[1]); 
      }
 
-     app.setApplicationName( application_name.c_str() );
+     app.setApplicationName( gApplication_name.c_str() );
 
-     fc::async( [=](){ startup( profile_name ); } );
+     fc::async( [=](){ startup( gProfile_name ); } );
 
      qApp->connect( qApp, &QApplication::aboutToQuit, [=](){ bts::application::instance()->quit(); } );
 

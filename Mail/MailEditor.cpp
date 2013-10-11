@@ -168,7 +168,7 @@ void MailEditor::setupMailActions()
     actionSave = action = new QAction(QIcon::fromTheme("mail-send", QIcon(":/images/128x128/send_mail.png")),
                                  tr("&Send"), this);
     action->setShortcut(QKeySequence::Save);
-    connect(action, SIGNAL(triggered()), this, SLOT(fileSave()));
+    connect(action, SIGNAL(triggered()), this, SLOT(sendMailMessage()));
     action->setEnabled(false);
     tool_bar->addAction(action);
 
@@ -587,13 +587,37 @@ bool MailEditor::maybeSave()
     return true;
 }
 
+using namespace bts::bitchat;
+using namespace bts::addressbook;
+//DLNFIX
+void MailEditor::sendMailMessage()
+{
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+    auto idents = profile->identities();
+    private_email_message msg;
+    msg.subject = subject_field->text().toStdString();
+    msg.body = textEdit->document()->toHtml().toStdString();
+    if( idents.size() )
+    {
+        auto my_priv_key = profile->get_keychain().get_identity_key( idents[0].dac_id );
+        //foreach(to, toList)
+        std::string to = to_field->toPlainText().toStdString();
+        auto to_contact = profile->get_addressbook()->get_contact_by_dac_id(to);
+        assert(to_contact.valid());
+        app->send_email(msg, to_contact->public_key, my_priv_key);
+        //TODO add code to save to SentItems
+        textEdit->document()->setModified(false);
+        close();
+    }
+}
 
 bool MailEditor::fileSave()
 {
-    if (fileName.isEmpty())
+    if (_fileName.isEmpty())
         return fileSaveAs();
 
-    QTextDocumentWriter writer(fileName);
+    QTextDocumentWriter writer(_fileName);
     bool success = writer.write(textEdit->document());
     if (success)
         textEdit->document()->setModified(false);
@@ -616,7 +640,7 @@ bool MailEditor::fileSaveAs()
           || fn.endsWith(".html", Qt::CaseInsensitive))) {
         fn += ".html"; // default
     }
-    fileName = fn;
+    _fileName = fn;
     return fileSave();
 }
 
