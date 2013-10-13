@@ -613,6 +613,24 @@ bool MailEditor::maybeSave()
     return true;
 }
 
+QStringList getListOfImageNames(QTextDocument* text_document)
+{
+    QStringList image_names;
+    QTextBlock block = text_document->begin();
+    while (block.isValid()) 
+    {
+        for (QTextBlock::iterator i = block.begin(); !i.atEnd(); ++i) 
+        {
+            QTextCharFormat format = i.fragment().charFormat();
+            bool isImage = format.isImageFormat();
+            if (isImage)
+                image_names << format.toImageFormat().name();
+        }
+        block = block.next();
+    }
+    return image_names;
+}
+
 //DLNFIX
 void MailEditor::sendMailMessage()
 {
@@ -626,27 +644,15 @@ void MailEditor::sendMailMessage()
     {         
         auto my_priv_key = profile->get_keychain().get_identity_key( idents[0].dac_id );
         //foreach(to, toList)
-        QStringList images;
-        QTextBlock b = to_field->document()->begin();
-        while (b.isValid()) 
+        QStringList recipient_image_names = getListOfImageNames(to_field->document());
+        foreach(auto recipient,recipient_image_names)
         {
-            for (QTextBlock::iterator i = b.begin(); !i.atEnd(); ++i) 
-            {
-                QTextCharFormat format = i.fragment().charFormat();
-                bool isImage = format.isImageFormat();
-                if (isImage)
-                    images << format.toImageFormat().name();
-            }
-            b = b.next();
-        }
-        foreach(auto recipient,images)
-        {
-            std::string to = recipient.toStdString();
+            std::string to_string = recipient.toStdString();
             //check first to see if we have a dac_id
-            auto to_contact = profile->get_addressbook()->get_contact_by_dac_id(to);
+            auto to_contact = profile->get_addressbook()->get_contact_by_dac_id(to_string);
             if (!to_contact.valid())
             { //TODO if not dac_id, check if we have a full name
-
+                to_contact = profile->get_addressbook()->get_contact_by_full_name(to_string);
             }
             assert(to_contact.valid());
             app->send_email(msg, to_contact->public_key, my_priv_key);
