@@ -172,7 +172,7 @@ void ContactView::onInfo()
 
 void ContactView::onMail()
 {
-    GetKeyhoteeWindow()->newMailMessage(_current_contact.wallet_index);
+    GetKeyhoteeWindow()->newMailMessageTo(_current_contact.wallet_index);
 }
 
 void ContactView::onDelete()

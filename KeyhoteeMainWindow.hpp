@@ -52,7 +52,8 @@ class KeyhoteeMainWindow  : public QMainWindow
       //edit menu responses
       void         enableMining_toggled(bool enabled);
 
-      void         newMailMessage(int contact_id = -1);
+      void         newMailMessage();
+      void         newMailMessageTo(int contact_id);
       void         addContact();
       void         showContacts();
       void         onSidebarSelectionChanged();

@@ -157,12 +157,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
 
     connect( ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui );
 
-    _contact_completer = new QCompleter(this);
-    _contact_completer->setModel( modelFromFile( "words.txt", _contact_completer) );
-    _contact_completer->setModelSorting( QCompleter::CaseInsensitivelySortedModel );
-    _contact_completer->setCaseSensitivity( Qt::CaseInsensitive);
-    _contact_completer->setWrapAround(true);
-
 #ifdef Q_OS_MAC
     //QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
@@ -231,8 +225,17 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
 
     _inbox  = new InboxModel(this,profile);
 
-    _addressbook_model  = new AddressBookModel( this, profile->get_addressbook() );
+    auto addressbook = profile->get_addressbook();
+    _addressbook_model  = new AddressBookModel( this, addressbook );
     connect( _addressbook_model, &QAbstractItemModel::dataChanged, this, &KeyhoteeMainWindow::addressBookDataChanged );
+
+
+    _contact_completer = new QCompleter(this);
+    _contact_completer->setModel( _addressbook_model->GetContactCompletionModel() );
+    //_contact_completer->setModelSorting( QCompleter::CaseInsensitivelySortedModel );
+    _contact_completer->setCaseSensitivity( Qt::CaseInsensitive);
+    _contact_completer->setWrapAround(true);
+
 
     ui->contacts_page->setAddressBook(_addressbook_model);
     ui->new_contact->setAddressBook(_addressbook_model);
@@ -408,10 +411,16 @@ void KeyhoteeMainWindow::showContacts()
   ui->widget_stack->setCurrentWidget( ui->contacts_page );
 }
 
-void KeyhoteeMainWindow::newMailMessage(int contactId)
+void KeyhoteeMainWindow::newMailMessage()
+{
+    newMailMessageTo(-1);
+}
+
+void KeyhoteeMainWindow::newMailMessageTo(int contact_id)
 {
   auto msg_window = new MailEditor(this, _contact_completer);
-  msg_window->show();
+  msg_window->addToContact(contact_id);
+  msg_window->setFocusAndShow();
 }
 
 ContactGui* KeyhoteeMainWindow::getContactGui( int contact_id )

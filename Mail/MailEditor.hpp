@@ -31,7 +31,9 @@ class MailEditor : public QDialog
     Q_OBJECT
 
 public:
-    MailEditor(QWidget* parent = nullptr, QCompleter* contact_completer = nullptr );
+          MailEditor(QWidget* parent = nullptr, QCompleter* contact_completer = nullptr);
+    void  setFocusAndShow();
+    void  addToContact(int contact_id);
 
 Q_SIGNALS:
     void  saveDraft( const DraftMessage& message );

@@ -25,8 +25,9 @@ class ContactListEdit : public QTextEdit
        void focusInEvent( QFocusEvent* focus_event );
        void resizeEvent( QResizeEvent* resize_event );
    
-   private Q_SLOTS:
+   public Q_SLOTS:
        void insertCompletion( const QString& completion );
+   private Q_SLOTS:
        void fitHeightToDocument();
 
    private:

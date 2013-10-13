@@ -74,6 +74,7 @@ namespace Detail
           QIcon                                   _default_icon;
           std::vector<Contact>                    _contacts;
           bts::addressbook::addressbook_ptr       _address_book;
+          QStringListModel                        _contact_completion_model;
     };
 }
 
@@ -87,11 +88,22 @@ AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbo
 
    const std::unordered_map<uint32_t,bts::addressbook::wallet_contact>& loaded_contacts = address_book->get_contacts();
    my->_contacts.reserve( loaded_contacts.size() );
+   QStringList completion_list;
    for( auto itr = loaded_contacts.begin(); itr != loaded_contacts.end(); ++itr )
    {
+      auto contact = itr->second;
       ilog( "loading contacts..." );
-      my->_contacts.push_back( Contact(itr->second) );
+      my->_contacts.push_back( Contact(contact) );
+
+      //add dac_id to completion list
+      completion_list.push_back( contact.dac_id_string.c_str() );
+      //add fullname to completion list
+      QString fullName = contact.first_name.c_str();
+      fullName += " ";
+      fullName += contact.last_name.c_str();
+      completion_list.push_back(fullName);
    }
+   my->_contact_completion_model.setStringList(completion_list);
 }
 
 AddressBookModel::~AddressBookModel()
@@ -247,3 +259,7 @@ const Contact& AddressBookModel::getContact( const QModelIndex& index  )
    return my->_contacts[index.row()];
 }
 
+QStringListModel* AddressBookModel::GetContactCompletionModel()
+{
+  return &(my->_contact_completion_model);
+}

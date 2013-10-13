@@ -40,6 +40,9 @@ const QString rsrcPath = ":/images/mac";
 const QString rsrcPath = ":/images/win";
 #endif
 
+using namespace bts::bitchat;
+using namespace bts::addressbook;
+
 MailEditor::MailEditor(QWidget *parent, QCompleter* contact_completer)
 : QDialog(parent),
   _contact_completer(contact_completer)
@@ -114,6 +117,29 @@ MailEditor::MailEditor(QWidget *parent, QCompleter* contact_completer)
 #endif
 
     enableFormat(false);
+}
+
+//set focus to first empty field in mail editor, then show window
+void MailEditor::setFocusAndShow()
+{
+    if (to_field->toPlainText().trimmed().isEmpty())
+        to_field->setFocus();
+    else if (subject_field->text().trimmed().isEmpty())
+        subject_field->setFocus();
+    else
+        textEdit->setFocus();
+    show();
+}
+
+void MailEditor::addToContact(int contact_id)
+{
+    if (contact_id < 0)
+        return;
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+    auto contacts = profile->get_addressbook()->get_contacts();
+    QString to_string = contacts[contact_id].getFullName().c_str();
+    to_field->insertCompletion(to_string);
 }
 
 void MailEditor::closeEvent(QCloseEvent* closeEvent)
@@ -587,8 +613,6 @@ bool MailEditor::maybeSave()
     return true;
 }
 
-using namespace bts::bitchat;
-using namespace bts::addressbook;
 //DLNFIX
 void MailEditor::sendMailMessage()
 {
@@ -599,13 +623,34 @@ void MailEditor::sendMailMessage()
     msg.subject = subject_field->text().toStdString();
     msg.body = textEdit->document()->toHtml().toStdString();
     if( idents.size() )
-    {
+    {         
         auto my_priv_key = profile->get_keychain().get_identity_key( idents[0].dac_id );
         //foreach(to, toList)
-        std::string to = to_field->toPlainText().toStdString();
-        auto to_contact = profile->get_addressbook()->get_contact_by_dac_id(to);
-        assert(to_contact.valid());
-        app->send_email(msg, to_contact->public_key, my_priv_key);
+        QStringList images;
+        QTextBlock b = to_field->document()->begin();
+        while (b.isValid()) 
+        {
+            for (QTextBlock::iterator i = b.begin(); !i.atEnd(); ++i) 
+            {
+                QTextCharFormat format = i.fragment().charFormat();
+                bool isImage = format.isImageFormat();
+                if (isImage)
+                    images << format.toImageFormat().name();
+            }
+            b = b.next();
+        }
+        foreach(auto recipient,images)
+        {
+            std::string to = recipient.toStdString();
+            //check first to see if we have a dac_id
+            auto to_contact = profile->get_addressbook()->get_contact_by_dac_id(to);
+            if (!to_contact.valid())
+            { //TODO if not dac_id, check if we have a full name
+
+            }
+            assert(to_contact.valid());
+            app->send_email(msg, to_contact->public_key, my_priv_key);
+        }
         //TODO add code to save to SentItems
         textEdit->document()->setModified(false);
         close();

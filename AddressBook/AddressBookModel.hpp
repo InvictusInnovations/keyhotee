@@ -3,6 +3,7 @@
 #include <bts/addressbook/addressbook.hpp>
 #include "Contact.hpp"
 
+
 namespace Detail { class AddressBookModelImpl; }
 
 class AddressBookModel : public QAbstractTableModel
@@ -37,6 +38,8 @@ class AddressBookModel : public QAbstractTableModel
 
     virtual QVariant headerData( int section, Qt::Orientation o, int role = Qt::DisplayRole )const;
     virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole )const;
+
+    QStringListModel* GetContactCompletionModel();
 
   private:
      std::unique_ptr<Detail::AddressBookModelImpl> my;
