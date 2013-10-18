@@ -88,7 +88,11 @@ class KeyhoteeMainWindow  : public QMainWindow
       QTreeWidgetItem*                        _drafts_root;
       QTreeWidgetItem*                        _sent_root;
 
-      InboxModel*                             _inbox;
+      InboxModel*                             _inbox_model;
+      InboxModel*                             _draft_model;
+      InboxModel*                             _pending_model;
+      InboxModel*                             _sent_model;
+
       AddressBookModel*                       _addressbook_model;
       bts::addressbook::addressbook_ptr       _addressbook;
       std::unordered_map<int,ContactGui>      _contact_guis;

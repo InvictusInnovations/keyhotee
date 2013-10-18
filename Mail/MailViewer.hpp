@@ -1,5 +1,7 @@
 #include <QWidget>
 #include <memory>
+#include <bts/bitchat/bitchat_private_message.hpp>
+#include "MessageHeader.hpp"
 
 namespace Ui { class MailViewer; }
 
@@ -12,6 +14,7 @@ class MailViewer : public QWidget
    public:
        MailViewer( QWidget* parent = nullptr );
       ~MailViewer();
+      void displayMailMessages(std::vector<MessageHeader>);
 
    private:
       QToolBar*                       message_tools;

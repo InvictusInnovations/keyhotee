@@ -100,7 +100,7 @@ class ApplicationDelegate : public bts::application_delegate
         auto opt_contact = _main_window._addressbook->get_contact_by_public_key( *(msg.from_key) );
         if( !opt_contact )
         {
-            elog( "Recieved text from unknown contact!" );
+            elog( "Received text from unknown contact!" );
         }
         else
         {
@@ -109,12 +109,14 @@ class ApplicationDelegate : public bts::application_delegate
             auto text = msg.as<bts::bitchat::private_text_message>();
             QDateTime dateTime;
             dateTime.setTime_t(msg.sig_time.sec_since_epoch());
+            bts::get_profile()->get_chat_db()->store(msg);
             contact_gui->receiveChatMessage( opt_contact->dac_id_string.c_str(), text.msg.c_str(), dateTime );
         }
      }
 
      virtual void received_email( const bts::bitchat::decrypted_message& msg)
      {
+        bts::get_profile()->get_inbox_db()->store(msg);
      }
 };
 
@@ -223,7 +225,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     auto profile    = app->get_profile();
     auto idents = profile->identities();
 
-    _inbox  = new InboxModel(this,profile);
+    _inbox_model  = new InboxModel(this,profile,profile->get_inbox_db());
+    _draft_model  = new InboxModel(this,profile,profile->get_draft_db());
+    _pending_model  = new InboxModel(this,profile,profile->get_pending_db());
+    _sent_model  = new InboxModel(this,profile,profile->get_sent_db());
 
     auto addressbook = profile->get_addressbook();
     _addressbook_model  = new AddressBookModel( this, addressbook );
@@ -239,9 +244,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
 
     ui->contacts_page->setAddressBook(_addressbook_model);
     ui->new_contact->setAddressBook(_addressbook_model);
-    ui->inbox_page->setModel(_inbox, MailInbox::Inbox);
-    ui->draft_box_page->setModel(_inbox, MailInbox::Drafts);
-    ui->sent_box_page->setModel(_inbox, MailInbox::Sent);
+    ui->inbox_page->setModel(_inbox_model, MailInbox::Inbox);
+    ui->draft_box_page->setModel(_draft_model, MailInbox::Drafts);
+    ui->sent_box_page->setModel(_sent_model, MailInbox::Sent);
 
 
     ui->actionEnable_Mining->setChecked(app->get_mining_intensity() != 0);

@@ -2,31 +2,14 @@
 #include <QtGui>
 #include <bts/profile.hpp>
 
+class MessageHeader;
+
 namespace Detail { class InboxModelImpl; }
-
-class MessageHeader
-{
-    public:
-       MessageHeader():read_mark(false),attachment(false),money_amount(0){}
-
-       QString     from;
-       QIcon       from_icon;
-       QString     to;
-       QString     subject;
-       QDateTime   date_received;
-       QDateTime   date_sent;
-       bool        read_mark;
-       bool        attachment;
-       QIcon       money_type;
-       double      money_amount;
-
-       fc::uint256  digest;
-};
 
 class InboxModel : public QAbstractTableModel
 {
   public:
-    InboxModel( QObject* parent, const bts::profile_ptr& user_profile );
+    InboxModel(QObject* parent, const bts::profile_ptr& user_profile, bts::bitchat::message_db_ptr mail_db);
     ~InboxModel();
 
     enum Columns
@@ -44,7 +27,7 @@ class InboxModel : public QAbstractTableModel
         NumColumns
     };
 
-    bts::bitchat::decrypted_message getDecryptedMessage( const QModelIndex& index )const;  
+    void getFullMessage( const QModelIndex& index, MessageHeader& header )const;
 
     virtual int rowCount( const QModelIndex& parent = QModelIndex() )const;
     virtual int columnCount( const QModelIndex& parent = QModelIndex() )const;
@@ -55,5 +38,7 @@ class InboxModel : public QAbstractTableModel
     virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole )const;
 
   private:
+     void readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db);
+
      std::unique_ptr<Detail::InboxModelImpl> my;
 };

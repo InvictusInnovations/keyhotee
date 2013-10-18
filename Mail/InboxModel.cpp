@@ -1,4 +1,5 @@
 #include "InboxModel.hpp"
+#include "MessageHeader.hpp"
 #include <QIcon>
 #include <QPixmap>
 #include <QImage>
@@ -9,12 +10,15 @@
 #include <fc/log/logger.hpp>
 #include <fc/io/raw.hpp>
 
+using namespace bts::bitchat;
+
 namespace Detail 
 {
     class InboxModelImpl
     {
        public:
-          bts::profile_ptr              _user_profile;
+          bts::profile_ptr              _profile;
+          bts::bitchat::message_db_ptr  _mail_db;
           std::vector<MessageHeader>    _headers;
           QIcon                         _attachment_icon;
           QIcon                         _chat_icon;
@@ -23,48 +27,51 @@ namespace Detail
     };
 }
 
-QDateTime toQDateTime( const fc::time_point_sec& sec )
+QDateTime toQDateTime( const fc::time_point_sec& time_in_seconds )
 {
-   return QDateTime();
+   QDateTime date_time;
+   date_time.setTime_t(time_in_seconds.sec_since_epoch());
+   return date_time;
 }
 
-InboxModel::InboxModel( QObject* parent, const bts::profile_ptr& user_profile )
+InboxModel::InboxModel( QObject* parent, const bts::profile_ptr& profile, bts::bitchat::message_db_ptr mail_db)
 : QAbstractTableModel(parent),
   my( new Detail::InboxModelImpl() )
 {
-   my->_user_profile = user_profile;
+   my->_profile = profile;
+   my->_mail_db = mail_db;
    my->_attachment_icon = QIcon( ":/images/paperclip-icon.png" );
    my->_chat_icon = QIcon( ":/images/chat.png" );
    my->_money_icon = QIcon( ":/images/bitcoin.png" );
    my->_read_icon = QIcon( ":/images/read-icon.png" );
 
-   std::vector<bts::bitchat::message_header>  headers = user_profile->get_inbox()->fetch_headers( 
-                                                                                     bts::bitchat::private_email_message::type );
-   my->_headers.resize(headers.size());
-
-   auto abook = user_profile->get_addressbook();
-   for( uint32_t i = 0; i < headers.size(); ++i )
-   {
-      my->_headers[i].digest          = headers[i].digest;
-      my->_headers[i].date_received   = toQDateTime( headers[i].received_time );
-      auto to_contact                 = abook->get_contact_by_public_key( headers[i].to_key );
-      auto from_contact               = abook->get_contact_by_public_key( headers[i].from_key );
-      if( to_contact )
-      {
-          my->_headers[i].to   =  to_contact->dac_id_string.c_str();
-      }
-
-      if( from_contact )
-      {
-          my->_headers[i].from =  from_contact->dac_id_string.c_str();
-      }
-//      my->_headers[i].date_sent     = toQDateTime( headers[i].
-      my->_headers[i].read_mark       = headers[i].read_mark;
-   }
+   readMailBoxHeadersDb(mail_db);
 }
 
 InboxModel::~InboxModel()
 {
+}
+
+void InboxModel::readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db )
+{
+   auto addressbook = my->_profile->get_addressbook();
+   auto headers = mail_db->fetch_headers(bts::bitchat::private_email_message::type );
+   my->_headers.resize(headers.size());
+
+   for( uint32_t i = 0; i < headers.size(); ++i )
+   {
+      my->_headers[i].digest          = headers[i].digest;
+      my->_headers[i].date_received   = toQDateTime( headers[i].received_time );
+      auto to_contact                 = addressbook->get_contact_by_public_key( headers[i].to_key );
+      auto from_contact               = addressbook->get_contact_by_public_key( headers[i].from_key );
+      if( to_contact )
+          my->_headers[i].to   =  to_contact->dac_id_string.c_str();
+      if( from_contact )
+          my->_headers[i].from =  from_contact->dac_id_string.c_str();
+      my->_headers[i].subject = "Encrypted subject";
+      my->_headers[i].date_sent = toQDateTime( headers[i].from_sig_time );
+      my->_headers[i].read_mark = headers[i].read_mark;
+   }
 }
 
 int InboxModel::rowCount( const QModelIndex& parent )const
@@ -160,7 +167,7 @@ QVariant InboxModel::headerData( int section, Qt::Orientation orientation, int r
 QVariant InboxModel::data( const QModelIndex& index, int role )const
 {
     if( !index.isValid() ) return QVariant();
-
+    MessageHeader& header = my->_headers[index.row()];
   //  const & current_contact = my->_contacts[index.row()];
     switch( role )
     {
@@ -173,6 +180,18 @@ QVariant InboxModel::data( const QModelIndex& index, int role )const
        case Qt::DecorationRole:
           switch( (Columns)index.column() )
           {
+            case Read:
+            if (header.read_mark)
+               return my->_read_icon;
+            else
+               return "";
+//            case Money:
+//               return QVariant();
+            case Attachment:
+               if (header.attachment)
+                  return my->_attachment_icon;
+               else
+                  return "";
              default:
                 return QVariant();
           }
@@ -180,25 +199,36 @@ QVariant InboxModel::data( const QModelIndex& index, int role )const
           switch( (Columns)index.column() )
           {
              case Read:
+                return header.read_mark;
              case Money:
+                return header.money_amount;
              case Attachment:
-             case Chat:
+                return header.attachment;
+//             case Chat:
              case From:
+                return header.from;
              case Subject:
+                return header.subject;
              case DateReceived:
+                return header.date_received;
              case To:
+                return header.to;
              case DateSent:
+                return header.date_sent;
              case Status:
+                return QVariant(); //DLNFIX what is this?
              case NumColumns:
-                return QVariant();
+                return QVariant(); //DLNFIX what is this?
           }
     }
     return QVariant();
 }
 
-
-bts::bitchat::decrypted_message InboxModel::getDecryptedMessage( const QModelIndex& index )const
+void InboxModel::getFullMessage( const QModelIndex& index, MessageHeader& header )const
 {
-   bts::bitchat::decrypted_message msg;
-  return msg;
+   header = my->_headers[index.row()];
+   auto raw_data = my->_mail_db->fetch_data(header.digest);
+   auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
+   header.subject = email_msg.subject.c_str();
+   header.body    = email_msg.body.c_str();
 }

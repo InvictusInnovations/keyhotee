@@ -35,3 +35,20 @@ MailViewer::~MailViewer()
 {
 }
 
+#include "InboxModel.hpp" //for MessageHeader
+void MailViewer::displayMailMessages(std::vector<MessageHeader> msgs)
+{
+   if (msgs.size() == 1)
+   {
+      auto msg = msgs[0];
+      QString formatted_date = msg.date_sent.toString(Qt::DefaultLocaleShortDate);
+      ui->date_label->setText(formatted_date);
+      ui->from_label->setText(msg.from);
+      ui->subject_label->setText(msg.subject);
+      ui->message_content->setHtml(msg.body);
+   }
+   else
+   {
+   //TODO: show summary display when multiple messages selected
+   }
+}
