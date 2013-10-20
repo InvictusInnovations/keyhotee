@@ -3,12 +3,12 @@
 #include <memory>
 #include <unordered_map>
 #include <bts/addressbook/addressbook.hpp>
+#include <bts/application.hpp>
 
 namespace Ui { class KeyhoteeMainWindow; }
 class QTreeWidgetItem;
 class ContactView;
 class AddressBookModel;
-class ApplicationDelegate;
 class QCompleter;
 class InboxView;
 class InboxModel;
@@ -40,7 +40,7 @@ public:
 private:
 };
 
-class KeyhoteeMainWindow  : public QMainWindow 
+class KeyhoteeMainWindow  : public QMainWindow, public bts::application_delegate
 {
   public:
       KeyhoteeMainWindow();
@@ -71,9 +71,13 @@ class KeyhoteeMainWindow  : public QMainWindow
       void         openMail( int message_id );
       void         openSent( int message_id );
 
+      //application_delegate implementation
+     virtual void received_text( const bts::bitchat::decrypted_message& msg);
+     virtual void received_email( const bts::bitchat::decrypted_message& msg);
+
+
      
   private:
-      friend class ApplicationDelegate;
       void addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right, const QVector<int>& roles );
 
       void    createContactGui( int contact_id );
@@ -97,7 +101,6 @@ class KeyhoteeMainWindow  : public QMainWindow
       bts::addressbook::addressbook_ptr       _addressbook;
       std::unordered_map<int,ContactGui>      _contact_guis;
       std::unique_ptr<Ui::KeyhoteeMainWindow> ui;
-      std::unique_ptr<ApplicationDelegate>    _app_delegate;
-};
+}; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* GetKeyhoteeWindow();

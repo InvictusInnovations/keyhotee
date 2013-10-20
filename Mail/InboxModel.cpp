@@ -52,27 +52,47 @@ InboxModel::~InboxModel()
 {
 }
 
-void InboxModel::readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db )
+void InboxModel::fillMailHeader(const bts::bitchat::message_header& header,
+                                MessageHeader& mail_header)
 {
    auto addressbook = my->_profile->get_addressbook();
+   mail_header.digest = header.digest;
+   mail_header.date_received   = toQDateTime( header.received_time );
+   auto to_contact   = addressbook->get_contact_by_public_key( header.to_key );
+   auto from_contact = addressbook->get_contact_by_public_key( header.from_key );
+   if( to_contact )
+         mail_header.to   =  to_contact->dac_id_string.c_str();
+   if( from_contact )
+         mail_header.from =  from_contact->dac_id_string.c_str();
+   mail_header.date_sent = toQDateTime( header.from_sig_time );
+   mail_header.read_mark = header.read_mark;
+
+//   mailHeader.subject = "Encrypted subject";
+   auto raw_data = my->_mail_db->fetch_data(mail_header.digest);
+   auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
+   mail_header.subject = email_msg.subject.c_str();
+}
+
+void InboxModel::addMailHeader(const bts::bitchat::message_header& header)
+{
+   MessageHeader mail_header;
+   fillMailHeader(header, mail_header);
+   int newRow = my->_headers.size();
+   beginInsertRows(QModelIndex(),newRow,newRow);
+   my->_headers.push_back(mail_header);
+   endInsertRows();
+}
+
+void InboxModel::readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db )
+{
    auto headers = mail_db->fetch_headers(bts::bitchat::private_email_message::type );
    my->_headers.resize(headers.size());
-
    for( uint32_t i = 0; i < headers.size(); ++i )
    {
-      my->_headers[i].digest          = headers[i].digest;
-      my->_headers[i].date_received   = toQDateTime( headers[i].received_time );
-      auto to_contact                 = addressbook->get_contact_by_public_key( headers[i].to_key );
-      auto from_contact               = addressbook->get_contact_by_public_key( headers[i].from_key );
-      if( to_contact )
-          my->_headers[i].to   =  to_contact->dac_id_string.c_str();
-      if( from_contact )
-          my->_headers[i].from =  from_contact->dac_id_string.c_str();
-      my->_headers[i].subject = "Encrypted subject";
-      my->_headers[i].date_sent = toQDateTime( headers[i].from_sig_time );
-      my->_headers[i].read_mark = headers[i].read_mark;
+      fillMailHeader(headers[i],my->_headers[i]);
    }
 }
+
 
 int InboxModel::rowCount( const QModelIndex& parent )const
 {

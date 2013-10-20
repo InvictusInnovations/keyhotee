@@ -27,6 +27,7 @@ class InboxModel : public QAbstractTableModel
         NumColumns
     };
 
+    void addMailHeader(const bts::bitchat::message_header& header);
     void getFullMessage( const QModelIndex& index, MessageHeader& header )const;
 
     virtual int rowCount( const QModelIndex& parent = QModelIndex() )const;
@@ -37,7 +38,11 @@ class InboxModel : public QAbstractTableModel
     virtual QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole )const;
     virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole )const;
 
+
   private:
+     void fillMailHeader(const bts::bitchat::message_header& header,
+                         MessageHeader& mail_header);
+
      void readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db);
 
      std::unique_ptr<Detail::InboxModelImpl> my;

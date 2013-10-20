@@ -4,7 +4,6 @@
 #include "AddressBook/ContactView.hpp"
 #include "Mail/MailEditor.hpp"
 #include "Mail/InboxModel.hpp"
-#include <bts/application.hpp>
 #include <bts/bitchat/bitchat_private_message.hpp>
 
 #ifdef Q_OS_MAC
@@ -86,40 +85,6 @@ void ContactGui::updateTreeItemDisplay()
 }
 
 
-class ApplicationDelegate : public bts::application_delegate
-{
-    public:
-     KeyhoteeMainWindow& _main_window;
-     ApplicationDelegate( KeyhoteeMainWindow& window )
-     :_main_window(window)
-     {
-     }
-
-     virtual void received_text( const bts::bitchat::decrypted_message& msg)
-     {
-        auto opt_contact = _main_window._addressbook->get_contact_by_public_key( *(msg.from_key) );
-        if( !opt_contact )
-        {
-            elog( "Received text from unknown contact!" );
-        }
-        else
-        {
-            wlog( "Received text from known contact!" );
-            auto contact_gui = _main_window.createContactGuiIfNecessary( opt_contact->wallet_index );
-            auto text = msg.as<bts::bitchat::private_text_message>();
-            QDateTime dateTime;
-            dateTime.setTime_t(msg.sig_time.sec_since_epoch());
-            bts::get_profile()->get_chat_db()->store(msg);
-            contact_gui->receiveChatMessage( opt_contact->dac_id_string.c_str(), text.msg.c_str(), dateTime );
-        }
-     }
-
-     virtual void received_email( const bts::bitchat::decrypted_message& msg)
-     {
-        bts::get_profile()->get_inbox_db()->store(msg);
-     }
-};
-
 QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer)
 {
    QFile file(fileName);
@@ -147,7 +112,6 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
 KeyhoteeMainWindow::KeyhoteeMainWindow()
  : QMainWindow()
 {
-    _app_delegate.reset( new ApplicationDelegate(*this) );
     ui.reset( new Ui::KeyhoteeMainWindow() );
     ui->setupUi(this);
     setWindowIcon( QIcon( ":/images/shield1024.png" ) );
@@ -221,7 +185,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     _wallets_root->setExpanded(true);
 
     auto app    = bts::application::instance();
-    app->set_application_delegate( _app_delegate.get() );
+    app->set_application_delegate( this );
     auto profile    = app->get_profile();
     auto idents = profile->identities();
 
@@ -494,4 +458,28 @@ void KeyhoteeMainWindow::showContactGui( ContactGui& contact_gui )
     }
 }
 
+void KeyhoteeMainWindow::received_text( const bts::bitchat::decrypted_message& msg)
+{
+   auto opt_contact = _addressbook->get_contact_by_public_key( *(msg.from_key) );
+   if( !opt_contact )
+   {
+      elog( "Received text from unknown contact!" );
+   }
+   else
+   {
+      wlog( "Received text from known contact!" );
+      auto contact_gui = createContactGuiIfNecessary( opt_contact->wallet_index );
+      auto text = msg.as<bts::bitchat::private_text_message>();
+      QDateTime dateTime;
+      dateTime.setTime_t(msg.sig_time.sec_since_epoch());
+      bts::get_profile()->get_chat_db()->store(msg);
+      contact_gui->receiveChatMessage( opt_contact->dac_id_string.c_str(), text.msg.c_str(), dateTime );
+   }
+}
+
+void KeyhoteeMainWindow::received_email( const bts::bitchat::decrypted_message& msg)
+{
+   auto header = bts::get_profile()->get_inbox_db()->store(msg);
+   _inbox_model->addMailHeader(header);
+}
 
