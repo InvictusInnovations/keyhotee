@@ -21,9 +21,19 @@ class MailInbox : public QWidget
 
       void setModel( QAbstractItemModel* model, InboxType type = Inbox );
    private:
+      void setupActions();
       void showCurrentMail(const QModelIndex &selected, const QModelIndex &deselected);
-      void showSelectedMail(const QItemSelection& selected, const QItemSelection& deselected);
+      void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+      void onReplyMail();
+      void onReplyAllMail();
+      void onForwardMail();
+      void onDeleteMail();
 
       std::unique_ptr<Ui::MailInbox> ui;
       InboxType                      _type;
+
+      QAction*                        reply_mail;
+      QAction*                        reply_all_mail;
+      QAction*                        forward_mail;
+      QAction*                        delete_mail;
 };

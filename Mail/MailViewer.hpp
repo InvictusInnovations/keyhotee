@@ -4,9 +4,7 @@
 #include "MessageHeader.hpp"
 
 namespace Ui { class MailViewer; }
-
 class QToolBar;
-class QAction;
 
 class MailViewer : public QWidget
 {
@@ -16,11 +14,7 @@ class MailViewer : public QWidget
       ~MailViewer();
       void displayMailMessages(std::vector<MessageHeader>);
 
-   private:
       QToolBar*                       message_tools;
-      QAction*                        reply_all;
-      QAction*                        reply;
-      QAction*                        forward;
-      QAction*                        delete_mail;
+   private:
       std::unique_ptr<Ui::MailViewer> ui;
 };

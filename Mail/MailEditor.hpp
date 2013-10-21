@@ -31,7 +31,10 @@ class MailEditor : public QDialog
     Q_OBJECT
 
 public:
-          MailEditor(QWidget* parent = nullptr, QCompleter* contact_completer = nullptr);
+          MailEditor(QWidget* parent = nullptr);
+
+   static void setContactCompleter(QCompleter* completer) { _contact_completer = completer; }
+
     void  setFocusAndShow();
     void  addToContact(int contact_id);
 
@@ -142,6 +145,6 @@ private:
     QString _fileName;
     QTextEdit* textEdit;
 
-    QCompleter* _contact_completer;
+    static QCompleter* _contact_completer;
 };
 

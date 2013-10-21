@@ -83,7 +83,7 @@ class KeyhoteeMainWindow  : public QMainWindow, public bts::application_delegate
       void    createContactGui( int contact_id );
       void    showContactGui( ContactGui& contact_gui );
 
-      QCompleter*                             _contact_completer;
+      //QCompleter*                             _contact_completer;
       QTreeWidgetItem*                        _identities_root;
       QTreeWidgetItem*                        _mailboxes_root;
       QTreeWidgetItem*                        _wallets_root;

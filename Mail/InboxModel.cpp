@@ -55,8 +55,8 @@ InboxModel::~InboxModel()
 void InboxModel::fillMailHeader(const bts::bitchat::message_header& header,
                                 MessageHeader& mail_header)
 {
+   mail_header.header = header;
    auto addressbook = my->_profile->get_addressbook();
-   mail_header.digest = header.digest;
    mail_header.date_received   = toQDateTime( header.received_time );
    auto to_contact   = addressbook->get_contact_by_public_key( header.to_key );
    auto from_contact = addressbook->get_contact_by_public_key( header.from_key );
@@ -65,10 +65,9 @@ void InboxModel::fillMailHeader(const bts::bitchat::message_header& header,
    if( from_contact )
          mail_header.from =  from_contact->dac_id_string.c_str();
    mail_header.date_sent = toQDateTime( header.from_sig_time );
-   mail_header.read_mark = header.read_mark;
 
 //   mailHeader.subject = "Encrypted subject";
-   auto raw_data = my->_mail_db->fetch_data(mail_header.digest);
+   auto raw_data = my->_mail_db->fetch_data(header.digest);
    auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
    mail_header.subject = email_msg.subject.c_str();
 }
@@ -104,9 +103,15 @@ int InboxModel::columnCount( const QModelIndex& parent  )const
     return NumColumns;
 }
 
-bool InboxModel::removeRows( int row, int count, const QModelIndex& parent )
+bool InboxModel::removeRows(int row, int count, const QModelIndex&)
 {
-   return false;
+    beginRemoveRows( QModelIndex(), row, row + count - 1);
+    for (int i = row; i < row + count; ++i) 
+    {
+       my->_mail_db->remove(my->_headers[i].header);
+    }
+    endRemoveRows();
+    return true;
 }
 
 QVariant InboxModel::headerData( int section, Qt::Orientation orientation, int role )const
@@ -201,7 +206,7 @@ QVariant InboxModel::data( const QModelIndex& index, int role )const
           switch( (Columns)index.column() )
           {
             case Read:
-            if (header.read_mark)
+            if (header.header.read_mark)
                return my->_read_icon;
             else
                return "";
@@ -219,7 +224,7 @@ QVariant InboxModel::data( const QModelIndex& index, int role )const
           switch( (Columns)index.column() )
           {
              case Read:
-                return header.read_mark;
+                return header.header.read_mark;
              case Money:
                 return header.money_amount;
              case Attachment:
@@ -247,7 +252,7 @@ QVariant InboxModel::data( const QModelIndex& index, int role )const
 void InboxModel::getFullMessage( const QModelIndex& index, MessageHeader& header )const
 {
    header = my->_headers[index.row()];
-   auto raw_data = my->_mail_db->fetch_data(header.digest);
+   auto raw_data = my->_mail_db->fetch_data(header.header.digest);
    auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
    header.subject = email_msg.subject.c_str();
    header.body    = email_msg.body.c_str();

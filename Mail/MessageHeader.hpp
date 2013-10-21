@@ -1,23 +1,22 @@
 #pragma once
 #include <QtGui>
+#include <bts/bitchat/bitchat_message_db.hpp>
 
 class MessageHeader
 {
     public:
-       MessageHeader():read_mark(false),attachment(false),money_amount(0){}
+       MessageHeader():attachment(false),money_amount(0){}
 
+       bts::bitchat::message_header header;
        QString     from;
        QIcon       from_icon;
        QString     to;
        QString     subject;
        QDateTime   date_received;
        QDateTime   date_sent;
-       bool        read_mark;
        bool        attachment;
        QIcon       money_type;
        double      money_amount;
        QString     body;
-
-       fc::uint256  digest;
 };
 

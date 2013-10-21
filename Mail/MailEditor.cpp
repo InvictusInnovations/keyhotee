@@ -40,12 +40,13 @@ const QString rsrcPath = ":/images/mac";
 const QString rsrcPath = ":/images/win";
 #endif
 
+QCompleter* MailEditor::_contact_completer = nullptr;
+
 using namespace bts::bitchat;
 using namespace bts::addressbook;
 
-MailEditor::MailEditor(QWidget *parent, QCompleter* contact_completer)
-: QDialog(parent),
-  _contact_completer(contact_completer)
+MailEditor::MailEditor(QWidget *parent)
+: QDialog(parent)
 {
     to_values = new QTextDocument(this);
     cc_values = new QTextDocument(this);

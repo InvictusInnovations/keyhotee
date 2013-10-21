@@ -2,6 +2,7 @@
 #include <QIcon>
 #include <QPixmap>
 #include <QImage>
+#include <qcompleter.h>
 
 #include <fc/reflect/variant.hpp>
 #include <fc/exception/exception.hpp>
@@ -75,6 +76,7 @@ namespace Detail
           std::vector<Contact>                    _contacts;
           bts::addressbook::addressbook_ptr       _address_book;
           QStringListModel                        _contact_completion_model;
+          QCompleter*                             _contact_completer;
     };
 }
 
@@ -102,6 +104,12 @@ AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbo
       completion_list.push_back(fullName);
    }
    my->_contact_completion_model.setStringList(completion_list);
+   //create completer from completion model
+   my->_contact_completer = new QCompleter(this);
+   my->_contact_completer->setModel( &(my->_contact_completion_model) );
+   //_contact_completer->setModelSorting( QCompleter::CaseInsensitivelySortedModel );
+   my->_contact_completer->setCaseSensitivity( Qt::CaseInsensitive);
+   my->_contact_completer->setWrapAround(true);
 }
 
 AddressBookModel::~AddressBookModel()
@@ -257,7 +265,9 @@ const Contact& AddressBookModel::getContact( const QModelIndex& index  )
    return my->_contacts[index.row()];
 }
 
-QStringListModel* AddressBookModel::GetContactCompletionModel()
-{
-  return &(my->_contact_completion_model);
-}
+//QStringListModel* AddressBookModel::GetContactCompletionModel()
+//{
+//  return &(my->_contact_completion_model);
+//}
+
+QCompleter* AddressBookModel::GetContactCompleter() { return my->_contact_completer; }

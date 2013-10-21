@@ -198,13 +198,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     _addressbook_model  = new AddressBookModel( this, addressbook );
     connect( _addressbook_model, &QAbstractItemModel::dataChanged, this, &KeyhoteeMainWindow::addressBookDataChanged );
 
-
-    _contact_completer = new QCompleter(this);
-    _contact_completer->setModel( _addressbook_model->GetContactCompletionModel() );
-    //_contact_completer->setModelSorting( QCompleter::CaseInsensitivelySortedModel );
-    _contact_completer->setCaseSensitivity( Qt::CaseInsensitive);
-    _contact_completer->setWrapAround(true);
-
+    MailEditor::setContactCompleter( _addressbook_model->GetContactCompleter() );
 
     ui->contacts_page->setAddressBook(_addressbook_model);
     ui->new_contact->setAddressBook(_addressbook_model);
@@ -387,7 +381,7 @@ void KeyhoteeMainWindow::newMailMessage()
 
 void KeyhoteeMainWindow::newMailMessageTo(int contact_id)
 {
-  auto msg_window = new MailEditor(this, _contact_completer);
+  auto msg_window = new MailEditor(this);
   msg_window->addToContact(contact_id);
   msg_window->setFocusAndShow();
 }
