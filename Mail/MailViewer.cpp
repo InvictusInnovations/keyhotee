@@ -21,7 +21,7 @@ MailViewer::~MailViewer()
 {
 }
 
-#include "InboxModel.hpp" //for MessageHeader
+#include "MailboxModel.hpp" //for MessageHeader
 void MailViewer::displayMailMessages(std::vector<MessageHeader> msgs)
 {
    if (msgs.size() == 1)

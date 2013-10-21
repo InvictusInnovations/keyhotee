@@ -1,13 +1,13 @@
-#include "MailInbox.hpp"
+#include "Mailbox.hpp"
 #include "../ui_MailInbox.h"
-#include "InboxModel.hpp"
+#include "MailboxModel.hpp"
 #include <fc/reflect/variant.hpp>
 #include "MailEditor.hpp"
 #include <QToolBar>
 
 
-MailInbox::MailInbox( QWidget* parent )
-: ui( new Ui::MailInbox() ),
+Mailbox::Mailbox( QWidget* parent )
+: ui( new Ui::Mailbox() ),
   _type(Inbox)
 {
    ui->setupUi( this );
@@ -15,12 +15,12 @@ MailInbox::MailInbox( QWidget* parent )
 }
 
 
-void MailInbox::showCurrentMail(const QModelIndex &selected,
+void Mailbox::showCurrentMail(const QModelIndex &selected,
                                  const QModelIndex &deselected)
 {
 }
 
-void MailInbox::onSelectionChanged(const QItemSelection &selected,
+void Mailbox::onSelectionChanged(const QItemSelection &selected,
                                   const QItemSelection &deselected)
 {
    QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
@@ -33,7 +33,7 @@ void MailInbox::onSelectionChanged(const QItemSelection &selected,
    //display selected email(s) in message preview window
    std::vector<MessageHeader> msgs;
    MessageHeader message_header;
-   InboxModel* model = static_cast<InboxModel*>(ui->inbox_table->model());
+   MailboxModel* model = static_cast<MailboxModel*>(ui->inbox_table->model());
    foreach (QModelIndex index, items) 
    {
       model->getFullMessage(index,message_header);
@@ -42,37 +42,37 @@ void MailInbox::onSelectionChanged(const QItemSelection &selected,
    ui->current_message->displayMailMessages(msgs);
 }
 
-MailInbox::~MailInbox()
+Mailbox::~Mailbox()
 {
 }
 
-void MailInbox::setModel( QAbstractItemModel* model, InboxType type )
+void Mailbox::setModel( QAbstractItemModel* model, InboxType type )
 {
    _type = type;
    ui->inbox_table->setModel(model);
 
-   ui->inbox_table->horizontalHeader()->resizeSection( InboxModel::To, 120 );
-   ui->inbox_table->horizontalHeader()->resizeSection( InboxModel::Subject, 300 );
-   ui->inbox_table->horizontalHeader()->resizeSection( InboxModel::DateReceived, 120 );
-   ui->inbox_table->horizontalHeader()->resizeSection( InboxModel::From, 120 );
-   ui->inbox_table->horizontalHeader()->resizeSection( InboxModel::DateSent, 120 );
+   ui->inbox_table->horizontalHeader()->resizeSection( MailboxModel::To, 120 );
+   ui->inbox_table->horizontalHeader()->resizeSection( MailboxModel::Subject, 300 );
+   ui->inbox_table->horizontalHeader()->resizeSection( MailboxModel::DateReceived, 120 );
+   ui->inbox_table->horizontalHeader()->resizeSection( MailboxModel::From, 120 );
+   ui->inbox_table->horizontalHeader()->resizeSection( MailboxModel::DateSent, 120 );
    if( _type == Inbox )
    {
-      ui->inbox_table->horizontalHeader()->hideSection( InboxModel::Status );
-      ui->inbox_table->horizontalHeader()->hideSection( InboxModel::DateSent );
+      ui->inbox_table->horizontalHeader()->hideSection( MailboxModel::Status );
+      ui->inbox_table->horizontalHeader()->hideSection( MailboxModel::DateSent );
    }
    if( _type == Sent )
    {
-      ui->inbox_table->horizontalHeader()->swapSections( InboxModel::To, InboxModel::From );
-      ui->inbox_table->horizontalHeader()->swapSections( InboxModel::DateReceived, InboxModel::DateSent );
-      ui->inbox_table->horizontalHeader()->hideSection( InboxModel::DateReceived );
+      ui->inbox_table->horizontalHeader()->swapSections( MailboxModel::To, MailboxModel::From );
+      ui->inbox_table->horizontalHeader()->swapSections( MailboxModel::DateReceived, MailboxModel::DateSent );
+      ui->inbox_table->horizontalHeader()->hideSection( MailboxModel::DateReceived );
    }
    if( _type == Drafts )
    {
-      ui->inbox_table->horizontalHeader()->swapSections( InboxModel::To, InboxModel::From );
-      ui->inbox_table->horizontalHeader()->swapSections( InboxModel::DateReceived, InboxModel::DateSent );
-      ui->inbox_table->horizontalHeader()->hideSection( InboxModel::DateReceived );
-      ui->inbox_table->horizontalHeader()->hideSection( InboxModel::Status );
+      ui->inbox_table->horizontalHeader()->swapSections( MailboxModel::To, MailboxModel::From );
+      ui->inbox_table->horizontalHeader()->swapSections( MailboxModel::DateReceived, MailboxModel::DateSent );
+      ui->inbox_table->horizontalHeader()->hideSection( MailboxModel::DateReceived );
+      ui->inbox_table->horizontalHeader()->hideSection( MailboxModel::Status );
    }
 
    ui->inbox_table->horizontalHeader()->setSectionsMovable(true);
@@ -82,17 +82,17 @@ void MailInbox::setModel( QAbstractItemModel* model, InboxType type )
 
    //connect signals for the new selection model (created by setModel call)
    QItemSelectionModel* inbox_selection_model = ui->inbox_table->selectionModel();
-   connect( inbox_selection_model, &QItemSelectionModel::selectionChanged, this, &MailInbox::onSelectionChanged );
-   connect( inbox_selection_model, &QItemSelectionModel::currentChanged, this, &MailInbox::showCurrentMail );
+   connect( inbox_selection_model, &QItemSelectionModel::selectionChanged, this, &Mailbox::onSelectionChanged );
+   connect( inbox_selection_model, &QItemSelectionModel::currentChanged, this, &Mailbox::showCurrentMail );
 
-   connect( reply_mail, &QAction::triggered, this, &MailInbox::onReplyMail);
-   connect( reply_all_mail, &QAction::triggered, this, &MailInbox::onReplyAllMail);
-   connect( forward_mail, &QAction::triggered, this, &MailInbox::onForwardMail);
-   connect( delete_mail, &QAction::triggered, this, &MailInbox::onDeleteMail);
+   connect( reply_mail, &QAction::triggered, this, &Mailbox::onReplyMail);
+   connect( reply_all_mail, &QAction::triggered, this, &Mailbox::onReplyAllMail);
+   connect( forward_mail, &QAction::triggered, this, &Mailbox::onForwardMail);
+   connect( delete_mail, &QAction::triggered, this, &Mailbox::onDeleteMail);
 
 }
 
-void MailInbox::setupActions()
+void Mailbox::setupActions()
 {
    reply_mail = new QAction( QIcon( ":/images/mail_reply.png"), tr( "Reply"), this );
    reply_all_mail = new QAction( QIcon( ":/images/mail_reply_all.png"), tr( "Reply All"),this );
@@ -110,7 +110,7 @@ void MailInbox::setupActions()
    message_tools->addAction( delete_mail );
 }
 
-void MailInbox::onReplyMail()
+void Mailbox::onReplyMail()
 {
    auto msg_window = new MailEditor(this);
    //msg_window->addToContact(contact_id);
@@ -119,7 +119,7 @@ void MailInbox::onReplyMail()
    msg_window->setFocusAndShow();
 }
 
-void MailInbox::onReplyAllMail()
+void Mailbox::onReplyAllMail()
 {
    auto msg_window = new MailEditor(this);
    //msg_window->addToContact(contact_id);
@@ -128,7 +128,7 @@ void MailInbox::onReplyAllMail()
    msg_window->setFocusAndShow();
 }
 
-void MailInbox::onForwardMail()
+void Mailbox::onForwardMail()
 {
    auto msg_window = new MailEditor(this);
    //msg_window->addToContact(contact_id);
@@ -137,10 +137,10 @@ void MailInbox::onForwardMail()
    msg_window->setFocusAndShow();
 }
 
-void MailInbox::onDeleteMail()
+void Mailbox::onDeleteMail()
 {
    //remove selected mail from inbox model (and database)
-   InboxModel* model = static_cast<InboxModel*>(ui->inbox_table->model());
+   MailboxModel* model = static_cast<MailboxModel*>(ui->inbox_table->model());
    //ui->inbox_table->setUpdatesEnabled(false);
    QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
    QModelIndexList indexes = selection_model->selectedRows();

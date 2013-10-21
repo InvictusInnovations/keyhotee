@@ -11,7 +11,7 @@ class ContactView;
 class AddressBookModel;
 class QCompleter;
 class InboxView;
-class InboxModel;
+class MailboxModel;
 class KeyhoteeMainWindow;
 
 /**
@@ -92,10 +92,10 @@ class KeyhoteeMainWindow  : public QMainWindow, public bts::application_delegate
       QTreeWidgetItem*                        _drafts_root;
       QTreeWidgetItem*                        _sent_root;
 
-      InboxModel*                             _inbox_model;
-      InboxModel*                             _draft_model;
-      InboxModel*                             _pending_model;
-      InboxModel*                             _sent_model;
+      MailboxModel*                             _inbox_model;
+      MailboxModel*                             _draft_model;
+      MailboxModel*                             _pending_model;
+      MailboxModel*                             _sent_model;
 
       AddressBookModel*                       _addressbook_model;
       bts::addressbook::addressbook_ptr       _addressbook;

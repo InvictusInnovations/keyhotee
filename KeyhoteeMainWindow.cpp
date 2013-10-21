@@ -3,7 +3,7 @@
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/ContactView.hpp"
 #include "Mail/MailEditor.hpp"
-#include "Mail/InboxModel.hpp"
+#include "Mail/MailboxModel.hpp"
 #include <bts/bitchat/bitchat_private_message.hpp>
 
 #ifdef Q_OS_MAC
@@ -189,10 +189,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     auto profile    = app->get_profile();
     auto idents = profile->identities();
 
-    _inbox_model  = new InboxModel(this,profile,profile->get_inbox_db());
-    _draft_model  = new InboxModel(this,profile,profile->get_draft_db());
-    _pending_model  = new InboxModel(this,profile,profile->get_pending_db());
-    _sent_model  = new InboxModel(this,profile,profile->get_sent_db());
+    _inbox_model  = new MailboxModel(this,profile,profile->get_inbox_db());
+    _draft_model  = new MailboxModel(this,profile,profile->get_draft_db());
+    _pending_model  = new MailboxModel(this,profile,profile->get_pending_db());
+    _sent_model  = new MailboxModel(this,profile,profile->get_sent_db());
 
     auto addressbook = profile->get_addressbook();
     _addressbook_model  = new AddressBookModel( this, addressbook );
@@ -202,9 +202,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
 
     ui->contacts_page->setAddressBook(_addressbook_model);
     ui->new_contact->setAddressBook(_addressbook_model);
-    ui->inbox_page->setModel(_inbox_model, MailInbox::Inbox);
-    ui->draft_box_page->setModel(_draft_model, MailInbox::Drafts);
-    ui->sent_box_page->setModel(_sent_model, MailInbox::Sent);
+    ui->inbox_page->setModel(_inbox_model, Mailbox::Inbox);
+    ui->draft_box_page->setModel(_draft_model, Mailbox::Drafts);
+    ui->sent_box_page->setModel(_sent_model, Mailbox::Sent);
 
 
     ui->actionEnable_Mining->setChecked(app->get_mining_intensity() != 0);

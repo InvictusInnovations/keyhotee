@@ -1,4 +1,4 @@
-#include "InboxModel.hpp"
+#include "MailboxModel.hpp"
 #include "MessageHeader.hpp"
 #include <QIcon>
 #include <QPixmap>
@@ -14,7 +14,7 @@ using namespace bts::bitchat;
 
 namespace Detail 
 {
-    class InboxModelImpl
+    class MailboxModelImpl
     {
        public:
           bts::profile_ptr              _profile;
@@ -34,9 +34,9 @@ QDateTime toQDateTime( const fc::time_point_sec& time_in_seconds )
    return date_time;
 }
 
-InboxModel::InboxModel( QObject* parent, const bts::profile_ptr& profile, bts::bitchat::message_db_ptr mail_db)
+MailboxModel::MailboxModel( QObject* parent, const bts::profile_ptr& profile, bts::bitchat::message_db_ptr mail_db)
 : QAbstractTableModel(parent),
-  my( new Detail::InboxModelImpl() )
+  my( new Detail::MailboxModelImpl() )
 {
    my->_profile = profile;
    my->_mail_db = mail_db;
@@ -48,11 +48,11 @@ InboxModel::InboxModel( QObject* parent, const bts::profile_ptr& profile, bts::b
    readMailBoxHeadersDb(mail_db);
 }
 
-InboxModel::~InboxModel()
+MailboxModel::~MailboxModel()
 {
 }
 
-void InboxModel::fillMailHeader(const bts::bitchat::message_header& header,
+void MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
                                 MessageHeader& mail_header)
 {
    mail_header.header = header;
@@ -72,7 +72,7 @@ void InboxModel::fillMailHeader(const bts::bitchat::message_header& header,
    mail_header.subject = email_msg.subject.c_str();
 }
 
-void InboxModel::addMailHeader(const bts::bitchat::message_header& header)
+void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
 {
    MessageHeader mail_header;
    fillMailHeader(header, mail_header);
@@ -82,7 +82,7 @@ void InboxModel::addMailHeader(const bts::bitchat::message_header& header)
    endInsertRows();
 }
 
-void InboxModel::readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db )
+void MailboxModel::readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db )
 {
    auto headers = mail_db->fetch_headers(bts::bitchat::private_email_message::type );
    my->_headers.resize(headers.size());
@@ -93,17 +93,17 @@ void InboxModel::readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db )
 }
 
 
-int InboxModel::rowCount( const QModelIndex& parent )const
+int MailboxModel::rowCount( const QModelIndex& parent )const
 {
     return my->_headers.size();
 }
 
-int InboxModel::columnCount( const QModelIndex& parent  )const
+int MailboxModel::columnCount( const QModelIndex& parent  )const
 {
     return NumColumns;
 }
 
-bool InboxModel::removeRows(int row, int count, const QModelIndex&)
+bool MailboxModel::removeRows(int row, int count, const QModelIndex&)
 {
     beginRemoveRows( QModelIndex(), row, row + count - 1);
     for (int i = row; i < row + count; ++i) 
@@ -114,7 +114,7 @@ bool InboxModel::removeRows(int row, int count, const QModelIndex&)
     return true;
 }
 
-QVariant InboxModel::headerData( int section, Qt::Orientation orientation, int role )const
+QVariant MailboxModel::headerData( int section, Qt::Orientation orientation, int role )const
 {
     if( orientation == Qt::Horizontal )
     {
@@ -189,7 +189,7 @@ QVariant InboxModel::headerData( int section, Qt::Orientation orientation, int r
     return QVariant();
 }
 
-QVariant InboxModel::data( const QModelIndex& index, int role )const
+QVariant MailboxModel::data( const QModelIndex& index, int role )const
 {
     if( !index.isValid() ) return QVariant();
     MessageHeader& header = my->_headers[index.row()];
@@ -249,7 +249,7 @@ QVariant InboxModel::data( const QModelIndex& index, int role )const
     return QVariant();
 }
 
-void InboxModel::getFullMessage( const QModelIndex& index, MessageHeader& header )const
+void MailboxModel::getFullMessage( const QModelIndex& index, MessageHeader& header )const
 {
    header = my->_headers[index.row()];
    auto raw_data = my->_mail_db->fetch_data(header.header.digest);

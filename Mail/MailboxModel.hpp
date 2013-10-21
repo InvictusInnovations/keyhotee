@@ -4,13 +4,13 @@
 
 class MessageHeader;
 
-namespace Detail { class InboxModelImpl; }
+namespace Detail { class MailboxModelImpl; }
 
-class InboxModel : public QAbstractTableModel
+class MailboxModel : public QAbstractTableModel
 {
   public:
-    InboxModel(QObject* parent, const bts::profile_ptr& user_profile, bts::bitchat::message_db_ptr mail_db);
-    ~InboxModel();
+    MailboxModel(QObject* parent, const bts::profile_ptr& user_profile, bts::bitchat::message_db_ptr mail_db);
+    ~MailboxModel();
 
     enum Columns
     {
@@ -44,5 +44,5 @@ class InboxModel : public QAbstractTableModel
 
      void readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db);
 
-     std::unique_ptr<Detail::InboxModelImpl> my;
+     std::unique_ptr<Detail::MailboxModelImpl> my;
 };

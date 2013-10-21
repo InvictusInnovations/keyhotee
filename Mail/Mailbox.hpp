@@ -1,11 +1,11 @@
 #include <QWidget>
 #include <memory>
 
-namespace Ui { class MailInbox; }
+namespace Ui { class Mailbox; }
 class QAbstractItemModel;
 class QItemSelection;
 
-class MailInbox : public QWidget
+class Mailbox : public QWidget
 {
    Q_OBJECT
    public:
@@ -16,8 +16,8 @@ class MailInbox : public QWidget
           Sent
       };
 
-       MailInbox( QWidget* parent = nullptr );
-      ~MailInbox();
+       Mailbox( QWidget* parent = nullptr );
+      ~Mailbox();
 
       void setModel( QAbstractItemModel* model, InboxType type = Inbox );
    private:
@@ -29,7 +29,7 @@ class MailInbox : public QWidget
       void onForwardMail();
       void onDeleteMail();
 
-      std::unique_ptr<Ui::MailInbox> ui;
+      std::unique_ptr<Ui::Mailbox> ui;
       InboxType                      _type;
 
       QAction*                        reply_mail;

@@ -114,7 +114,7 @@ qt5_wrap_ui( UiLoginDialog                     LoginDialog.ui )
 qt5_wrap_ui( UiKeyhoteeMainWindow              KeyhoteeMainWindow.ui )
 qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
 qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
-qt5_wrap_ui( UiMailInbox                       Mail/MailInbox.ui )
+qt5_wrap_ui( UiMailInbox                       Mail/Mailbox.ui )
 qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
 
 QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
@@ -143,12 +143,12 @@ set( sources
         Mail/MailEditor.hpp
         Mail/MailEditor.cpp
 
-        Mail/InboxModel.hpp
-        Mail/InboxModel.cpp
+        Mail/MailboxModel.hpp
+        Mail/MailboxModel.cpp
 
-        Mail/MailInbox.ui
-        Mail/MailInbox.hpp
-        Mail/MailInbox.cpp
+        Mail/Mailbox.ui
+        Mail/Mailbox.hpp
+        Mail/Mailbox.cpp
 
         Mail/MailViewer.ui
         Mail/MailViewer.hpp
