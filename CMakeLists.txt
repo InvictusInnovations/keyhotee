@@ -82,6 +82,7 @@ ENDIF(WIN32)
 
 FIND_PACKAGE( OpenSSL )
 include_directories( ${OPENSSL_INCLUDE_DIR} )
+include_directories( ${Boost_INCLUDE_DIR} )
 SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES} ${SSL_EAY_RELEASE} ${LIB_EAY_RELEASE})
 
 add_subdirectory(bitshares)
@@ -114,7 +115,7 @@ qt5_wrap_ui( UiLoginDialog                     LoginDialog.ui )
 qt5_wrap_ui( UiKeyhoteeMainWindow              KeyhoteeMainWindow.ui )
 qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
 qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
-qt5_wrap_ui( UiMailInbox                       Mail/Mailbox.ui )
+qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
 qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
 
 QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
@@ -169,7 +170,7 @@ set( sources
 
 add_library( keyhotee_library ${library_sources} )
 message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
-target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets Qt5WebKitWidgets Qt5PrintSupport ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets Qt5::WebKitWidgets Qt5WebKitWidgets Qt5PrintSupport ${QtMacExtras} ${APPKIT_LIBRARY})
  
 
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
