@@ -114,7 +114,7 @@ qt5_wrap_ui( UiLoginDialog                     LoginDialog.ui )
 qt5_wrap_ui( UiKeyhoteeMainWindow              KeyhoteeMainWindow.ui )
 qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
 qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
-qt5_wrap_ui( UiMailInbox                       Mail/Mailbox.ui )
+qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
 qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
 
 QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )

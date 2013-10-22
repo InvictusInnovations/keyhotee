@@ -4,6 +4,7 @@
 namespace Ui { class Mailbox; }
 class QAbstractItemModel;
 class QItemSelection;
+class MailboxModel;
 
 class Mailbox : public QWidget
 {
@@ -19,7 +20,7 @@ class Mailbox : public QWidget
        Mailbox( QWidget* parent = nullptr );
       ~Mailbox();
 
-      void setModel( QAbstractItemModel* model, InboxType type = Inbox );
+      void setModel( MailboxModel* model, InboxType type = Inbox );
    private:
       void setupActions();
       void showCurrentMail(const QModelIndex &selected, const QModelIndex &deselected);
@@ -31,6 +32,7 @@ class Mailbox : public QWidget
 
       std::unique_ptr<Ui::Mailbox> ui;
       InboxType                      _type;
+      MailboxModel*                  _sourceModel;
 
       QAction*                        reply_mail;
       QAction*                        reply_all_mail;

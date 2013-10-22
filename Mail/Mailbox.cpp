@@ -1,5 +1,5 @@
 #include "Mailbox.hpp"
-#include "../ui_MailInbox.h"
+#include "../ui_Mailbox.h"
 #include "MailboxModel.hpp"
 #include <fc/reflect/variant.hpp>
 #include "MailEditor.hpp"
@@ -8,7 +8,8 @@
 
 Mailbox::Mailbox( QWidget* parent )
 : ui( new Ui::Mailbox() ),
-  _type(Inbox)
+  _type(Inbox),
+  _sourceModel(nullptr)
 {
    ui->setupUi( this );
    setupActions();
@@ -33,10 +34,11 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
    //display selected email(s) in message preview window
    std::vector<MessageHeader> msgs;
    MessageHeader message_header;
-   MailboxModel* model = static_cast<MailboxModel*>(ui->inbox_table->model());
+   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
    foreach (QModelIndex index, items) 
    {
-      model->getFullMessage(index,message_header);
+      auto sourceModelIndex = model->mapToSource(index);
+      _sourceModel->getFullMessage(sourceModelIndex,message_header);
       msgs.push_back(message_header);
    }
    ui->current_message->displayMailMessages(msgs);
@@ -46,10 +48,16 @@ Mailbox::~Mailbox()
 {
 }
 
-void Mailbox::setModel( QAbstractItemModel* model, InboxType type )
+void Mailbox::setModel( MailboxModel* model, InboxType type )
 {
    _type = type;
-   ui->inbox_table->setModel(model);
+   _sourceModel = model;
+   //enable sorting the mailbox
+   QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel();
+   proxyModel->setSourceModel( model );
+   ui->inbox_table->setModel( proxyModel ); 
+   //ui->inbox_table->sortByColumn(0, Qt::AscendingOrder);
+   //ui->inbox_table->setModel( model ); 
 
    ui->inbox_table->horizontalHeader()->resizeSection( MailboxModel::To, 120 );
    ui->inbox_table->horizontalHeader()->resizeSection( MailboxModel::Subject, 300 );
@@ -140,13 +148,13 @@ void Mailbox::onForwardMail()
 void Mailbox::onDeleteMail()
 {
    //remove selected mail from inbox model (and database)
-   MailboxModel* model = static_cast<MailboxModel*>(ui->inbox_table->model());
-   //ui->inbox_table->setUpdatesEnabled(false);
+   auto model = ui->inbox_table->model();
+   //model->setUpdatesEnabled(false);
    QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
    QModelIndexList indexes = selection_model->selectedRows();
    qSort(indexes);
    for(int i = indexes.count() - 1; i > -1; --i)
        model->removeRows(indexes.at(i).row(),1);
-   //ui->inbox_table->setUpdatesEnabled(true);   
+   //model->setUpdatesEnabled(true);   
 }
 
