@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MailInbox</class>
- <widget class="QWidget" name="MailInbox">
+ <class>Mailbox</class>
+ <widget class="QWidget" name="Mailbox">
   <property name="geometry">
    <rect>
     <x>0</x>

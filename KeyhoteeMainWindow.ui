@@ -291,7 +291,7 @@
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="MailInbox" name="inbox_page">
+       <widget class="Mailbox" name="inbox_page">
         <layout class="QGridLayout" name="inboxlayout">
          <property name="leftMargin">
           <number>0</number>
@@ -310,8 +310,8 @@
          </property>
         </layout>
        </widget>
-       <widget class="MailInbox" name="draft_box_page"/>
-       <widget class="MailInbox" name="sent_box_page"/>
+       <widget class="Mailbox" name="draft_box_page"/>
+       <widget class="Mailbox" name="sent_box_page"/>
        <widget class="ContactsTable" name="contacts_page">
         <layout class="QGridLayout" name="gridLayout_3">
          <property name="leftMargin">
@@ -466,9 +466,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>MailInbox</class>
+   <class>Mailbox</class>
    <extends>QWidget</extends>
-   <header>Mail/MailInbox.hpp</header>
+   <header>Mail/Mailbox.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
