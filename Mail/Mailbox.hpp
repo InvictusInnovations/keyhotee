@@ -21,6 +21,8 @@ class Mailbox : public QWidget
       ~Mailbox();
 
       void setModel( MailboxModel* model, InboxType type = Inbox );
+      void searchEditChanged(QString search_string);
+
    private:
       void setupActions();
       void showCurrentMail(const QModelIndex &selected, const QModelIndex &deselected);

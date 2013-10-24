@@ -128,7 +128,20 @@ int AddressBookModel::columnCount( const QModelIndex& parent  )const
 
 bool AddressBookModel::removeRows( int row, int count, const QModelIndex& parent )
 {
-   return false;
+    beginRemoveRows( QModelIndex(), row, row + count - 1);
+    for (int i = row; i < row + count; ++i) 
+    {       
+      // remove from addressbook database
+      uint32_t wallet_index = my->_contacts[i].wallet_index;
+      my->_address_book->remove_contact(wallet_index);
+    }
+    //remove from in-memory contact list
+    auto rowI = my->_contacts.begin() + row;
+    my->_contacts.erase(rowI,rowI+count);
+    //remove fullname and dac_id from Qcompleter
+    my->_contact_completion_model.removeRows(row*2,count*2);
+    endRemoveRows();
+    return true;
 }
 
 QVariant AddressBookModel::headerData( int section, Qt::Orientation orientation, int role )const
@@ -227,21 +240,38 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
 
 int AddressBookModel::storeContact( const Contact& contact_to_store )
 {
+   QModelIndex completionIndex;
    if( contact_to_store.wallet_index == WALLET_INVALID_INDEX )
    {
-       auto num_contacts = my->_contacts.size();
-       beginInsertRows( QModelIndex(), num_contacts, num_contacts );
+      auto num_contacts = my->_contacts.size();
+      beginInsertRows( QModelIndex(), num_contacts, num_contacts );
           my->_contacts.push_back(contact_to_store);
           my->_contacts.back().wallet_index =  my->_contacts.size()-1;
-       endInsertRows();
-       my->_address_book->store_contact( my->_contacts.back() );
-       return my->_contacts.back().wallet_index;
+      endInsertRows();
+      //update completion model with new contact dac_id and fullname
+      int row_count = my->_contact_completion_model.rowCount();
+      my->_contact_completion_model.insertRows( row_count, 2 );
+      completionIndex = my->_contact_completion_model.index(row_count);
+      my->_contact_completion_model.setData(completionIndex, contact_to_store.dac_id_string.c_str());
+      completionIndex = my->_contact_completion_model.index(row_count+1);
+      my->_contact_completion_model.setData(completionIndex, contact_to_store.getFullName().c_str());
+
+      //add fullname to completion list
+      my->_address_book->store_contact( my->_contacts.back() );
+      return my->_contacts.back().wallet_index;
    }
 
    FC_ASSERT( contact_to_store.wallet_index < int(my->_contacts.size()) );
    auto row = contact_to_store.wallet_index;
    my->_contacts[row] = contact_to_store;
    my->_address_book->store_contact(  my->_contacts[row]  );
+
+   //update completion model with modified contact dac_id and fullname
+   int completionRow = row * 2;
+   completionIndex = my->_contact_completion_model.index(completionRow);
+   my->_contact_completion_model.setData(completionIndex, contact_to_store.dac_id_string.c_str());
+   completionIndex = my->_contact_completion_model.index(completionRow+1);
+   my->_contact_completion_model.setData(completionIndex, contact_to_store.getFullName().c_str());
 
    Q_EMIT dataChanged( index( row, 0 ), index( row, NumColumns - 1) );
    return contact_to_store.wallet_index;
