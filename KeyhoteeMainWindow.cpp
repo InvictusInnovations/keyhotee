@@ -7,7 +7,7 @@
 #include <bts/bitchat/bitchat_private_message.hpp>
 
 #ifdef Q_OS_MAC
-#include <qmacnativetoolbar.h>
+//#include <qmacnativetoolbar.h>
 #endif
 
 #include <fc/reflect/variant.hpp>

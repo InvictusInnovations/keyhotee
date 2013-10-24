@@ -36,7 +36,6 @@ set(BITSHARES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BitShares)
 message(${BITSHARES_DIR})
 include_directories(${BITSHARES_DIR}/include)
 include_directories(${BITSHARES_DIR}/fc/include)
-
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 
@@ -66,6 +65,7 @@ IF( WIN32 )
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
 ELSE(WIN32)
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-1.12.0/include )
+  include_directories( ${BITSHARES_DIR}/vendor/qtmacextras/include )
 
   MESSAGE(status "Compiling on UNIX")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -Wno-unused-local-typedefs -fmax-errors=3 -msse4.2" ) 
@@ -170,8 +170,8 @@ set( sources
 
 add_library( keyhotee_library ${library_sources} )
 message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
-target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets Qt5::WebKitWidgets Qt5WebKitWidgets Qt5PrintSupport ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets Qt5::WebKitWidgets ${QtMacExtras} ${APPKIT_LIBRARY})
  
 
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
-target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} Qt5::Widgets  Qt5WebKitWidgets Qt5PrintSupport ${PLATFORM_SPECIFIC_LIBS}  ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} Qt5::Widgets  Qt5::WebKitWidgets Qt5::PrintSupport ${PLATFORM_SPECIFIC_LIBS}  ${QtMacExtras} ${APPKIT_LIBRARY})
