@@ -128,7 +128,20 @@ int AddressBookModel::columnCount( const QModelIndex& parent  )const
 
 bool AddressBookModel::removeRows( int row, int count, const QModelIndex& parent )
 {
-   return false;
+    beginRemoveRows( QModelIndex(), row, row + count - 1);
+    for (int i = row; i < row + count; ++i) 
+    {       
+      // remove from addressbook database
+      uint32_t wallet_index = my->_contacts[i].wallet_index;
+      my->_address_book->remove_contact(wallet_index);
+    }
+    //remove from in-memory contact list
+    auto rowI = my->_contacts.begin() + row;
+    my->_contacts.erase(rowI,rowI+count);
+    //remove fullname and dac_id from Qcompleter
+    my->_contact_completion_model.removeRows(row*2,count*2);
+    endRemoveRows();
+    return true;
 }
 
 QVariant AddressBookModel::headerData( int section, Qt::Orientation orientation, int role )const

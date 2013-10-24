@@ -148,13 +148,17 @@ void Mailbox::onForwardMail()
 void Mailbox::onDeleteMail()
 {
    //remove selected mail from inbox model (and database)
-   auto model = ui->inbox_table->model();
+   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
    //model->setUpdatesEnabled(false);
    QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
-   QModelIndexList indexes = selection_model->selectedRows();
+   QModelIndexList sortFilterIndexes = selection_model->selectedRows();
+   QModelIndexList indexes;
+   foreach(QModelIndex sortFilterIndex,sortFilterIndexes)
+     indexes.append(model->mapToSource(sortFilterIndex));
    qSort(indexes);
+   auto sourceModel = model->sourceModel();
    for(int i = indexes.count() - 1; i > -1; --i)
-       model->removeRows(indexes.at(i).row(),1);
+       sourceModel->removeRows(indexes.at(i).row(),1);
    //model->setUpdatesEnabled(true);   
 }
 

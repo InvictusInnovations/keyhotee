@@ -110,6 +110,9 @@ bool MailboxModel::removeRows(int row, int count, const QModelIndex&)
     {
        my->_mail_db->remove(my->_headers[i].header);
     }
+    //delete headers from my->_headers
+    auto rowI = my->_headers.begin() + row;
+    my->_headers.erase(rowI,rowI+count);
     endRemoveRows();
     return true;
 }
