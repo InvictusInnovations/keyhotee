@@ -136,10 +136,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
     ui->toolbar->addWidget(empty);
 
-    auto search_edit = new QLineEdit( ui->toolbar );
-    ui->toolbar->addWidget(search_edit);
-    search_edit->setMaximumSize( QSize(  150, 22 ) );
-    search_edit->setAttribute(Qt::WA_MacShowFocusRect, 0);
+    _search_edit = new QLineEdit( ui->toolbar );
+    ui->toolbar->addWidget(_search_edit);
+    _search_edit->setMaximumSize( QSize(  150, 22 ) );
+    _search_edit->setAttribute(Qt::WA_MacShowFocusRect, 0);
     const char* search_style = "QLineEdit { "\
        "padding-right: 20px; "\
        "padding-left: 5px; "\
@@ -148,8 +148,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
        "background-repeat: no-repeat;"\
        "border: 1px solid gray;"\
        "border-radius: 10px;}";
-    search_edit->setStyleSheet( search_style );
-    search_edit->setPlaceholderText( tr("Search") );
+    _search_edit->setStyleSheet( search_style );
+    _search_edit->setPlaceholderText( tr("Search") );
 
     QWidget* empty2 = new QWidget();
     empty->resize( QSize(10,10) );
@@ -162,6 +162,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     connect( ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts );
     connect( ui->splitter, &QSplitter::splitterMoved, this, &KeyhoteeMainWindow::sideBarSplitterMoved );
     connect( ui->side_bar, &QTreeWidget::itemSelectionChanged, this, &KeyhoteeMainWindow::onSidebarSelectionChanged );
+
+    //connect( _search_edit, SIGNAL(textChanged(QString)), this, SLOT(searchEditChanged(QString)) );
+    connect( _search_edit, &QLineEdit::textChanged, this, &KeyhoteeMainWindow::searchEditChanged );
 
     auto space2     = ui->side_bar->topLevelItem(TopLevelItemIndexes::Space2);
     auto space3     = ui->side_bar->topLevelItem(TopLevelItemIndexes::Space3);
@@ -295,6 +298,16 @@ void KeyhoteeMainWindow::addressBookDataChanged( const QModelIndex& top_left, co
    {
         itr->second.updateTreeItemDisplay();
    }
+}
+
+void KeyhoteeMainWindow::searchEditChanged(QString search_string)
+{
+  auto current_widget = ui->widget_stack->currentWidget();
+  Mailbox* mailbox = dynamic_cast<Mailbox*>(current_widget);
+  if (mailbox)
+  {
+    mailbox->searchEditChanged(search_string);
+  }
 }
 
 bool KeyhoteeMainWindow::isSelectedContactGui(ContactGui* contactGui)

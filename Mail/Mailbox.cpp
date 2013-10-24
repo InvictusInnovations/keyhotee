@@ -6,6 +6,29 @@
 #include <QToolBar>
 
 
+class MailSortFilterProxyModel : public QSortFilterProxyModel
+{
+public:
+    MailSortFilterProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+protected:
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+};
+
+bool MailSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+{
+    QModelIndex from_index = sourceModel()->index(sourceRow, MailboxModel::From, sourceParent);
+    QModelIndex subject_index = sourceModel()->index(sourceRow, MailboxModel::Subject, sourceParent);
+    return (sourceModel()->data(from_index).toString().contains(filterRegExp()) ||
+            sourceModel()->data(subject_index).toString().contains(filterRegExp()));
+}
+
+void Mailbox::searchEditChanged(QString search_string)
+{
+   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+   QRegExp regex(search_string, Qt::CaseInsensitive, QRegExp::FixedString);
+   model->setFilterRegExp(regex);
+}
+
 Mailbox::Mailbox( QWidget* parent )
 : ui( new Ui::Mailbox() ),
   _type(Inbox),
@@ -53,7 +76,7 @@ void Mailbox::setModel( MailboxModel* model, InboxType type )
    _type = type;
    _sourceModel = model;
    //enable sorting the mailbox
-   QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel();
+   QSortFilterProxyModel* proxyModel = new MailSortFilterProxyModel();
    proxyModel->setSourceModel( model );
    ui->inbox_table->setModel( proxyModel ); 
    //ui->inbox_table->sortByColumn(0, Qt::AscendingOrder);

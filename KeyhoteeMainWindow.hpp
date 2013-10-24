@@ -7,6 +7,7 @@
 
 namespace Ui { class KeyhoteeMainWindow; }
 class QTreeWidgetItem;
+class QLineEdit;
 class ContactView;
 class AddressBookModel;
 class QCompleter;
@@ -79,6 +80,7 @@ class KeyhoteeMainWindow  : public QMainWindow, public bts::application_delegate
      
   private:
       void addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right, const QVector<int>& roles );
+      void searchEditChanged(QString search_string);
 
       void    createContactGui( int contact_id );
       void    showContactGui( ContactGui& contact_gui );
@@ -100,6 +102,8 @@ class KeyhoteeMainWindow  : public QMainWindow, public bts::application_delegate
       AddressBookModel*                       _addressbook_model;
       bts::addressbook::addressbook_ptr       _addressbook;
       std::unordered_map<int,ContactGui>      _contact_guis;
+
+      QLineEdit*                              _search_edit;
       std::unique_ptr<Ui::KeyhoteeMainWindow> ui;
 }; //KeyhoteeMainWindow
 
