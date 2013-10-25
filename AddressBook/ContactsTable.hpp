@@ -16,6 +16,7 @@ class ContactsTable  : public QWidget
 
     void setAddressBook( AddressBookModel* addressbook_model );
     void openContact( const QModelIndex& index );
+    void searchEditChanged(QString search_string);
 
   Q_SIGNALS:
     void contactOpened( int contact_id );

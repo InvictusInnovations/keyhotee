@@ -307,6 +307,13 @@ void KeyhoteeMainWindow::searchEditChanged(QString search_string)
   if (mailbox)
   {
     mailbox->searchEditChanged(search_string);
+    return;
+  }
+  ContactsTable* contacts_table = dynamic_cast<ContactsTable*>(current_widget);
+  if (contacts_table)
+  {
+    contacts_table->searchEditChanged(search_string);
+    return;
   }
 }
 
