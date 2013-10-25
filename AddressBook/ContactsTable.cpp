@@ -7,6 +7,31 @@
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
 
+class ContactsSortFilterProxyModel : public QSortFilterProxyModel
+{
+public:
+    ContactsSortFilterProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+protected:
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+};
+
+bool ContactsSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+{
+    QModelIndex first_name_index = sourceModel()->index(sourceRow, AddressBookModel::FirstName, sourceParent);
+    QModelIndex last_name_index  = sourceModel()->index(sourceRow, AddressBookModel::LastName, sourceParent);
+    QModelIndex id_index         = sourceModel()->index(sourceRow, AddressBookModel::Id, sourceParent);
+    return (sourceModel()->data(first_name_index).toString().contains(filterRegExp()) ||
+            sourceModel()->data(last_name_index).toString().contains(filterRegExp())  ||
+            sourceModel()->data(id_index).toString().contains(filterRegExp())           );
+}
+
+void ContactsTable::searchEditChanged(QString search_string)
+{
+   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->contact_table->model());
+   QRegExp regex(search_string, Qt::CaseInsensitive, QRegExp::FixedString);
+   model->setFilterRegExp(regex);
+}
+
 ContactsTable::ContactsTable( QWidget* parent )
 : QWidget(parent), 
   ui( new Ui::ContactsTable() )
@@ -26,7 +51,7 @@ void ContactsTable::setAddressBook( AddressBookModel* addressbook_model )
   _addressbook_model = addressbook_model;
   if( _addressbook_model )
   {
-     _sorted_addressbook_model = new QSortFilterProxyModel( this );
+     _sorted_addressbook_model = new ContactsSortFilterProxyModel( this );
      _sorted_addressbook_model->setSourceModel( _addressbook_model );
      _sorted_addressbook_model->setDynamicSortFilter(true);
      ui->contact_table->setModel( _sorted_addressbook_model );
