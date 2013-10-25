@@ -167,11 +167,18 @@ set( sources
 
 
 
+if (WIN32)
+  set (QTWEBKIT Qt5WebKitWidgets)
+  set (QTPRINT_SUPPORT Qt5PrintSupport)
+else(WIN32)
+  set (QTWEBKIT Qt5::WebKitWidgets)
+  set (QTPRINT_SUPPORT Qt5::PrintSupport)
+endif(WIN32)
 
 add_library( keyhotee_library ${library_sources} )
 message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
-target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets Qt5::WebKitWidgets ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets ${QTWEBKIT} ${QtMacExtras} ${APPKIT_LIBRARY})
  
 
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
-target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} Qt5::Widgets  Qt5::WebKitWidgets Qt5::PrintSupport ${PLATFORM_SPECIFIC_LIBS}  ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} Qt5::Widgets ${QTWEBKIT}  ${QTPRINT_SUPPORT}  ${PLATFORM_SPECIFIC_LIBS}  ${QtMacExtras} ${APPKIT_LIBRARY})
