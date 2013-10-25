@@ -71,14 +71,12 @@ void startup( const std::string& profile_name )
 
 int main( int argc, char** argv )
 {
-  #if 0
   #ifdef WIN32
   bool console_ok = AllocConsole();
   freopen( "CONOUT$", "wb", stdout);
   freopen( "CONOUT$", "wb", stderr);
   printf("testing stdout\n");
   fprintf(stderr,"testing stderr\n");
-  #endif
   #endif
   try {
      QApplication app(argc,argv); 
