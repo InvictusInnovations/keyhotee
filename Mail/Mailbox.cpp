@@ -4,6 +4,7 @@
 #include <fc/reflect/variant.hpp>
 #include "MailEditor.hpp"
 #include <QToolBar>
+#include <bts/profile.hpp>
 
 
 class MailSortFilterProxyModel : public QSortFilterProxyModel
@@ -141,19 +142,53 @@ void Mailbox::setupActions()
    message_tools->addAction( delete_mail );
 }
 
-void Mailbox::onReplyMail()
+QModelIndex Mailbox::getSelectedMail()
 {
-   auto msg_window = new MailEditor(this);
-   //msg_window->addToContact(contact_id);
-   //add quoted text to window
-   //set focus to top of window
-   msg_window->setFocusAndShow();
+   QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
+   QModelIndexList sortFilterIndexes = selection_model->selectedRows();
+   if (sortFilterIndexes.size() == 1)
+      return sortFilterIndexes[0];
+   else
+      return QModelIndex();
 }
 
-void Mailbox::onReplyAllMail()
+QSortFilterProxyModel* Mailbox::sortedModel()
 {
+   return  static_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+}
+
+
+void Mailbox::replyMail(bool reply_all)
+{
+   QModelIndex index = getSelectedMail();
+   if (index == QModelIndex())
+     return;
+   MessageHeader header;
+   QModelIndex mappedIndex = sortedModel()->mapToSource(index);
+   _sourceModel->getFullMessage(mappedIndex,header);
    auto msg_window = new MailEditor(this);
-   //msg_window->addToContact(contact_id);
+   auto addressbook = bts::get_profile()->get_addressbook();
+   auto reply_to_contact = addressbook->get_contact_by_public_key( header.header.from_key );
+   if (reply_to_contact)
+      msg_window->addToContact(reply_to_contact->wallet_index);
+   //TODO else we need way to show raw public key
+
+   if (reply_all)
+   {
+   //TODO add check to avoid replying to self as well
+      foreach(auto to_key,header.to_list)
+      {
+         auto to_contact = addressbook->get_contact_by_public_key( to_key );
+         if (to_contact)
+            msg_window->addToContact(to_contact->wallet_index);            
+      }
+      foreach(auto cc_key, header.cc_list)
+      {
+         auto cc_contact = addressbook->get_contact_by_public_key( cc_key );
+         if (cc_contact)
+            msg_window->addCcContact(cc_contact->wallet_index);            
+      }
+   }
    //add quoted text to window
    //set focus to top of window
    msg_window->setFocusAndShow();

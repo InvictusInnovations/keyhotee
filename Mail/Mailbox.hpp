@@ -5,6 +5,7 @@ namespace Ui { class Mailbox; }
 class QAbstractItemModel;
 class QItemSelection;
 class MailboxModel;
+class QSortFilterProxyModel;
 
 class Mailbox : public QWidget
 {
@@ -25,12 +26,19 @@ class Mailbox : public QWidget
 
    private:
       void setupActions();
+      QModelIndex getSelectedMail();
       void showCurrentMail(const QModelIndex &selected, const QModelIndex &deselected);
       void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-      void onReplyMail();
-      void onReplyAllMail();
+
+      void replyMail(bool reply_all);
+      void onReplyMail()    { replyMail(false); }
+      void onReplyAllMail() { replyMail(true); }
+
       void onForwardMail();
       void onDeleteMail();
+
+      QSortFilterProxyModel* sortedModel();
+
 
       std::unique_ptr<Ui::Mailbox> ui;
       InboxType                      _type;

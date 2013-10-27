@@ -30,6 +30,7 @@ void MailViewer::displayMailMessages(std::vector<MessageHeader> msgs)
       QString formatted_date = msg.date_sent.toString(Qt::DefaultLocaleShortDate);
       ui->date_label->setText(formatted_date);
       ui->from_label->setText(msg.from);
+      //TODO: add to and cc lists
       ui->subject_label->setText(msg.subject);
       ui->message_content->setHtml(msg.body);
    }
