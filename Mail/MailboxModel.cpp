@@ -58,17 +58,19 @@ void MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
    mail_header.header = header;
    auto addressbook = my->_profile->get_addressbook();
    mail_header.date_received   = toQDateTime( header.received_time );
-   auto to_contact   = addressbook->get_contact_by_public_key( header.to_key );
    auto from_contact = addressbook->get_contact_by_public_key( header.from_key );
-   if( to_contact )
-         mail_header.to   =  to_contact->dac_id_string.c_str();
    if( from_contact )
          mail_header.from =  from_contact->dac_id_string.c_str();
+   //auto to_contact   = addressbook->get_contact_by_public_key( header.to_key );
+   //if( to_contact )
+   //      mail_header.to   =  to_contact->dac_id_string.c_str();
    mail_header.date_sent = toQDateTime( header.from_sig_time );
 
-//   mailHeader.subject = "Encrypted subject";
+   //fill remaining fields from private_email_message
    auto raw_data = my->_mail_db->fetch_data(header.digest);
    auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
+   mail_header.to_list = email_msg.to_list;
+   mail_header.cc_list = email_msg.cc_list;
    mail_header.subject = email_msg.subject.c_str();
 }
 
@@ -240,7 +242,20 @@ QVariant MailboxModel::data( const QModelIndex& index, int role )const
              case DateReceived:
                 return header.date_received;
              case To:
-                return header.to;
+                {
+                QStringList to_list;
+                QString to;
+                auto address_book = bts::get_profile()->get_addressbook();
+                foreach(auto public_key, header.to_list)
+                  {
+                  auto contact = address_book->get_contact_by_public_key(public_key);
+                  if (contact)
+                     to_list.append(contact->dac_id_string.c_str());
+                  else //TODO: maybe display the public key?
+                     to_list.append("<unknown>");
+                  }
+                return to_list.join(',');
+                }
              case DateSent:
                 return header.date_sent;
              case Status:
@@ -257,6 +272,8 @@ void MailboxModel::getFullMessage( const QModelIndex& index, MessageHeader& head
    header = my->_headers[index.row()];
    auto raw_data = my->_mail_db->fetch_data(header.header.digest);
    auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
+   header.to_list = email_msg.to_list;
+   header.cc_list = email_msg.cc_list;
    header.subject = email_msg.subject.c_str();
    header.body    = email_msg.body.c_str();
 }

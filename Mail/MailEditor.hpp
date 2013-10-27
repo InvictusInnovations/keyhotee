@@ -37,6 +37,8 @@ public:
 
     void  setFocusAndShow();
     void  addToContact(int contact_id);
+    void  addCcContact(int contact_id);
+
 
 Q_SIGNALS:
     void  saveDraft( const DraftMessage& message );
@@ -54,6 +56,7 @@ private:
     void setCurrentFileName(const QString& fileName);
     void enableSendMoney(bool);
     void showAttachFileDialog(bool);
+
 
 private slots:
     void moneyUnitChanged(int index);

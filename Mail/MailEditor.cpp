@@ -33,6 +33,7 @@
 
 #include <bts/application.hpp>
 #include <bts/profile.hpp>
+#include <fc/crypto/elliptic.hpp>
 
 #ifdef Q_OS_MAC
 const QString rsrcPath = ":/images/mac";
@@ -141,6 +142,19 @@ void MailEditor::addToContact(int contact_id)
     auto contacts = profile->get_addressbook()->get_contacts();
     QString to_string = contacts[contact_id].getFullName().c_str();
     to_field->insertCompletion(to_string);
+}
+
+void MailEditor::addCcContact(int contact_id)
+{
+    if (contact_id < 0)
+        return;
+    if( !actionToggleCc->isChecked() )
+       actionToggleCc->setChecked(true);
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+    auto contacts = profile->get_addressbook()->get_contacts();
+    QString to_string = contacts[contact_id].getFullName().c_str();
+    cc_field->insertCompletion(to_string);
 }
 
 void MailEditor::closeEvent(QCloseEvent* closeEvent)
@@ -632,36 +646,55 @@ QStringList getListOfImageNames(QTextDocument* text_document)
     return image_names;
 }
 
-//DLNFIX
+void getRecipientKeys(ContactListEdit* to_field, std::vector<fc::ecc::public_key>& to_list)
+{
+   if (!to_field)
+     return;
+   auto addressbook = bts::get_profile()->get_addressbook();
+   QStringList recipient_image_names = getListOfImageNames(to_field->document());      
+   foreach(auto recipient,recipient_image_names)
+   {
+      std::string to_string = recipient.toStdString();
+      //check first to see if we have a dac_id
+      auto to_contact = addressbook->get_contact_by_dac_id(to_string);
+      if (!to_contact.valid())
+      { // if not dac_id, check if we have a full name
+         to_contact = addressbook->get_contact_by_full_name(to_string);
+      }
+      assert(to_contact.valid());
+      to_list.push_back(to_contact->public_key);
+   }
+}
+
 void MailEditor::sendMailMessage()
 {
-    auto app = bts::application::instance();
-    auto profile = app->get_profile();
-    auto idents = profile->identities();
-    private_email_message msg;
-    msg.subject = subject_field->text().toStdString();
-    msg.body = textEdit->document()->toHtml().toStdString();
-    if( idents.size() )
-    {         
-        auto my_priv_key = profile->get_keychain().get_identity_key( idents[0].dac_id );
-        //foreach(to, toList)
-        QStringList recipient_image_names = getListOfImageNames(to_field->document());
-        foreach(auto recipient,recipient_image_names)
-        {
-            std::string to_string = recipient.toStdString();
-            //check first to see if we have a dac_id
-            auto to_contact = profile->get_addressbook()->get_contact_by_dac_id(to_string);
-            if (!to_contact.valid())
-            { //TODO if not dac_id, check if we have a full name
-                to_contact = profile->get_addressbook()->get_contact_by_full_name(to_string);
-            }
-            assert(to_contact.valid());
-            app->send_email(msg, to_contact->public_key, my_priv_key);
-        }
-        //TODO add code to save to SentItems
-        textEdit->document()->setModified(false);
-        close();
-    }
+   auto app = bts::application::instance();
+   auto profile = app->get_profile();
+   auto identities = profile->identities();
+   if( identities.size() )
+   {         
+      private_email_message msg;
+      msg.subject = subject_field->text().toStdString();
+      msg.body = textEdit->document()->toHtml().toStdString();
+
+      getRecipientKeys(to_field,msg.to_list);
+      getRecipientKeys(cc_field,msg.cc_list);
+      //bcc addresses are not included in the email itself
+      std::vector<fc::ecc::public_key> bcc_list;
+      getRecipientKeys(bcc_field,bcc_list);
+
+      auto my_priv_key = profile->get_keychain().get_identity_key( identities[0].dac_id );
+      foreach(auto public_key, msg.to_list)
+         app->send_email(msg, public_key, my_priv_key);
+      foreach(auto public_key, msg.cc_list)
+         app->send_email(msg, public_key, my_priv_key);
+      foreach(auto public_key, bcc_list)
+         app->send_email(msg, public_key, my_priv_key);
+
+      //TODO add code to save to SentItems
+      textEdit->document()->setModified(false);
+      close();
+   }
 }
 
 bool MailEditor::fileSave()

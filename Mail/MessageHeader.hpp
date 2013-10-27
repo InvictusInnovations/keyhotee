@@ -1,6 +1,7 @@
 #pragma once
 #include <QtGui>
 #include <bts/bitchat/bitchat_message_db.hpp>
+#include <fc/crypto/elliptic.hpp>
 
 class MessageHeader
 {
@@ -10,7 +11,8 @@ class MessageHeader
        bts::bitchat::message_header header;
        QString     from;
        QIcon       from_icon;
-       QString     to;
+       std::vector<fc::ecc::public_key>   to_list;
+       std::vector<fc::ecc::public_key>   cc_list;
        QString     subject;
        QDateTime   date_received;
        QDateTime   date_sent;
