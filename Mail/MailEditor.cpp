@@ -33,6 +33,7 @@
 
 #include <bts/application.hpp>
 #include <bts/profile.hpp>
+#include <bts/address.hpp>
 #include <fc/crypto/elliptic.hpp>
 
 #ifdef Q_OS_MAC
@@ -137,11 +138,21 @@ void MailEditor::addToContact(int contact_id)
 {
     if (contact_id < 0)
         return;
-    auto app = bts::application::instance();
-    auto profile = app->get_profile();
-    auto contacts = profile->get_addressbook()->get_contacts();
+    auto contacts = bts::get_profile()->get_addressbook()->get_contacts();
     QString to_string = contacts[contact_id].getFullName().c_str();
     to_field->insertCompletion(to_string);
+}
+
+void MailEditor::addToContact(fc::ecc::public_key public_key)
+{
+   auto contact_o = bts::get_profile()->get_addressbook()->get_contact_by_public_key(public_key);
+   if (contact_o)
+      addToContact(contact_o->wallet_index);
+   else
+      {
+      std::string base58_string = bts::address(public_key);
+      to_field->insertCompletion(base58_string.c_str());
+      }
 }
 
 void MailEditor::addCcContact(int contact_id)
@@ -150,11 +161,33 @@ void MailEditor::addCcContact(int contact_id)
         return;
     if( !actionToggleCc->isChecked() )
        actionToggleCc->setChecked(true);
-    auto app = bts::application::instance();
-    auto profile = app->get_profile();
-    auto contacts = profile->get_addressbook()->get_contacts();
+    auto contacts = bts::get_profile()->get_addressbook()->get_contacts();
     QString to_string = contacts[contact_id].getFullName().c_str();
     cc_field->insertCompletion(to_string);
+}
+
+void MailEditor::addCcContact(fc::ecc::public_key public_key)
+{
+   auto contact_o = bts::get_profile()->get_addressbook()->get_contact_by_public_key(public_key);
+   if (contact_o)
+      addToContact(contact_o->wallet_index);
+   else
+   {
+      if( !actionToggleCc->isChecked() )
+         actionToggleCc->setChecked(true);
+      std::string base58_string = bts::address(public_key);
+      cc_field->insertCompletion(base58_string.c_str());
+   }
+}
+
+void MailEditor::CopyToBody(QString body_string)
+{
+   textEdit->document()->setHtml(body_string);
+}
+
+void MailEditor::SetSubject(QString subject_string)
+{
+   subject_field->setText(subject_string);
 }
 
 void MailEditor::closeEvent(QCloseEvent* closeEvent)

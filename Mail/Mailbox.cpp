@@ -158,7 +158,7 @@ QSortFilterProxyModel* Mailbox::sortedModel()
 }
 
 
-void Mailbox::replyMail(bool reply_all)
+void Mailbox::duplicateMail(ReplyType reply_type)
 {
    QModelIndex index = getSelectedMail();
    if (index == QModelIndex())
@@ -167,39 +167,35 @@ void Mailbox::replyMail(bool reply_all)
    QModelIndex mappedIndex = sortedModel()->mapToSource(index);
    _sourceModel->getFullMessage(mappedIndex,header);
    auto msg_window = new MailEditor(this);
-   auto addressbook = bts::get_profile()->get_addressbook();
-   auto reply_to_contact = addressbook->get_contact_by_public_key( header.header.from_key );
-   if (reply_to_contact)
-      msg_window->addToContact(reply_to_contact->wallet_index);
-   //TODO else we need way to show raw public key
+   //TODO: add "x wrote on such date":
+   QString new_body = header.body;
+   msg_window->CopyToBody(new_body);
 
-   if (reply_all)
+   QString new_subject;
+   auto addressbook = bts::get_profile()->get_addressbook();
+   if (reply_type == reply || reply_type == reply_all)
+   {
+      new_subject = "Re: " + header.subject;
+      auto reply_to_contact = addressbook->get_contact_by_public_key( header.header.from_key );
+      if (reply_to_contact)
+         msg_window->addToContact(reply_to_contact->wallet_index);
+      //TODO else we need way to show raw public key
+   }
+   else if (reply_type == forward)
+   {
+      new_subject = "Fwd: " + header.subject;
+      //TODO add attachments
+   }
+   if (reply_type == reply_all)
    {
    //TODO add check to avoid replying to self as well
       foreach(auto to_key,header.to_list)
-      {
-         auto to_contact = addressbook->get_contact_by_public_key( to_key );
-         if (to_contact)
-            msg_window->addToContact(to_contact->wallet_index);            
-      }
+         msg_window->addToContact(to_key);          
       foreach(auto cc_key, header.cc_list)
-      {
-         auto cc_contact = addressbook->get_contact_by_public_key( cc_key );
-         if (cc_contact)
-            msg_window->addCcContact(cc_contact->wallet_index);            
-      }
+         msg_window->addCcContact(cc_key);            
    }
-   //add quoted text to window
-   //set focus to top of window
-   msg_window->setFocusAndShow();
-}
-
-void Mailbox::onForwardMail()
-{
-   auto msg_window = new MailEditor(this);
-   //msg_window->addToContact(contact_id);
-   //add quoted text to window
-   //set focus to top of window
+   msg_window->SetSubject(new_subject);
+   //TODO set focus to top of window
    msg_window->setFocusAndShow();
 }
 
