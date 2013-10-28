@@ -25,16 +25,17 @@ class Mailbox : public QWidget
       void searchEditChanged(QString search_string);
 
    private:
+      enum ReplyType { reply, reply_all, forward };
       void setupActions();
       QModelIndex getSelectedMail();
       void showCurrentMail(const QModelIndex &selected, const QModelIndex &deselected);
       void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
-      void replyMail(bool reply_all);
-      void onReplyMail()    { replyMail(false); }
-      void onReplyAllMail() { replyMail(true); }
+      void duplicateMail(ReplyType);
+      void onReplyMail()    { duplicateMail(ReplyType::reply); }
+      void onReplyAllMail() { duplicateMail(ReplyType::reply_all); }
+      void onForwardMail()  { duplicateMail(ReplyType::forward); }
 
-      void onForwardMail();
       void onDeleteMail();
 
       QSortFilterProxyModel* sortedModel();

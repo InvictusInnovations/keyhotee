@@ -10,6 +10,8 @@
 #include <QToolButton>
 #include <QWidgetAction>
 #include <QPushButton>
+#include <fc/crypto/elliptic.hpp>
+
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -37,7 +39,13 @@ public:
 
     void  setFocusAndShow();
     void  addToContact(int contact_id);
+    void  addToContact(fc::ecc::public_key public_key);
+
     void  addCcContact(int contact_id);
+    void  addCcContact(fc::ecc::public_key public_key);
+
+    void  CopyToBody(QString body_string);
+    void  SetSubject(QString subject_string);
 
 
 Q_SIGNALS:

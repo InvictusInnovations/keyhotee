@@ -4,9 +4,10 @@
 #include <QPixmap>
 #include <QImage>
 
+#include <bts/bitchat/bitchat_message_db.hpp>
+#include <bts/address.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/exception/exception.hpp>
-#include <bts/bitchat/bitchat_message_db.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/io/raw.hpp>
 
@@ -58,12 +59,16 @@ void MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
    mail_header.header = header;
    auto addressbook = my->_profile->get_addressbook();
    mail_header.date_received   = toQDateTime( header.received_time );
+
+   // Later, we might want to do this in data function instead (as we do for to_list)
+   // It would be slightly slower, but unknown keys would change to known contact names 
+   // when added to contact list
    auto from_contact = addressbook->get_contact_by_public_key( header.from_key );
    if( from_contact )
-         mail_header.from =  from_contact->dac_id_string.c_str();
-   //auto to_contact   = addressbook->get_contact_by_public_key( header.to_key );
-   //if( to_contact )
-   //      mail_header.to   =  to_contact->dac_id_string.c_str();
+      mail_header.from =  from_contact->dac_id_string.c_str();
+   else
+      mail_header.from = std::string(bts::address(header.from_key)).c_str();
+
    mail_header.date_sent = toQDateTime( header.from_sig_time );
 
    //fill remaining fields from private_email_message
@@ -245,14 +250,18 @@ QVariant MailboxModel::data( const QModelIndex& index, int role )const
                 {
                 QStringList to_list;
                 QString to;
+                std::string base58_string;
                 auto address_book = bts::get_profile()->get_addressbook();
                 foreach(auto public_key, header.to_list)
                   {
-                  auto contact = address_book->get_contact_by_public_key(public_key);
-                  if (contact)
-                     to_list.append(contact->dac_id_string.c_str());
-                  else //TODO: maybe display the public key?
-                     to_list.append("<unknown>");
+                     auto contact = address_book->get_contact_by_public_key(public_key);
+                     if (contact)
+                        to_list.append(contact->dac_id_string.c_str());
+                     else //display public_key as base58
+                     {
+                        std::string base58_string = bts::address(public_key);
+                        to_list.append(base58_string.c_str());
+                     }
                   }
                 return to_list.join(',');
                 }
