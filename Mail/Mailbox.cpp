@@ -169,7 +169,7 @@ void Mailbox::duplicateMail(ReplyType reply_type)
    auto msg_window = new MailEditor(this);
    //TODO: add "x wrote on such date":
    QString new_body = header.body;
-   msg_window->CopyToBody(new_body);
+   msg_window->copyToBody(new_body);
 
    QString new_subject;
    auto addressbook = bts::get_profile()->get_addressbook();
