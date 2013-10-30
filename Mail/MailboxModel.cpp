@@ -35,6 +35,28 @@ QDateTime toQDateTime( const fc::time_point_sec& time_in_seconds )
    return date_time;
 }
 
+//DLNFIX move this to utility function file
+QString makeContactListString(std::vector<fc::ecc::public_key> key_list)
+{
+   QStringList to_list;
+   QString to;
+   std::string base58_string;
+   auto address_book = bts::get_profile()->get_addressbook();
+   foreach(auto public_key, key_list)
+   {
+      auto contact = address_book->get_contact_by_public_key(public_key);
+      if (contact)
+         to_list.append(contact->dac_id_string.c_str());
+      else //display public_key as base58
+      {
+         std::string base58_string = bts::address(public_key);
+         to_list.append(base58_string.c_str());
+      }
+   }
+   return to_list.join(',');
+}
+
+
 MailboxModel::MailboxModel( QObject* parent, const bts::profile_ptr& profile, bts::bitchat::message_db_ptr mail_db)
 : QAbstractTableModel(parent),
   my( new Detail::MailboxModelImpl() )
@@ -248,22 +270,7 @@ QVariant MailboxModel::data( const QModelIndex& index, int role )const
                 return header.date_received;
              case To:
                 {
-                QStringList to_list;
-                QString to;
-                std::string base58_string;
-                auto address_book = bts::get_profile()->get_addressbook();
-                foreach(auto public_key, header.to_list)
-                  {
-                     auto contact = address_book->get_contact_by_public_key(public_key);
-                     if (contact)
-                        to_list.append(contact->dac_id_string.c_str());
-                     else //display public_key as base58
-                     {
-                        std::string base58_string = bts::address(public_key);
-                        to_list.append(base58_string.c_str());
-                     }
-                  }
-                return to_list.join(',');
+                return makeContactListString(header.to_list);
                 }
              case DateSent:
                 return header.date_sent;

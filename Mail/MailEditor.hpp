@@ -44,7 +44,7 @@ public:
     void  addCcContact(int contact_id);
     void  addCcContact(fc::ecc::public_key public_key);
 
-    void  CopyToBody(QString body_string);
+    void  copyToBody(QString body_string);
     void  SetSubject(QString subject_string);
 
 

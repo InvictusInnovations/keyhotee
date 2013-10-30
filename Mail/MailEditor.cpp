@@ -180,7 +180,7 @@ void MailEditor::addCcContact(fc::ecc::public_key public_key)
    }
 }
 
-void MailEditor::CopyToBody(QString body_string)
+void MailEditor::copyToBody(QString body_string)
 {
    textEdit->document()->setHtml(body_string);
 }
