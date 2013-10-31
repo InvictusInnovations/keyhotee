@@ -23,6 +23,8 @@ class Mailbox : public QWidget
 
       void setModel( MailboxModel* model, InboxType type = Inbox );
       void searchEditChanged(QString search_string);
+   private slots:
+      void onDoubleClickedItem(QModelIndex);
 
    private:
       enum ReplyType { reply, reply_all, forward };
