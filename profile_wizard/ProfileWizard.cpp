@@ -2,6 +2,8 @@
 #include <ui_ProfileEditPage.h>
 #include <ui_ProfileIntroPage.h>
 #include <ui_ProfileNymPage.h>
+#include <QStandardPaths>
+#include <QFileDialog>
 
 #include <fc/thread/thread.hpp>
 
@@ -19,6 +21,7 @@ class NymPage : public QWizardPage
           _profile_nym_ui.setupUi(this);
 
           connect( _profile_nym_ui.keyhotee_id, &QLineEdit::textEdited, this, &NymPage::validateId );
+          connect( _profile_nym_ui.avatar_button, &QPushButton::clicked, this, &NymPage::iconSearch );          
         }
 
         virtual bool isComplete() const { return _complete; }
@@ -63,6 +66,13 @@ class NymPage : public QWizardPage
                _profile_nym_ui.id_warning->setText( e.to_string().c_str() );
             }
         }
+
+	void iconSearch()
+	{
+	    auto writableLocation = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+	    auto fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), writableLocation, tr("Image Files (*.png *.jpg *.bmp)"));
+            _profile_nym_ui.id_warning->setText( fileName ); // REVISIT!!!! testing: display filename.
+	}
 
 
         fc::time_point _last_validate;
