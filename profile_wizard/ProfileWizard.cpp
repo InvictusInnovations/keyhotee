@@ -8,6 +8,7 @@
 #include <fc/thread/thread.hpp>
 
 #include <fc/log/logger.hpp>
+#include <bts/addressbook/addressbook.hpp>
 
 void display_main_window();
 class NymPage : public QWizardPage
@@ -67,12 +68,12 @@ class NymPage : public QWizardPage
             }
         }
 
-	void iconSearch()
-	{
-	    auto writableLocation = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
-	    auto fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), writableLocation, tr("Image Files (*.png *.jpg *.bmp)"));
-            _profile_nym_ui.id_warning->setText( fileName ); // REVISIT!!!! testing: display filename.
-	}
+        void iconSearch()
+        {
+            auto writableLocation = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+            auto fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), writableLocation, tr("Image Files (*.png *.jpg *.bmp)"));
+                  _profile_nym_ui.id_warning->setText( fileName ); // REVISIT!!!! testing: display filename.
+        }
 
 
         fc::time_point _last_validate;
@@ -220,6 +221,13 @@ void ProfileWizard::createProfile( int result )
       bts::identity new_ident;
       new_ident.dac_id = _nym_page->_profile_nym_ui.keyhotee_id->text().toStdString();
       profile->store_identity( new_ident );
+      auto abook = profile->get_addressbook();
+      bts::addressbook::wallet_contact myself;
+      myself.wallet_index = 0;
+      myself.first_name = conf.firstname;
+      myself.last_name = conf.lastname;
+      myself.set_dac_id( new_ident.dac_id );
+      abook->store_contact( myself );
 
       display_main_window();
    }

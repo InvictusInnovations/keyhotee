@@ -122,7 +122,7 @@ void start_profile_creation_wizard( const bts::application_ptr& /*btsapp*/)
 {
    // TODO: figure out memory management here..
    auto profile_wizard = new ProfileWizard(nullptr);  
-   profile_wizard->resize( QSize( 640, 525 ) );
+   profile_wizard->resize( QSize( 680, 600 ) );
    profile_wizard->show();
 }
 
