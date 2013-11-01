@@ -39,6 +39,17 @@ Mailbox::Mailbox( QWidget* parent )
    setupActions();
 }
 
+void Mailbox::onDoubleClickedItem(QModelIndex index)
+{
+   MessageHeader message_header;
+   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+   auto sourceModelIndex = model->mapToSource(index);
+   _sourceModel->getFullMessage(sourceModelIndex,message_header);
+
+   auto mailViewer = new MailViewer(this);
+   mailViewer->displayMailMessage(message_header);
+   mailViewer->show();
+}
 
 void Mailbox::showCurrentMail(const QModelIndex &selected,
                                  const QModelIndex &deselected)
@@ -116,6 +127,7 @@ void Mailbox::setModel( MailboxModel* model, InboxType type )
    QItemSelectionModel* inbox_selection_model = ui->inbox_table->selectionModel();
    connect( inbox_selection_model, &QItemSelectionModel::selectionChanged, this, &Mailbox::onSelectionChanged );
    connect( inbox_selection_model, &QItemSelectionModel::currentChanged, this, &Mailbox::showCurrentMail );
+    connect(ui->inbox_table,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(onDoubleClickedItem(QModelIndex)));
 
    connect( reply_mail, &QAction::triggered, this, &Mailbox::onReplyMail);
    connect( reply_all_mail, &QAction::triggered, this, &Mailbox::onReplyAllMail);

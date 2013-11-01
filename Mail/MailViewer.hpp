@@ -12,6 +12,8 @@ class MailViewer : public QWidget
    public:
        MailViewer( QWidget* parent = nullptr );
       ~MailViewer();
+      //displays mail and marks as having been read
+      void displayMailMessage(MessageHeader& msg);
       void displayMailMessages(std::vector<MessageHeader>);
 
       QToolBar*                       message_tools;

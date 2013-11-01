@@ -4,6 +4,7 @@
 
 #include <KeyhoteeMainWindow.hpp>
 #include <bts/application.hpp>
+#include <bts/address.hpp>
 
 #include <fc/thread/thread.hpp>
 #include <fc/log/logger.hpp>
@@ -243,6 +244,8 @@ void ContactView::setContact( const Contact& current_contact,
     ui->lastname->setText( _current_contact.last_name.c_str() );
    // ui->email->setText( _current_contact.email_address );
    // ui->phone->setText( _current_contact.phone_number );
+    std::string base58_string = bts::address(_current_contact.public_key );
+    ui->public_key_view->setText( base58_string.c_str() );
     ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
     ui->icon_view->setIcon( _current_contact.getIcon() );
 } FC_RETHROW_EXCEPTIONS( warn, "" ) }

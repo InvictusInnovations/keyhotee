@@ -3,6 +3,7 @@
 #include "KeyhoteeMainWindow.hpp"
 #include "../ui_MailViewer.h"
 #include <QToolBar>
+#include "MailboxModel.hpp" //for MessageHeader
 
 //DLNFIX move this to utility function file
 QString makeContactListString(std::vector<fc::ecc::public_key> key_list);
@@ -25,40 +26,46 @@ MailViewer::~MailViewer()
 {
 }
 
-#include "MailboxModel.hpp" //for MessageHeader
+void MailViewer::displayMailMessage(MessageHeader& msg)
+{
+   //TODO: later, possibly set a timer and only mark as read if still displaying
+   //      this message when timer expires?
+   msg.header.read_mark = true;
+   QString formatted_date = msg.date_sent.toString(Qt::DefaultLocaleShortDate);
+   ui->date_label->setText(formatted_date);
+   ui->from_label->setText(msg.from);
+   if (msg.to_list.size())
+   {
+      ui->to_prefix->show();
+      ui->to_label->show();
+      ui->to_label->setText( makeContactListString(msg.to_list) );
+   }
+   else
+   {
+      ui->to_prefix->hide();
+      ui->to_label->hide();
+   }
+   if (msg.cc_list.size())
+   {
+      ui->cc_prefix->show();
+      ui->cc_label->show();
+      ui->cc_label->setText( makeContactListString(msg.cc_list) );
+   }
+   else
+   {
+      ui->cc_prefix->hide();
+      ui->cc_label->hide();
+   }
+   //TODO: add to and cc lists
+   ui->subject_label->setText(msg.subject);
+   ui->message_content->setHtml(msg.body);
+}
+
 void MailViewer::displayMailMessages(std::vector<MessageHeader> msgs)
 {
    if (msgs.size() == 1)
    {
-      MessageHeader& msg = msgs[0];
-      QString formatted_date = msg.date_sent.toString(Qt::DefaultLocaleShortDate);
-      ui->date_label->setText(formatted_date);
-      ui->from_label->setText(msg.from);
-      if (msg.to_list.size())
-      {
-         ui->to_prefix->show();
-         ui->to_label->show();
-         ui->to_label->setText( makeContactListString(msg.to_list) );
-      }
-      else
-      {
-         ui->to_prefix->hide();
-         ui->to_label->hide();
-      }
-      if (msg.cc_list.size())
-      {
-         ui->cc_prefix->show();
-         ui->cc_label->show();
-         ui->cc_label->setText( makeContactListString(msg.cc_list) );
-      }
-      else
-      {
-         ui->cc_prefix->hide();
-         ui->cc_label->hide();
-      }
-      //TODO: add to and cc lists
-      ui->subject_label->setText(msg.subject);
-      ui->message_content->setHtml(msg.body);
+      displayMailMessage(msgs[0]);
    }
    else
    {
