@@ -18,6 +18,7 @@
 
 extern std::string gApplication_name;
 extern std::string gProfile_name;
+extern bool gMiningIsPossible;
 
 KeyhoteeMainWindow* GetKeyhoteeWindow()
 {
@@ -155,6 +156,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     empty->resize( QSize(10,10) );
     ui->toolbar->addWidget(empty2);
     
+    ui->actionEnable_Mining->setEnabled(gMiningIsPossible);
+    ui->actionEnable_Mining->setVisible(gMiningIsPossible);
     connect( ui->actionExit, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionExit_triggered );
     connect( ui->actionNew_Message, &QAction::triggered, this, &KeyhoteeMainWindow::newMailMessage );
     connect( ui->actionEnable_Mining, &QAction::toggled, this, &KeyhoteeMainWindow::enableMining_toggled );    
