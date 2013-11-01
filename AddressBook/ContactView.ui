@@ -276,7 +276,7 @@
    <item row="1" column="0">
     <widget class="QStackedWidget" name="contact_pages">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="chat_page">
       <layout class="QGridLayout" name="gridLayout">
@@ -333,7 +333,7 @@
        <item row="0" column="1">
         <widget class="QStackedWidget" name="info_stack">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="info_status">
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -344,14 +344,14 @@
                <enum>QFormLayout::FieldsStayAtSizeHint</enum>
               </property>
               <item row="0" column="1">
-               <widget class="QLabel" name="label_5">
+               <widget class="QLabel" name="security_level_view">
                 <property name="text">
                  <string>Blocked</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="label_2">
+               <widget class="QLabel" name="phone_prefix">
                 <property name="text">
                  <string>Phone:</string>
                 </property>
@@ -365,7 +365,7 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="label_3">
+               <widget class="QLabel" name="email_prefix">
                 <property name="text">
                  <string>Email:</string>
                 </property>
@@ -379,21 +379,21 @@
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_4">
+               <widget class="QLabel" name="security_level_prefix">
                 <property name="text">
                  <string>Security Level:</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="0">
-               <widget class="QLabel" name="label">
+               <widget class="QLabel" name="public_key_prefix">
                 <property name="text">
                  <string>Public Key:</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="1">
-               <widget class="QLabel" name="label_6">
+               <widget class="QLabel" name="public_key_view">
                 <property name="text">
                  <string>Unknown</string>
                 </property>
@@ -577,14 +577,14 @@
               <enum>QFormLayout::ExpandingFieldsGrow</enum>
              </property>
              <item row="0" column="0">
-              <widget class="QLabel" name="label_7">
+              <widget class="QLabel" name="privacy_level_label">
                <property name="text">
                 <string>Privacy Level</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="comboBox">
+              <widget class="QComboBox" name="privacy_comboBox">
                <item>
                 <property name="text">
                  <string>Blocked</string>
