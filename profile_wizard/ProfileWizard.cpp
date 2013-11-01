@@ -225,8 +225,9 @@ void ProfileWizard::createProfile( int result )
       bts::addressbook::wallet_contact myself;
       myself.wallet_index = 0;
       myself.first_name = conf.firstname;
-      myself.last_name = conf.lastname;
+      myself.last_name  = conf.lastname;
       myself.set_dac_id( new_ident.dac_id );
+      myself.public_key = profile->get_keychain().get_identity_key( myself.dac_id_string ).get_public_key();
       abook->store_contact( myself );
 
       display_main_window();

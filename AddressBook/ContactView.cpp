@@ -9,6 +9,7 @@
 #include <fc/thread/thread.hpp>
 #include <fc/log/logger.hpp>
 
+#include <fc/crypto/base58.hpp>
 #include <QWebFrame>
 
 bool ContactView::eventFilter(QObject* object, QEvent* event)
@@ -244,7 +245,12 @@ void ContactView::setContact( const Contact& current_contact,
     ui->lastname->setText( _current_contact.last_name.c_str() );
    // ui->email->setText( _current_contact.email_address );
    // ui->phone->setText( _current_contact.phone_number );
-    std::string base58_string = bts::address(_current_contact.public_key );
+    auto vec   = fc::raw::pack( _current_contact.public_key );
+    uint32_t check = fc::city_hash64( vec.data(), vec.size() );
+    vec.resize( vec.size()+sizeof(check) );
+    memcpy( &vec[vec.size()-sizeof(check)], (char*)&check, sizeof(check) );
+    
+    std::string base58_string = fc::to_base58( vec.data(), vec.size() );
     ui->public_key_view->setText( base58_string.c_str() );
     ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
     ui->icon_view->setIcon( _current_contact.getIcon() );
