@@ -97,6 +97,7 @@ ContactView::ContactView( QWidget* parent )
    connect( ui->firstname, &QLineEdit::textChanged, this, &ContactView::firstNameChanged );
    connect( ui->lastname, &QLineEdit::textChanged, this, &ContactView::lastNameChanged );
    connect( ui->id_edit, &QLineEdit::textChanged, this, &ContactView::keyhoteeIdChanged );
+   connect( ui->public_key, &QLineEdit::textChanged, this, &ContactView::publicKeyChanged );
 
    ui->chat_input->installEventFilter(this);
 
@@ -288,6 +289,72 @@ void ContactView::lastNameChanged( const QString& /*name*/ )
    updateNameLabel();
 }
 
+/*****************  Algorithm for handling keyhoteeId, keyhoteeeId status, and public key fields 
+Notes:
+If gMiningIsPossible,
+  We can lookup a public key from a kehoteeId
+  We can validate a public key is registered, 
+    but we can't lookup the associated keyhoteeId, only a hash of the keyhoteeId
+
+Some choices in Display Status for id not found on block chain: Available, Unable to find, Not registered
+
+*** When creating new identity (this is for later implementation and some details may change):
+
+Note: Public key field is not editable (only keyhotee-generated public keys are allowed as they must be tied to wallet)
+
+If gMiningPossible,
+  Display Mining Effort combo box: 
+    options: Let Expire, Renew Quarterly, Renew Monthly, Renew Weekly, Renew Daily, Max Effort
+
+  If keyhoteeId changed, lookup id and report status
+    Display status: Not Available (red), Available (black), Registered To Me (green), Registering (yellow)
+        (If keyhoteeId is not registered and mining effort is not 'Let Expire', then status is "Registering')
+    OR:
+    Display status: Registered (red), Not Registered (black), Registered To Me (green), Registering (yellow)
+        (If keyhoteeId is not registered and mining effort is not 'Let Expire', then status is "Registering')
+    Generate new public key based on keyhoteeId change and display it
+
+ 
+If not gMiningPossible,
+  Hide Mining Effort combo box: 
+
+  If keyhoteeId changed, just keep it
+    Generate new public key based on keyhoteeId change and display it
+
+*** When adding a contact:
+
+If gMiningPossible,
+  If keyhoteeId changed, lookup id and report status
+    Display status: Registered (green), Unable to find (red)
+    if keyhoteeId registered in block chain, set public key field to display it
+    if keyhoteeId field not registered in block chain, clear public key field
+    enable save if valid public key or disable save
+
+  If public key changed, validate it
+    if public key is registered, change keyhotee field to ********
+    if public key is not registered, clear keyhotee id field
+    enable save if valid public key or disable save
+
+If not gMiningPossible,
+  Disable keyhoteeId field
+  If public key changed, validate it
+    enable save if valid public key or disable save
+
+*** When editing a contact:
+
+If gMiningPossible,
+  Public key is not editable
+  if keyhotee set, set as not editable
+  If keyhoteeId blank, lookup id and report status
+    Display status: Matches (green)
+                    Mismatch (red)
+  Doesn't save keyhoteeId on mismatch (i.e. field data isn't transferred to the contact record)          
+
+If not gMiningPossible,
+  Public key is not editable
+  KeyhoteeId is not editable
+
+*/
 void ContactView::keyhoteeIdChanged( const QString& id )
 {
    /** TODO
@@ -312,11 +379,20 @@ void ContactView::keyhoteeIdChanged( const QString& id )
    updateNameLabel();
 }
 
+void ContactView::publicKeyChanged( const QString& public_key_string )
+{
+   //if valid public_key, clear existing keyhotee id field
+   if (public_key_string.size())
+   {
+      ui->id_edit->clear();
+   }
+}
+
 void ContactView::lookupId()
 {
    try {
        auto current_id = ui->id_edit->text().toStdString();
-       if( current_id == std::string() )
+       if( current_id.empty() )
        {
             ui->id_status->setText( QString() );
             ui->save_button->setEnabled(false);

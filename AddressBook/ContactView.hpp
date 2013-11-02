@@ -33,6 +33,7 @@ class ContactView : public QWidget
      void firstNameChanged( const QString& name );
      void lastNameChanged( const QString& name );
      void keyhoteeIdChanged( const QString& name );
+     void publicKeyChanged( const QString& name );
      void updateNameLabel();
 
      void lookupId();
