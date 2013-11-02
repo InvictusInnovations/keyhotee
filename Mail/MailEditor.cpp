@@ -1,3 +1,4 @@
+#include <iostream>
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
@@ -21,10 +22,12 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QMimeData>
+#include <QSignalMapper>
+#include <QCheckBox>
 #ifndef QT_NO_PRINTER
-#include <QPrintDialog>
-#include <QPrinter>
-#include <QPrintPreviewDialog>
+#include <QtPrintSupport/QPrintDialog>
+#include <QtPrintSupport/QPrinter>
+#include <QtPrintSupport/QPrintPreviewDialog>
 #endif
 #include "../ContactListEdit.hpp"
 
@@ -48,7 +51,7 @@ using namespace bts::bitchat;
 using namespace bts::addressbook;
 
 MailEditor::MailEditor(QWidget *parent)
-: QDialog(parent)
+: QDialog(parent),lastSelectedDirectory(QString(".")), attach_bar(nullptr)
 {
     to_values = new QTextDocument(this);
     cc_values = new QTextDocument(this);
@@ -65,6 +68,7 @@ MailEditor::MailEditor(QWidget *parent)
     setupTextActions();
     setupMoneyToolBar();
     setupAddressBar();
+    setupattachfileBar();
 
     {
         //QMenu* helpMenu = new QMenu(tr("Help"), this);
@@ -74,7 +78,7 @@ MailEditor::MailEditor(QWidget *parent)
     }
     textEdit = new QTextEdit(this);
 
-    layout->addWidget( textEdit, 4, 0 );
+    layout->addWidget( textEdit, 5, 0 );
     connect(textEdit, SIGNAL(currentCharFormatChanged(QTextCharFormat)),
             this, SLOT(currentCharFormatChanged(QTextCharFormat)));
     connect(textEdit, SIGNAL(cursorPositionChanged()),
@@ -285,7 +289,7 @@ void MailEditor::setupMailActions()
                                  tr("&Attach File"), this);
  //   a->setShortcut(QKeySequence::Save);
     connect(action, &QAction::toggled, this, &MailEditor::showAttachFileDialog );
- //   a->setCheckable(true);
+    action->setCheckable(true);
     action->setEnabled(true);
     tool_bar->addAction(action);
 
@@ -328,6 +332,159 @@ void MailEditor::setupAddressBar()
    connect( actionToggleBcc, &QAction::toggled,  [=](bool state) { updateAddressBarLayout(); } );
    connect( actionToggleFrom, &QAction::toggled,  [=](bool state) { updateAddressBarLayout(); } );
 }
+
+
+void MailEditor::setupattachfileBar()
+{
+
+    delete attach_bar;
+
+    attach_bar    = new QWidget(this);
+    attachfilelayout = new QFormLayout(attach_bar);
+
+    QHBoxLayout *hblayout = new QHBoxLayout;
+
+    cblist.push_back(new QCheckBox);
+
+    selectedDirectory.push_back(new QLineEdit());
+    selectedDirectoryButton.push_back(new QPushButton("Attach file"));
+    selectedDirectory[0]->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    selectedDirectoryButton[0]->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+
+    QSignalMapper* signalMapper = new QSignalMapper (this) ;
+    QSignalMapper* signalMappercb = new QSignalMapper (this) ;
+    QSignalMapper* signalMapperontextchange = new QSignalMapper (this) ;
+
+    hblayout->addWidget(selectedDirectory[0]);
+    hblayout->addWidget(selectedDirectoryButton[0]);
+    attachfilelayout->addRow(cblist[0], hblayout);
+    connect(cblist[0], SIGNAL(stateChanged(int)), signalMappercb,SLOT(map()));
+    signalMappercb->setMapping (cblist[0], 0) ;
+    connect (signalMappercb, SIGNAL(mapped(int)), this, SLOT(attachallfiles(int))) ;
+
+    connect(selectedDirectoryButton[0],SIGNAL(clicked()),signalMapper,SLOT(map()));
+    signalMapper->setMapping (selectedDirectoryButton[0], 0) ;
+    connect (signalMapper, SIGNAL(mapped(int)), this, SLOT(openFileDialog(int))) ;
+
+    connect(selectedDirectory[0],SIGNAL(textChanged(QString)),signalMapperontextchange,SLOT(map()));
+    signalMapperontextchange->setMapping(selectedDirectory[0], 0) ;
+    connect (signalMapperontextchange, SIGNAL(mapped(int)), this, SLOT(onTextChange(int))) ;
+
+    attachfilelayout->setFieldGrowthPolicy( QFormLayout::ExpandingFieldsGrow );
+    layout->addWidget( attach_bar, 4, 0 );
+}
+
+void MailEditor::attachallfiles(int i)
+{
+    if(Qt::Checked == cblist[i]->checkState())
+    {
+        QFile file(selectedDirectory[i]->text());
+
+        int indexofattachment = attachments.size() - 1;
+        if(i >= indexofattachment)
+        {
+            attachment *att = new attachment();
+            attachments.push_back(*att);
+            createnewattachfile();
+        }
+
+        if( !file.exists() )
+        {
+          attachments[i].body.clear();
+          attachments[i].filename.clear();
+          return;
+        }
+        else
+        {
+            attachments[i].body.clear();
+            attachments[i].filename.clear();
+            QFileInfo fi(file);
+            attachments[i].filename = fi.fileName().toStdString();
+        }
+
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        QTextStream in(&file);
+
+        QChar ch;
+        while (!in.atEnd()) {
+                in >> ch;
+                attachments[i].body.push_back(ch.toLatin1());
+        }
+    }
+    else
+    {
+        attachments[i].filename.clear();
+        attachments[i].body.clear();
+    }
+
+}
+
+void MailEditor::createnewattachfile()
+{
+    QSignalMapper* signalMapper = new QSignalMapper (this) ;
+    QSignalMapper* signalMappercb = new QSignalMapper (this) ;
+    QSignalMapper* signalMapperontextchange = new QSignalMapper (this) ;
+    QHBoxLayout *hblayout = new QHBoxLayout;
+    cblist.push_back(new QCheckBox);
+
+    selectedDirectory.push_back(new QLineEdit());
+    selectedDirectoryButton.push_back(new QPushButton("Attach file"));
+
+    selectedDirectory[selectedDirectory.size() - 1]->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    selectedDirectoryButton[selectedDirectoryButton.size() - 1]->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+
+    hblayout->addWidget(selectedDirectory[selectedDirectory.size() - 1]);
+    hblayout->addWidget(selectedDirectoryButton[selectedDirectoryButton.size() - 1]);
+    attachfilelayout->addRow(cblist[cblist.size() - 1], hblayout);
+    connect(cblist[cblist.size() - 1], SIGNAL(stateChanged(int)), signalMappercb,SLOT(map()));
+    signalMappercb->setMapping (cblist[cblist.size() - 1], cblist.size() - 1) ;
+    connect (signalMappercb, SIGNAL(mapped(int)), this, SLOT(attachallfiles(int))) ;
+
+    connect(selectedDirectoryButton[selectedDirectoryButton.size() - 1],SIGNAL(clicked()),signalMapper,SLOT(map()));
+    signalMapper->setMapping(selectedDirectoryButton[selectedDirectoryButton.size() - 1], selectedDirectoryButton.size() - 1) ;
+    connect (signalMapper, SIGNAL(mapped(int)), this, SLOT(openFileDialog(int))) ;
+
+    connect(selectedDirectory[selectedDirectory.size() - 1],SIGNAL(textChanged(QString)),signalMapperontextchange,SLOT(map()));
+    signalMapperontextchange->setMapping(selectedDirectory[selectedDirectory.size() - 1], selectedDirectory.size() - 1) ;
+    connect (signalMapperontextchange, SIGNAL(mapped(int)), this, SLOT(onTextChange(int))) ;
+
+    attachfilelayout->setFieldGrowthPolicy( QFormLayout::ExpandingFieldsGrow );
+}
+
+void  MailEditor::openFileDialog(int i)
+{
+  //Update Last Selected Directory
+ lastSelectedDirectory =QFileDialog::getOpenFileName(
+                     attach_bar,
+                     *new QString("File to attach"),
+                     lastSelectedDirectory);
+
+  selectedDirectory[i]->setText(lastSelectedDirectory);
+}
+
+void MailEditor::onTextChange(int i)
+{
+  if(i >= attachments.size())
+  {
+      attachment *att = new attachment();
+      attachments.push_back(*att);
+  }
+  else
+  {
+      attachallfiles(i);
+  }
+
+  cblist[i]->setCheckState(Qt::Checked);
+  for(auto it = selectedDirectory.begin(); it != selectedDirectory.end(); it++)
+  {
+      if((*it)->text().trimmed().isEmpty())
+      {
+          return;
+      }
+  }
+//  createnewattachfile();
+}
+
 void MailEditor::updateAddressBarLayout()
 {
    QString subject_text = subject_field->text();
@@ -397,6 +554,7 @@ void MailEditor::enableSendMoney(bool show_send_money )
 }
 void MailEditor::showAttachFileDialog(bool show_send_money )
 {
+   openFileDialog(selectedDirectoryButton.size() - 1);
    // money_tool_bar->setVisible(show_send_money);
    // style_tb->setVisible(show_format);
 }
@@ -709,7 +867,18 @@ void MailEditor::sendMailMessage()
       private_email_message msg;
       msg.subject = subject_field->text().toStdString();
       msg.body = textEdit->document()->toHtml().toStdString();
-
+      for (auto it = attachments.begin(); it != attachments.end() ; )
+      {
+          if (it->filename.empty())
+          {
+              it = attachments.erase(it);
+          }
+          else
+          {
+              ++it;
+          }
+      }
+      msg.attachments = attachments;
       getRecipientKeys(to_field,msg.to_list);
       getRecipientKeys(cc_field,msg.cc_list);
       //bcc addresses are not included in the email itself
