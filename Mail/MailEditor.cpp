@@ -25,9 +25,9 @@
 #include <QSignalMapper>
 #include <QCheckBox>
 #ifndef QT_NO_PRINTER
-#include <QtPrintSupport/QPrintDialog>
-#include <QtPrintSupport/QPrinter>
-#include <QtPrintSupport/QPrintPreviewDialog>
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QPrintPreviewDialog>
 #endif
 #include "../ContactListEdit.hpp"
 
@@ -482,7 +482,6 @@ void MailEditor::onTextChange(int i)
           return;
       }
   }
-//  createnewattachfile();
 }
 
 void MailEditor::updateAddressBarLayout()
