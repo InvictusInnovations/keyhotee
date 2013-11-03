@@ -94,8 +94,8 @@ private slots:
     void printPreview(QPrinter*);
 
     void subjectChanged( const QString& subject );
-    void attachallfiles(int i);
-    void createnewattachfile();
+    void attachFile(int i);
+    void createNewAttachFile();
     void openFileDialog(int i);
     void onTextChange(int i);
 
@@ -107,11 +107,11 @@ private:
     void setupMoneyToolBar();
 
     void setupAddressBar();
-    void setupattachfileBar();
+    void setupAttachFileBar();
     void updateAddressBarLayout();
 
     QWidget*      address_bar;
-    QWidget*       attach_bar;
+    QWidget*       _attach_bar;
     ContactListEdit*  to_field; 
     ContactListEdit*  cc_field;
     ContactListEdit*  bcc_field;
@@ -122,14 +122,14 @@ private:
     QComboBox*    from_field;
     QFormLayout*  address_layout;
 
-    QFormLayout*  attachfilelayout;
+    QFormLayout*  _attach_file_layout;
 
-    std::vector<QLineEdit*> selectedDirectory;
-    std::vector<QCheckBox*> cblist;
+    std::vector<QLineEdit*> _selected_list_directory;
+    std::vector<QCheckBox*> _attachments_list_checkbox;
 
-    std::vector<QPushButton*> selectedDirectoryButton;
-    std::vector<bts::bitchat::attachment>  attachments;
-    QString lastSelectedDirectory;
+    std::vector<QPushButton*> _select_directory_list_button;
+    std::vector<bts::bitchat::attachment>  _attachments;
+    QString _last_selected_directory;
 
     QGridLayout*  layout;
 
