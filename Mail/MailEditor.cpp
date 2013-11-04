@@ -374,6 +374,7 @@ void MailEditor::setupAttachFileBar()
 
 void MailEditor::attachFile(int i)
 {
+
     if(Qt::Checked == _attachments_list_checkbox[i]->checkState())
     {
         QFile file(_selected_list_directory[i]->text());
@@ -381,8 +382,7 @@ void MailEditor::attachFile(int i)
         int index_attachment = _attachments.size() - 1;
         if(i > index_attachment)
         {
-            attachment *ptr_attachment_Obj = new attachment();
-            _attachments.push_back(*ptr_attachment_Obj);
+            _attachments.push_back(attachment());
         }
 
         if(_attachments_list_checkbox.size() == _attachments.size())
@@ -405,11 +405,9 @@ void MailEditor::attachFile(int i)
         }
 
         file.open(QIODevice::ReadOnly);
-        char* charbuffer = new char [file.size()];
-        file.read(charbuffer,file.size());
 
-        std::vector<char> attachment_body_vector(charbuffer, charbuffer + file.size());
-        _attachments[i].body = attachment_body_vector;
+        _attachments[i].body.resize(file.size());
+        file.read(_attachments[i].body.data(),file.size());
 
         file.close();
 
@@ -419,7 +417,6 @@ void MailEditor::attachFile(int i)
         _attachments[i].filename.clear();
         _attachments[i].body.clear();
     }
-
 }
 
 void MailEditor::createNewAttachFile()
@@ -439,7 +436,6 @@ void MailEditor::createNewAttachFile()
 
     hbox_layout->addWidget(_selected_list_directory[_selected_list_directory.size() - 1]);
     hbox_layout->addWidget(_select_directory_list_button[_select_directory_list_button.size() - 1]);
-
     _attach_file_layout->addRow(_attachments_list_checkbox[_attachments_list_checkbox.size() - 1], hbox_layout);
     connect(_attachments_list_checkbox[_attachments_list_checkbox.size() - 1], SIGNAL(stateChanged(int)), signalMapper_checkbox,SLOT(map()));
     signalMapper_checkbox->setMapping (_attachments_list_checkbox[_attachments_list_checkbox.size() - 1], _attachments_list_checkbox.size() - 1) ;
@@ -459,7 +455,7 @@ void MailEditor::createNewAttachFile()
 void  MailEditor::openFileDialog(int i)
 {
     //Update Last Selected Directory
-    _last_selected_directory =QFileDialog::getOpenFileName(
+    _last_selected_directory = QFileDialog::getOpenFileName(
                      _attach_bar,
                      "File to attach",
                      _last_selected_directory);
@@ -472,8 +468,7 @@ void MailEditor::onTextChange(int i)
     int size_of_attachments = _attachments.size();
     if(i >= size_of_attachments)
     {
-        attachment *ptr_attachment_Obj = new attachment();
-        _attachments.push_back(*ptr_attachment_Obj);
+        _attachments.push_back(attachment());
     }
     else
     {
@@ -481,13 +476,6 @@ void MailEditor::onTextChange(int i)
     }
 
     _attachments_list_checkbox[i]->setCheckState(Qt::Checked);
-    for(auto it = _selected_list_directory.begin(); it != _selected_list_directory.end(); it++)
-    {
-        if((*it)->text().trimmed().isEmpty())
-        {
-            return;
-        }
-    }
 }
 
 void MailEditor::updateAddressBarLayout()
