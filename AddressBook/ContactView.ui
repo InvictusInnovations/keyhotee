@@ -741,6 +741,28 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>icon_view</tabstop>
+  <tabstop>mail_button</tabstop>
+  <tabstop>chat_button</tabstop>
+  <tabstop>info_button</tabstop>
+  <tabstop>chat_conversation</tabstop>
+  <tabstop>chat_input</tabstop>
+  <tabstop>firstname</tabstop>
+  <tabstop>lastname</tabstop>
+  <tabstop>id_edit</tabstop>
+  <tabstop>public_key</tabstop>
+  <tabstop>privacy_comboBox</tabstop>
+  <tabstop>email</tabstop>
+  <tabstop>phone</tabstop>
+  <tabstop>notes</tabstop>
+  <tabstop>delete_contact</tabstop>
+  <tabstop>cancel_button</tabstop>
+  <tabstop>save_button</tabstop>
+  <tabstop>share_contact</tabstop>
+  <tabstop>edit_button</tabstop>
+  <tabstop>request_contact</tabstop>
+ </tabstops>
  <resources>
   <include location="../Keyhotee.qrc"/>
  </resources>
