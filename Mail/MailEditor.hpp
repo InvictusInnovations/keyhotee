@@ -10,8 +10,9 @@
 #include <QToolButton>
 #include <QWidgetAction>
 #include <QPushButton>
+#include <QCheckBox>
 #include <fc/crypto/elliptic.hpp>
-
+#include <bts/application.hpp>
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -93,6 +94,10 @@ private slots:
     void printPreview(QPrinter*);
 
     void subjectChanged( const QString& subject );
+    void attachFile(int i);
+    void createNewAttachFile();
+    void openFileDialog(int i);
+    void onTextChange(int i);
 
 private:
     void mergeFormatOnWordOrSelection(const QTextCharFormat& format);
@@ -102,9 +107,11 @@ private:
     void setupMoneyToolBar();
 
     void setupAddressBar();
+    void setupAttachFileBar();
     void updateAddressBarLayout();
 
     QWidget*      address_bar;
+    QWidget*       _attach_bar;
     ContactListEdit*  to_field; 
     ContactListEdit*  cc_field;
     ContactListEdit*  bcc_field;
@@ -114,6 +121,15 @@ private:
     QLineEdit*    subject_field;
     QComboBox*    from_field;
     QFormLayout*  address_layout;
+
+    QFormLayout*  _attach_file_layout;
+
+    std::vector<QLineEdit*> _selected_list_directory;
+    std::vector<QCheckBox*> _attachments_list_checkbox;
+
+    std::vector<QPushButton*> _select_directory_list_button;
+    std::vector<bts::bitchat::attachment>  _attachments;
+    QString _last_selected_directory;
 
     QGridLayout*  layout;
 
