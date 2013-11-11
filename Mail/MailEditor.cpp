@@ -391,24 +391,25 @@ void MailEditor::setupAttachmentTable()
             continue;
         }
 
-        qint64 size_file = file_info.size();
-        _sizeof_files.push_back(size_file);
-        qint64 total_filesize = 0;
+        qint64 size_file_in_bytes = file_info.size();
+        _sizeof_files.push_back(size_file_in_bytes);
+        qint64 total_filesize_in_bytes = 0;
         std::for_each(_sizeof_files.begin(),_sizeof_files.end(),[&](qint64 file_size){
-                                total_filesize += file_size;
+                                total_filesize_in_bytes += file_size;
          });
 
         std::vector<std::string> file_size_unit = {"B","KB","MB","GB","TB","PB","EB","ZB","YB","BB"};
 
         int index_file_size = 0;
         int index_total_file_size = 0;
-
+        qreal total_filesize = (qreal)total_filesize_in_bytes;
         while(total_filesize > 1024)
         {
            total_filesize = total_filesize / 1024;
            index_total_file_size++;
         }
 
+        qreal size_file = (qreal)size_file_in_bytes;
         while(size_file > 1024)
         {
            size_file = size_file / 1024;
@@ -420,7 +421,7 @@ void MailEditor::setupAttachmentTable()
         attachFile((*filename_Iterator).toLocal8Bit().constData());
         _hbox_layout->removeWidget(_attachment_table);
         _hbox_layout->setDirection(QBoxLayout::LeftToRight);
-        QString Header = QString::number(_absolute_filename.size()) + " attachment(s);" + QString::number(total_filesize) + QString::fromStdString(file_size_unit[index_total_file_size]);
+        QString Header = QString::number(_absolute_filename.size()) + " attachment(s);" + QString::number(total_filesize, 'f', 1) + QString::fromStdString(file_size_unit[index_total_file_size]);
 
         _attachment_table->setHorizontalHeaderLabels(Header.split(";"));
         _attachment_table->horizontalHeaderItem(0)->setTextAlignment(Qt::AlignLeft);
@@ -430,7 +431,7 @@ void MailEditor::setupAttachmentTable()
         filename->setTextAlignment(Qt::AlignLeft);
         filename->setToolTip((*filename_Iterator).toLocal8Bit().constData());
 
-        QTableWidgetItem *size_of_file = new QTableWidgetItem( QString::number(size_file) + QString::fromStdString(file_size_unit[index_file_size]));
+        QTableWidgetItem *size_of_file = new QTableWidgetItem( QString::number(size_file, 'f', 1) + QString::fromStdString(file_size_unit[index_file_size]));
         size_of_file->setToolTip(QString((*filename_Iterator).toLocal8Bit().constData()));
         size_of_file->setTextAlignment(Qt::AlignRight);
 
@@ -463,21 +464,21 @@ void MailEditor::removeAttachments()
         _attachment_table->removeRow(rows[index]);
         _attachment_table->setRowCount(_attachments.size() + 1);
     }
-    qint64 total_filesize = 0;
+    qint64 filesizeinbytes = 0;
     std::for_each(_sizeof_files.begin(),_sizeof_files.end(),[&](qint64 file_size){
-                            total_filesize += file_size;
+                            filesizeinbytes += file_size;
      });
     std::vector<std::string> file_size_unit = {"B","KB","MB","GB","TB","PB","EB","ZB","YB","BB"};
 
     int index_total_file_size = 0;
-
+    qreal total_filesize = (qreal)filesizeinbytes;
     while(total_filesize > 1024)
     {
        total_filesize = total_filesize / 1024;
        index_total_file_size++;
     }
 
-    QString Header = QString::number(_attachments.size()) + " Attachment(s);" + QString::number(total_filesize) + QString::fromStdString(file_size_unit[index_total_file_size]);
+    QString Header = QString::number(_attachments.size()) + " Attachment(s);" + QString::number(total_filesize, 'f', 1) + QString::fromStdString(file_size_unit[index_total_file_size]);
     _attachment_table->setHorizontalHeaderLabels(Header.split(";"));
 }
 
