@@ -480,6 +480,13 @@ void MailEditor::removeAttachments()
 
     QString Header = QString::number(_attachments.size()) + " Attachment(s);" + QString::number(total_filesize, 'f', 1) + QString::fromStdString(file_size_unit[index_total_file_size]);
     _attachment_table->setHorizontalHeaderLabels(Header.split(";"));
+
+    if(_attachments.size() == 0)
+        return;
+    if((unsigned int)rows[rows.size() - 1] >_attachments.size() - 1)
+        _attachment_table->selectRow(_attachments.size() - 1);
+    else
+        _attachment_table->selectRow(rows[rows.size() - 1] - 1);
 }
 
 void MailEditor::renameAttachment()
