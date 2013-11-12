@@ -9,8 +9,7 @@
 #include <QLineEdit>
 #include <QToolButton>
 #include <QWidgetAction>
-#include <QPushButton>
-#include <QCheckBox>
+#include <QTableWidget>
 #include <fc/crypto/elliptic.hpp>
 #include <bts/application.hpp>
 
@@ -94,10 +93,13 @@ private slots:
     void printPreview(QPrinter*);
 
     void subjectChanged( const QString& subject );
-    void attachFile(int i);
-    void createNewAttachFile();
-    void openFileDialog(int i);
-    void onTextChange(int i);
+
+    void showContextMenu(const QPoint& p);
+    void removeAttachments();
+    void renameAttachment();
+    void setModifiedFilenames();
+    void selectAllAttachment();
+    void setupAttachmentTable();
 
 private:
     void mergeFormatOnWordOrSelection(const QTextCharFormat& format);
@@ -107,11 +109,16 @@ private:
     void setupMoneyToolBar();
 
     void setupAddressBar();
-    void setupAttachFileBar();
+
+    void attachFile(QString filename);
     void updateAddressBarLayout();
 
     QWidget*      address_bar;
-    QWidget*       _attach_bar;
+
+    QTableWidget* _attachment_table;
+    QHBoxLayout*       _hbox_layout;
+    QStringList     _selected_files;
+
     ContactListEdit*  to_field; 
     ContactListEdit*  cc_field;
     ContactListEdit*  bcc_field;
@@ -122,14 +129,15 @@ private:
     QComboBox*    from_field;
     QFormLayout*  address_layout;
 
-    QFormLayout*  _attach_file_layout;
+    std::vector<bts::bitchat::attachment>        _attachments;
+    std::vector<std::string>               _absolute_filename;
+    std::vector<qint64>                         _sizeof_files;
 
-    std::vector<QLineEdit*> _selected_list_directory;
-    std::vector<QCheckBox*> _attachments_list_checkbox;
-
-    std::vector<QPushButton*> _select_directory_list_button;
-    std::vector<bts::bitchat::attachment>  _attachments;
-    QString _last_selected_directory;
+    QMenu*            _contextMenu;
+    QAction*          _attach_file;
+    QAction*    _remove_attachment;
+    QAction*    _rename_attachment;
+    QAction* _selectall_attachment;
 
     QGridLayout*  layout;
 
