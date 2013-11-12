@@ -403,16 +403,16 @@ void MailEditor::setupAttachmentTable()
         int index_file_size = 0;
         int index_total_file_size = 0;
         qreal total_filesize = (qreal)total_filesize_in_bytes;
-        while(total_filesize > 1024)
+        while(total_filesize > 1024.0)
         {
-           total_filesize = total_filesize / 1024;
+           total_filesize = total_filesize / 1024.0;
            index_total_file_size++;
         }
 
         qreal size_file = (qreal)size_file_in_bytes;
-        while(size_file > 1024)
+        while(size_file > 1024.0)
         {
-           size_file = size_file / 1024;
+           size_file = size_file / 1024.0;
            index_file_size++;
         }
 
@@ -472,9 +472,9 @@ void MailEditor::removeAttachments()
 
     int index_total_file_size = 0;
     qreal total_filesize = (qreal)filesizeinbytes;
-    while(total_filesize > 1024)
+    while(total_filesize > 1024.0)
     {
-       total_filesize = total_filesize / 1024;
+       total_filesize = total_filesize / 1024.0;
        index_total_file_size++;
     }
 
