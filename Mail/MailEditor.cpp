@@ -48,6 +48,7 @@ const QString rsrcPath = ":/images/win";
 #endif
 
 QCompleter* MailEditor::_contact_completer = nullptr;
+const char* file_size_unit[] = {"B","KB","MB","GB","TB","PB","EB","ZB","YB","BB"};
 
 using namespace bts::bitchat;
 using namespace bts::addressbook;
@@ -398,7 +399,6 @@ void MailEditor::setupAttachmentTable()
                                 total_filesize_in_bytes += file_size;
          });
 
-        std::vector<std::string> file_size_unit = {"B","KB","MB","GB","TB","PB","EB","ZB","YB","BB"};
 
         int index_file_size = 0;
         int index_total_file_size = 0;
@@ -431,7 +431,7 @@ void MailEditor::setupAttachmentTable()
         filename->setTextAlignment(Qt::AlignLeft);
         filename->setToolTip((*filename_Iterator).toLocal8Bit().constData());
 
-        QTableWidgetItem *size_of_file = new QTableWidgetItem( QString::number(size_file, 'f', 1) + QString::fromStdString(file_size_unit[index_file_size]));
+        QTableWidgetItem *size_of_file = new QTableWidgetItem( QString::number(size_file, 'f', 1) + file_size_unit[index_file_size]);
         size_of_file->setToolTip(QString((*filename_Iterator).toLocal8Bit().constData()));
         size_of_file->setTextAlignment(Qt::AlignRight);
 
@@ -468,7 +468,6 @@ void MailEditor::removeAttachments()
     std::for_each(_sizeof_files.begin(),_sizeof_files.end(),[&](qint64 file_size){
                             filesizeinbytes += file_size;
      });
-    std::vector<std::string> file_size_unit = {"B","KB","MB","GB","TB","PB","EB","ZB","YB","BB"};
 
     int index_total_file_size = 0;
     qreal total_filesize = (qreal)filesizeinbytes;

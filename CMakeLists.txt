@@ -60,6 +60,13 @@ IF( WIN32 )
   #set( OPENSSL_ROOT_DIR "${BITSHARES_DIR}/vendor/openssl" )
   #set( LIB_EAY_RELEASE "${BITSHARES_DIR}/vendor/openssl/out32dll/libeay32.lib" )
   #set( SSL_EAY_RELEASE "${BITSHARES_DIR}/vendor/openssl/out32dll/ssleay32.lib" )
+  set( OPENSSL_ROOT_DIR "c:/openssl" )
+  set( LIB_EAY_RELEASE "c:/openssl/lib/libeay32.lib" )
+  set( SSL_EAY_RELEASE "c:/openssl/lib/ssleay32.lib" )
+  #set( OPENSSL_ROOT_DIR "c:/openssl64" )
+  #set( LIB_EAY_RELEASE "c:/openssl64/libeay32.lib" )
+  #set( SSL_EAY_RELEASE "c:/openssl64/ssleay32.lib" )
+
   #include_directories( "${BITSHARES_DIR}/vendor/openssl/include" )
 
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
@@ -86,6 +93,7 @@ include_directories( ${Boost_INCLUDE_DIR} )
 SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES} ${SSL_EAY_RELEASE} ${LIB_EAY_RELEASE})
 
 add_subdirectory(bitshares)
+add_subdirectory(miner)
 
 IF( APPLE )
     SET_SOURCE_FILES_PROPERTIES(
