@@ -9,9 +9,9 @@
 #include <QLineEdit>
 #include <QToolButton>
 #include <QWidgetAction>
-#include <QPushButton>
+#include <QTableWidget>
 #include <fc/crypto/elliptic.hpp>
-
+#include <bts/application.hpp>
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -94,6 +94,13 @@ private slots:
 
     void subjectChanged( const QString& subject );
 
+    void showContextMenu(const QPoint& p);
+    void removeAttachments();
+    void renameAttachment();
+    void setModifiedFilenames();
+    void selectAllAttachment();
+    void setupAttachmentTable();
+
 private:
     void mergeFormatOnWordOrSelection(const QTextCharFormat& format);
     void fontChanged(const QFont& new_font);
@@ -102,9 +109,16 @@ private:
     void setupMoneyToolBar();
 
     void setupAddressBar();
+
+    void attachFile(QString filename);
     void updateAddressBarLayout();
 
     QWidget*      address_bar;
+
+    QTableWidget* _attachment_table;
+    QHBoxLayout*       _hbox_layout;
+    QStringList     _selected_files;
+
     ContactListEdit*  to_field; 
     ContactListEdit*  cc_field;
     ContactListEdit*  bcc_field;
@@ -114,6 +128,16 @@ private:
     QLineEdit*    subject_field;
     QComboBox*    from_field;
     QFormLayout*  address_layout;
+
+    std::vector<bts::bitchat::attachment>        _attachments;
+    std::vector<std::string>               _absolute_filenames;
+    std::vector<qint64>                         _sizeof_files;
+
+    QMenu*            _contextMenu;
+    QAction*          _attach_file;
+    QAction*    _remove_attachment;
+    QAction*    _rename_attachment;
+    QAction* _selectall_attachment;
 
     QGridLayout*  layout;
 

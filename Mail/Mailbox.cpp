@@ -44,39 +44,39 @@ void Mailbox::onDoubleClickedItem(QModelIndex index)
    MessageHeader message_header;
    QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
    auto sourceModelIndex = model->mapToSource(index);
-   _sourceModel->getFullMessage(sourceModelIndex,message_header);
-
+   auto sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
    auto mailViewer = new MailViewer(this);
-   mailViewer->displayMailMessage(message_header);
+   mailViewer->displayMailMessage(sourceModelIndex,sourceModel);
    mailViewer->show();
 }
 
 void Mailbox::showCurrentMail(const QModelIndex &selected,
-                                 const QModelIndex &deselected)
+                              const QModelIndex &deselected)
 {
 }
 
 void Mailbox::onSelectionChanged(const QItemSelection &selected,
-                                  const QItemSelection &deselected)
+                                 const QItemSelection &deselected)
 {
    QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
-   QModelIndexList items = selection_model->selectedRows();
+   QModelIndexList indexes = selection_model->selectedRows();
    //disable reply buttons if more than one email selected
-   bool oneEmailSelected = (items.size() == 1);
+   bool oneEmailSelected = (indexes.size() == 1);
    reply_mail->setEnabled(oneEmailSelected);
    reply_all_mail->setEnabled(oneEmailSelected);
    forward_mail->setEnabled(oneEmailSelected);
    //display selected email(s) in message preview window
-   std::vector<MessageHeader> msgs;
-   MessageHeader message_header;
-   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
-   foreach (QModelIndex index, items) 
+   if (oneEmailSelected)
    {
-      auto sourceModelIndex = model->mapToSource(index);
-      _sourceModel->getFullMessage(sourceModelIndex,message_header);
-      msgs.push_back(message_header);
+      QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+      auto sourceModelIndex = model->mapToSource(indexes[0]);
+      auto sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
+      ui->current_message->displayMailMessage(sourceModelIndex,sourceModel);
    }
-   ui->current_message->displayMailMessages(msgs);
+   else
+   {
+      //TODO: not implemented ui->current_message->displayMailMessages(indexes,selection_model);
+   }
 }
 
 Mailbox::~Mailbox()

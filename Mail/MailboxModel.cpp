@@ -293,3 +293,10 @@ void MailboxModel::getFullMessage( const QModelIndex& index, MessageHeader& head
    header.subject = email_msg.subject.c_str();
    header.body    = email_msg.body.c_str();
 }
+
+void MailboxModel::markMessageAsRead( const QModelIndex& index)
+{
+   MessageHeader& msg = my->_headers[index.row()];
+   msg.header.read_mark = true;
+   my->_mail_db->store_message_header(msg.header);
+}

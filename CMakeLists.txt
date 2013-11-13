@@ -54,6 +54,9 @@ IF( WIN32 )
   ENDIF()
   #boost
   SET( Boost_INCLUDE_DIR $ENV{BOOST_ROOT} )
+  set( OPENSSL_ROOT_DIR "c:/openssl" )
+  set( LIB_EAY_RELEASE "c:/openssl/lib/libeay32.lib" )
+  set( SSL_EAY_RELEASE "c:/openssl/lib/ssleay32.lib" )
 
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
 ELSE(WIN32)
@@ -79,6 +82,7 @@ include_directories( ${Boost_INCLUDE_DIR} )
 SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES} ${SSL_EAY_RELEASE} ${LIB_EAY_RELEASE})
 
 add_subdirectory(bitshares)
+add_subdirectory(miner)
 
 IF( APPLE )
     SET_SOURCE_FILES_PROPERTIES(
@@ -176,4 +180,3 @@ target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_L
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
 target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} Qt5::Widgets ${QTWEBKIT}  ${QTPRINT_SUPPORT}  ${PLATFORM_SPECIFIC_LIBS}  ${QtMacExtras} ${APPKIT_LIBRARY})
 
-add_subdirectory( miner )

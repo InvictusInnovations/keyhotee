@@ -32,10 +32,13 @@ class ContactView : public QWidget
 
      void firstNameChanged( const QString& name );
      void lastNameChanged( const QString& name );
-     void keyhoteeIdChanged( const QString& name );
+     void keyhoteeIdEdited( const QString& name );
+     void publicKeyEdited( const QString& public_key_string );
+
      void updateNameLabel();
 
      void lookupId();
+     void lookupPublicKey();
 
      bool isChatSelected();
      void sendChatMessage();
@@ -45,7 +48,6 @@ class ContactView : public QWidget
       bool eventFilter(QObject *obj, QEvent *event);
 
   private:
-     bool                                      _complete;
      fc::time_point                            _last_validate;
      Contact                                   _current_contact;
      fc::optional<bts::bitname::name_record>   _current_record;

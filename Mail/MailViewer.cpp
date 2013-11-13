@@ -3,7 +3,7 @@
 #include "KeyhoteeMainWindow.hpp"
 #include "../ui_MailViewer.h"
 #include <QToolBar>
-#include "MailboxModel.hpp" //for MessageHeader
+#include "MailboxModel.hpp"
 
 //DLNFIX move this to utility function file
 QString makeContactListString(std::vector<fc::ecc::public_key> key_list);
@@ -26,11 +26,14 @@ MailViewer::~MailViewer()
 {
 }
 
-void MailViewer::displayMailMessage(MessageHeader& msg)
-{
+void MailViewer::displayMailMessage(const QModelIndex& index, MailboxModel* mailbox)
+{ 
+   
    //TODO: later, possibly set a timer and only mark as read if still displaying
    //      this message when timer expires?
-   msg.header.read_mark = true;
+   mailbox->markMessageAsRead(index);
+   MessageHeader msg;
+   mailbox->getFullMessage(index,msg);
    QString formatted_date = msg.date_sent.toString(Qt::DefaultLocaleShortDate);
    ui->date_label->setText(formatted_date);
    ui->from_label->setText(msg.from);
@@ -61,15 +64,20 @@ void MailViewer::displayMailMessage(MessageHeader& msg)
    ui->message_content->setHtml(msg.body);
 }
 
-void MailViewer::displayMailMessages(std::vector<MessageHeader> msgs)
+#if 0
+void MailViewer::displayMailMessages(QModelIndexList indexes,QItemSelectionModel* selection_model)
 {
-   if (msgs.size() == 1)
+   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+   foreach (QModelIndex index, items) 
    {
-      displayMailMessage(msgs[0]);
+      auto sourceModelIndex = model->mapToSource(index);
+      _sourceModel->getFullMessage(sourceModelIndex,message_header);
+      msgs.push_back(message_header);
    }
-   else
+
    {
    //TODO: show summary display when multiple messages selected
    }
 }
+#endif
 

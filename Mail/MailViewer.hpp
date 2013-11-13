@@ -5,6 +5,7 @@
 
 namespace Ui { class MailViewer; }
 class QToolBar;
+class MailboxModel;
 
 class MailViewer : public QWidget
 {
@@ -13,8 +14,8 @@ class MailViewer : public QWidget
        MailViewer( QWidget* parent = nullptr );
       ~MailViewer();
       //displays mail and marks as having been read
-      void displayMailMessage(MessageHeader& msg);
-      void displayMailMessages(std::vector<MessageHeader>);
+      void displayMailMessage(const QModelIndex& index, MailboxModel* mailbox);
+      void displayMailMessages(QModelIndexList,QItemSelectionModel* mailbox);
 
       QToolBar*                       message_tools;
    private:

@@ -29,6 +29,7 @@ class MailboxModel : public QAbstractTableModel
 
     void addMailHeader(const bts::bitchat::message_header& header);
     void getFullMessage( const QModelIndex& index, MessageHeader& header )const;
+    void markMessageAsRead( const QModelIndex& index);
 
     virtual int rowCount( const QModelIndex& parent = QModelIndex() )const;
     virtual int columnCount( const QModelIndex& parent = QModelIndex() )const;
