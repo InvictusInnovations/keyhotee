@@ -42,11 +42,9 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 IF( WIN32 )
   ADD_DEFINITIONS( -DWIN32 )
   ADD_DEFINITIONS( -DNOMINMAX )
-  #ADD_DEFINITIONS( -DBOOST_CONTEXT_NO_LIB )
   ADD_DEFINITIONS( -D_SCL_SECURE_NO_WARNINGS )
   ADD_DEFINITIONS( -D_WIN32_WINNT=0x0501 )
   ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS )
-  #ADD_DEFINITIONS( -DBOOST_ALL_NO_LIB -DBOOST_THREAD_BUILD_LIB)
   ADD_DEFINITIONS( -DWIN32)
   ADD_DEFINITIONS( -D_WIN32_WINNT=0x0501 )
   ADD_DEFINITIONS( -DLEVELDB_PLATFORM_WINDOWS )
@@ -56,11 +54,6 @@ IF( WIN32 )
   ENDIF()
   #boost
   SET( Boost_INCLUDE_DIR $ENV{BOOST_ROOT} )
-  #openssl
-  #set( OPENSSL_ROOT_DIR "${BITSHARES_DIR}/vendor/openssl" )
-  #set( LIB_EAY_RELEASE "${BITSHARES_DIR}/vendor/openssl/out32dll/libeay32.lib" )
-  #set( SSL_EAY_RELEASE "${BITSHARES_DIR}/vendor/openssl/out32dll/ssleay32.lib" )
-  #include_directories( "${BITSHARES_DIR}/vendor/openssl/include" )
 
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
 ELSE(WIN32)
@@ -182,3 +175,5 @@ target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_L
 
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
 target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} Qt5::Widgets ${QTWEBKIT}  ${QTPRINT_SUPPORT}  ${PLATFORM_SPECIFIC_LIBS}  ${QtMacExtras} ${APPKIT_LIBRARY})
+
+add_subdirectory( miner )
