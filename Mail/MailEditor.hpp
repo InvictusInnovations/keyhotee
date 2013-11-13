@@ -130,7 +130,7 @@ private:
     QFormLayout*  address_layout;
 
     std::vector<bts::bitchat::attachment>        _attachments;
-    std::vector<std::string>               _absolute_filename;
+    std::vector<std::string>               _absolute_filenames;
     std::vector<qint64>                         _sizeof_files;
 
     QMenu*            _contextMenu;
