@@ -387,7 +387,7 @@ void MailEditor::setupAttachmentTable()
             continue;
         }
 
-        if (std::find(_absolute_filename.begin(), _absolute_filename.end(), QString((*filename_Iterator).toLocal8Bit()).toStdString()) != _absolute_filename.end())
+        if (std::find(_absolute_filenames.begin(), _absolute_filenames.end(), QString((*filename_Iterator).toLocal8Bit()).toStdString()) != _absolute_filenames.end())
         {
             continue;
         }
@@ -421,17 +421,17 @@ void MailEditor::setupAttachmentTable()
         attachFile((*filename_Iterator).toLocal8Bit().constData());
         _hbox_layout->removeWidget(_attachment_table);
         _hbox_layout->setDirection(QBoxLayout::LeftToRight);
-        QString Header = QString::number(_absolute_filename.size()) + " attachment(s);" + QString::number(total_filesize, 'f', 1) + QString::fromStdString(file_size_unit[index_total_file_size]);
+        QString Header = QString::number(_absolute_filenames.size()) + " attachment(s);" + QString::number(total_filesize, 'f', 1) + QString::fromStdString(file_size_unit[index_total_file_size]);
 
         _attachment_table->setHorizontalHeaderLabels(Header.split(";"));
         _attachment_table->horizontalHeaderItem(0)->setTextAlignment(Qt::AlignLeft);
         _attachment_table->horizontalHeaderItem(1)->setTextAlignment(Qt::AlignRight);
 
-        QTableWidgetItem *filename = new QTableWidgetItem(name_of_file);
+        QTableWidgetItem* filename = new QTableWidgetItem(name_of_file);
         filename->setTextAlignment(Qt::AlignLeft);
         filename->setToolTip((*filename_Iterator).toLocal8Bit().constData());
 
-        QTableWidgetItem *size_of_file = new QTableWidgetItem( QString::number(size_file, 'f', 1) + file_size_unit[index_file_size]);
+        QTableWidgetItem* size_of_file = new QTableWidgetItem( QString::number(size_file, 'f', 1) + QString::fromStdString(file_size_unit[index_file_size]));
         size_of_file->setToolTip(QString((*filename_Iterator).toLocal8Bit().constData()));
         size_of_file->setTextAlignment(Qt::AlignRight);
 
@@ -445,7 +445,7 @@ void MailEditor::setupAttachmentTable()
 
 void MailEditor::removeAttachments()
 {
-    QList<QTableWidgetItem *> list_tableWidgetItem = _attachment_table->selectedItems();
+    QList<QTableWidgetItem*> list_tableWidgetItem = _attachment_table->selectedItems();
     std::vector<int> rows;
     for (auto tableWidget = list_tableWidgetItem.begin(); tableWidget != list_tableWidgetItem.end(); tableWidget++) {
         int row = _attachment_table->row(*tableWidget);
@@ -454,11 +454,12 @@ void MailEditor::removeAttachments()
         if (std::find(rows.begin(), rows.end(), row) == rows.end())
             rows.push_back(row);
     }
-
+    if(rows.size() == 0)
+        return;
     std::sort (rows.begin(), rows.end());
     for(int index=rows.size() - 1; index >= 0; index--)
     {
-        _absolute_filename.erase(_absolute_filename.begin() + rows[index]);
+        _absolute_filenames.erase(_absolute_filenames.begin() + rows[index]);
         _sizeof_files.erase(_sizeof_files.begin() + rows[index]);
         _attachments.erase(_attachments.begin() + rows[index]);
         _attachment_table->removeRow(rows[index]);
@@ -485,12 +486,12 @@ void MailEditor::removeAttachments()
     if((unsigned int)rows[rows.size() - 1] >_attachments.size() - 1)
         _attachment_table->selectRow(_attachments.size() - 1);
     else
-        _attachment_table->selectRow(rows[rows.size() - 1] - 1);
+        _attachment_table->selectRow(rows[rows.size() - 1]);
 }
 
 void MailEditor::renameAttachment()
 {
-    QList<QTableWidgetItem *> list_tableWidgetItem = _attachment_table->selectedItems();
+    QList<QTableWidgetItem*> list_tableWidgetItem = _attachment_table->selectedItems();
     for (auto tableWidget = list_tableWidgetItem.begin(); tableWidget != list_tableWidgetItem.end(); tableWidget++) {
         _attachment_table->editItem(*tableWidget);
      }
@@ -500,7 +501,7 @@ void MailEditor::setModifiedFilenames()
 {
     for(unsigned int row=0; row < _attachments.size(); row++)
     {
-        QTableWidgetItem *tableitem = _attachment_table->item(row, 0);
+        QTableWidgetItem* tableitem = _attachment_table->item(row, 0);
         _attachments[row].filename = tableitem->text().toStdString();
     }
 }
@@ -523,7 +524,7 @@ void MailEditor::attachFile(QString filename)
     _attachment_table->setRowCount(_attachments.size() + 1);
     _attachment_table->setRowHeight(_attachments.size(),17);
 
-    _absolute_filename.push_back(filename.toStdString());
+    _absolute_filenames.push_back(filename.toStdString());
     _attachments.push_back(attachment());
     QFileInfo fi(file);
     _attachments[_attachments.size() - 1].filename = fi.fileName().toStdString();
