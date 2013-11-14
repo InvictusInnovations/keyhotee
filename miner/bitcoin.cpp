@@ -379,7 +379,6 @@ work    client::getwork()
    std::stringstream ss;
    ss << "{\"jsonrpc\": \"1.0\", \"id\":\"1\", \"method\": \"getwork\", \"params\":[]}";
    boost::property_tree::ptree pt =  my->request(ss.str());
-//   boost::property_tree::json_parser::write_json( std::cerr, pt );
    std::vector<char> bytes;
    boost::property_tree::ptree& child = pt.get_child("result");
    std::string data = child.get<std::string>("data");
@@ -408,7 +407,7 @@ bool    client::setwork( const work& w )
    ss<<"\"]}";
 //   std::cerr << "result?" << std::string( fc::to_hex( (char*)&w, sizeof(w) ) );
    boost::property_tree::ptree pt =  my->request(ss.str());
-//   boost::property_tree::json_parser::write_json( std::cerr, my->request(ss.str()) );
+   boost::property_tree::json_parser::write_json( std::cerr, pt );
 
    return pt.get<bool>("result");
 }
