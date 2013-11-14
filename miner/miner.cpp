@@ -63,7 +63,6 @@ int main( int argc, char** argv )
        if( argc == 1 )
        {
             std::cerr<<"Usage: "<<argv[0]<<" HOST PTS_ADDRESS [THREADS=HARDWARE]\n";
-            return 0;
             std::cerr<<"Performing Benchmark...\n";
             fc::sha256 base;
             auto start = fc::time_point::now();
