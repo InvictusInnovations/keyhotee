@@ -26,7 +26,6 @@ extern volatile bool   cancel_search;
 uint64_t               total_hashes = 0;
 
 uint64_t& get_thread_count();
-uint64_t               donation_percent = 60;
 
 
 void start_work( const bts::network::stcp_socket_ptr& sock, work_message msg )
@@ -46,15 +45,7 @@ void start_work( const bts::network::stcp_socket_ptr& sock, work_message msg )
 
           if( (((unsigned char*)&result)[0] < 0x03 ) )
           {
-             if( (uint32_t(rand()) % 100) < (100-donation_percent) )
-             {
                 std::cout<<std::string(fc::time_point::now())<< " "<<std::string(result)<<"\n";
-                msg.type = 0;
-             }
-             else
-             {
-                msg.type = 1;
-             }
              auto data = fc::raw::pack(msg);
              data.resize(192);
              sock->write( data.data(), data.size() );
@@ -69,7 +60,6 @@ void start_work( const bts::network::stcp_socket_ptr& sock, work_message msg )
 int main( int argc, char** argv )
 {
     try {
-       double keep = (100-donation_percent)/100.0;
        if( argc == 1 )
        {
             std::cerr<<"Usage: "<<argv[0]<<" HOST PTS_ADDRESS [THREADS=HARDWARE]\n";
@@ -83,10 +73,10 @@ int main( int argc, char** argv )
                base._hash[0]=i;
               auto pairs = momentum_search( base );
               total += pairs.size();
-              std::cerr<<"HPM: "<< keep*total / ((fc::time_point::now()-start).count()/60000000.0 ) <<"\r";
+              std::cerr<<"HPM: "<< total / ((fc::time_point::now()-start).count()/60000000.0 ) <<"\r";
             }
             auto stop  = fc::time_point::now();
-            std::cerr<<"HPM: "<< keep*total / ((stop-start).count()/60000000.0 ) <<"\n";
+            std::cerr<<"HPM: "<< total / ((stop-start).count()/60000000.0 ) <<"\n";
             return -1;
        }
        if( argc < 3 )
@@ -144,7 +134,7 @@ int main( int argc, char** argv )
               total_hashes = 0;
               fc::async( [&](){
                          while( true ){
-                           std::cerr <<"\r  hpm: "       << keep*total_hashes / ((fc::time_point::now() - start ).count()/60000000.0 ) <<"        \r";
+                           std::cerr <<"\r  hpm: "       << total_hashes / ((fc::time_point::now() - start ).count()/60000000.0 ) <<"        \r";
                            fc::usleep(fc::seconds(5));
                          }
                          }
@@ -174,7 +164,7 @@ int main( int argc, char** argv )
                            <<"  mature earned(est): "   <<((1.0-msg.pool_fee)*(msg.mature_balance/double(COIN)) * msg.user.valid/double(msg.pool_shares))
                            <<"  fee: "       << double(msg.pool_fee*100) <<"%"
                            <<"  address: "   << ptsaddr
-                           <<"  hpm: "       << keep*total_hashes / ((fc::time_point::now() - start ).count()/60000000.0 )
+                           <<"  hpm: "       << total_hashes / ((fc::time_point::now() - start ).count()/60000000.0 )
                            <<"\n";
                   }
                   else
