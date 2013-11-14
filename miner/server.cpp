@@ -20,6 +20,7 @@
 
 #include <boost/exception/all.hpp>
 #include <fstream>
+#include <stdint.h>
 
 using namespace bts::network;
 #define COIN 100000000ll
@@ -431,8 +432,8 @@ class server
                   if( momentum_verify( mid, header.birthday_a, header.birthday_b ) )
                   {
                      all_shares++;
-                     if( (((unsigned uint8_t*)&result)[0] == 0x00 )   
-                         && (((unsigned uint8_t*)&result)[1] == 0x00 ) )  
+                     if( (((uint8_t*)&result)[0] == 0x00 )   &&
+                         (((uint8_t*)&result)[1] == 0x00 ) )  
                      {
                         submit_work( header );
                      }
