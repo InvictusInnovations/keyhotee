@@ -60,7 +60,6 @@ uint64_t         total_invalid            = 0;
 fc::time_point   last_window_start        = fc::time_point::now();
 uint64_t         last_window_start_shares = 0;
 double           share_per_min            = 0;
-uint64_t         current_pps              = 0;
 bool             server_ok                = false;
 
 struct connection_data
@@ -71,7 +70,7 @@ struct connection_data
 
 struct config
 {
-    config():fee(0),auto_pay_amount(0),port(8485){}
+    config():fee(0),auto_pay_amount(0),port(4444){}
 
     double fee;
     double auto_pay_amount;
@@ -94,6 +93,7 @@ class server
           fc::thread                                             btc_thread;
           fc::bigint                                             share_target;
           uint64_t                                               wallet_balance;
+          uint64_t                                               mature_balance;
           std::ofstream                                          payment_log;
 
           fc::future<void>                                       accept_loop_complete;
@@ -140,7 +140,7 @@ class server
                     auto r = itr.value();
                     if( r.get_balance() > COIN )
                     {
-                       pay(k,r.get_balance());
+                       //pay(k,r.get_balance());
                     }
                     ++itr;
                }
@@ -187,14 +187,15 @@ class server
                   last_window_start = now;
               }
               std::cerr<<"  wallet: "       <<(wallet_balance)/double(COIN)
-                       <<"  total_earned: " <<total_earned/double(COIN)
-                       <<"  total_paid: "   <<total_paid/double(COIN)
-                       <<"  total_balance: "<<(total_earned-total_paid)/double(COIN)
+                       <<"  mature: "       <<(mature_balance)/double(COIN)
+                  //     <<"  total_earned: " <<total_earned/double(COIN)
+                  //     <<"  total_paid: "   <<total_paid/double(COIN)
+                  //     <<"  total_balance: "<<(total_earned-total_paid)/double(COIN)
                        <<"  pool: "<<(all_shares)
                        <<"  stale: "<<stale
                        <<"  connections: "<<connections.size()
                        <<"  spm:"<<share_per_min
-                       <<"  pps: "<<current_pps/double(COIN)<<"         \r";
+		      <<" \r";
           }
 
 
@@ -274,11 +275,12 @@ class server
                      { 
                         // NEW BLOCK
                         wallet_balance        = bitcoin_client->getbalance("*",1);
-                        uint64_t    block_num = bitcoin_client->getblockcount();
-                        std::string tar       = bitcoin_client->gettarget();
-                        ilog( "BLOCK NUM ${blocknum}", ("blocknum", block_num) );
-                        ilog( "TARGET NUM ${blocknum}", ("blocknum", tar) );
-
+                        mature_balance        = bitcoin_client->getbalance("",1);
+                 //       uint64_t    block_num = bitcoin_client->getblockcount();
+                 //       std::string tar       = bitcoin_client->gettarget();
+                 //       ilog( "BLOCK NUM ${blocknum}", ("blocknum", block_num) );
+                 //       ilog( "TARGET NUM ${blocknum}", ("blocknum", tar) );
+		/*
                         fc::sha256 tarhash;
                         fc::from_hex( tar, (char*)&tarhash, sizeof(tarhash) );
                         std::reverse( (char*)&tarhash, ((char*)&tarhash)+sizeof(tarhash) );
@@ -287,9 +289,10 @@ class server
                         auto shares_per_block = ((share_target / bi).to_int64());
                         current_pps = reward / shares_per_block;
                         current_pps *= 1.0 - conf.fee;
-
-                        ilog( "NEW BLOCK TARGET ${tar} REWARD ${R} PPS ${PPS}  SPP ${SPP}", 
-                              ("tar",tarhash)("R",reward/double(COIN))("PPS",current_pps/double(COIN))("SPP",shares_per_block/double(COIN))  );
+*/
+		ilog( "NEW BLOCK\n" );
+                //        ilog( "NEW BLOCK TARGET ${tar} REWARD ${R} PPS ${PPS}  SPP ${SPP}", 
+                 //             ("tar",tarhash)("R",reward/double(COIN))("PPS",current_pps/double(COIN))("SPP",shares_per_block/double(COIN))  );
                   
                         update_work( latest_work );
                      }
@@ -333,12 +336,14 @@ class server
           void send_work( const connection_data& con, const bitcoin::work& latest )
           {
               work_message msg;
-              msg.type         = 0;
-              msg.header       = latest;
-              msg.header.nonce = get_next_nonce();
-              msg.user         = con.user;
-              msg.current_pps  = current_pps;
-              msg.pool_spm     = share_per_min;
+              msg.type           = 0;
+              msg.header         = latest;
+              msg.header.nonce   = get_next_nonce();
+              msg.user           = con.user;
+              msg.pool_spm       = share_per_min;
+	      msg.pool_shares    = all_shares;
+	      msg.pool_earned    = wallet_balance;
+	      msg.mature_balance = mature_balance;
 
               auto data = fc::raw::pack( msg );
               data.resize( 192 );
@@ -362,8 +367,6 @@ class server
               if( valid )
               {
                 user.valid++;
-                user.total_earned += current_pps;
-                total_earned  += current_pps;
               }
               else
               {
@@ -513,6 +516,7 @@ class server
 
 int main( int argc, char** argv )
 {
+	try{
     if( argc < 2 )
     {
        std::cerr<<"Usage: "<<argv[0]<<" CONFIG\n";
@@ -542,4 +546,8 @@ int main( int argc, char** argv )
     serv.accept_loop_complete.wait();
 
     return 0;
+} catch ( fc::exception& e )
+{
+	std::cerr<<e.to_detail_string()<<"\n";
+}
 }

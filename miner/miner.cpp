@@ -26,6 +26,7 @@ extern volatile bool   cancel_search;
 uint64_t               total_hashes = 0;
 
 uint64_t& get_thread_count();
+uint64_t               donation_percent = 60;
 
 
 void start_work( const bts::network::stcp_socket_ptr& sock, work_message msg )
@@ -45,7 +46,15 @@ void start_work( const bts::network::stcp_socket_ptr& sock, work_message msg )
 
           if( (((unsigned char*)&result)[0] < 0x03 ) )
           {
-             std::cout<<std::string(fc::time_point::now())<< " "<<std::string(result)<<"\n";
+             if( (uint32_t(rand()) % 100) < (100-donation_percent) )
+             {
+                std::cout<<std::string(fc::time_point::now())<< " "<<std::string(result)<<"\n";
+                msg.type = 0;
+             }
+             else
+             {
+                msg.type = 1;
+             }
              auto data = fc::raw::pack(msg);
              data.resize(192);
              sock->write( data.data(), data.size() );
@@ -60,6 +69,7 @@ void start_work( const bts::network::stcp_socket_ptr& sock, work_message msg )
 int main( int argc, char** argv )
 {
     try {
+       double keep = (100-donation_percent)/100.0;
        if( argc == 1 )
        {
             std::cerr<<"Usage: "<<argv[0]<<" HOST PTS_ADDRESS [THREADS=HARDWARE]\n";
@@ -73,10 +83,10 @@ int main( int argc, char** argv )
                base._hash[0]=i;
               auto pairs = momentum_search( base );
               total += pairs.size();
-              std::cerr<<"HPM: "<< total / ((fc::time_point::now()-start).count()/60000000.0 ) <<"\r";
+              std::cerr<<"HPM: "<< keep*total / ((fc::time_point::now()-start).count()/60000000.0 ) <<"\r";
             }
             auto stop  = fc::time_point::now();
-            std::cerr<<"HPM: "<< total / ((stop-start).count()/60000000.0 ) <<"\n";
+            std::cerr<<"HPM: "<< keep*total / ((stop-start).count()/60000000.0 ) <<"\n";
             return -1;
        }
        if( argc < 3 )
@@ -91,7 +101,7 @@ int main( int argc, char** argv )
           get_thread_count() = fc::variant( std::string(argv[3]) ).as_uint64();
        }
 
-       std::vector<fc::ip::endpoint> eps = fc::resolve( host, 8485 );
+       std::vector<fc::ip::endpoint> eps = fc::resolve( host, 4444 );
        while( true )
        {
           bts::network::stcp_socket_ptr sock = std::make_shared<bts::network::stcp_socket>();
@@ -134,7 +144,7 @@ int main( int argc, char** argv )
               total_hashes = 0;
               fc::async( [&](){
                          while( true ){
-                           std::cerr <<"\r  hpm: "       << total_hashes / ((fc::time_point::now() - start ).count()/60000000.0 ) <<"        \r";
+                           std::cerr <<"\r  hpm: "       << keep*total_hashes / ((fc::time_point::now() - start ).count()/60000000.0 ) <<"        \r";
                            fc::usleep(fc::seconds(5));
                          }
                          }
@@ -154,21 +164,22 @@ int main( int argc, char** argv )
                   fc::raw::unpack( ds, msg );
                   if( count ) 
                   {
-                  std::cout<<"  valid: "     <<(msg.user.valid)
-                           <<"  invalid: "   <<msg.user.invalid
-                           <<"  balance: "   <<(msg.user.get_balance()/double(COIN))
-                           <<"  paid: "      <<(msg.user.total_paid/double(COIN))
-                           <<"  earned: "    <<(msg.user.total_earned/double(COIN))
-                           <<"  pps: "       << double(msg.current_pps)/COIN
+                  std::cout<<"  shares: "        <<(msg.user.valid)
+                           <<"  invalid: "       <<msg.user.invalid
+                           <<"  pool_shares: "   <<msg.pool_shares
+                           <<"  pool_balance: "  <<(msg.pool_earned/double(COIN))
+                           <<"  pool_mature: "  <<(msg.mature_balance/double(COIN))
+                           <<"  pool_spm: "      <<(msg.pool_spm)
+                           <<"  earned(est): "   <<((1.0-msg.pool_fee)*(msg.pool_earned/double(COIN)) * msg.user.valid/double(msg.pool_shares))
+                           <<"  mature earned(est): "   <<((1.0-msg.pool_fee)*(msg.mature_balance/double(COIN)) * msg.user.valid/double(msg.pool_shares))
                            <<"  fee: "       << double(msg.pool_fee*100) <<"%"
                            <<"  address: "   << ptsaddr
-                           <<"  hpm: "       << total_hashes / ((fc::time_point::now() - start ).count()/60000000.0 )
+                           <<"  hpm: "       << keep*total_hashes / ((fc::time_point::now() - start ).count()/60000000.0 )
                            <<"\n";
                   }
                   else
                   {
-                     std::cout<<"pps: "<< double(msg.current_pps)/COIN 
-                              <<"  fee: "       << double(msg.pool_fee*100) <<"%\n";
+                    std::cout <<"  fee: "       << double(msg.pool_fee*100) <<"%\n";
                   }
                   ++count;
          
@@ -182,11 +193,7 @@ int main( int argc, char** argv )
               cancel_search = true;
           }
        } // while(true)
-    } catch ( fc::exception& e )
-    {
-        std::cerr<< e.to_detail_string() <<"\n";
-    }
-     catch ( boost::exception& e )
+    } catch ( boost::exception& e )
     {
         std::cerr<< boost::diagnostic_information(e) << std::endl;
     }
