@@ -54,9 +54,11 @@ IF( WIN32 )
   ENDIF()
   #boost
   SET( Boost_INCLUDE_DIR $ENV{BOOST_ROOT} )
-  set( OPENSSL_ROOT_DIR "c:/openssl" )
-  set( LIB_EAY_RELEASE "c:/openssl/lib/libeay32.lib" )
-  set( SSL_EAY_RELEASE "c:/openssl/lib/ssleay32.lib" )
+
+  #You need to set OPENSSL_ROOT environment variable for your system on WIN32
+  set( OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT} )
+  set( LIB_EAY_RELEASE "${OPENSSL_ROOT_DIR}/lib/libeay32.lib" )
+  set( SSL_EAY_RELEASE "${OPENSSL_ROOT_DIR}/lib/ssleay32.lib" )
 
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
 ELSE(WIN32)
@@ -70,19 +72,12 @@ ELSE(WIN32)
   #SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wno-unused-local-typedefs" )
   SET(Boost_USE_STATIC_LIBS ON)
   FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context coroutine) 
+  FIND_PACKAGE( OpenSSL )
 
  IF( NOT APPLE )
       SET( pthread pthread )
  ENDIF( NOT APPLE )
 ENDIF(WIN32)
-
-if(WIN32)
-  set( OPENSSL_ROOT_DIR "c:/openssl64" )
-  set( LIB_EAY_RELEASE "c:/openssl64/libeay32.lib" )
-  set( SSL_EAY_RELEASE "c:/openssl64/ssleay32.lib" )
-else(WIN32)
-  FIND_PACKAGE( OpenSSL )
-endif(WIN32)
 
 include_directories( ${OPENSSL_INCLUDE_DIR} )
 include_directories( ${Boost_INCLUDE_DIR} )
