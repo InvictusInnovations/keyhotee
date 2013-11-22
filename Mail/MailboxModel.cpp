@@ -99,6 +99,7 @@ void MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
    mail_header.to_list = email_msg.to_list;
    mail_header.cc_list = email_msg.cc_list;
    mail_header.subject = email_msg.subject.c_str();
+   mail_header.hasAttachments = email_msg.attachments.size();
 }
 
 void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
@@ -245,7 +246,7 @@ QVariant MailboxModel::data( const QModelIndex& index, int role )const
 //            case Money:
 //               return QVariant();
             case Attachment:
-               if (header.attachment)
+               if (header.hasAttachments)
                   return my->_attachment_icon;
                else
                   return "";
@@ -260,7 +261,7 @@ QVariant MailboxModel::data( const QModelIndex& index, int role )const
              case Money:
                 return header.money_amount;
              case Attachment:
-                return header.attachment;
+                return header.hasAttachments;
 //             case Chat:
              case From:
                 return header.from;
@@ -292,6 +293,7 @@ void MailboxModel::getFullMessage( const QModelIndex& index, MessageHeader& head
    header.cc_list = email_msg.cc_list;
    header.subject = email_msg.subject.c_str();
    header.body    = email_msg.body.c_str();
+   header.attachments = email_msg.attachments;
 }
 
 void MailboxModel::markMessageAsRead( const QModelIndex& index)
