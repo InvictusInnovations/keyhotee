@@ -111,7 +111,7 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
 }
 
 KeyhoteeMainWindow::KeyhoteeMainWindow()
- : QMainWindow()
+ : SelfSizingMainWindow()
 {
     ui.reset( new Ui::KeyhoteeMainWindow() );
     ui->setupUi(this);
@@ -254,7 +254,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
         }
     }
     */
-
+    QString settings_file = "keyhotee_";
+    settings_file.append(gProfile_name.c_str());
+    setSettingsFile(settings_file);
+    readSettings();
 }
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
