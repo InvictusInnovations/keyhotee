@@ -128,6 +128,8 @@ set( sources
         images/shield.icns 
         qrc_Keyhotee.cpp
 
+		qtreusable/selfsizingmainwindow.cpp
+
         profile_wizard/ProfileEditPage.ui 
         profile_wizard/ProfileIntroPage.ui 
         profile_wizard/ProfileNymPage.ui 

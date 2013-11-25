@@ -1,9 +1,9 @@
 #pragma once
-#include <QMainWindow>
 #include <memory>
 #include <unordered_map>
 #include <bts/addressbook/addressbook.hpp>
 #include <bts/application.hpp>
+#include <qtreusable/selfsizingmainwindow.h>
 
 namespace Ui { class KeyhoteeMainWindow; }
 class QTreeWidgetItem;
@@ -41,7 +41,7 @@ public:
 private:
 };
 
-class KeyhoteeMainWindow  : public QMainWindow, public bts::application_delegate
+class KeyhoteeMainWindow  : public SelfSizingMainWindow, public bts::application_delegate
 {
   public:
       KeyhoteeMainWindow();
