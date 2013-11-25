@@ -18,6 +18,7 @@
 #include <fc/thread/spin_lock.hpp>
 #include <openssl/sha.h>
 #include <boost/thread/thread.hpp>
+#include "sha2.h"
 extern "C" {
 #include "sphlib-3.0/c/sph_sha2.h"
 }
@@ -43,13 +44,20 @@ extern "C" {
      //     fc::sha512::encoder enc;
      //     enc.write( (char*)&i, sizeof(i) );
      //     enc.write( (char*)&head, sizeof(head) );
-          
           sph_sha512_context context;
           sph_sha512_init( &context );
           sph_sha512(&context, (char*)&i, sizeof(i) );
           sph_sha512(&context, (char*)&head, sizeof(head) );
           fc::sha512 result;
           sph_sha512_close( &context, (char*)&result );
+         /*
+         sha512_ctx ctx;
+         sha512_init( &ctx );
+          sha512_update(&ctx, (unsigned char*)&i, sizeof(i) );
+          sha512_update(&ctx, (unsigned char*)&head, sizeof(head) );
+          fc::sha512 result;
+          sha512_final(&ctx, (unsigned char*)&result );
+          */
       
      //     auto result = enc.result();
         
@@ -72,10 +80,10 @@ extern "C" {
       return results;
    }
     
-   std::vector< std::pair<uint32_t,uint32_t> > momentum_search( pow_seed_type head )
+   std::vector< std::pair<uint32_t,uint32_t> > momentum_search( pow_seed_type head, int instance  )
    {
-      static hashtable found;
-      found.reset();
+      static hashtable found[1];
+      found[instance].reset();
       std::vector< std::pair<uint32_t,uint32_t> > results;
       results.reserve(16);
       fc::spin_lock m;
@@ -85,7 +93,7 @@ extern "C" {
       
       for( uint32_t i = 0; i < get_thread_count(); ++i )
       {
-         done[i]=mothreads[i].async( [&,i](){ return search( i, found, head ); });
+         done[i]=mothreads[i].async( [&,i](){ return search( i, found[instance], head ); });
       }
       
       for( uint32_t t = 0; t < get_thread_count(); ++t )

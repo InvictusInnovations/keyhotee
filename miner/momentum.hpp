@@ -12,7 +12,7 @@
    /** 
     *  @return all collisions found in the nonce search space 
     */
-   std::vector< std::pair<uint32_t,uint32_t> > momentum_search( pow_seed_type head );
+   std::vector< std::pair<uint32_t,uint32_t> > momentum_search( pow_seed_type head, int instance = 0 );
    bool momentum_verify( pow_seed_type head, uint32_t a, uint32_t b );
 
 

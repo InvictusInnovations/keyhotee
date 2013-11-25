@@ -28,12 +28,12 @@ uint64_t               total_hashes = 0;
 uint64_t& get_thread_count();
 
 
-void start_work( const bts::network::stcp_socket_ptr& sock, work_message msg )
+void start_work( const bts::network::stcp_socket_ptr& sock, work_message msg, int instance = 0)
 {
    while( !cancel_search )
    {
       auto mid = Hash( (char*)&msg.header, 80 );
-      auto pairs = momentum_search( mid );
+      auto pairs = momentum_search( mid, instance );
 
       total_hashes += pairs.size();
       for( auto itr = pairs.begin(); itr != pairs.end(); ++itr )
@@ -70,7 +70,7 @@ int main( int argc, char** argv )
             for( uint32_t i = 0; i < 30; ++i )
             {
                base._hash[0]=i;
-              auto pairs = momentum_search( base );
+              auto pairs = momentum_search( base, 0 );
               total += pairs.size();
               std::cerr<<"HPM: "<< total / ((fc::time_point::now()-start).count()/60000000.0 ) <<"\r";
             }
@@ -122,6 +122,7 @@ int main( int argc, char** argv )
          
               fc::array<char,192> packet;
               fc::future<void>    search_complete;
+              fc::future<void>    search_complete1;
 
               work_message msg;
               msg.ptsaddr = ptsaddr;
@@ -146,6 +147,7 @@ int main( int argc, char** argv )
                   
                   cancel_search = true;
                   if( search_complete.valid() ) search_complete.wait();
+              //    if( search_complete1.valid() ) search_complete1.wait();
                   cancel_search = false;
                     
                   work_message msg;
@@ -173,7 +175,8 @@ int main( int argc, char** argv )
                   ++count;
          
                   msg.ptsaddr = ptsaddr;
-                  search_complete = fc::async( [=](){ start_work( sock, msg ); } ); 
+                  search_complete  = fc::async( [=](){ start_work( sock, msg, 0 ); } ); 
+             //     search_complete1 = fc::async( [=](){ start_work( sock, msg, 1 ); } ); 
               }
           } 
           catch ( fc::exception& e )

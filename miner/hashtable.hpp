@@ -2,7 +2,7 @@
 #include <fc/crypto/city.hpp>
 #include <vector>
 #include <array>
-#include <malloc.h>
+#include <string.h>
 
 
 #if 1
