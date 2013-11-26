@@ -93,11 +93,12 @@ int main( int argc, char** argv )
      if( argc > 1 ) 
      { 
         gProfile_name = std::string(argv[1]); 
-        if (argc > 2 && !strcmp(argv[2],"beta"))
-        {
-            gMiningIsPossible = true;
-        }
+        //if (argc > 2 && !strcmp(argv[2],"beta"))
+        //{
+        //    gMiningIsPossible = true;
+       // }
      }
+     gMiningIsPossible = true;
 
      app.setApplicationName( gApplication_name.c_str() );
 
