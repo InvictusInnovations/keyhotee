@@ -19,5 +19,7 @@ class MailViewer : public QWidget
 
       QToolBar*                       message_tools;
    private:
+      void displayAttachments(const MessageHeader& msg);
+
       std::unique_ptr<Ui::MailViewer> ui;
 };
