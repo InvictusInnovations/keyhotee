@@ -1,0 +1,33 @@
+== Overview of first tasks ==
+
+Complete and smooth out interface for creating contacts, sending email, and chatting.
+
+== Bugs/Improvements ==
+Creating new contact then canceling should revert to show contacts list (or to previous window if easy)
+Ask for confirmation on contact deletion actions. Maybe add GUI element as another way to delete contacts from contact list.
+Prevent duplicate contacts (I think this means don't allow multiple aliases to map to same keyhotee id, but confirm with DanL)
+The TO field shows the address of your account rather than the proper identity. (DanN)
+Bug in reply/forward (DanN)
+Bug in serializing public key. Create unit test for DanL (DanN).
+
+== Functionality to be implemented ==
+* When an email is sent, add to a queue of outgoing messages. And add to "pending" mailbox folder. After separate thread has removed it from queue (when it has completed proof-of-work necessary to broadast the email), move email from "pending" mailbox to "sent" mailbox.
+* Add support for saving drafts of emails to "draft" mailbox folder. Maybe add to draft as soon as they start writing the email or maybe use an autosave mechanism that does this after a few minutes (I think thunderbird works this way).
+* Add a debug diagnostics dialog that can be opened up from Help menu. This window should contain a text editor that displays the contents of a text file that we would write out to a file with diagnostics info. Info can include state information about the block chain, etc.
+* Show Repute and Age for contacts with keyhotee Ids on contact list and contact info page
+* Identify contacts which are the user's own identities (versus other people's public keys).
+* Display number of active connections in the status bar at the bottom of keyhotee window.
+* Create Identity Menu and move "Enable Mining" to the identity menu.
+* Add menu item to create a new identity (last page of wizard for example)
+* Don't broadcast our mined name more than once per block… perhaps this could be solved by increasing the difficulty of mining your name.
+* Check name chain on load to make sure all blocks are at least the min difficulty.. currently it does not check.
+* Add button next to PublicKey to 'copy' to clipboard 
+* New Contact form… when a Keyhotee ID is entered an Invalid public key is displayed… 
+* Allow user to select their own ICON.
+* When a node on a longer name fork connects to a node on a shorter name fork the name databases do not seem to sync.
+* app_config.data_dir should not be specified in config file, it should be inferred from location of config file.
+* Just like text messages show 'unread count'….  there should be an unread email count.   Unread messages should be rendered in Bold in the list.
+* Add keyhotee Id field directly to emails being sent. This will allow user to see a human-readable name rather than just a public key address even when they don't have the sender's information in their contact list.
+* Should be able to select Icons for contacts (Sanjay)
+* Move attachment list to bottom of email, display in mail viewer, and add options to save attachments (Yuvaraj)
+* Option to preview or otherwise display attachments which are valid images, etc. Low priority.
