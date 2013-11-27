@@ -32,7 +32,7 @@
 #include <QPrintPreviewDialog>
 #endif
 #include "../ContactListEdit.hpp"
-
+#include "public_key_address.hpp"
 #include "MailEditor.hpp"
 #include <fc/log/logger.hpp>
 
@@ -157,8 +157,8 @@ void MailEditor::addToContact(fc::ecc::public_key public_key)
       addToContact(contact_o->wallet_index);
    else
       {
-      std::string base58_string = bts::address(public_key);
-      to_field->insertCompletion(base58_string.c_str());
+      std::string public_key_string = public_key_address(public_key);
+      to_field->insertCompletion(public_key_string.c_str());
       }
 }
 
@@ -182,8 +182,8 @@ void MailEditor::addCcContact(fc::ecc::public_key public_key)
    {
       if( !actionToggleCc->isChecked() )
          actionToggleCc->setChecked(true);
-      std::string base58_string = bts::address(public_key);
-      cc_field->insertCompletion(base58_string.c_str());
+      std::string public_key_string = public_key_address(public_key);
+      cc_field->insertCompletion(public_key_string.c_str());
    }
 }
 

@@ -1,6 +1,7 @@
 #include "ContactView.hpp"
 #include "ui_ContactView.h"
 #include "AddressBookModel.hpp"
+#include "public_key_address.hpp"
 
 #include <KeyhoteeMainWindow.hpp>
 #include <bts/application.hpp>
@@ -9,46 +10,10 @@
 #include <fc/thread/thread.hpp>
 #include <fc/log/logger.hpp>
 
-#include <fc/crypto/base58.hpp>
-#include <fc/crypto/city.hpp>
-#include <fc/crypto/elliptic.hpp>
 #include <QWebFrame>
 
 extern bool gMiningIsPossible;
 
-struct public_key_address
-{
-    fc::ecc::public_key_data key;
-    uint32_t                 check;
-
-    bool is_valid()const
-    {
-       return uint32_t(fc::city_hash64( (char*)&key, sizeof(key) )) == check;
-    }
-    public_key_address(){}
-
-    public_key_address( const fc::ecc::public_key_data& k )
-    {
-       key = k;
-       check =  uint32_t(fc::city_hash64( (char*)&key, sizeof(key) ));
-    }
-    public_key_address( const std::string& str )
-    {
-       std::vector<char> bin = fc::from_base58( str );
-       if( bin.size() == 37 )
-       {
-          memcpy( (char*)&key, bin.data(), 33 );
-          memcpy( (char*)&check, bin.data()+33, 4 );
-       }
-    }
-    operator std::string()const
-    {
-        fc::array<char,37> data;
-        memcpy( (char*)&data, (char*)&key, 33 );
-        memcpy( ((char*)&data)+33, (char*)&check, 4 );
-        return fc::to_base58( (char*)&data, 37 );
-    }
-};
 
 bool ContactView::eventFilter(QObject* object, QEvent* event)
 {
@@ -179,11 +144,16 @@ void ContactView::onSave()
     _current_contact.privacy_setting = bts::addressbook::secret_contact;
 
     _address_book->storeContact( _current_contact );
+    //DLNFIX
+    #if 1
     ui->info_stack->setCurrentWidget(ui->info_status);
     ui->chat_button->setEnabled(true);
     ui->mail_button->setEnabled(true);
     ui->info_button->setEnabled(true);
     ui->info_button->setChecked(true);
+    #else
+    setContact(_current_contact,ContactView::info);
+    #endif
 } FC_RETHROW_EXCEPTIONS( warn, "onSave" ) }
 
 void ContactView::onCancel()
@@ -293,15 +263,8 @@ void ContactView::setContact( const Contact& current_contact,
     ui->lastname->setText( _current_contact.last_name.c_str() );
    // ui->email->setText( _current_contact.email_address );
    // ui->phone->setText( _current_contact.phone_number );
-    /*
-    auto vec   = fc::raw::pack( _current_contact.public_key );
-    uint32_t check = fc::city_hash64( vec.data(), vec.size() );
-    vec.resize( vec.size()+sizeof(check) );
-    memcpy( &vec[vec.size()-sizeof(check)], (char*)&check, sizeof(check) );
-    
-    std::string base58_string = fc::to_base58( vec.data(), vec.size() );
-    */
-    ui->public_key_view->setText( std::string(public_key_address( _current_contact.public_key )).c_str() );//base58_string.c_str() );
+    std::string public_key_string = public_key_address( _current_contact.public_key );
+    ui->public_key_view->setText( public_key_string.c_str() );
     ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
     ui->icon_view->setIcon( _current_contact.getIcon() );
 } FC_RETHROW_EXCEPTIONS( warn, "" ) }
@@ -476,9 +439,8 @@ void ContactView::lookupId()
        {
             ui->id_status->setStyleSheet("QLabel { color : green; }");
             ui->id_status->setText( tr( "Registered" ) );
-            //DLNFIX replace with version that includes hash?
-            std::string base58_string = bts::address(_current_record->pub_key);
-            ui->public_key->setText( base58_string.c_str() );
+            std::string public_key_string = public_key_address(_current_record->pub_key);
+            ui->public_key->setText( public_key_string.c_str() );
             if( _address_book != nullptr )
                ui->save_button->setEnabled(true);
        }

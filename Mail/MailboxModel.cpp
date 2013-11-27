@@ -1,5 +1,6 @@
 #include "MailboxModel.hpp"
 #include "MessageHeader.hpp"
+#include "public_key_address.hpp"
 #include <QIcon>
 #include <QPixmap>
 #include <QImage>
@@ -40,7 +41,7 @@ QString makeContactListString(std::vector<fc::ecc::public_key> key_list)
 {
    QStringList to_list;
    QString to;
-   std::string base58_string;
+   std::string public_key_string;
    auto address_book = bts::get_profile()->get_addressbook();
    foreach(auto public_key, key_list)
    {
@@ -49,8 +50,8 @@ QString makeContactListString(std::vector<fc::ecc::public_key> key_list)
          to_list.append(contact->dac_id_string.c_str());
       else //display public_key as base58
       {
-         std::string base58_string = bts::address(public_key);
-         to_list.append(base58_string.c_str());
+         std::string public_key_string = public_key_address(public_key);
+         to_list.append(public_key_string.c_str());
       }
    }
    return to_list.join(',');
