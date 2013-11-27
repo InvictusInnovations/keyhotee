@@ -173,6 +173,8 @@ void ContactView::onSave()
            _current_contact.known_since = QDateTime::currentDateTime();
        }
        */
+       public_key_address key_address(ui->public_key->text().toStdString());
+       _current_contact.public_key = key_address.key;
     }
     _current_contact.privacy_setting = bts::addressbook::secret_contact;
 
