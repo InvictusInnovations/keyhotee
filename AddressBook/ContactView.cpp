@@ -224,6 +224,7 @@ void ContactView::setContact( const Contact& current_contact,
         {
             ui->name_label->setText( tr( "New Contact" ) );
             ui->id_edit->setText( QString() );
+            ui->public_key->setText( QString() );
             //keyhoteeIds don't function when mining is not possible
             if (!gMiningIsPossible)
                ui->id_edit->setEnabled(false);
