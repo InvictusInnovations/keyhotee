@@ -195,6 +195,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     auto profile    = app->get_profile();
     auto idents = profile->identities();
 
+
     _inbox_model  = new MailboxModel(this,profile,profile->get_inbox_db());
     _draft_model  = new MailboxModel(this,profile,profile->get_draft_db());
     _pending_model  = new MailboxModel(this,profile,profile->get_pending_db());
@@ -213,7 +214,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui->sent_box_page->setModel(_sent_model, Mailbox::Sent);
 
 
-    ui->actionEnable_Mining->setChecked(app->get_mining_intensity() != 0);
     wlog( "idents: ${idents}", ("idents",idents) );
     for( size_t i = 0; i < idents.size(); ++i )
     {
@@ -234,6 +234,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
                         profile->get_keychain().get_identity_key( idents[i].dac_id ).get_public_key(), 
                         idents[i].mining_effort );
     }
+    app->set_mining_intensity(100);
+    ui->actionEnable_Mining->setChecked(app->get_mining_intensity() != 0);
     _addressbook = profile->get_addressbook();
 
     /*
