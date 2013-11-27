@@ -98,6 +98,7 @@ ContactView::ContactView( QWidget* parent )
 
    connect( ui->firstname, &QLineEdit::textChanged, this, &ContactView::firstNameChanged );
    connect( ui->lastname, &QLineEdit::textChanged, this, &ContactView::lastNameChanged );
+   connect( ui->id_edit, &QLineEdit::textChanged, this, &ContactView::keyhoteeIdChanged );
    connect( ui->id_edit, &QLineEdit::textEdited, this, &ContactView::keyhoteeIdEdited );
    connect( ui->public_key, &QLineEdit::textEdited, this, &ContactView::publicKeyEdited );
 
@@ -279,16 +280,20 @@ void ContactView::firstNameChanged( const QString& /*name*/ )
     updateNameLabel();
 }
 
+void ContactView::keyhoteeIdChanged( const QString& /*name*/ )
+{
+    updateNameLabel();
+}
+
 void ContactView::updateNameLabel()
 {
    auto full_name = ui->firstname->text() + " " + ui->lastname->text();
+   QString dac_id = ui->id_edit->text();
+   if (dac_id != QString())
+     full_name += "(" + dac_id + ")";
    if( full_name != " " )
    {
        ui->name_label->setText(full_name);
-   }
-   else if( ui->id_edit->text() != QString() )
-   {
-       ui->name_label->setText( ui->id_edit->text() );
    }
    else
    {
