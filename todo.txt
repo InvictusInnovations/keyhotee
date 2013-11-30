@@ -2,6 +2,11 @@
 
 Complete and smooth out interface for creating contacts, sending email, and chatting.
 
+== Priority Required Features ==
+Implement c++ API that will convert an international string to ASCI via http://www.gnu.org/software/libidn/doxygen/   
+   This should be implemented as part of bitname/name_hash.cpp 
+
+
 == Bugs/Improvements ==
 Creating new contact then canceling should revert to show contacts list (or to previous window if easy)
 Ask for confirmation on contact deletion actions. Maybe add GUI element as another way to delete contacts from contact list.
