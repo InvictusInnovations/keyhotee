@@ -8,7 +8,7 @@
 
 
 /**
- *  Caches GUI-Specific data associated with the wallet.
+ *  Caches GUI-Specific data associated with the wallet_contact.
  */
 class Contact : public bts::addressbook::wallet_contact
 {

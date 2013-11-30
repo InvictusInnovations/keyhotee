@@ -205,7 +205,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     _addressbook_model  = new AddressBookModel( this, addressbook );
     connect( _addressbook_model, &QAbstractItemModel::dataChanged, this, &KeyhoteeMainWindow::addressBookDataChanged );
 
-    MailEditor::setContactCompleter( _addressbook_model->GetContactCompleter() );
+    MailEditor::setContactCompleter( _addressbook_model->getContactCompleter() );
 
     ui->contacts_page->setAddressBook(_addressbook_model);
     ui->new_contact->setAddressBook(_addressbook_model);

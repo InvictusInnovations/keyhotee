@@ -7,6 +7,9 @@ class QCompleter;
 
 namespace Detail { class AddressBookModelImpl; }
 
+/**
+ *  Provides a Model interface to the addressbook. 
+ */
 class AddressBookModel : public QAbstractTableModel
 {
   public:
@@ -40,8 +43,7 @@ class AddressBookModel : public QAbstractTableModel
     virtual QVariant headerData( int section, Qt::Orientation o, int role = Qt::DisplayRole )const;
     virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole )const;
 
-    //QStringListModel* GetContactCompletionModel();
-    QCompleter*       GetContactCompleter();
+    QCompleter*       getContactCompleter();
 
   private:
      std::unique_ptr<Detail::AddressBookModelImpl> my;

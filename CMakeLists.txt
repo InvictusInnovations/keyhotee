@@ -128,13 +128,14 @@ set( sources
         images/shield.icns 
         qrc_Keyhotee.cpp
 
-		qtreusable/selfsizingmainwindow.cpp
+		    qtreusable/selfsizingmainwindow.cpp
 
         profile_wizard/ProfileEditPage.ui 
         profile_wizard/ProfileIntroPage.ui 
         profile_wizard/ProfileNymPage.ui 
         profile_wizard/ProfileWizard.cpp
 
+        AddressBook/Contact.cpp
         AddressBook/ContactsTable.ui
         AddressBook/ContactsTable.hpp
         AddressBook/ContactsTable.cpp
