@@ -1,7 +1,7 @@
 
 #include "MailViewer.hpp"
 #include "KeyhoteeMainWindow.hpp"
-#include "../ui_MailViewer.h"
+#include "ui_MailViewer.h"
 #include <QToolBar>
 #include "MailboxModel.hpp"
 #include <QImageReader>

@@ -1,5 +1,5 @@
 #include "Mailbox.hpp"
-#include "../ui_Mailbox.h"
+#include "ui_Mailbox.h"
 #include "MailboxModel.hpp"
 #include <fc/reflect/variant.hpp>
 #include "MailEditor.hpp"

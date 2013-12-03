@@ -8,27 +8,21 @@ IF( WIN32 )
 #  set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake;C:/gh/qt5.1.1/qtwebkit/WebKitBuild/Release/lib/cmake/Qt5WebKitWidgets;"  )
   set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
   message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+
+  #You need to set OPENSSL_ROOT environment variable for your system on WIN32
+  message("Setting up OpenSSL root and include vars on Win32 platform")
+  set( OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT} )
+  set( OPENSSL_INCLUDE_DIR ${OPENSSL_ROOT_DIR}/include )
+
 ENDIF(WIN32)
 
-find_package( Qt5Widgets )
-include_directories(${Qt5Widgets_INCLUDE_DIRS})
+find_package( OpenSSL )
+find_package( Qt5Core )
+find_package( Qt5WebKitWidgets )
+find_package( Qt5PrintSupport )
 
 if (WIN32)
   MESSAGE(platform= "Compiling on WIN32")
-  set(QTDIR $ENV{QTDIR})
-  message(qtdir=${QTDIR})
-  set(QTWEBKITDIR ../qt5.1.1/qtwebkit)
-  include_directories(${QTDIR}/include)
-  set(QtPrintSupport_include $ENV{QTDIR}/include/QtPrintSupport)
-  message(include+=${QtPrintSupport_include})
-  include_directories(${QtPrintSupport_include})
-  link_directories(${QTDIR}/lib)
-  
-  include_directories(${QTWEBKITDIR}/include)
-  include_directories(${QTWEBKITDIR}/include/QtWebKitWidgets)
-  link_directories(${QTWEBKITDIR}/WebKitBuild/Release/lib)
-else(WIN32)
-  find_package( Qt5WebKitWidgets )
 endif(WIN32)
 
 #Note: bitshares repo should be checked out under keyhotee dir or path here should be changed
@@ -45,20 +39,13 @@ IF( WIN32 )
   ADD_DEFINITIONS( -D_SCL_SECURE_NO_WARNINGS )
   ADD_DEFINITIONS( -D_WIN32_WINNT=0x0501 )
   ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS )
-  ADD_DEFINITIONS( -DWIN32)
-  ADD_DEFINITIONS( -D_WIN32_WINNT=0x0501 )
   ADD_DEFINITIONS( -DLEVELDB_PLATFORM_WINDOWS )
   # Activate C++ exception handling
   IF (NOT CMAKE_CXX_FLAGS MATCHES "/EHsc")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")    
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
   ENDIF()
   #boost
   SET( Boost_INCLUDE_DIR $ENV{BOOST_ROOT} )
-
-  #You need to set OPENSSL_ROOT environment variable for your system on WIN32
-  set( OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT} )
-  set( LIB_EAY_RELEASE "${OPENSSL_ROOT_DIR}/lib/libeay32.lib" )
-  set( SSL_EAY_RELEASE "${OPENSSL_ROOT_DIR}/lib/ssleay32.lib" )
 
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
 ELSE(WIN32)
@@ -72,7 +59,6 @@ ELSE(WIN32)
   #SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wno-unused-local-typedefs" )
   SET(Boost_USE_STATIC_LIBS ON)
   FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context coroutine) 
-  FIND_PACKAGE( OpenSSL )
 
  IF( NOT APPLE )
       SET( pthread pthread )
@@ -81,7 +67,8 @@ ENDIF(WIN32)
 
 include_directories( ${OPENSSL_INCLUDE_DIR} )
 include_directories( ${Boost_INCLUDE_DIR} )
-SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES} ${SSL_EAY_RELEASE} ${LIB_EAY_RELEASE})
+SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES})
+# ${SSL_EAY_RELEASE} ${LIB_EAY_RELEASE})
 
 add_subdirectory(bitshares)
 add_subdirectory(miner)
@@ -128,20 +115,20 @@ set( sources
         images/shield.icns 
         qrc_Keyhotee.cpp
 
-		    qtreusable/selfsizingmainwindow.cpp
+        qtreusable/selfsizingmainwindow.cpp
 
         profile_wizard/ProfileEditPage.ui 
         profile_wizard/ProfileIntroPage.ui 
         profile_wizard/ProfileNymPage.ui 
         profile_wizard/ProfileWizard.cpp
 
-        AddressBook/Contact.cpp
         AddressBook/ContactsTable.ui
         AddressBook/ContactsTable.hpp
         AddressBook/ContactsTable.cpp
         AddressBook/ContactView.ui
         AddressBook/ContactView.hpp
         AddressBook/ContactView.cpp
+        AddressBook/Contact.cpp
 
         Mail/MailEditor.hpp
         Mail/MailEditor.cpp
@@ -167,21 +154,22 @@ set( sources
         KeyhoteeMainWindow.cpp 
         main.cpp )
 
-
-
-if (WIN32)
-  set (QTWEBKIT Qt5WebKitWidgets)
-  set (QTPRINT_SUPPORT Qt5PrintSupport)
-else(WIN32)
-  set (QTWEBKIT Qt5::WebKitWidgets)
-  set (QTPRINT_SUPPORT Qt5::PrintSupport)
-endif(WIN32)
-
+# Configure dependencies of keyhotee_library module
 add_library( keyhotee_library ${library_sources} )
+qt5_use_modules(keyhotee_library Widgets WebKit)
 message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
-target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} Qt5::Widgets ${QTWEBKIT} ${QtMacExtras} ${APPKIT_LIBRARY})
- 
+target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
 
+# Configure dependencies of keyhotee main application module
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
-target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} Qt5::Widgets ${QTWEBKIT}  ${QTPRINT_SUPPORT}  ${PLATFORM_SPECIFIC_LIBS}  ${QtMacExtras} ${APPKIT_LIBRARY})
+# Use the Widgets module from Qt 5.
+qt5_use_modules(Keyhotee Widgets PrintSupport WebKit)
+
+target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
+
+if (MSVC)
+  message("Setting up debug options for MSVC build")
+# Probably cmake has a bug and vcxproj generated for executable in Debug conf. has disabled debug info
+  set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
+endif(MSVC)
 

@@ -10,7 +10,7 @@
 #include <fc/thread/thread.hpp>
 #include <fc/log/logger.hpp>
 
-#include <QWebFrame>
+#include <QtWebKitWidgets/QWebFrame>
 
 extern bool gMiningIsPossible;
 
