@@ -68,7 +68,6 @@ ENDIF(WIN32)
 include_directories( ${OPENSSL_INCLUDE_DIR} )
 include_directories( ${Boost_INCLUDE_DIR} )
 SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES})
-# ${SSL_EAY_RELEASE} ${LIB_EAY_RELEASE})
 
 add_subdirectory(bitshares)
 add_subdirectory(miner)
