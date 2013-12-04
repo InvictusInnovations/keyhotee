@@ -7,6 +7,8 @@
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
 
+#include <QMessageBox>
+
 class ContactsSortFilterProxyModel : public QSortFilterProxyModel
 {
 public:
@@ -72,6 +74,8 @@ void ContactsTable::openContact( const QModelIndex& index )
 
 void ContactsTable::onDeleteContact()
 {
+   if(QMessageBox::question(this, "Delete Contact", "Are you sure you delete a contact?") == QMessageBox::Button::No)
+     return;
    //remove selected contacts from inbox model (and database)
    QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->contact_table->model());
    //model->setUpdatesEnabled(false);

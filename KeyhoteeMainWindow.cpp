@@ -355,6 +355,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       }
       else if( selected_items[0] == _mailboxes_root )
       {
+          ui->widget_stack->setCurrentWidget( ui->inbox_page );
       }
       /*
       else if( selected_items[0] == _identities_root )
