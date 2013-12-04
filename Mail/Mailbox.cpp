@@ -6,6 +6,8 @@
 #include <QToolBar>
 #include <bts/profile.hpp>
 
+#include <QMessageBox>
+
 
 class MailSortFilterProxyModel : public QSortFilterProxyModel
 {
@@ -219,6 +221,10 @@ void Mailbox::onDeleteMail()
    QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
    QModelIndexList sortFilterIndexes = selection_model->selectedRows();
    QModelIndexList indexes;
+   if (indexes.count() == 0)
+     return;
+   if(QMessageBox::question(this, "Delete Mail", "Are you sure you delete an email?") == QMessageBox::Button::No)
+     return;
    foreach(QModelIndex sortFilterIndex,sortFilterIndexes)
      indexes.append(model->mapToSource(sortFilterIndex));
    qSort(indexes);
