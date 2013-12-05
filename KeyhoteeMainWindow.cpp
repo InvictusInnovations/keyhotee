@@ -448,7 +448,7 @@ void KeyhoteeMainWindow::on_actionSelectAll_triggered()
 
 void KeyhoteeMainWindow::on_actionDelete_triggered()
 {
-  notSupported();
+ // notSupported();
 }
 
 // Menu Identity
