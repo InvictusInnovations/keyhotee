@@ -1,0 +1,11 @@
+c:\gh\keyhotee\miner\release\pool_miner.exe
+c:\gh\keyhotee\miner\coyote_miner.bat
+c:\windows\system32\msvcp110.dll
+c:\windows\system32\msvcr110.dll
+c:\lib\boost\stage64\lib\BOOST_CHRONO-VC110-MT-1_53.DLL
+c:\lib\boost\stage64\lib\BOOST_CONTEXT-VC110-MT-1_53.DLL
+c:\lib\boost\stage64\lib\BOOST_DATE_TIME-VC110-MT-1_53.DLL
+c:\lib\boost\stage64\lib\BOOST_FILESYSTEM-VC110-MT-1_53.DLL
+c:\lib\boost\stage64\lib\BOOST_SYSTEM-VC110-MT-1_53.DLL
+c:\lib\boost\stage64\lib\BOOST_THREAD-VC110-MT-1_53.DLL
+c:\openssl64\LIBEAY32.DLL

@@ -1,0 +1,1 @@
+pool_miner.exe 162.243.45.158 PgtB3ZSuwoWsyEnWivuV2xU1P3BwisugkJ
