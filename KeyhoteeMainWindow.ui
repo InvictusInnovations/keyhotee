@@ -356,25 +356,56 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionEnable_Mining"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionPaste"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelect_All"/>
+    <addaction name="separator"/>
+    <addaction name="actionDelete"/>
    </widget>
    <widget class="QMenu" name="menuMail">
     <property name="title">
      <string>Mail</string>
     </property>
     <addaction name="actionNew_Message"/>
+    <addaction name="actionReply"/>
+    <addaction name="actionReply_all"/>
+    <addaction name="actionForward"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_attachement"/>
    </widget>
    <widget class="QMenu" name="menuContact">
     <property name="title">
      <string>Contact</string>
     </property>
     <addaction name="actionNew_Contact"/>
+    <addaction name="actionSet_Icon"/>
+    <addaction name="separator"/>
     <addaction name="actionShow_Contacts"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionDiagnostic"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuIdentity">
+    <property name="title">
+     <string>Identity</string>
+    </property>
+    <addaction name="actionNew_identity"/>
+    <addaction name="separator"/>
+    <addaction name="actionEnable_Mining"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuIdentity"/>
    <addaction name="menuMail"/>
    <addaction name="menuContact"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolbar">
@@ -402,6 +433,9 @@
    <addaction name="actionNew_Message"/>
    <addaction name="separator"/>
    <addaction name="actionNew_Contact"/>
+   <addaction name="separator"/>
+   <addaction name="actionDelete"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionMail">
    <property name="text">
@@ -440,7 +474,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Enable Mining</string>
@@ -449,6 +483,122 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/win/editcopy.png</normaloff>:/images/win/editcopy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/win/editcut.png</normaloff>:/images/win/editcut.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/win/editpaste.png</normaloff>:/images/win/editpaste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionSelect_All">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/delete_icon.png</normaloff>:/images/delete_icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
+  <action name="actionForward">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/mail_forward.png</normaloff>:/images/mail_forward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Forward</string>
+   </property>
+  </action>
+  <action name="actionReply">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/mail_reply.png</normaloff>:/images/mail_reply.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reply</string>
+   </property>
+  </action>
+  <action name="actionReply_all">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/mail_reply_all.png</normaloff>:/images/mail_reply_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reply all</string>
+   </property>
+  </action>
+  <action name="actionSave_attachement">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/win/filesave.png</normaloff>:/images/win/filesave.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save attachement</string>
+   </property>
+  </action>
+  <action name="actionDiagnostic">
+   <property name="text">
+    <string>Diagnostic </string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionNew_identity">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/add_contact.png</normaloff>:/images/add_contact.png</iconset>
+   </property>
+   <property name="text">
+    <string>New identity</string>
+   </property>
+  </action>
+  <action name="actionSet_Icon">
+   <property name="text">
+    <string>Set Icon</string>
    </property>
   </action>
  </widget>

@@ -47,12 +47,6 @@ class KeyhoteeMainWindow  : public SelfSizingMainWindow, public bts::application
       KeyhoteeMainWindow();
       ~KeyhoteeMainWindow();
 
-      //file menu responses
-      void on_actionExit_triggered();
-
-      //edit menu responses
-      void         enableMining_toggled(bool enabled);
-
       void         newMailMessage();
       void         newMailMessageTo(int contact_id);
       void         addContact();
@@ -77,7 +71,30 @@ class KeyhoteeMainWindow  : public SelfSizingMainWindow, public bts::application
      virtual void received_email( const bts::bitchat::decrypted_message& msg);
 
 
-     
+  private slots:
+    // ---------- MenuBar
+    // File
+    void on_actionExit_triggered();
+    // Edit
+    void on_actionCopy_triggered();
+    void on_actionCut_triggered();
+    void on_actionPaste_triggered();
+    void on_actionSelectAll_triggered();
+    void on_actionDelete_triggered();
+    // Identity
+    void on_actionNew_identity_triggered();
+    void enableMining_toggled(bool enabled);
+    // Mail
+    void on_actionReply_triggered();
+    void on_actionReply_all_triggered();
+    void on_actionForward_triggered();
+    void on_actionSave_attachement_triggered();
+    // Contact
+    void on_actionset_Icon_triggered();
+    // Help
+    void on_actionDiagnostic_triggered();
+    void on_actionAbout_triggered();
+
   private:
       void addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right, const QVector<int>& roles );
       void searchEditChanged(QString search_string);
@@ -105,6 +122,8 @@ class KeyhoteeMainWindow  : public SelfSizingMainWindow, public bts::application
 
       QLineEdit*                              _search_edit;
       std::unique_ptr<Ui::KeyhoteeMainWindow> ui;
+
+    void notSupported();
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* GetKeyhoteeWindow();

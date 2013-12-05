@@ -22,10 +22,11 @@ class ContactsTable  : public QWidget
     void contactOpened( int contact_id );
 
   private:
-    void onDeleteContact();
-
     std::unique_ptr<Ui::ContactsTable> ui;
     AddressBookModel*                  _addressbook_model;
     QSortFilterProxyModel*             _sorted_addressbook_model;
     QAction*                           _delete_contact;
+
+  public slots:
+    void onDeleteContact();
 };

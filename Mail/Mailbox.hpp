@@ -38,8 +38,9 @@ class Mailbox : public QWidget
       void onReplyAllMail() { duplicateMail(ReplyType::reply_all); }
       void onForwardMail()  { duplicateMail(ReplyType::forward); }
 
+   public slots:
       void onDeleteMail();
-
+  private:
       QSortFilterProxyModel* sortedModel();
 
 

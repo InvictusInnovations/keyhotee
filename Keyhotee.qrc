@@ -34,5 +34,9 @@
       <file>images/mail_forward.png</file>
       <file>images/mail_reply_all.png</file>
       <file>images/delete_icon.png</file>
+      <file>images/win/editcopy.png</file>
+      <file>images/win/editcut.png</file>
+      <file>images/win/editpaste.png</file>
+      <file>images/win/filesave.png</file>
  </qresource>
  </RCC>

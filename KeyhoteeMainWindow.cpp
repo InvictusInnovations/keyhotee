@@ -15,6 +15,7 @@
 
 #include <QLineEdit>
 #include <QCompleter>
+#include <QMessageBox>
 
 extern std::string gApplication_name;
 extern std::string gProfile_name;
@@ -158,11 +159,33 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     
     ui->actionEnable_Mining->setEnabled(gMiningIsPossible);
     ui->actionEnable_Mining->setVisible(gMiningIsPossible);
+    
+    // ---------------------- MenuBar
+    // File
     connect( ui->actionExit, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionExit_triggered );
+    // Edit
+    connect( ui->actionCopy, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionCopy_triggered );
+    connect( ui->actionCut, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionCut_triggered );
+    connect( ui->actionPaste, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionPaste_triggered );
+    connect( ui->actionSelect_All, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionSelectAll_triggered );
+    connect( ui->actionDelete, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionDelete_triggered );
+    // Identity
+    connect( ui->actionNew_identity, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionNew_identity_triggered );
+    connect( ui->actionEnable_Mining, &QAction::toggled, this, &KeyhoteeMainWindow::enableMining_toggled );
+    // Mail
     connect( ui->actionNew_Message, &QAction::triggered, this, &KeyhoteeMainWindow::newMailMessage );
-    connect( ui->actionEnable_Mining, &QAction::toggled, this, &KeyhoteeMainWindow::enableMining_toggled );    
+    connect( ui->actionReply, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionReply_triggered );
+    connect( ui->actionReply_all, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionReply_all_triggered );
+    connect( ui->actionForward, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionForward_triggered );
+    connect( ui->actionSave_attachement, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionSave_attachement_triggered );
+    // Contact
     connect( ui->actionNew_Contact, &QAction::triggered, this, &KeyhoteeMainWindow::addContact );
+    connect( ui->actionSet_Icon, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionset_Icon_triggered );
     connect( ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts );
+    // Help
+    connect( ui->actionDiagnostic, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionDiagnostic_triggered );
+    connect( ui->actionAbout, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionAbout_triggered );
+
     connect( ui->splitter, &QSplitter::splitterMoved, this, &KeyhoteeMainWindow::sideBarSplitterMoved );
     connect( ui->side_bar, &QTreeWidget::itemSelectionChanged, this, &KeyhoteeMainWindow::onSidebarSelectionChanged );
 
@@ -213,6 +236,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui->draft_box_page->setModel(_draft_model, Mailbox::Drafts);
     ui->sent_box_page->setModel(_sent_model, Mailbox::Sent);
 
+    connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
 
     wlog( "idents: ${idents}", ("idents",idents) );
     for( size_t i = 0; i < idents.size(); ++i )
@@ -340,6 +364,11 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
    QList<QTreeWidgetItem*> selected_items = ui->side_bar->selectedItems();
    if( selected_items.size() )
    {
+      disconnect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
+      disconnect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
+      disconnect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
+      disconnect(ui->actionDelete, SIGNAL(triggered()), ui->sent_box_page, SLOT(onDeleteMail()));
+
       if( selected_items[0]->type() == ContactItem )
       {
           auto con_id = selected_items[0]->data(0, ContactIdRole ).toInt();
@@ -352,10 +381,12 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else if( selected_items[0] == _contacts_root )
       {
           showContacts();
+          connect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
       }
       else if( selected_items[0] == _mailboxes_root )
       {
           ui->widget_stack->setCurrentWidget( ui->inbox_page );
+          connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
       }
       /*
       else if( selected_items[0] == _identities_root )
@@ -365,14 +396,17 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else if( selected_items[0] == _inbox_root )
       {
           ui->widget_stack->setCurrentWidget( ui->inbox_page );
+          connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
       }
       else if( selected_items[0] == _drafts_root )
       {
           ui->widget_stack->setCurrentWidget( ui->draft_box_page );
+          connect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
       }
       else if( selected_items[0] == _sent_root )
       {
           ui->widget_stack->setCurrentWidget( ui->sent_box_page );
+          connect(ui->actionDelete, SIGNAL(triggered()), ui->sent_box_page, SLOT(onDeleteMail()));
       }
    }
 }
@@ -385,17 +419,89 @@ void KeyhoteeMainWindow::selectIdentityItem( QTreeWidgetItem* item )
 {
 }
 
+// Menu File
 void KeyhoteeMainWindow::on_actionExit_triggered()
 {
     qApp->closeAllWindows();
 }
 
+// Menu Edit
+void KeyhoteeMainWindow::on_actionCopy_triggered()
+{
+  notSupported();
+}
+
+void KeyhoteeMainWindow::on_actionCut_triggered()
+{
+  notSupported();
+}
+
+void KeyhoteeMainWindow::on_actionPaste_triggered()
+{
+  notSupported();
+}
+
+void KeyhoteeMainWindow::on_actionSelectAll_triggered()
+{
+  notSupported();
+}
+
+void KeyhoteeMainWindow::on_actionDelete_triggered()
+{
+  notSupported();
+}
+
+// Menu Identity
+void KeyhoteeMainWindow::on_actionNew_identity_triggered()
+{
+  notSupported();
+}
 
 void KeyhoteeMainWindow::enableMining_toggled(bool enabled)
 {
     auto app    = bts::application::instance();
     app->set_mining_intensity(enabled ? 100 : 0);
 }
+
+// Menu Mail
+void KeyhoteeMainWindow::on_actionReply_triggered()
+{
+  notSupported();
+}
+
+void KeyhoteeMainWindow::on_actionReply_all_triggered()
+{
+  notSupported();
+}
+
+void KeyhoteeMainWindow::on_actionForward_triggered()
+{
+  notSupported();
+}
+
+void KeyhoteeMainWindow::on_actionSave_attachement_triggered()
+{
+  notSupported();
+}
+
+// Menu Contact
+void KeyhoteeMainWindow::on_actionset_Icon_triggered()
+{
+  notSupported();
+}
+
+// Menu Help
+void KeyhoteeMainWindow::on_actionDiagnostic_triggered()
+{
+  notSupported();
+}
+
+void KeyhoteeMainWindow::on_actionAbout_triggered()
+{
+  notSupported();
+}
+
+
 
 void KeyhoteeMainWindow::showContacts()
 {
@@ -506,3 +612,7 @@ void KeyhoteeMainWindow::received_email( const bts::bitchat::decrypted_message& 
    _inbox_model->addMailHeader(header);
 }
 
+void KeyhoteeMainWindow::notSupported()
+{
+  QMessageBox::warning(this, "Warning", "Not supported");
+}

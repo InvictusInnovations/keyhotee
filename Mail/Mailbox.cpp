@@ -144,7 +144,7 @@ void Mailbox::setupActions()
    reply_all_mail = new QAction( QIcon( ":/images/mail_reply_all.png"), tr( "Reply All"),this );
    forward_mail = new QAction( QIcon( ":/images/mail_forward.png"), tr("Forward"), this);
    delete_mail = new QAction(QIcon( ":/images/delete_icon.png"), tr( "Delete" ), this);
-   delete_mail->setShortcut(Qt::Key_Delete);
+   //delete_mail->setShortcut(Qt::Key_Delete);
    //add actions to MailViewer toolbar
    QToolBar* message_tools = ui->current_message->message_tools;
    message_tools->addAction( reply_mail );
@@ -221,13 +221,13 @@ void Mailbox::onDeleteMail()
    QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
    QModelIndexList sortFilterIndexes = selection_model->selectedRows();
    QModelIndexList indexes;
-   if (indexes.count() == 0)
-     return;
-   if(QMessageBox::question(this, "Delete Mail", "Are you sure you delete an email?") == QMessageBox::Button::No)
-     return;
    foreach(QModelIndex sortFilterIndex,sortFilterIndexes)
      indexes.append(model->mapToSource(sortFilterIndex));
    qSort(indexes);
+   if (indexes.count() == 0)
+     return;
+   if(QMessageBox::question(this, "Delete email", "Are you sure you want to delete an email?") == QMessageBox::Button::No)
+     return;
    auto sourceModel = model->sourceModel();
    for(int i = indexes.count() - 1; i > -1; --i)
        sourceModel->removeRows(indexes.at(i).row(),1);

@@ -39,11 +39,11 @@ ContactsTable::ContactsTable( QWidget* parent )
   ui( new Ui::ContactsTable() )
 {
   ui->setupUi(this); 
-  _delete_contact = new QAction(this); //QIcon( ":/images/delete_icon.png"), tr( "Delete" ), this);
-  _delete_contact->setShortcut(Qt::Key_Delete);
-  addAction(_delete_contact);
+  //_delete_contact = new QAction(this); //QIcon( ":/images/delete_icon.png"), tr( "Delete" ), this);
+  //_delete_contact->setShortcut(Qt::Key_Delete);
+  //addAction(_delete_contact);
 
-  connect( _delete_contact, &QAction::triggered, this, &ContactsTable::onDeleteContact);
+  //connect( _delete_contact, &QAction::triggered, this, &ContactsTable::onDeleteContact);
 }
 
 ContactsTable::~ContactsTable(){}
@@ -74,8 +74,6 @@ void ContactsTable::openContact( const QModelIndex& index )
 
 void ContactsTable::onDeleteContact()
 {
-   if(QMessageBox::question(this, "Delete Contact", "Are you sure you delete a contact?") == QMessageBox::Button::No)
-     return;
    //remove selected contacts from inbox model (and database)
    QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->contact_table->model());
    //model->setUpdatesEnabled(false);
@@ -85,6 +83,10 @@ void ContactsTable::onDeleteContact()
    foreach(QModelIndex sortFilterIndex,sortFilterIndexes)
      indexes.append(model->mapToSource(sortFilterIndex));
    qSort(indexes);
+   if (indexes.count() == 0)
+     return;
+   if(QMessageBox::question(this, "Delete Contact", "Are you sure you want to delete a contact?") == QMessageBox::Button::No)
+     return;
    auto sourceModel = model->sourceModel();
    for(int i = indexes.count() - 1; i > -1; --i)
        sourceModel->removeRows(indexes.at(i).row(),1);
