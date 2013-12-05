@@ -85,7 +85,7 @@ void ContactsTable::onDeleteContact()
    qSort(indexes);
    if (indexes.count() == 0)
      return;
-   if(QMessageBox::question(this, "Delete Contact", "Are you sure you want to delete a contact?") == QMessageBox::Button::No)
+   if(QMessageBox::question(this, "Delete Contact", "Are you sure you want to delete this contact?") == QMessageBox::Button::No)
      return;
    auto sourceModel = model->sourceModel();
    for(int i = indexes.count() - 1; i > -1; --i)
