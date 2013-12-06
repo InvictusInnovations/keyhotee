@@ -436,6 +436,7 @@
    <addaction name="separator"/>
    <addaction name="actionDelete"/>
    <addaction name="separator"/>
+   <addaction name="actionShow_details"/>
   </widget>
   <action name="actionMail">
    <property name="text">
@@ -599,6 +600,21 @@
   <action name="actionSet_Icon">
    <property name="text">
     <string>Set Icon</string>
+   </property>
+  </action>
+  <action name="actionShow_details">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/showDetails.png</normaloff>:/images/showDetails.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show details</string>
    </property>
   </action>
  </widget>

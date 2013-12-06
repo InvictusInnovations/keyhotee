@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>543</height>
+    <width>533</width>
+    <height>727</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,13 +29,16 @@
    <property name="horizontalSpacing">
     <number>5</number>
    </property>
-   <item row="0" column="0" colspan="2">
+   <item row="0" column="1">
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
      <property name="handleWidth">
       <number>9</number>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
      </property>
      <widget class="QTableView" name="contact_table">
       <property name="sizePolicy">
@@ -47,7 +50,7 @@
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>100</height>
+        <height>150</height>
        </size>
       </property>
       <property name="selectionBehavior">
@@ -69,10 +72,19 @@
        <bool>true</bool>
       </attribute>
      </widget>
+     <widget class="ContactView" name="current_contact" native="true"/>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ContactView</class>
+   <extends>QWidget</extends>
+   <header>AddressBook/ContactView.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

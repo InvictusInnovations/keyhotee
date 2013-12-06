@@ -38,5 +38,6 @@
       <file>images/win/editcut.png</file>
       <file>images/win/editpaste.png</file>
       <file>images/win/filesave.png</file>
+      <file>images/showDetails.png</file>
  </qresource>
  </RCC>

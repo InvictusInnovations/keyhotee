@@ -23,6 +23,8 @@ class Mailbox : public QWidget
 
       void setModel( MailboxModel* model, InboxType type = Inbox );
       void searchEditChanged(QString search_string);
+
+      bool isShowDetailsHidden();
    private slots:
       void onDoubleClickedItem(QModelIndex);
 
@@ -40,6 +42,7 @@ class Mailbox : public QWidget
 
    public slots:
       void onDeleteMail();
+      void on_actionShow_details_toggled(bool checked);
   private:
       QSortFilterProxyModel* sortedModel();
 

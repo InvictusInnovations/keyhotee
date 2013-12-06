@@ -94,3 +94,21 @@ void ContactsTable::onDeleteContact()
 
    //TODO Remove fullname/bitname for deleted contacts from QCompleter
 }
+
+bool ContactsTable::isShowDetailsHidden()
+{
+  return ui->current_contact->isHidden();
+}
+
+void ContactsTable::on_actionShow_details_toggled(bool checked)
+{
+  if (checked)
+  {
+    ui->current_contact->show();
+  }
+  else
+  {
+    ui->current_contact->hide();
+  }
+  
+}

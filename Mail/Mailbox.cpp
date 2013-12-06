@@ -234,3 +234,20 @@ void Mailbox::onDeleteMail()
    //model->setUpdatesEnabled(true);   
 }
 
+bool Mailbox::isShowDetailsHidden()
+{
+  return ui->current_message->isHidden();
+}
+
+void Mailbox::on_actionShow_details_toggled(bool checked)
+{
+  if (checked)
+  {
+    ui->current_message->show();
+  }
+  else
+  {
+    ui->current_message->hide();
+  }
+  
+}
