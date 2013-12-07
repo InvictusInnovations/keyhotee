@@ -18,6 +18,7 @@ class ContactsTable  : public QWidget
     void openContact( const QModelIndex& index );
     void searchEditChanged(QString search_string);
 
+    bool isShowDetailsHidden();
   Q_SIGNALS:
     void contactOpened( int contact_id );
 
@@ -29,4 +30,5 @@ class ContactsTable  : public QWidget
 
   public slots:
     void onDeleteContact();
+    void on_actionShow_details_toggled(bool checked);
 };

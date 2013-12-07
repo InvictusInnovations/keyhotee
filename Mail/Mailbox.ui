@@ -37,6 +37,9 @@
      <property name="handleWidth">
       <number>0</number>
      </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
+     </property>
      <widget class="QTableView" name="inbox_table">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">

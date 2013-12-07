@@ -237,6 +237,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui->sent_box_page->setModel(_sent_model, Mailbox::Sent);
 
     connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
+    connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
 
     wlog( "idents: ${idents}", ("idents",idents) );
     for( size_t i = 0; i < idents.size(); ++i )
@@ -258,7 +259,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
                         profile->get_keychain().get_identity_key( idents[i].dac_id ).get_public_key(), 
                         idents[i].mining_effort );
     }
-    app->set_mining_intensity(100);
+    app->set_mining_intensity(0);
     ui->actionEnable_Mining->setChecked(app->get_mining_intensity() != 0);
     _addressbook = profile->get_addressbook();
 
@@ -368,6 +369,10 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       disconnect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
       disconnect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
       disconnect(ui->actionDelete, SIGNAL(triggered()), ui->sent_box_page, SLOT(onDeleteMail()));
+      disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
+      disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
+      disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->draft_box_page, SLOT(on_actionShow_details_toggled(bool)));
+      disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->sent_box_page, SLOT(on_actionShow_details_toggled(bool)));
 
       if( selected_items[0]->type() == ContactItem )
       {
@@ -382,11 +387,22 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       {
           showContacts();
           connect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
+          connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
+          if(ui->contacts_page->isShowDetailsHidden())
+            ui->actionShow_details->setChecked(false);
+          else
+            ui->actionShow_details->setChecked(true);
       }
       else if( selected_items[0] == _mailboxes_root )
       {
           ui->widget_stack->setCurrentWidget( ui->inbox_page );
           connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
+          connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
+          if(ui->inbox_page->isShowDetailsHidden())
+            ui->actionShow_details->setChecked(false);
+          else
+            ui->actionShow_details->setChecked(true);
+
       }
       /*
       else if( selected_items[0] == _identities_root )
@@ -397,16 +413,31 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       {
           ui->widget_stack->setCurrentWidget( ui->inbox_page );
           connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
+          connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
+          if(ui->inbox_page->isShowDetailsHidden())
+            ui->actionShow_details->setChecked(false);
+          else
+            ui->actionShow_details->setChecked(true);
       }
       else if( selected_items[0] == _drafts_root )
       {
           ui->widget_stack->setCurrentWidget( ui->draft_box_page );
           connect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
+          connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->draft_box_page, SLOT(on_actionShow_details_toggled(bool)));
+          if(ui->draft_box_page->isShowDetailsHidden())
+            ui->actionShow_details->setChecked(false);
+          else
+            ui->actionShow_details->setChecked(true);
       }
       else if( selected_items[0] == _sent_root )
       {
           ui->widget_stack->setCurrentWidget( ui->sent_box_page );
           connect(ui->actionDelete, SIGNAL(triggered()), ui->sent_box_page, SLOT(onDeleteMail()));
+          connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->sent_box_page, SLOT(on_actionShow_details_toggled(bool)));
+          if(ui->sent_box_page->isShowDetailsHidden())
+            ui->actionShow_details->setChecked(false);
+          else
+            ui->actionShow_details->setChecked(true);
       }
    }
 }
