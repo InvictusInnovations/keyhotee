@@ -604,17 +604,19 @@ void KeyhoteeMainWindow::createContactGui( int contact_id )
     view->setAddressBook( _addressbook_model );
     const Contact& contact = _addressbook_model->getContactById( contact_id );
     view->setContact(contact);
-    ui->widget_stack->addWidget( view );
+    ui->contacts_page->addContactView (*view);
 
 }
 
 void KeyhoteeMainWindow::showContactGui( ContactGui& contact_gui )
-{
+{   
     ui->side_bar->setCurrentItem( contact_gui._tree_item );
-    ui->widget_stack->setCurrentWidget( contact_gui._view );
+    //ui->widget_stack->setCurrentWidget( contact_gui._view );
+    ui->widget_stack->setCurrentWidget( ui->contacts_page );
+    ui->contacts_page->showView (*contact_gui._view);
     if (contact_gui.isChatVisible())
     {
-    contact_gui._view->onChat();
+      contact_gui._view->onChat();
     }
 }
 

@@ -11,6 +11,8 @@
 #include <fc/log/logger.hpp>
 
 #include <QtWebKitWidgets/QWebFrame>
+#include <QToolBar>
+#include <QMessageBox>
 
 extern bool gMiningIsPossible;
 
@@ -88,13 +90,29 @@ ContactView::ContactView( QWidget* parent )
 {
    _address_book = nullptr;
    ui->setupUi(this);
+   message_tools = new QToolBar( ui->toolbar_container ); 
+   QGridLayout* grid_layout = new QGridLayout(ui->toolbar_container);
+   grid_layout->setContentsMargins( 0,0,0,0);
+   grid_layout->setSpacing(0);
+   ui->toolbar_container->setLayout(grid_layout);
+   grid_layout->addWidget(message_tools,0,0);
+   
+   send_mail = new QAction( QIcon( ":/images/128x128/send_mail.png"), tr( "Mail"), this );
+   edit_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Edit (need new icon)"), this );
+   share_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Share (need new icon)"), this );
+   request_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Request contact (need new icon)"), this );
+   message_tools->addAction( send_mail );
+   message_tools->addAction( edit_contact );
+   message_tools->addAction( share_contact );
+   message_tools->addAction( request_contact );
+
    //ui->chat_conversation->setHtml( "<html><head></head><body>Hello World<br/></body></html>" );
    connect( ui->save_button, &QPushButton::clicked, this, &ContactView::onSave );
    connect( ui->cancel_button, &QPushButton::clicked, this, &ContactView::onCancel );
-   connect( ui->edit_button, &QPushButton::clicked, this, &ContactView::onEdit );
-   connect( ui->mail_button, &QAbstractButton::clicked, this, &ContactView::onMail );
-   connect( ui->chat_button, &QAbstractButton::clicked, this, &ContactView::onChat );
-   connect( ui->info_button, &QAbstractButton::clicked, this, &ContactView::onInfo );
+   connect( edit_contact, &QAction::triggered, this, &ContactView::onEdit );
+   connect( send_mail, &QAction::triggered, this, &ContactView::onMail);
+   connect( share_contact, &QAction::triggered, this, &ContactView::onShareContact);
+   connect( request_contact, &QAction::triggered, this, &ContactView::onRequestContact);   
 
    connect( ui->firstname, &QLineEdit::textChanged, this, &ContactView::firstNameChanged );
    connect( ui->lastname, &QLineEdit::textChanged, this, &ContactView::lastNameChanged );
@@ -110,8 +128,10 @@ ContactView::ContactView( QWidget* parent )
 
 void ContactView::onEdit()
 {
-    ui->contact_pages->setCurrentWidget( ui->info_page );
-    ui->info_stack->setCurrentWidget(ui->info_edit);
+   
+   ui->contact_pages->setCurrentIndex (info);
+   ui->info_stack->setCurrentWidget(ui->info_edit);
+
 }
 
 void ContactView::onSave()
@@ -148,10 +168,8 @@ void ContactView::onSave()
     //DLNFIX
     #if 1
     ui->info_stack->setCurrentWidget(ui->info_status);
-    ui->chat_button->setEnabled(true);
-    ui->mail_button->setEnabled(true);
-    ui->info_button->setEnabled(true);
-    ui->info_button->setChecked(true);
+    ui->contact_pages->setTabEnabled (chat, true);
+    ui->contact_pages->setCurrentIndex (info);
     #else
     setContact(_current_contact,ContactView::info);
     #endif
@@ -168,19 +186,19 @@ void ContactView::onCancel()
 
 void ContactView::onChat()
 {
-    ui->contact_pages->setCurrentWidget( ui->chat_page );
-    //clear unread message count on display of chat window
-    //DLNFIX maybe getMainWindow can be removed via some connect magic or similar observer notification?
-    ContactGui* contact_gui = GetKeyhoteeWindow()->getContactGui(_current_contact.wallet_index);
-    if (contact_gui)
-        contact_gui->setUnreadMsgCount(0);
-    ui->chat_input->setFocus();
+   ui->contact_pages->setCurrentIndex (chat);
+   //clear unread message count on display of chat window
+   //DLNFIX maybe getMainWindow can be removed via some connect magic or similar observer notification?
+   ContactGui* contact_gui = GetKeyhoteeWindow()->getContactGui(_current_contact.wallet_index);
+   if (contact_gui)
+      contact_gui->setUnreadMsgCount(0);
+   ui->chat_input->setFocus();
 }
 
 void ContactView::onInfo()
-{
-    ui->info_stack->setCurrentWidget(ui->info_status);
-    ui->contact_pages->setCurrentWidget( ui->info_page );
+{   
+   ui->info_stack->setCurrentWidget(ui->info_status);
+   ui->contact_pages->setCurrentIndex (info);
 }
 
 void ContactView::onMail()
@@ -188,10 +206,16 @@ void ContactView::onMail()
     GetKeyhoteeWindow()->newMailMessageTo(_current_contact.wallet_index);
 }
 
-void ContactView::onDelete()
+
+void ContactView::onShareContact()
 {
+   QMessageBox::warning(this, tr("Warning"), tr("Not supported"));
 }
 
+void ContactView::onRequestContact()
+{
+   QMessageBox::warning(this, tr("Warning"), tr("Not supported"));
+}
 
 ContactView::~ContactView()
 {
@@ -206,11 +230,8 @@ void ContactView::setContact( const Contact& current_contact,
     {
         elog( "********* null public key!" );
         ui->save_button->setEnabled(false);
-        ui->chat_button->setEnabled(false);
-        ui->mail_button->setEnabled(false);
-        ui->save_button->setEnabled(false);
-        ui->info_button->setEnabled(false);
-        ui->info_button->setChecked(true);
+        ui->contact_pages->setTabEnabled (chat, false);
+        ui->contact_pages->setCurrentIndex (info);
         onEdit();
 
         if (gMiningIsPossible)
@@ -237,22 +258,8 @@ void ContactView::setContact( const Contact& current_contact,
         /// changes.
         ui->id_edit->setEnabled(false);
         ui->save_button->setEnabled(true);
-        ui->chat_button->setEnabled(true);
-        ui->mail_button->setEnabled(true);
-        ui->info_button->setEnabled(true);
-
-        if (contact_display == chat)
-        {
-            ui->chat_button->setChecked(true);
-            onChat();
-        }
-        else
-        {
-            ui->info_button->setChecked(true);
-            onInfo();
-
-        }
-            /** TODO... restore this kind of check
+        onInfo();
+        /** TODO... restore this kind of check
         if( _current_contact.bit_id_public_key != _current_contact.public_key  )
         {
             ui->id_status->setText( 
@@ -483,4 +490,10 @@ void  ContactView::setAddressBook( AddressBookModel* addressbook )
 AddressBookModel* ContactView::getAddressBook()const
 {
     return _address_book;
+}
+
+void ContactView::initTab() const
+{
+   ui->info_stack->setCurrentWidget(ui->info_status);
+   ui->contact_pages->setTabEnabled (chat, true);
 }
