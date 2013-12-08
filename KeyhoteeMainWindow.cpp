@@ -1,9 +1,14 @@
+
 #include "ui_KeyhoteeMainWindow.h"
 #include "KeyhoteeMainWindow.hpp"
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/ContactView.hpp"
 #include "Mail/MailEditor.hpp"
 #include "Mail/MailboxModel.hpp"
+
+#include "connectionstatusframe.h"
+#include "GitSHA1.h"
+
 #include <bts/bitchat/bitchat_private_message.hpp>
 
 #ifdef Q_OS_MAC
@@ -13,8 +18,10 @@
 #include <fc/reflect/variant.hpp>
 #include <fc/log/logger.hpp>
 
-#include <QLineEdit>
+/// QT headers:
 #include <QCompleter>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
 
 extern std::string gApplication_name;
@@ -133,6 +140,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
 #else
     QApplication::setWindowIcon( QIcon( ":/images/shield1024.png" ) );
 #endif
+
+    setupStatusBar();
 
     QWidget* empty = new QWidget();
     empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -323,7 +332,8 @@ void KeyhoteeMainWindow::sideBarSplitterMoved( int pos, int index )
     }
 }
 
-void KeyhoteeMainWindow::addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right, const QVector<int>& roles )
+void KeyhoteeMainWindow::addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right,
+  const QVector<int>& roles )
 {
    const Contact& changed_contact = _addressbook_model->getContact(top_left);
    auto itr = _contact_guis.find( changed_contact.wallet_index );
@@ -528,11 +538,28 @@ void KeyhoteeMainWindow::on_actionDiagnostic_triggered()
 }
 
 void KeyhoteeMainWindow::on_actionAbout_triggered()
-{
-  notSupported();
-}
+  {
+  QString title(tr("About "));
+  title += windowTitle();
+  QString text;
+  text = tr("<p align='center'><b>");
+  text += windowTitle();
+  text += tr(" version ");
+  text += tr(APPLICATION_VERSION);
+  text += tr("</b><br/><br/>");
+  /// Build tag: <a href="https://github.com/InvictusInnovations/keyhotee/commit/xxxx">xxxx</a>
+  text += tr("Built from revision: <a href=\"https://github.com/InvictusInnovations/keyhotee/commit/");
+  text += tr(g_GIT_SHA1);
+  text += tr("\">");
+  text += tr(g_GIT_SHA1);
+  text += tr("</a>");
+  text += tr("<br/>");
+  text += tr("Invictus Innovations Inc<br/>");
+  text += tr("<a href=\"http://invictus-innovations.com/keyhotee/\">http://invictus-innovations.com/keyhotee/</a>");
+  text += tr("<br/></p>");
 
-
+  QMessageBox::about(this, title, text);
+  }
 
 void KeyhoteeMainWindow::showContacts()
 {
@@ -619,6 +646,13 @@ void KeyhoteeMainWindow::showContactGui( ContactGui& contact_gui )
       contact_gui._view->onChat();
     }
 }
+
+void KeyhoteeMainWindow::setupStatusBar()
+  {
+  QStatusBar* sb = statusBar();
+  TConnectionStatusFrame* cs = new TConnectionStatusFrame(ConnectionStatusDS);
+  sb->addPermanentWidget(cs);
+  }
 
 void KeyhoteeMainWindow::received_text( const bts::bitchat::decrypted_message& msg)
 {

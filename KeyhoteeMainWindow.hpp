@@ -5,6 +5,8 @@
 #include <bts/application.hpp>
 #include <qtreusable/selfsizingmainwindow.h>
 
+#include "dataaccessimpl.h"
+
 namespace Ui { class KeyhoteeMainWindow; }
 class QTreeWidgetItem;
 class QLineEdit;
@@ -41,11 +43,12 @@ public:
 private:
 };
 
-class KeyhoteeMainWindow  : public SelfSizingMainWindow, public bts::application_delegate
+class KeyhoteeMainWindow  : public SelfSizingMainWindow,
+                            protected bts::application_delegate
 {
   public:
       KeyhoteeMainWindow();
-      ~KeyhoteeMainWindow();
+      virtual ~KeyhoteeMainWindow();
 
       void         newMailMessage();
       void         newMailMessageTo(int contact_id);
@@ -66,7 +69,8 @@ class KeyhoteeMainWindow  : public SelfSizingMainWindow, public bts::application
       void         openMail( int message_id );
       void         openSent( int message_id );
 
-      //application_delegate implementation
+  protected:
+   /// application_delegate interface implementation
      virtual void received_text( const bts::bitchat::decrypted_message& msg);
      virtual void received_email( const bts::bitchat::decrypted_message& msg);
 
@@ -96,34 +100,38 @@ class KeyhoteeMainWindow  : public SelfSizingMainWindow, public bts::application
     void on_actionAbout_triggered();
 
   private:
-      void addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right, const QVector<int>& roles );
-      void searchEditChanged(QString search_string);
+    void    addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right,
+      const QVector<int>& roles );
+    void    searchEditChanged(QString search_string);
 
-      void    createContactGui( int contact_id );
-      void    showContactGui( ContactGui& contact_gui );
+    void    createContactGui( int contact_id );
+    void    showContactGui( ContactGui& contact_gui );
+    void    setupStatusBar();
+    void    notSupported();
 
-      //QCompleter*                             _contact_completer;
-      QTreeWidgetItem*                        _identities_root;
-      QTreeWidgetItem*                        _mailboxes_root;
-      QTreeWidgetItem*                        _wallets_root;
-      QTreeWidgetItem*                        _contacts_root;
-      QTreeWidgetItem*                        _inbox_root;
-      QTreeWidgetItem*                        _drafts_root;
-      QTreeWidgetItem*                        _sent_root;
+  /// Class attributes:
 
-      MailboxModel*                             _inbox_model;
-      MailboxModel*                             _draft_model;
-      MailboxModel*                             _pending_model;
-      MailboxModel*                             _sent_model;
+    //QCompleter*                             _contact_completer;
+    QTreeWidgetItem*                        _identities_root;
+    QTreeWidgetItem*                        _mailboxes_root;
+    QTreeWidgetItem*                        _wallets_root;
+    QTreeWidgetItem*                        _contacts_root;
+    QTreeWidgetItem*                        _inbox_root;
+    QTreeWidgetItem*                        _drafts_root;
+    QTreeWidgetItem*                        _sent_root;
 
-      AddressBookModel*                       _addressbook_model;
-      bts::addressbook::addressbook_ptr       _addressbook;
-      std::unordered_map<int,ContactGui>      _contact_guis;
+    MailboxModel*                             _inbox_model;
+    MailboxModel*                             _draft_model;
+    MailboxModel*                             _pending_model;
+    MailboxModel*                             _sent_model;
 
-      QLineEdit*                              _search_edit;
-      std::unique_ptr<Ui::KeyhoteeMainWindow> ui;
+    AddressBookModel*                       _addressbook_model;
+    bts::addressbook::addressbook_ptr       _addressbook;
+    std::unordered_map<int,ContactGui>      _contact_guis;
 
-    void notSupported();
+    QLineEdit*                              _search_edit;
+    std::unique_ptr<Ui::KeyhoteeMainWindow> ui;
+    TConnectionStatusDS                     ConnectionStatusDS;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* GetKeyhoteeWindow();

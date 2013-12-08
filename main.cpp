@@ -16,6 +16,8 @@
 #include "LoginDialog.hpp"
 #include "KeyhoteeMainWindow.hpp"
 
+#include <boost/filesystem/path.hpp>
+
 #include <QApplication>
 #include <QStandardPaths>
 #include <QTimer>
@@ -29,26 +31,32 @@ bool gMiningIsPossible = false;
 
 
 bts::application_config load_config( const std::string& profile_name )
-{ try {
-     auto qdatadir     = QStandardPaths::writableLocation( QStandardPaths::DataLocation );
-     auto data_dir     = fc::path( qdatadir.toStdString() ) / profile_name;
-     fc::create_directories(data_dir);
-     auto config_file  = data_dir / "config.json";
-     ilog( "config_file: ${file}", ("file",config_file) );
-     if( !fc::exists( config_file ) )
-     {
-        bts::application_config default_cfg;
-        default_cfg.data_dir = data_dir / "data";
+  {
+  try 
+    {
+    auto strDataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdWString();
+    boost::filesystem::path dataDir(strDataDir);
+    boost::filesystem::path profileDataDir(dataDir/profile_name);
+    fc::path profileDir(profileDataDir);
+    fc::create_directories(profileDir);
+    auto config_file  = profileDir / "config.json";
+    ilog( "config_file: ${file}", ("file",config_file) );
+    if(fc::exists(config_file) == false)
+      {
+      bts::application_config default_cfg;
+      default_cfg.data_dir = profileDir / "data";
 
-        fc::ofstream out( config_file );
-        out << fc::json::to_pretty_string( default_cfg );
-     }
+      fc::ofstream out( config_file );
+      out << fc::json::to_pretty_string( default_cfg );
+      }
 
-     auto app_config = fc::json::from_file( config_file ).as<bts::application_config>();
-     fc::ofstream out( config_file );
-     out << fc::json::to_pretty_string( app_config );
-     return app_config;
-} FC_RETHROW_EXCEPTIONS( warn, "") }
+    auto app_config = fc::json::from_file( config_file ).as<bts::application_config>();
+    fc::ofstream out( config_file );
+    out << fc::json::to_pretty_string( app_config );
+    return app_config;
+    }
+  FC_RETHROW_EXCEPTIONS( warn, "")
+  }
 
 
 void start_profile_creation_wizard(const bts::application_ptr& btsapp);
@@ -73,6 +81,7 @@ void startup( const std::string& profile_name )
 int main( int argc, char** argv )
 {
   #ifdef WIN32
+
   bool console_ok = AllocConsole();
   freopen( "CONOUT$", "wb", stdout);
   freopen( "CONOUT$", "wb", stderr);
