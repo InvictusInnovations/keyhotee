@@ -8,11 +8,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/GitVersionGen/")
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-IF( WIN32 )
 #  set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake;C:/gh/qt5.1.1/qtwebkit/WebKitBuild/Release/lib/cmake/Qt5WebKitWidgets;"  )
-  set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
-  message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
+message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
+IF( WIN32 )
   #You need to set OPENSSL_ROOT environment variable for your system on WIN32
   message("Setting up OpenSSL root and include vars on Win32 platform")
   set( OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT} )
@@ -79,7 +79,7 @@ include_directories( ${OPENSSL_INCLUDE_DIR} )
 include_directories( ${Boost_INCLUDE_DIR} )
 SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES})
 
-add_subdirectory(bitshares)
+add_subdirectory(BitShares)
 add_subdirectory(miner)
 
 IF( APPLE )
