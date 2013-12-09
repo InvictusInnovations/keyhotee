@@ -128,7 +128,6 @@ ContactView::ContactView( QWidget* parent )
 
 void ContactView::onEdit()
 {
-   
    ui->contact_pages->setCurrentIndex (info);
    ui->info_stack->setCurrentWidget(ui->info_edit);
 
@@ -159,12 +158,18 @@ void ContactView::onSave()
            _current_contact.known_since = QDateTime::currentDateTime();
        }
        */
-       public_key_address key_address(ui->public_key->text().toStdString());
-       _current_contact.public_key = key_address.key;
+       std::string enteredPKey = ui->public_key->text().toStdString();
+       if(enteredPKey.empty() == false)
+         {
+         assert(public_key_address::is_valid(enteredPKey) && "Some bug in control validator");
+         public_key_address key_address(enteredPKey);
+         _current_contact.public_key = key_address.key;
+         }
     }
     _current_contact.privacy_setting = bts::addressbook::secret_contact;
 
     _address_book->storeContact( _current_contact );
+
     //DLNFIX
     #if 1
     ui->info_stack->setCurrentWidget(ui->info_status);
@@ -404,12 +409,6 @@ void ContactView::keyhoteeIdEdited( const QString& id )
 }
 
 //implement real version and put in bitshares or fc (probably should be in fc)
-bool is_valid_public_key(const std::string& public_key_string) 
-{ 
-   return public_key_address(public_key_string).is_valid();
-} 
-
-//implement real version and put in bitshares or fc (probably should be in fc)
 bool is_registered_public_key(std::string public_key_string) 
 { 
    return false; //(public_key_string == "invictus");
@@ -423,7 +422,7 @@ void ContactView::publicKeyEdited( const QString& public_key_string )
       lookupPublicKey();
    }
    //check for validly hashed public key and enable/disable save button accordingly
-   bool public_key_is_valid = is_valid_public_key(public_key_string.toStdString());
+   bool public_key_is_valid = public_key_address::is_valid(public_key_string.toStdString());
    if (public_key_is_valid)
    {
       ui->id_status->setText( tr("Public Key Only Mode: valid key") );
