@@ -1,32 +1,32 @@
 == Overview of first tasks ==
 
-Complete and smooth out interface for creating contacts, sending email, and chatting.
+Assigned several task ids. Complete and smooth out interface for creating contacts, sending email, and chatting.
 
 == Priority Required Features ==
-Implement c++ API that will convert an international string to ASCI via http://www.gnu.org/software/libidn/doxygen/   
+#5 Implement c++ API that will convert an international string to ASCI via http://www.gnu.org/software/libidn/doxygen/   
    This should be implemented as part of bitname/name_hash.cpp 
 
 
 == Bugs/Improvements ==
-Creating new contact then canceling should revert to show contacts list (or to previous window if easy)
-Ask for confirmation on contact deletion actions. Maybe add GUI element as another way to delete contacts from contact list.
-Prevent duplicate contacts (I think this means don't allow multiple aliases to map to same keyhotee id, but confirm with DanL)
-The TO field shows the address of your account rather than the proper identity. (DanN)
-Bug in reply/forward (DanN)
+#7 Creating new contact then canceling should revert to show contacts list (or to previous window if easy)
+#2 Ask for confirmation on contact deletion actions. Maybe add GUI element as another way to delete contacts from contact list.
+#15 Prevent duplicate contacts (I think this means don't allow multiple aliases to map to same keyhotee id, but confirm with DanL)
+#19 (BW: described problem don't appear but option could work better as described in the issue) The TO field shows the address of your account rather than the proper identity. (DanN)
+#20 Bug in reply/forward (DanN)
 Bug in serializing public key. Create unit test for DanL (DanN).
 
 == Functionality to be implemented ==
 * When an email is sent, add to a queue of outgoing messages. And add to "pending" mailbox folder. After separate thread has removed it from queue (when it has completed proof-of-work necessary to broadast the email), move email from "pending" mailbox to "sent" mailbox.
-* Add support for saving drafts of emails to "draft" mailbox folder. Maybe add to draft as soon as they start writing the email or maybe use an autosave mechanism that does this after a few minutes (I think thunderbird works this way).
-* Add a debug diagnostics dialog that can be opened up from Help menu. This window should contain a text editor that displays the contents of a text file that we would write out to a file with diagnostics info. Info can include state information about the block chain, etc.
-* Show Repute and Age for contacts with keyhotee Ids on contact list and contact info page
-* Identify contacts which are the user's own identities (versus other people's public keys).
-* Display number of active connections in the status bar at the bottom of keyhotee window.
-* Create Identity Menu and move "Enable Mining" to the identity menu.
-* Add menu item to create a new identity (last page of wizard for example)
+#8 * Add support for saving drafts of emails to "draft" mailbox folder. Maybe add to draft as soon as they start writing the email or maybe use an autosave mechanism that does this after a few minutes (I think thunderbird works this way).
+#11 * Add a debug diagnostics dialog that can be opened up from Help menu. This window should contain a text editor that displays the contents of a text file that we would write out to a file with diagnostics info. Info can include state information about the block chain, etc.
+#6 * Show Repute and Age for contacts with keyhotee Ids on contact list and contact info page
+#14 * Identify contacts which are the user's own identities (versus other people's public keys).
+#22 * Display number of active connections in the status bar at the bottom of keyhotee window.
+#9 * Create Identity Menu and move "Enable Mining" to the identity menu.
+#9 * Add menu item to create a new identity (last page of wizard for example)
 * Don't broadcast our mined name more than once per block… perhaps this could be solved by increasing the difficulty of mining your name.
 * Check name chain on load to make sure all blocks are at least the min difficulty.. currently it does not check.
-* Add button next to PublicKey to 'copy' to clipboard 
+#21 * Add button next to PublicKey to 'copy' to clipboard 
 * New Contact form… when a Keyhotee ID is entered an Invalid public key is displayed… 
 * Allow user to select their own ICON.
 * When a node on a longer name fork connects to a node on a shorter name fork the name databases do not seem to sync.

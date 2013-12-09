@@ -7,12 +7,13 @@
 
 namespace Ui { class ContactView; }
 class AddressBookModel;
+class QToolBar;
 
 
 class ContactView : public QWidget
 {
   public:
-     enum ContactDisplay { chat, info, edit };
+     enum ContactDisplay { info, chat, edit };
      ContactView( QWidget* parent = nullptr );
      ~ContactView();
 
@@ -28,7 +29,8 @@ class ContactView : public QWidget
      void onEdit();
      void onSave();
      void onCancel();
-     void onDelete();
+     void onShareContact();
+     void onRequestContact();
 
      void firstNameChanged( const QString& name );
      void lastNameChanged( const QString& name );
@@ -44,6 +46,8 @@ class ContactView : public QWidget
      bool isChatSelected();
      void sendChatMessage();
      void appendChatMessage( const QString& from, const QString& msg, const QDateTime& date_time = QDateTime::currentDateTime() );
+     void initTab() const;
+
 
   protected:
       bool eventFilter(QObject *obj, QEvent *event);
@@ -54,4 +58,9 @@ class ContactView : public QWidget
      fc::optional<bts::bitname::name_record>   _current_record;
      AddressBookModel*                         _address_book;
      std::unique_ptr<Ui::ContactView>          ui;
+     QToolBar*                                 message_tools;
+     QAction*                                  send_mail;
+     QAction*                                  edit_contact;
+     QAction*                                  share_contact;
+     QAction*                                  request_contact;
 };

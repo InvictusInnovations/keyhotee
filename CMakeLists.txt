@@ -4,11 +4,15 @@ cmake_minimum_required( VERSION 2.8.11 )
 set( CMAKE_INCLUDE_CURRENT_DIR ON)
 set( CMAKE_AUTOMOC ON  )
 
-IF( WIN32 )
-#  set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake;C:/gh/qt5.1.1/qtwebkit/WebKitBuild/Release/lib/cmake/Qt5WebKitWidgets;"  )
-  set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
-  message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/GitVersionGen/")
+include(GetGitRevisionDescription)
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
+#  set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake;C:/gh/qt5.1.1/qtwebkit/WebKitBuild/Release/lib/cmake/Qt5WebKitWidgets;"  )
+set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
+message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+
+IF( WIN32 )
   #You need to set OPENSSL_ROOT environment variable for your system on WIN32
   message("Setting up OpenSSL root and include vars on Win32 platform")
   set( OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT} )
@@ -32,7 +36,6 @@ include_directories(${BITSHARES_DIR}/include)
 include_directories(${BITSHARES_DIR}/fc/include)
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
-
 IF( WIN32 )
   ADD_DEFINITIONS( -DWIN32 )
   ADD_DEFINITIONS( -DNOMINMAX )
@@ -45,7 +48,14 @@ IF( WIN32 )
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
   ENDIF()
   #boost
-  SET( Boost_INCLUDE_DIR $ENV{BOOST_ROOT} )
+  SET(BOOST_ROOT $ENV{BOOST_ROOT})
+  add_definitions(-DBOOST_ALL_NO_LIB)  # Needed to disable MSVC autolinking feature (#pragma comment)
+  set(Boost_USE_DEBUG_PYTHON ON)
+  set(Boost_USE_MULTITHREADED ON)
+  set(Boost_USE_STATIC_LIBS OFF)
+  set(BOOST_ALL_DYN_LINK ON) # force dynamic linking for all libraries
+
+  FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context) 
 
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
 ELSE(WIN32)
@@ -69,7 +79,7 @@ include_directories( ${OPENSSL_INCLUDE_DIR} )
 include_directories( ${Boost_INCLUDE_DIR} )
 SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES})
 
-add_subdirectory(bitshares)
+add_subdirectory(BitShares)
 add_subdirectory(miner)
 
 IF( APPLE )
@@ -97,6 +107,7 @@ qt5_wrap_ui( profile_wizard/UiProfileEditPage  profile_wizard/ProfileEditPage.ui
 qt5_wrap_ui( profile_wizard/UiProfileIntroPage profile_wizard/ProfileIntroPage.ui )
 qt5_wrap_ui( profile_wizard/UiNymPage          profile_wizard/ProfileNymPage.ui )
 qt5_wrap_ui( UiLoginDialog                     LoginDialog.ui )
+qt5_wrap_ui( UiConnectionStatusFrame           connectionstatusframe.ui )
 qt5_wrap_ui( UiKeyhoteeMainWindow              KeyhoteeMainWindow.ui )
 qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
 qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
@@ -151,20 +162,44 @@ set( sources
 
         KeyhoteeMainWindow.ui 
         KeyhoteeMainWindow.cpp 
+
+        connectionstatusframe.ui
+        connectionstatusframe.h
+        connectionstatusframe.cpp
+
+        dataaccessimpl.h
+        dataaccessimpl.cpp
+
+        ch/connectionstatusds.h
+
         main.cpp )
+
+# Append files generated from git revision to the sources list
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" @ONLY)
+list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.h)
 
 # Configure dependencies of keyhotee_library module
 add_library( keyhotee_library ${library_sources} )
 qt5_use_modules(keyhotee_library Widgets WebKit)
 message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
-target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( keyhotee_library upnpc-static bshare fc miniupnpc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
+
+# Let's configure binaries output directory (by default invictus-root/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $ENV{INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE $ENV{INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG $ENV{INVICTUS_ROOT}/bin)
 
 # Configure dependencies of keyhotee main application module
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
+
+# Let's configure different target names for release and debug builds.
+set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_DEBUG KeyhoteeD )
+set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
+
 # Use the Widgets module from Qt 5.
 qt5_use_modules(Keyhotee Widgets PrintSupport WebKit)
 
-target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc miniupnpc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
 
 if (MSVC)
   message("Setting up debug options for MSVC build")

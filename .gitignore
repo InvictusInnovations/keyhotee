@@ -1,3 +1,6 @@
+#Compiled local files
+build/
+BitShares/
 # Compiled Object files
 *.slo
 *.lo

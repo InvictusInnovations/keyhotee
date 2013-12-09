@@ -3,6 +3,7 @@
 #include "AddressBookModel.hpp"
 #include <bts/application.hpp>
 #include <bts/profile.hpp>
+#include "AddressBook/ContactView.hpp"
 
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
@@ -62,7 +63,7 @@ void ContactsTable::setAddressBook( AddressBookModel* addressbook_model )
   ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-  connect( ui->contact_table, &QAbstractItemView::activated, this, &ContactsTable::openContact );
+  connect( ui->contact_table, &QAbstractItemView::activated /*maybe clicked ? */, this, &ContactsTable::openContact );
 }
 
 void ContactsTable::openContact( const QModelIndex& index )
@@ -97,18 +98,27 @@ void ContactsTable::onDeleteContact()
 
 bool ContactsTable::isShowDetailsHidden()
 {
-  return ui->current_contact->isHidden();
+  return ui->contact_details_view->isHidden();
 }
 
 void ContactsTable::on_actionShow_details_toggled(bool checked)
 {
   if (checked)
   {
-    ui->current_contact->show();
+    ui->contact_details_view->show();
   }
   else
   {
-    ui->current_contact->hide();
+    ui->contact_details_view->hide();
   }
   
+}
+
+void ContactsTable::addContactView( ContactView& view ) const {
+   ui->contact_details_view->addWidget (&view);
+}
+
+void ContactsTable::showView( ContactView& view ) const {
+   view.initTab ();   
+   ui->contact_details_view->setCurrentWidget (&view);   
 }
