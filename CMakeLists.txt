@@ -182,7 +182,7 @@ list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.h)
 add_library( keyhotee_library ${library_sources} )
 qt5_use_modules(keyhotee_library Widgets WebKit)
 message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
-target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( keyhotee_library upnpc-static bshare fc miniupnpc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
 
 # Let's configure binaries output directory (by default invictus-root/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $ENV{INVICTUS_ROOT}/bin)
@@ -199,7 +199,7 @@ set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
 # Use the Widgets module from Qt 5.
 qt5_use_modules(Keyhotee Widgets PrintSupport WebKit)
 
-target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc miniupnpc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
 
 if (MSVC)
   message("Setting up debug options for MSVC build")
