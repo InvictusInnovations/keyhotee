@@ -178,11 +178,18 @@ set( sources
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" @ONLY)
 list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.h)
 
+# Some unknown diff between windows and unix, this is quick fix, leave for DanL to clean-up
+IF(WIN32)
+ELSE(WIN32)
+    #apparently this is needed for Ubuntu (see commit from jefferylee), but it causes problems for windows (lib is brought in via upnpc-static on windows at least)
+	set(${MINIUPNP_LIB}  miniupnpc)
+ENDIF(WIN32)
+
 # Configure dependencies of keyhotee_library module
 add_library( keyhotee_library ${library_sources} )
 qt5_use_modules(keyhotee_library Widgets WebKit)
 message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
-target_link_libraries( keyhotee_library upnpc-static bshare fc miniupnpc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( keyhotee_library upnpc-static bshare fc ${MINIUPNP_LIB} leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
 
 # Let's configure binaries output directory (by default invictus-root/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $ENV{INVICTUS_ROOT}/bin)
@@ -199,7 +206,8 @@ set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
 # Use the Widgets module from Qt 5.
 qt5_use_modules(Keyhotee Widgets PrintSupport WebKit)
 
-target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc miniupnpc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
+#fc  miniupnpc
+target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc ${MINIUPNP_LIB} leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
 
 if (MSVC)
   message("Setting up debug options for MSVC build")
