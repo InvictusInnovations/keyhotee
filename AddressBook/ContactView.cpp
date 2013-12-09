@@ -144,7 +144,7 @@ void ContactView::onSave()
        //_current_contact.bit_id_hash = _current_record->name_hash;
        if( !_current_contact.public_key.valid() )
        {
-            _current_contact.public_key = _current_record->pub_key;
+            _current_contact.public_key = _current_record->active_key;
             FC_ASSERT( _current_contact.public_key.valid() );
        }
        // TODO: lookup block id / timestamp that registered this ID
@@ -452,7 +452,7 @@ void ContactView::lookupId()
        {
             ui->id_status->setStyleSheet("QLabel { color : green; }");
             ui->id_status->setText( tr( "Registered" ) );
-            std::string public_key_string = public_key_address(_current_record->pub_key);
+            std::string public_key_string = public_key_address(_current_record->active_key);
             ui->public_key->setText( public_key_string.c_str() );
             if( _address_book != nullptr )
                ui->save_button->setEnabled(true);

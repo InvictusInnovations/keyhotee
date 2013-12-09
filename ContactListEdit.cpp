@@ -2,7 +2,7 @@
 #include <QCompleter>
 #include <QAbstractItemView>
 #include <QKeyEvent>
-#include <QScrolLBar>
+#include <QScrollBar>
 #include <QPainter>
 
 #include <fc/log/logger.hpp>

@@ -8,11 +8,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/GitVersionGen/")
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-IF( WIN32 )
 #  set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake;C:/gh/qt5.1.1/qtwebkit/WebKitBuild/Release/lib/cmake/Qt5WebKitWidgets;"  )
-  set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
-  message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
+message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
+IF( WIN32 )
   #You need to set OPENSSL_ROOT environment variable for your system on WIN32
   message("Setting up OpenSSL root and include vars on Win32 platform")
   set( OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT} )
@@ -79,7 +79,7 @@ include_directories( ${OPENSSL_INCLUDE_DIR} )
 include_directories( ${Boost_INCLUDE_DIR} )
 SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES})
 
-add_subdirectory(bitshares)
+add_subdirectory(BitShares)
 add_subdirectory(miner)
 
 IF( APPLE )
@@ -182,7 +182,7 @@ list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.h)
 add_library( keyhotee_library ${library_sources} )
 qt5_use_modules(keyhotee_library Widgets WebKit)
 message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
-target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( keyhotee_library upnpc-static bshare fc miniupnpc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
 
 # Let's configure binaries output directory (by default invictus-root/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $ENV{INVICTUS_ROOT}/bin)
@@ -199,7 +199,7 @@ set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
 # Use the Widgets module from Qt 5.
 qt5_use_modules(Keyhotee Widgets PrintSupport WebKit)
 
-target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
+target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc miniupnpc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
 
 if (MSVC)
   message("Setting up debug options for MSVC build")
