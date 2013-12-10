@@ -14,8 +14,9 @@ class Contact : public bts::addressbook::wallet_contact
 {
    public:
       Contact(){}
-      Contact( const bts::addressbook::wallet_contact& );
-
+      explicit Contact( const bts::addressbook::wallet_contact& );
+      /// Returns true if the identity associated to given contact is owned by current profile's identity.
+      bool           isOwn() const;
       QString        getLabel()const;
       const QIcon&   getIcon()const;
       void           setIcon( const QIcon& icon );
