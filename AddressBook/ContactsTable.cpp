@@ -13,7 +13,7 @@
 class ContactsSortFilterProxyModel : public QSortFilterProxyModel
 {
 public:
-    ContactsSortFilterProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+    ContactsSortFilterProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) { setSortRole(Qt::UserRole);}
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };

@@ -18,6 +18,8 @@ namespace Detail
     {
        public:
           QIcon                                   _default_icon;
+          QIcon                                   _ownership_yes;
+          QIcon                                   _ownership_no;
           std::vector<Contact>                    _contacts;
           bts::addressbook::addressbook_ptr       _address_book;
           QStringListModel                        _contact_completion_model;
@@ -32,6 +34,9 @@ AddressBookModel::AddressBookModel( QObject* parent, bts::addressbook::addressbo
 {
    my->_address_book = address_book;
    my->_default_icon.addFile(QStringLiteral(":/images/user.png"), QSize(), QIcon::Normal, QIcon::Off);
+
+   my->_ownership_yes.addFile(QStringLiteral(":/images/ownership.png"), QSize(), QIcon::Normal, QIcon::Off);
+   my->_ownership_no.addFile(QStringLiteral(":/images/blank.png"), QSize(), QIcon::Normal, QIcon::Off);
 
    const std::unordered_map<uint32_t,bts::addressbook::wallet_contact>& loaded_contacts = address_book->get_contacts();
    my->_contacts.reserve( loaded_contacts.size() );
@@ -111,6 +116,8 @@ QVariant AddressBookModel::headerData( int section, Qt::Orientation orientation,
               {
                  case FirstName:
                      return tr("First Name");
+                 case Ownership:
+                     return tr("Ownership");
                  case LastName:
                      return tr("Last Name");
                  case Id:
@@ -152,6 +159,8 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
            {
                case UserIcon:
                    return QSize( 48, 48 );
+               case Ownership:
+                   return QSize( 48, 48 );
                default:
                    return QVariant();
            }
@@ -160,6 +169,8 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
           {
              case UserIcon:
                  return current_contact.getIcon();
+             case Ownership:
+                 return (current_contact.isOwn()?my->_ownership_yes : my->_ownership_no);
              default:
                 return QVariant();
           }
@@ -177,10 +188,29 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
              case Repute:
                  return 0;
 
+             case Ownership:
              case UserIcon:
              case NumColumns:
                 return QVariant();
           }
+       case Qt::UserRole:
+         switch( (Columns)index.column() )
+         {
+            case Ownership:
+                 return (current_contact.isOwn()?true:false);
+             case FirstName:
+                 return current_contact.first_name.c_str();
+             case LastName:
+                 return current_contact.last_name.c_str();
+             case Id:
+                 return current_contact.dac_id_string.c_str();
+            case Age:
+                 return 0;
+             case Repute:
+                 return 0;
+            default:
+              return QVariant();
+         }
     }
     return QVariant();
 }
