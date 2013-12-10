@@ -182,7 +182,7 @@ list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.h)
 IF(WIN32)
 ELSE(WIN32)
     #apparently this is needed for Ubuntu (see commit from jefferylee), but it causes problems for windows (lib is brought in via upnpc-static on windows at least)
-	set(${MINIUPNP_LIB}  miniupnpc)
+	set(MINIUPNP_LIB  miniupnpc)
 ENDIF(WIN32)
 
 # Configure dependencies of keyhotee_library module
