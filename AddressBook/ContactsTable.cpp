@@ -63,7 +63,7 @@ void ContactsTable::setAddressBook( AddressBookModel* addressbook_model )
   ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-  connect( ui->contact_table, &QAbstractItemView::activated /*maybe clicked ? */, this, &ContactsTable::openContact );
+  connect( ui->contact_table, &QAbstractItemView::clicked, this, &ContactsTable::openContact );
 }
 
 void ContactsTable::openContact( const QModelIndex& index )

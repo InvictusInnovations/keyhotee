@@ -316,7 +316,8 @@ void KeyhoteeMainWindow::addContact()
         editcon->deleteLater();
      });
    */
-  ui->new_contact->setContact( Contact(), ContactView::edit );
+  ui->new_contact->setAddingNewContact (true);
+  ui->new_contact->setContact( Contact() );
   ui->widget_stack->setCurrentWidget( ui->new_contact );
 }
 

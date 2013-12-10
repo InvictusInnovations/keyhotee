@@ -1,6 +1,3 @@
-#Compiled local files
-build/
-BitShares/
 # Compiled Object files
 *.slo
 *.lo
@@ -66,3 +63,5 @@ bitchat/bitchat
 tests/blockchain_tests
 *automoc.cpp
 src/gui/sexc
+/CMakeLists.txt.user
+/.svn

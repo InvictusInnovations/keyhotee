@@ -76,7 +76,7 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="info_status">
         <widget class="QWidget" name="widget_4" native="true">
@@ -88,70 +88,139 @@
            <height>91</height>
           </rect>
          </property>
-         <layout class="QFormLayout" name="formLayout">
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+         <widget class="QLabel" name="security_level_view">
+          <property name="geometry">
+           <rect>
+            <x>90</x>
+            <y>9</y>
+            <width>36</width>
+            <height>16</height>
+           </rect>
           </property>
-          <item row="0" column="1">
-           <widget class="QLabel" name="security_level_view">
-            <property name="text">
-             <string>Blocked</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="phone_prefix">
-            <property name="text">
-             <string>Phone:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="phone_view">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="email_prefix">
-            <property name="text">
-             <string>Email:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="email_view">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="security_level_prefix">
-            <property name="text">
-             <string>Security Level:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="public_key_prefix">
-            <property name="text">
-             <string>Public Key:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="public_key_view">
-            <property name="text">
-             <string>Unknown</string>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
+          <property name="text">
+           <string>Blocked</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="phone_prefix">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>28</y>
+            <width>34</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Phone:</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="phone_view">
+          <property name="geometry">
+           <rect>
+            <x>90</x>
+            <y>28</y>
+            <width>16</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QLabel" name="email_prefix">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>47</y>
+            <width>28</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Email:</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="email_view">
+          <property name="geometry">
+           <rect>
+            <x>90</x>
+            <y>47</y>
+            <width>16</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QLabel" name="security_level_prefix">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>9</y>
+            <width>71</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Security Level:</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="public_key_prefix">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>66</y>
+            <width>52</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Public Key:</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="public_key_view">
+          <property name="geometry">
+           <rect>
+            <x>91</x>
+            <y>66</y>
+            <width>210</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Unknown</string>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          </property>
+         </widget>
+         <widget class="QToolButton" name="public_key_to_clipboard">
+          <property name="geometry">
+           <rect>
+            <x>310</x>
+            <y>64</y>
+            <width>21</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Copy to clipboard</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../Keyhotee.qrc">
+            <normaloff>:/images/win/editcopy.png</normaloff>:/images/win/editcopy.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+         </widget>
         </widget>
         <widget class="QGroupBox" name="notes_group">
          <property name="geometry">
@@ -159,7 +228,7 @@
            <x>20</x>
            <y>100</y>
            <width>429</width>
-           <height>80</height>
+           <height>161</height>
           </rect>
          </property>
          <property name="title">
@@ -269,7 +338,7 @@
          <widget class="QLineEdit" name="firstname">
           <property name="geometry">
            <rect>
-            <x>0</x>
+            <x>10</x>
             <y>0</y>
             <width>191</width>
             <height>31</height>
@@ -292,7 +361,7 @@
          <widget class="QLineEdit" name="lastname">
           <property name="geometry">
            <rect>
-            <x>200</x>
+            <x>220</x>
             <y>0</y>
             <width>151</width>
             <height>31</height>
@@ -476,13 +545,19 @@
           </rect>
          </property>
         </widget>
+        <zorder>privacy_comboBox</zorder>
+        <zorder>email_label</zorder>
+        <zorder>email</zorder>
+        <zorder>phone_label</zorder>
+        <zorder>phone</zorder>
+        <zorder>public_key_label</zorder>
+        <zorder>public_key</zorder>
         <zorder>notes_groupbox</zorder>
         <zorder>widget_5</zorder>
         <zorder>widget_6</zorder>
         <zorder>id_status</zorder>
         <zorder>id_edit</zorder>
-        <zorder></zorder>
-        <zorder>widget_2</zorder>
+        <zorder>privacy_level_label</zorder>
        </widget>
       </widget>
      </widget>
@@ -569,7 +644,7 @@
       <property name="margin">
        <number>0</number>
       </property>
-      <item row="0" column="0" colspan="2">
+      <item row="0" column="1">
        <widget class="QWidget" name="toolbar_container" native="true">
         <property name="minimumSize">
          <size>
@@ -588,48 +663,6 @@
         </property>
         <property name="styleSheet">
          <string notr="true">QWidget { background=qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255)) }</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QToolButton" name="icon_view">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Keyhotee ID</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../Keyhotee.qrc">
-          <normaloff>:/images/user.png</normaloff>:/images/user.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonIconOnly</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="name_label">
-        <property name="text">
-         <string>Name</string>
-        </property>
-        <property name="buddy">
-         <cstring></cstring>
         </property>
        </widget>
       </item>
