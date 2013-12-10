@@ -19,6 +19,7 @@ class AddressBookModel : public QAbstractTableModel
     enum Columns
     {
         UserIcon,
+        Ownership,
         FirstName,
         LastName,
         Id,

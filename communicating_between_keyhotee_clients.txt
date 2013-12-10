@@ -1,0 +1,36 @@
+== Communicating between Keyhotee clients ==
+
+=== General notes ===
+I recommend using the same password for all your test clients, this makes it easier to remember.
+For my profiles, I use: "default", "second", "third", etc.
+For my identities, I use "first", "second", "third", etc.
+
+=== Steps to setup communication between clients ===
+* Run "keyhoteed" and create a new identity (this first profile is "default" profile). I typically call this identity "first".
+* Enable mining from the Identity/Enable Mining long enough to successfully mine the identity.
+* Shut down keyhoteed
+* Run "keyhoteed second" and create a new identity.
+* Enable mining from the Identity/Enable Mining long enough to successfully mine the identity.
+* Shut down keyhoteed
+* On windows, launch an explorer window and go to "C:\Users\Administrator\AppData\Local\Invictus Innovations, Inc\Keyhotee\". This directory stores your profile directories. You should see a default profile and a second profile directory. Go into the second directory and edit the config.json file. Change it to look like this:
+{
+  "data_dir": "C:/Users/Administrator/AppData/Local/Invictus Innovations, Inc/Keyhotee/second/data",
+  "network_port": 10876,
+  "rpc_config": {
+    "port": 10877,
+    "user": "",
+    "pass": ""
+  },
+  "enable_upnp": false,
+  "default_nodes": [
+    "127.0.0.1:9876"
+  ]
+}
+This tells the second client to hook up to the default client.
+
+=== Configuring the two clients to "know each other" ===
+* Run "keyhoteed" again to launch the default profile client (this client must be started first).
+* Run "keyhoteed second" to launch the second profile client.
+* In the default client, create a new contact for "second" (if it says this Keyhotee ID is not registered, it means it wasn't mined enough or else the two clients didn't connect up properly).
+* In the "second" client, create a new contact for "first" (if it says this Keyhotee ID is not registered, it means it wasn't mined enough or else the two clients didn't connect up properly).
+* You should now be able to send chats and emails back and forth between the two clients.
