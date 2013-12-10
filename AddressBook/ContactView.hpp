@@ -37,6 +37,11 @@ class ContactView : public QWidget
      void keyhoteeIdChanged( const QString& name );
      void keyhoteeIdEdited( const QString& name );
      void publicKeyEdited( const QString& public_key_string );
+     void publicKeyChanged( const QString&) {setModyfied ();};
+     void emailChanged( const QString&) {setModyfied ();};
+     void phoneChanged( const QString&) {setModyfied ();};
+     void notesChanged() {setModyfied ();};
+     void privacyLevelChanged( const QString&) {setModyfied ();};
      void onPublicKeyToClipboard ();
 
      void updateNameLabel();
@@ -50,12 +55,17 @@ class ContactView : public QWidget
      void initTab() const;
      void setAddingNewContact (bool addNew) {_addingNewContact = addNew;};
      bool isAddingNewContact () const {return _addingNewContact;};
+     void keyEdit (bool enable);
 
 
   protected:
       bool eventFilter(QObject *obj, QEvent *event);
 
   private:
+      void setModyfied (bool modyfied = true) {_modyfied = modyfied;};
+      bool isModyfied () const {return _addingNewContact;};      
+      void onTabChanged(int index);
+
      fc::time_point                            _last_validate;
      Contact                                   _current_contact;
      fc::optional<bts::bitname::name_record>   _current_record;
@@ -69,4 +79,5 @@ class ContactView : public QWidget
      QAction*                                  request_contact;
      QAction*                                  cancel_edit_contact;
      bool                                      _addingNewContact;
+     bool                                      _modyfied;
 };

@@ -122,3 +122,9 @@ void ContactsTable::showView( ContactView& view ) const {
    view.initTab ();   
    ui->contact_details_view->setCurrentWidget (&view);   
 }
+
+void ContactsTable::addNewContact( ContactView& view ) const {
+   addContactView (view);
+   showView (view);
+   view.keyEdit(true);
+}

@@ -318,7 +318,8 @@ void KeyhoteeMainWindow::addContact()
    */
   ui->new_contact->setAddingNewContact (true);
   ui->new_contact->setContact( Contact() );
-  ui->widget_stack->setCurrentWidget( ui->new_contact );
+  ui->contacts_page->addNewContact(*ui->new_contact);
+  ui->widget_stack->setCurrentWidget( ui->contacts_page );
 }
 
 void KeyhoteeMainWindow::sideBarSplitterMoved( int pos, int index )
