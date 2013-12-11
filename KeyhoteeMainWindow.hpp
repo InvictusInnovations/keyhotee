@@ -119,6 +119,9 @@ class KeyhoteeMainWindow  : public SelfSizingMainWindow,
     QTreeWidgetItem*                        _inbox_root;
     QTreeWidgetItem*                        _drafts_root;
     QTreeWidgetItem*                        _sent_root;
+    QTreeWidgetItem*                        _bitcoin_root;
+    QTreeWidgetItem*                        _bitshares_root;
+    QTreeWidgetItem*                        _litecoin_root;
 
     MailboxModel*                             _inbox_model;
     MailboxModel*                             _draft_model;

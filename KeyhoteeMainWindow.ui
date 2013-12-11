@@ -289,7 +289,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>4</number>
        </property>
        <widget class="Mailbox" name="inbox_page">
         <layout class="QGridLayout" name="inboxlayout">
@@ -332,6 +332,7 @@
         </layout>
        </widget>
        <widget class="ContactView" name="new_contact"/>
+       <widget class="Wallets" name="wallets"/>
       </widget>
      </widget>
     </item>
@@ -635,6 +636,12 @@
    <class>Mailbox</class>
    <extends>QWidget</extends>
    <header>Mail/Mailbox.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Wallets</class>
+   <extends>QWidget</extends>
+   <header>wallets.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

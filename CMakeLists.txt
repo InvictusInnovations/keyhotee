@@ -113,6 +113,7 @@ qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
 qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
 qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
 qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
+qt5_wrap_ui( UiWallets                         wallets.ui )
 
 QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
 
@@ -166,6 +167,10 @@ set( sources
         connectionstatusframe.ui
         connectionstatusframe.h
         connectionstatusframe.cpp
+		
+		wallets.ui
+		wallets.hpp
+		wallets.cpp
 
         dataaccessimpl.h
         dataaccessimpl.cpp

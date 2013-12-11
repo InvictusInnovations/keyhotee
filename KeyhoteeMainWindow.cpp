@@ -61,6 +61,12 @@ enum SidebarItemTypes
     MailboxItem  = 3,
     ContactItem  = 4
 };
+enum WalletsChildren
+{
+    Bitcoin,
+    BitShares,
+    Litecoin
+};
 
 void ContactGui::setUnreadMsgCount(unsigned int count)
 {
@@ -221,6 +227,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     _sent_root    = _mailboxes_root->child(Sent);
 
     _wallets_root->setExpanded(true);
+    _bitcoin_root   = _wallets_root->child(Bitcoin);
+    _bitshares_root = _wallets_root->child(BitShares);
+    _litecoin_root  = _wallets_root->child(Litecoin);
 
     auto app    = bts::application::instance();
     app->set_application_delegate( this );
@@ -245,6 +254,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     ui->draft_box_page->setModel(_draft_model, Mailbox::Drafts);
     ui->sent_box_page->setModel(_sent_model, Mailbox::Sent);
 
+    ui->widget_stack->setCurrentWidget( ui->inbox_page );
     connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
     connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
 
@@ -450,6 +460,22 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
             ui->actionShow_details->setChecked(false);
           else
             ui->actionShow_details->setChecked(true);
+      }
+      else if( selected_items[0] == _wallets_root )
+      {
+          ui->widget_stack->setCurrentWidget( ui->wallets );
+      }
+      else if( selected_items[0] == _bitcoin_root )
+      {
+          ui->widget_stack->setCurrentWidget( ui->wallets );
+      }
+      else if( selected_items[0] == _bitshares_root )
+      {
+          ui->widget_stack->setCurrentWidget( ui->wallets );
+      }
+      else if( selected_items[0] == _litecoin_root )
+      {
+          ui->widget_stack->setCurrentWidget( ui->wallets );
       }
    }
 }
