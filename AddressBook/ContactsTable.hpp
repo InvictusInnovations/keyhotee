@@ -21,16 +21,17 @@ class ContactsTable  : public QWidget
     void addContactView( ContactView& view ) const;
     void showView( ContactView& view ) const;
     void addNewContact( ContactView& view ) const;
-
     bool isShowDetailsHidden();
+    void onCanceledAddContact ();
   Q_SIGNALS:
     void contactOpened( int contact_id );
+    void showPrevView ();
 
-  private:
-    std::unique_ptr<Ui::ContactsTable> ui;
-    AddressBookModel*                  _addressbook_model;
-    QSortFilterProxyModel*             _sorted_addressbook_model;
-    QAction*                           _delete_contact;
+  private:   
+   std::unique_ptr<Ui::ContactsTable> ui;
+   AddressBookModel*                  _addressbook_model;
+   QSortFilterProxyModel*             _sorted_addressbook_model;
+   QAction*                           _delete_contact;
 
   public slots:
     void onDeleteContact();

@@ -99,6 +99,8 @@ class KeyhoteeMainWindow  : public SelfSizingMainWindow,
     void on_actionDiagnostic_triggered();
     void on_actionAbout_triggered();
 
+    void onShowPrevView ();
+
   private:
     void    addressBookDataChanged( const QModelIndex& top_left, const QModelIndex& bottom_right,
       const QVector<int>& roles );

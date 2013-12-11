@@ -12,6 +12,7 @@ class QToolBar;
 
 class ContactView : public QWidget
 {
+Q_OBJECT
   public:
      enum ContactDisplay { info, chat};
      ContactView( QWidget* parent = nullptr );
@@ -24,7 +25,6 @@ class ContactView : public QWidget
      Contact getContact()const;
 
      void onChat();
-     void onInfo();
      void onMail();
      void onEdit();
      void onSave();
@@ -56,13 +56,15 @@ class ContactView : public QWidget
      bool isAddingNewContact () const {return _addingNewContact;};
      void keyEdit (bool enable);
 
+Q_SIGNALS:
+    void canceledAddContact();
 
   protected:
       bool eventFilter(QObject *obj, QEvent *event);
 
   private:
       void setModyfied (bool modyfied = true) {_modyfied = modyfied;};
-      bool isModyfied () const {return _addingNewContact;};      
+      bool isModyfied () const {return _modyfied;};      
       void onTabChanged(int index);
 
      fc::time_point                            _last_validate;

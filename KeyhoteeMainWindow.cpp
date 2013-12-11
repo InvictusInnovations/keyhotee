@@ -137,6 +137,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     }
 
     connect( ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui );
+    connect( ui->contacts_page, &ContactsTable::showPrevView, this, &KeyhoteeMainWindow::onShowPrevView );
 
 #ifdef Q_OS_MAC
     //QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
@@ -710,4 +711,9 @@ void KeyhoteeMainWindow::received_email( const bts::bitchat::decrypted_message& 
 void KeyhoteeMainWindow::notSupported()
 {
   QMessageBox::warning(this, "Warning", "Not supported");
+}
+
+void KeyhoteeMainWindow::onShowPrevView()
+{
+   onSidebarSelectionChanged();
 }

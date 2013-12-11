@@ -116,6 +116,7 @@ void ContactsTable::on_actionShow_details_toggled(bool checked)
 
 void ContactsTable::addContactView( ContactView& view ) const {
    ui->contact_details_view->addWidget (&view);
+   connect (&view, &ContactView::canceledAddContact, this, &ContactsTable::onCanceledAddContact);
 }
 
 void ContactsTable::showView( ContactView& view ) const {
@@ -126,4 +127,9 @@ void ContactsTable::addNewContact( ContactView& view ) const {
    addContactView (view);
    showView (view);
    view.keyEdit(true);
+}
+
+void ContactsTable::onCanceledAddContact ()
+{
+   Q_EMIT showPrevView();
 }

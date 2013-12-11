@@ -183,22 +183,15 @@ void ContactView::onSave()
          }
     }
     _current_contact.privacy_setting = bts::addressbook::secret_contact;
-
     _address_book->storeContact( _current_contact );
-
-    //DLNFIX
-    #if 1
     keyEdit (false);
-    ui->contact_pages->setCurrentIndex (info);
-    #else
-    setContact(_current_contact,ContactView::info);
-    #endif
 } FC_RETHROW_EXCEPTIONS( warn, "onSave" ) }
 
 void ContactView::onCancel()
 {
    if (isAddingNewContact()) {
-      QMessageBox::warning(this, tr("Warning"), tr("Fix - Hide view"));
+      this->setVisible (false);
+      emit canceledAddContact ();
    }
    else //editing contact
    {
@@ -219,12 +212,6 @@ void ContactView::onChat()
    if (contact_gui)
       contact_gui->setUnreadMsgCount(0);
    ui->chat_input->setFocus();
-}
-
-void ContactView::onInfo()
-{   
-   keyEdit (false);
-   ui->contact_pages->setCurrentIndex (info);
 }
 
 void ContactView::onMail()
@@ -280,7 +267,6 @@ void ContactView::setContact( const Contact& current_contact)
         /// changes.
         ui->id_edit->setEnabled(false);
         save_contact->setEnabled (true);
-        onInfo();
         /** TODO... restore this kind of check
         if( _current_contact.bit_id_public_key != _current_contact.public_key  )
         {
@@ -537,7 +523,6 @@ void ContactView::keyEdit (bool enable)
    edit_contact->setVisible (! enable);
    share_contact->setVisible (! enable);
    request_contact->setVisible (! enable);
-   request_contact->setVisible (! enable);   
 
    ui->contact_pages->setTabEnabled (chat, ! enable);
 
