@@ -27,7 +27,7 @@
 
 std::string gApplication_name = "Keyhotee";
 std::string gProfile_name = "default";
-bool gMiningIsPossible = false;
+bool gMiningIsPossible = true;
 
 
 bts::application_config load_config( const std::string& profile_name )
@@ -110,7 +110,6 @@ int main( int argc, char** argv )
         //    gMiningIsPossible = true;
        // }
      }
-     gMiningIsPossible = true;
 
      app.setApplicationName( gApplication_name.c_str() );
 

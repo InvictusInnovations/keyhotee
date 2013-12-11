@@ -36,6 +36,14 @@ include_directories(${BITSHARES_DIR}/include)
 include_directories(${BITSHARES_DIR}/fc/include)
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
+SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
+
+IF(${INVICTUS_ROOT} EQUAL "")
+    SET(INVICTUS_ROOT .)
+ENDIF(${INVICTUS_ROOT} EQUAL "")
+
+message("Using invictus root: " ${INVICTUS_ROOT})
+
 IF( WIN32 )
   ADD_DEFINITIONS( -DWIN32 )
   ADD_DEFINITIONS( -DNOMINMAX )
@@ -192,9 +200,6 @@ message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
 target_link_libraries( keyhotee_library upnpc-static bshare fc ${MINIUPNP_LIB} leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
 
 # Let's configure binaries output directory (by default invictus-root/bin)
-IF(NOT ENV{INVICTUS_ROOT})
-    SET(ENV{INVICTUS_ROOT} .)
-ENDIF(NOT ENV{INVICTUS_ROOT})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $ENV{INVICTUS_ROOT}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE $ENV{INVICTUS_ROOT}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG $ENV{INVICTUS_ROOT}/bin)
