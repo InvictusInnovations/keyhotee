@@ -20,6 +20,7 @@ class ContactsTable  : public QWidget
     void searchEditChanged(QString search_string);   
     void addContactView( ContactView& view ) const;
     void showView( ContactView& view ) const;
+    void addNewContact( ContactView& view ) const;
 
     bool isShowDetailsHidden();
   Q_SIGNALS:

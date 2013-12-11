@@ -13,9 +13,9 @@
 #include <QtWebKitWidgets/QWebFrame>
 #include <QToolBar>
 #include <QMessageBox>
+#include <QToolButton>
 
 extern bool gMiningIsPossible;
-
 
 bool ContactView::eventFilter(QObject* object, QEvent* event)
 {
@@ -89,7 +89,9 @@ ContactView::ContactView( QWidget* parent )
   ui( new Ui::ContactView() )
 {
    _address_book = nullptr;
-   ui->setupUi(this);
+   _addingNewContact = false;
+   ui->setupUi(this);   
+   setModyfied (false);
    message_tools = new QToolBar( ui->toolbar_container ); 
    QGridLayout* grid_layout = new QGridLayout(ui->toolbar_container);
    grid_layout->setContentsMargins( 0,0,0,0);
@@ -101,25 +103,38 @@ ContactView::ContactView( QWidget* parent )
    edit_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Edit (need new icon)"), this );
    share_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Share (need new icon)"), this );
    request_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Request contact (need new icon)"), this );
+   save_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Save (need new icon)"), this );
+   cancel_edit_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Discard changes (need new icon)"), this );
+   
    message_tools->addAction( send_mail );
+   message_tools->addAction( save_contact );
    message_tools->addAction( edit_contact );
    message_tools->addAction( share_contact );
    message_tools->addAction( request_contact );
+   message_tools->addAction( cancel_edit_contact );
 
    //ui->chat_conversation->setHtml( "<html><head></head><body>Hello World<br/></body></html>" );
-   connect( ui->save_button, &QPushButton::clicked, this, &ContactView::onSave );
-   connect( ui->cancel_button, &QPushButton::clicked, this, &ContactView::onCancel );
+   connect( save_contact, &QAction::triggered, this, &ContactView::onSave );
+   connect( cancel_edit_contact, &QAction::triggered, this, &ContactView::onCancel);
    connect( edit_contact, &QAction::triggered, this, &ContactView::onEdit );
    connect( send_mail, &QAction::triggered, this, &ContactView::onMail);
    connect( share_contact, &QAction::triggered, this, &ContactView::onShareContact);
-   connect( request_contact, &QAction::triggered, this, &ContactView::onRequestContact);   
+   connect( request_contact, &QAction::triggered, this, &ContactView::onRequestContact);
 
    connect( ui->firstname, &QLineEdit::textChanged, this, &ContactView::firstNameChanged );
    connect( ui->lastname, &QLineEdit::textChanged, this, &ContactView::lastNameChanged );
    connect( ui->id_edit, &QLineEdit::textChanged, this, &ContactView::keyhoteeIdChanged );
    connect( ui->id_edit, &QLineEdit::textEdited, this, &ContactView::keyhoteeIdEdited );
    connect( ui->public_key, &QLineEdit::textEdited, this, &ContactView::publicKeyEdited );
+   connect( ui->public_key, &QLineEdit::textChanged, this, &ContactView::publicKeyChanged );
+   connect( ui->privacy_comboBox, &QComboBox::editTextChanged, this, &ContactView::privacyLevelChanged );   
+   connect( ui->email, &QLineEdit::textChanged, this, &ContactView::emailChanged );
+   connect( ui->phone, &QLineEdit::textChanged, this, &ContactView::phoneChanged );
+   connect( ui->notes, &QPlainTextEdit::textChanged, this, &ContactView::notesChanged );
+   connect( ui->public_key_to_clipboard, &QToolButton::clicked, this, &ContactView::onPublicKeyToClipboard );
+   connect( ui->contact_pages, &QTabWidget::currentChanged, this, &ContactView::onTabChanged );
 
+   keyEdit (false);
    ui->chat_input->installEventFilter(this);
 
    setContact( Contact() );
@@ -127,10 +142,11 @@ ContactView::ContactView( QWidget* parent )
 }
 
 void ContactView::onEdit()
-{
+{   
+   setAddingNewContact (false); //editing
+   keyEdit (true);
    ui->contact_pages->setCurrentIndex (info);
    ui->info_stack->setCurrentWidget(ui->info_edit);
-
 }
 
 void ContactView::onSave()
@@ -172,7 +188,7 @@ void ContactView::onSave()
 
     //DLNFIX
     #if 1
-    ui->info_stack->setCurrentWidget(ui->info_status);
+    keyEdit (false);
     ui->contact_pages->setTabEnabled (chat, true);
     ui->contact_pages->setCurrentIndex (info);
     #else
@@ -182,11 +198,17 @@ void ContactView::onSave()
 
 void ContactView::onCancel()
 {
-    ui->info_stack->setCurrentWidget(ui->info_status);
-    ui->firstname->setText( _current_contact.first_name.c_str() );
-    ui->lastname->setText( _current_contact.last_name.c_str() );
-    ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
-    updateNameLabel();
+   if (isAddingNewContact()) {
+      QMessageBox::warning(this, tr("Warning"), tr("Fix - Hide view"));
+   }
+   else //editing contact
+   {
+      keyEdit (false);
+      ui->firstname->setText( _current_contact.first_name.c_str() );
+      ui->lastname->setText( _current_contact.last_name.c_str() );
+      ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
+      updateNameLabel();
+   }
 }
 
 void ContactView::onChat()
@@ -202,7 +224,7 @@ void ContactView::onChat()
 
 void ContactView::onInfo()
 {   
-   ui->info_stack->setCurrentWidget(ui->info_status);
+   keyEdit (false);
    ui->contact_pages->setCurrentIndex (info);
 }
 
@@ -226,18 +248,16 @@ ContactView::~ContactView()
 {
 }
 
-void ContactView::setContact( const Contact& current_contact,
-                              ContactDisplay contact_display )
+void ContactView::setContact( const Contact& current_contact)
 { try {
     _current_contact = current_contact;
     bool has_null_public_key = _current_contact.public_key == fc::ecc::public_key_data();
     if ( has_null_public_key )
     {
         elog( "********* null public key!" );
-        ui->save_button->setEnabled(false);
+        save_contact->setEnabled (false);
         ui->contact_pages->setTabEnabled (chat, false);
         ui->contact_pages->setCurrentIndex (info);
-        onEdit();
 
         if (gMiningIsPossible)
            ui->id_status->setText( tr( "Please provide a valid ID or public key" ) );
@@ -248,7 +268,6 @@ void ContactView::setContact( const Contact& current_contact,
 
         if( _current_contact.first_name == std::string() && _current_contact.last_name == std::string() )
         {
-            ui->name_label->setText( tr( "New Contact" ) );
             ui->id_edit->setText( QString() );
             ui->public_key->setText( QString() );
             //keyhoteeIds don't function when mining is not possible
@@ -262,7 +281,7 @@ void ContactView::setContact( const Contact& current_contact,
         /// set... you must create a new contact anytime their public key
         /// changes.
         ui->id_edit->setEnabled(false);
-        ui->save_button->setEnabled(true);
+        save_contact->setEnabled (true);
         onInfo();
         /** TODO... restore this kind of check
         if( _current_contact.bit_id_public_key != _current_contact.public_key  )
@@ -278,9 +297,8 @@ void ContactView::setContact( const Contact& current_contact,
    // ui->email->setText( _current_contact.email_address );
    // ui->phone->setText( _current_contact.phone_number );
     std::string public_key_string = public_key_address( _current_contact.public_key );
-    ui->public_key_view->setText( public_key_string.c_str() );
+    ui->public_key->setText( public_key_string.c_str() );
     ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
-    ui->icon_view->setIcon( _current_contact.getIcon() );
 } FC_RETHROW_EXCEPTIONS( warn, "" ) }
 
 Contact ContactView::getContact()const
@@ -291,16 +309,18 @@ Contact ContactView::getContact()const
 void ContactView::firstNameChanged( const QString& /*name*/ )
 {
     updateNameLabel();
+    setModyfied ();
 }
 
 void ContactView::keyhoteeIdChanged( const QString& /*name*/ )
 {
     updateNameLabel();
+    setModyfied ();
 }
 
 void ContactView::updateNameLabel()
 {
-   auto full_name = ui->firstname->text() + " " + ui->lastname->text();
+   /*auto full_name = ui->firstname->text() + " " + ui->lastname->text();
    QString dac_id = ui->id_edit->text();
    if (dac_id != QString())
      full_name += "(" + dac_id + ")";
@@ -311,12 +331,13 @@ void ContactView::updateNameLabel()
    else
    {
        ui->name_label->setText(tr( "New Contact" ));
-   }
+   }*/
 }
 
 void ContactView::lastNameChanged( const QString& /*name*/ )
 {
    updateNameLabel();
+   setModyfied ();
 }
 
 /*****************  Algorithm for handling keyhoteeId, keyhoteeeId status, and public key fields 
@@ -433,7 +454,7 @@ void ContactView::publicKeyEdited( const QString& public_key_string )
       ui->id_status->setText( tr("Public Key Only Mode: not a valid key") );
       ui->id_status->setStyleSheet("QLabel { color : red; }");
    }
-   ui->save_button->setEnabled(public_key_is_valid);
+   save_contact->setEnabled(public_key_is_valid);
 }
 
 void ContactView::lookupId()
@@ -443,7 +464,7 @@ void ContactView::lookupId()
        if( current_id.empty() )
        {
             ui->id_status->setText( QString() );
-            ui->save_button->setEnabled(false);
+            save_contact->setEnabled(false);
             return;
        }
        _current_record = bts::application::instance()->lookup_name( current_id );
@@ -454,14 +475,14 @@ void ContactView::lookupId()
             std::string public_key_string = public_key_address(_current_record->active_key);
             ui->public_key->setText( public_key_string.c_str() );
             if( _address_book != nullptr )
-               ui->save_button->setEnabled(true);
+               save_contact->setEnabled(true);
        }
        else
        {
             ui->id_status->setStyleSheet("QLabel { color : red; }");
             ui->id_status->setText( tr( "Unable to find ID" ) );
             ui->public_key->setText(QString());
-            ui->save_button->setEnabled(false);
+            save_contact->setEnabled(false);
        }
    } 
    catch ( const fc::exception& e )
@@ -493,6 +514,47 @@ AddressBookModel* ContactView::getAddressBook()const
 
 void ContactView::initTab() const
 {
-   ui->info_stack->setCurrentWidget(ui->info_status);
+   ui->info_stack->setCurrentWidget(ui->info_edit);
    ui->contact_pages->setTabEnabled (chat, true);
+}
+
+
+void ContactView::onPublicKeyToClipboard ()
+{
+   QClipboard *clip = QApplication::clipboard();
+   clip->setText(ui->public_key->text());
+   QMessageBox::information(this, tr("Clipboard"), 
+                  tr("The Public Key has been copied to the clipboard."));
+}
+
+void ContactView::keyEdit (bool enable)
+{
+   ui->firstname->setEnabled (enable);
+   ui->lastname->setEnabled (enable);
+   ui->id_edit->setEnabled (enable);
+   ui->public_key->setEnabled (enable);
+   ui->privacy_comboBox->setEnabled (enable);
+   ui->email->setEnabled (enable);
+   ui->phone->setEnabled (enable);
+   ui->notes->setEnabled (enable);
+
+   ui->id_status->setVisible (enable);
+   save_contact->setVisible (enable);
+   cancel_edit_contact->setVisible (enable);
+   send_mail->setVisible (! enable);
+   edit_contact->setVisible (! enable);
+   share_contact->setVisible (! enable);
+   request_contact->setVisible (! enable);
+   request_contact->setVisible (! enable);   
+
+   ui->contact_pages->setTabEnabled (chat, ! enable);
+}
+
+
+void ContactView::onTabChanged(int index)
+{
+   if (index == chat) {
+      //Question wykrywanie zmian
+      keyEdit (false);
+   }
 }
