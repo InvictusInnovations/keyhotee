@@ -1,18 +1,23 @@
 == Communicating between Keyhotee clients ==
 
 === General notes ===
-I recommend using the same password for all your test clients, this makes it easier to remember.
-For my profiles, I use: "default", "second", "third", etc.
-For my identities, I use "first", "second", "third", etc.
+* If you build a release version of Keyhotee, the executable will be called "keyhotee". The debug version is called "keyhoteed".
+* The Keyhotee executable is built to ${INVICTUS_ROOT}/bin
+
+
+== Profiles in Keyhotee ==
+* A profile is used by Keyhotee to store your identities, contacts, messages, etc. If multiple users plan to use Keyhotee on the same machine, each should generally create his own profile. 
+* If no command-line argument is used to launch Keyhotee, a profile named "default" will be used. Otherwise, the argument will specify the name of the profile.
+* If the profile doesn't yet exist when Keyhotee is launched, a new profile will be created. In this case Keyhotee will launch a wizard to create your brain wallet and your first identity.
+* For my profiles, I use: "default", "second", "third", etc.
+* For my identities, I use "first", "second", "third", etc.
+* I recommend using the same password for all your profiles, this makes it easier to remember.
 
 === Steps to setup communication between clients ===
-* Run "keyhoteed" and create a new identity (this first profile is "default" profile). I typically call this identity "first".
-* Enable mining from the Identity/Enable Mining long enough to successfully mine the identity.
-* Shut down keyhoteed
-* Run "keyhoteed second" and create a new identity.
-* Enable mining from the Identity/Enable Mining long enough to successfully mine the identity.
-* Shut down keyhoteed
-* On windows, launch an explorer window and go to "C:\Users\Administrator\AppData\Local\Invictus Innovations, Inc\Keyhotee\". This directory stores your profile directories. You should see a default profile and a second profile directory. Go into the second directory and edit the config.json file. Change it to look like this:
+* Run "keyhotee" (or keyhoteed if you built a debug version) and create a new identity (this first profile is "default" profile). I typically call this identity "first".
+* Run a second copy of keyhotee by typing "keyhotee second" and create a new identity. I typically call this identity "second".
+* Shut down keyhotee (don't bother mining the second identity yet).
+* On windows, launch an explorer window and go to "C:\Users\Administrator\AppData\Local\Invictus Innovations, Inc\Keyhotee\". You can get close to this directory by going to %appdata%. This directory stores your profile directories. You should see a default profile and a second profile directory. Go into the second directory and edit the config.json file. Change it to look like this:
 {
   "data_dir": "C:/Users/Administrator/AppData/Local/Invictus Innovations, Inc/Keyhotee/second/data",
   "network_port": 10876,
@@ -28,9 +33,10 @@ For my identities, I use "first", "second", "third", etc.
 }
 This tells the second client to hook up to the default client.
 
-=== Configuring the two clients to "know each other" ===
+=== Configuring the two clients to "know each other" so that they mine on same block chain ===
 * Run "keyhoteed" again to launch the default profile client (this client must be started first).
 * Run "keyhoteed second" to launch the second profile client.
+* In both clients,  enable mining from the Identity/Enable Mining long enough to successfully mine each identity.
 * In the default client, create a new contact for "second" (if it says this Keyhotee ID is not registered, it means it wasn't mined enough or else the two clients didn't connect up properly).
 * In the "second" client, create a new contact for "first" (if it says this Keyhotee ID is not registered, it means it wasn't mined enough or else the two clients didn't connect up properly).
 * You should now be able to send chats and emails back and forth between the two clients.
