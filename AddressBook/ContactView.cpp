@@ -143,10 +143,10 @@ ContactView::ContactView( QWidget* parent )
 
 void ContactView::onEdit()
 {   
-   setAddingNewContact (false); //editing
-   keyEdit (true);
+   setAddingNewContact (false); //editing   
+   keyEdit (true); //and set focus on the first field   
    ui->contact_pages->setCurrentIndex (info);
-   ui->info_stack->setCurrentWidget(ui->info_edit);
+   ui->info_stack->setCurrentWidget(ui->info_edit);   
 }
 
 void ContactView::onSave()
@@ -189,7 +189,6 @@ void ContactView::onSave()
     //DLNFIX
     #if 1
     keyEdit (false);
-    ui->contact_pages->setTabEnabled (chat, true);
     ui->contact_pages->setCurrentIndex (info);
     #else
     setContact(_current_contact,ContactView::info);
@@ -256,7 +255,6 @@ void ContactView::setContact( const Contact& current_contact)
     {
         elog( "********* null public key!" );
         save_contact->setEnabled (false);
-        ui->contact_pages->setTabEnabled (chat, false);
         ui->contact_pages->setCurrentIndex (info);
 
         if (gMiningIsPossible)
@@ -512,12 +510,6 @@ AddressBookModel* ContactView::getAddressBook()const
     return _address_book;
 }
 
-void ContactView::initTab() const
-{
-   ui->info_stack->setCurrentWidget(ui->info_edit);
-   ui->contact_pages->setTabEnabled (chat, true);
-}
-
 
 void ContactView::onPublicKeyToClipboard ()
 {
@@ -528,8 +520,8 @@ void ContactView::onPublicKeyToClipboard ()
 }
 
 void ContactView::keyEdit (bool enable)
-{
-   ui->firstname->setEnabled (enable);
+{      
+   ui->firstname->setEnabled (enable);   
    ui->lastname->setEnabled (enable);
    ui->id_edit->setEnabled (enable);
    ui->public_key->setEnabled (enable);
@@ -548,6 +540,8 @@ void ContactView::keyEdit (bool enable)
    request_contact->setVisible (! enable);   
 
    ui->contact_pages->setTabEnabled (chat, ! enable);
+
+   if (enable) ui->firstname->setFocus ();
 }
 
 

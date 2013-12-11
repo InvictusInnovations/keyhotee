@@ -119,7 +119,6 @@ void ContactsTable::addContactView( ContactView& view ) const {
 }
 
 void ContactsTable::showView( ContactView& view ) const {
-   view.initTab ();   
    ui->contact_details_view->setCurrentWidget (&view);   
 }
 

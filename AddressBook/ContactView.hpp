@@ -52,7 +52,6 @@ class ContactView : public QWidget
      bool isChatSelected();
      void sendChatMessage();
      void appendChatMessage( const QString& from, const QString& msg, const QDateTime& date_time = QDateTime::currentDateTime() );
-     void initTab() const;
      void setAddingNewContact (bool addNew) {_addingNewContact = addNew;};
      bool isAddingNewContact () const {return _addingNewContact;};
      void keyEdit (bool enable);
