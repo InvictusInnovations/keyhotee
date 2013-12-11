@@ -38,9 +38,9 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
 
-IF(${INVICTUS_ROOT} EQUAL "")
-    SET(INVICTUS_ROOT .)
-ENDIF(${INVICTUS_ROOT} EQUAL "")
+IF("${INVICTUS_ROOT}" STREQUAL "")
+    SET(INVICTUS_ROOT "./")
+ENDIF("${INVICTUS_ROOT}" STREQUAL "")
 
 message("Using invictus root: " ${INVICTUS_ROOT})
 
@@ -205,9 +205,9 @@ message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
 target_link_libraries( keyhotee_library upnpc-static bshare fc ${MINIUPNP_LIB} leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY})
 
 # Let's configure binaries output directory (by default invictus-root/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $ENV{INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE $ENV{INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG $ENV{INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
 
 # Configure dependencies of keyhotee main application module
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
