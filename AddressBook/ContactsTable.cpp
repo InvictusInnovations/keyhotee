@@ -13,7 +13,7 @@
 class ContactsSortFilterProxyModel : public QSortFilterProxyModel
 {
 public:
-    ContactsSortFilterProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+    ContactsSortFilterProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) { setSortRole(Qt::UserRole);}
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };
@@ -63,7 +63,7 @@ void ContactsTable::setAddressBook( AddressBookModel* addressbook_model )
   ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-  connect( ui->contact_table, &QAbstractItemView::activated /*maybe clicked ? */, this, &ContactsTable::openContact );
+  connect( ui->contact_table, &QAbstractItemView::clicked, this, &ContactsTable::openContact );
 }
 
 void ContactsTable::openContact( const QModelIndex& index )
@@ -121,4 +121,10 @@ void ContactsTable::addContactView( ContactView& view ) const {
 void ContactsTable::showView( ContactView& view ) const {
    view.initTab ();   
    ui->contact_details_view->setCurrentWidget (&view);   
+}
+
+void ContactsTable::addNewContact( ContactView& view ) const {
+   addContactView (view);
+   showView (view);
+   view.keyEdit(true);
 }

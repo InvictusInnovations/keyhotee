@@ -41,5 +41,7 @@
       <file>images/showDetails.png</file>
       <file>images/16x16/connectionstatus.png</file>
       <file>images/16x16/no_connectionstatus.png</file>
+      <file>images/ownership.png</file>
+      <file>images/blank.png</file>
  </qresource>
  </RCC>

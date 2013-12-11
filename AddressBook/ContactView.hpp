@@ -13,14 +13,14 @@ class QToolBar;
 class ContactView : public QWidget
 {
   public:
-     enum ContactDisplay { info, chat, edit };
+     enum ContactDisplay { info, chat};
      ContactView( QWidget* parent = nullptr );
      ~ContactView();
 
      void              setAddressBook( AddressBookModel* address_book );
      AddressBookModel* getAddressBook()const;
 
-     void setContact( const Contact& current_contact, ContactDisplay contact_display = chat );
+     void setContact( const Contact& current_contact);
      Contact getContact()const;
 
      void onChat();
@@ -37,6 +37,12 @@ class ContactView : public QWidget
      void keyhoteeIdChanged( const QString& name );
      void keyhoteeIdEdited( const QString& name );
      void publicKeyEdited( const QString& public_key_string );
+     void publicKeyChanged( const QString&) {setModyfied ();};
+     void emailChanged( const QString&) {setModyfied ();};
+     void phoneChanged( const QString&) {setModyfied ();};
+     void notesChanged() {setModyfied ();};
+     void privacyLevelChanged( const QString&) {setModyfied ();};
+     void onPublicKeyToClipboard ();
 
      void updateNameLabel();
 
@@ -47,12 +53,19 @@ class ContactView : public QWidget
      void sendChatMessage();
      void appendChatMessage( const QString& from, const QString& msg, const QDateTime& date_time = QDateTime::currentDateTime() );
      void initTab() const;
+     void setAddingNewContact (bool addNew) {_addingNewContact = addNew;};
+     bool isAddingNewContact () const {return _addingNewContact;};
+     void keyEdit (bool enable);
 
 
   protected:
       bool eventFilter(QObject *obj, QEvent *event);
 
   private:
+      void setModyfied (bool modyfied = true) {_modyfied = modyfied;};
+      bool isModyfied () const {return _addingNewContact;};      
+      void onTabChanged(int index);
+
      fc::time_point                            _last_validate;
      Contact                                   _current_contact;
      fc::optional<bts::bitname::name_record>   _current_record;
@@ -60,7 +73,11 @@ class ContactView : public QWidget
      std::unique_ptr<Ui::ContactView>          ui;
      QToolBar*                                 message_tools;
      QAction*                                  send_mail;
+     QAction*                                  save_contact;
      QAction*                                  edit_contact;
      QAction*                                  share_contact;
      QAction*                                  request_contact;
+     QAction*                                  cancel_edit_contact;
+     bool                                      _addingNewContact;
+     bool                                      _modyfied;
 };
