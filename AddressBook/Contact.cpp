@@ -68,11 +68,26 @@ bool Contact::isOwn() const
   bts::application_ptr app = bts::application::instance();
   bts::profile_ptr currentProfile = app->get_profile();
 
+  bts::keychain keyChain = currentProfile->get_keychain();
+
+  typedef std::set<fc::ecc::public_key_data> TPublicKeyIndex;
+
   try
     {
+    TPublicKeyIndex myPublicKeys;
+
+    for(const auto& id : currentProfile->identities())
+      {
+      auto myPublicKey = keyChain.get_identity_key(id.dac_id).get_public_key();
+      fc::ecc::public_key_data keyData = myPublicKey;
+
+      myPublicKeys.insert(keyData);
+      }
+
     /// If query for a private key associated to given contact fails, fc::exception is thrown
-    auto my_priv_key = currentProfile->get_keychain().get_identity_key(dac_id_string);
-    return true;
+    auto contactPublicKey = keyChain.get_identity_key(dac_id_string).get_public_key();
+
+    return myPublicKeys.find(contactPublicKey) != myPublicKeys.end();
     }
   catch(const fc::exception&)
     {
