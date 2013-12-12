@@ -55,6 +55,7 @@ Q_OBJECT
      void setAddingNewContact (bool addNew) {_addingNewContact = addNew;};
      bool isAddingNewContact () const {return _addingNewContact;};
      void keyEdit (bool enable);
+     bool CheckSaving();
 
 Q_SIGNALS:
     void canceledAddContact();
@@ -64,7 +65,8 @@ Q_SIGNALS:
 
   private:
       void setModyfied (bool modyfied = true) {_modyfied = modyfied;};
-      bool isModyfied () const {return _modyfied;};      
+      bool isModyfied () const {return _modyfied;};
+      bool isEditing () const {return _editing;};            
       void onTabChanged(int index);
 
      fc::time_point                            _last_validate;
@@ -81,4 +83,5 @@ Q_SIGNALS:
      QAction*                                  cancel_edit_contact;
      bool                                      _addingNewContact;
      bool                                      _modyfied;
+     bool                                      _editing;
 };

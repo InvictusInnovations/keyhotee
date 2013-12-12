@@ -92,6 +92,7 @@ ContactView::ContactView( QWidget* parent )
    _addingNewContact = false;
    ui->setupUi(this);   
    setModyfied (false);
+   _editing = false;
    message_tools = new QToolBar( ui->toolbar_container ); 
    QGridLayout* grid_layout = new QGridLayout(ui->toolbar_container);
    grid_layout->setContentsMargins( 0,0,0,0);
@@ -507,6 +508,7 @@ void ContactView::onPublicKeyToClipboard ()
 
 void ContactView::keyEdit (bool enable)
 {      
+   _editing = enable;
    ui->firstname->setEnabled (enable);   
    ui->lastname->setEnabled (enable);
    ui->id_edit->setEnabled (enable);
@@ -536,4 +538,21 @@ void ContactView::onTabChanged(int index)
       //Question wykrywanie zmian
       keyEdit (false);
    }
+}
+
+
+bool ContactView::CheckSaving()
+{
+   if (isEditing() && isModyfied()) {
+      QMessageBox::StandardButton ret;
+      ret = QMessageBox::question(this, tr("Application"),
+                                 tr("The contact has been modified.\nDo you want to save your changes ?"),
+                                 QMessageBox::Yes | QMessageBox::No);
+      if (ret == QMessageBox::Yes) onSave ();
+      else onCancel ();
+   }
+   else if (isEditing() && ! isModyfied())
+      keyEdit (false);
+
+   return true;
 }

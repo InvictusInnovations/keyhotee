@@ -45,6 +45,7 @@ ContactsTable::ContactsTable( QWidget* parent )
   //addAction(_delete_contact);
 
   //connect( _delete_contact, &QAction::triggered, this, &ContactsTable::onDeleteContact);
+  connect(ui->contact_details_view, &QStackedWidget::currentChanged, this, &ContactsTable::onCurrentViewChanged);
 }
 
 ContactsTable::~ContactsTable(){}
@@ -120,6 +121,13 @@ void ContactsTable::addContactView( ContactView& view ) const {
 }
 
 void ContactsTable::showView( ContactView& view ) const {
+   if (ContactView *currentView = qobject_cast<ContactView *>(ui->contact_details_view->currentWidget ())) {
+      int idxCurrentView = ui->contact_details_view->indexOf (currentView);
+      int idxNewView = ui->contact_details_view->indexOf (&view);
+      if (idxCurrentView != idxNewView) {
+         currentView->CheckSaving();
+      }
+   }
    ui->contact_details_view->setCurrentWidget (&view);   
 }
 
@@ -132,4 +140,9 @@ void ContactsTable::addNewContact( ContactView& view ) const {
 void ContactsTable::onCanceledAddContact ()
 {
    Q_EMIT showPrevView();
+}
+
+
+void ContactsTable::onCurrentViewChanged (int index)
+{
 }

@@ -36,4 +36,5 @@ class ContactsTable  : public QWidget
   public slots:
     void onDeleteContact();
     void on_actionShow_details_toggled(bool checked);
+    void onCurrentViewChanged (int index);
 };
