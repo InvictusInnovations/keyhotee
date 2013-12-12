@@ -528,7 +528,10 @@ void ContactView::keyEdit (bool enable)
 
    ui->contact_pages->setTabEnabled (chat, ! enable);
 
-   if (enable) ui->firstname->setFocus ();
+   if (enable) {
+      ui->firstname->setFocus ();
+      setModyfied (false);
+   }
 }
 
 
@@ -550,6 +553,7 @@ bool ContactView::CheckSaving()
                                  QMessageBox::Yes | QMessageBox::No);
       if (ret == QMessageBox::Yes) onSave ();
       else onCancel ();
+      setModyfied (false);
    }
    else if (isEditing() && ! isModyfied())
       keyEdit (false);
