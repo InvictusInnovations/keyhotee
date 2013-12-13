@@ -629,6 +629,7 @@ void KeyhoteeMainWindow::openContactGui( int contact_id )
     {
         auto contact_gui = createContactGuiIfNecessary( contact_id );
         showContactGui( *contact_gui );
+        contact_gui->updateTreeItemDisplay ();
     }
 }
 
