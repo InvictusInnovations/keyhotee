@@ -151,6 +151,8 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
 {
     if( !index.isValid() ) return QVariant();
 
+    const Columns selectedCol = (const Columns) index.column();
+
     const Contact& current_contact = my->_contacts[index.row()];
     switch( role )
     {
@@ -174,6 +176,12 @@ QVariant AddressBookModel::data( const QModelIndex& index, int role )const
              default:
                 return QVariant();
           }
+       case Qt::TextAlignmentRole:
+         if(selectedCol == Ownership)
+           return QVariant(Qt::AlignCenter+Qt::AlignHCenter);
+         else
+           return QVariant();
+         break;
        case Qt::DisplayRole:
           switch( (Columns)index.column() )
           {

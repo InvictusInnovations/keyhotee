@@ -31,8 +31,6 @@ Contact::Contact( const bts::addressbook::wallet_contact& contact )
    }
 }
 
-
-
 void Contact::setIcon( const QIcon& icon )
 {
    this->icon = icon;

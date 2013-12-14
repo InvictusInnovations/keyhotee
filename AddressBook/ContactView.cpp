@@ -92,19 +92,20 @@ ContactView::ContactView( QWidget* parent )
    _addingNewContact = false;
    ui->setupUi(this);   
    setModyfied (false);
-   message_tools = new QToolBar( ui->toolbar_container ); 
+   message_tools = new QToolBar( ui->toolbar_container );
+
    QGridLayout* grid_layout = new QGridLayout(ui->toolbar_container);
    grid_layout->setContentsMargins( 0,0,0,0);
    grid_layout->setSpacing(0);
    ui->toolbar_container->setLayout(grid_layout);
    grid_layout->addWidget(message_tools,0,0);
-   
-   send_mail = new QAction( QIcon( ":/images/128x128/send_mail.png"), tr( "Mail"), this );
-   edit_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Edit (need new icon)"), this );
+
+   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr( "Mail"), this );
+   edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png"), tr( "Edit"), this );
    share_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Share (need new icon)"), this );
-   request_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Request contact (need new icon)"), this );
-   save_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Save (need new icon)"), this );
-   cancel_edit_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Discard changes (need new icon)"), this );
+   request_contact = new QAction( QIcon(":/images/128x128/contact_info_request_authorisation.png"), tr( "Request authorisation"), this );
+   save_contact = new QAction( QIcon(":/images/128x128/contact_info_save.png"), tr( "Save (need new icon)"), this );
+   cancel_edit_contact = new QAction( QIcon(":/images/128x128/contact_info_cancel_edit.png"), tr( "Discard changes"), this );
    
    message_tools->addAction( send_mail );
    message_tools->addAction( save_contact );

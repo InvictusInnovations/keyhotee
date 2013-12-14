@@ -24,16 +24,7 @@
     <property name="spacing">
      <number>0</number>
     </property>
-    <property name="leftMargin">
-     <number>0</number>
-    </property>
-    <property name="topMargin">
-     <number>0</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
+    <property name="margin">
      <number>0</number>
     </property>
     <item>
@@ -42,7 +33,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <property name="handleWidth">
-       <number>0</number>
+       <number>5</number>
       </property>
       <widget class="QTreeWidget" name="side_bar">
        <property name="sizePolicy">
@@ -293,16 +284,7 @@
        </property>
        <widget class="Mailbox" name="inbox_page">
         <layout class="QGridLayout" name="inboxlayout">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
+         <property name="margin">
           <number>0</number>
          </property>
          <property name="spacing">
@@ -314,16 +296,7 @@
        <widget class="Mailbox" name="sent_box_page"/>
        <widget class="ContactsTable" name="contacts_page">
         <layout class="QGridLayout" name="gridLayout_3">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
+         <property name="margin">
           <number>0</number>
          </property>
          <property name="spacing">
@@ -538,6 +511,9 @@
    </property>
    <property name="text">
     <string>Delete</string>
+   </property>
+   <property name="statusTip">
+    <string>Allows to delete currently selected item(s)</string>
    </property>
    <property name="shortcut">
     <string>Del</string>
