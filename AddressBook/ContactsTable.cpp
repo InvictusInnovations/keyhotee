@@ -121,14 +121,18 @@ void ContactsTable::addContactView( ContactView& view ) const {
 }
 
 void ContactsTable::showView( ContactView& view ) const {
+   ui->contact_details_view->setCurrentWidget (&view);   
+}
+
+bool ContactsTable::CheckSaving( ContactView& newView ) const {
    if (ContactView *currentView = qobject_cast<ContactView *>(ui->contact_details_view->currentWidget ())) {
       int idxCurrentView = ui->contact_details_view->indexOf (currentView);
-      int idxNewView = ui->contact_details_view->indexOf (&view);
+      int idxNewView = ui->contact_details_view->indexOf (&newView);
       if (idxCurrentView != idxNewView) {
-         currentView->CheckSaving();
+         return currentView->CheckSaving();
       }
    }
-   ui->contact_details_view->setCurrentWidget (&view);   
+   return true;
 }
 
 void ContactsTable::addNewContact( ContactView& view ) const {

@@ -23,6 +23,7 @@ class ContactsTable  : public QWidget
     void addNewContact( ContactView& view ) const;
     bool isShowDetailsHidden();
     void onCanceledAddContact ();
+    bool CheckSaving( ContactView& newView ) const;
   Q_SIGNALS:
     void contactOpened( int contact_id );
     void showPrevView ();

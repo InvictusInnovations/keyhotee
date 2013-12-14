@@ -326,11 +326,14 @@ void KeyhoteeMainWindow::addContact()
         }
         editcon->deleteLater();
      });
-   */
-  ui->new_contact->setAddingNewContact (true);
-  ui->new_contact->setContact( Contact() );
-  ui->contacts_page->addNewContact(*ui->new_contact);
-  ui->widget_stack->setCurrentWidget( ui->contacts_page );
+   */   
+
+   if (ui->contacts_page->CheckSaving(*ui->new_contact)) {
+      ui->new_contact->setAddingNewContact (true);
+      ui->new_contact->setContact( Contact() );
+      ui->contacts_page->addNewContact(*ui->new_contact);
+      ui->widget_stack->setCurrentWidget( ui->contacts_page );
+   }
 }
 
 void KeyhoteeMainWindow::sideBarSplitterMoved( int pos, int index )
@@ -667,13 +670,15 @@ void KeyhoteeMainWindow::createContactGui( int contact_id )
 
 void KeyhoteeMainWindow::showContactGui( ContactGui& contact_gui )
 {   
-    ui->side_bar->setCurrentItem( contact_gui._tree_item );
-    //ui->widget_stack->setCurrentWidget( contact_gui._view );
-    ui->widget_stack->setCurrentWidget( ui->contacts_page );
-    ui->contacts_page->showView (*contact_gui._view);
-    if (contact_gui.isChatVisible())
-    {
-      contact_gui._view->onChat();
+    if (ui->contacts_page->CheckSaving(*contact_gui._view)) {
+       ui->side_bar->setCurrentItem( contact_gui._tree_item );
+       //ui->widget_stack->setCurrentWidget( contact_gui._view );
+       ui->widget_stack->setCurrentWidget( ui->contacts_page );
+       ui->contacts_page->showView (*contact_gui._view);
+       if (contact_gui.isChatVisible())
+       {
+         contact_gui._view->onChat();
+       }
     }
 }
 

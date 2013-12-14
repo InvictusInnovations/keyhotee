@@ -13,7 +13,7 @@
 #include <QtWebKitWidgets/QWebFrame>
 #include <QToolBar>
 #include <QMessageBox>
-#include <QToolButton>
+#include <QFileDialog>
 
 extern bool gMiningIsPossible;
 
@@ -106,6 +106,7 @@ ContactView::ContactView( QWidget* parent )
    request_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Request contact (need new icon)"), this );
    save_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Save (need new icon)"), this );
    cancel_edit_contact = new QAction( QIcon(":/images/read-icon.png"), tr( "Discard changes (need new icon)"), this );
+   connect( ui->icon_view, &QToolButton::clicked, this, &ContactView::onIconSearch );
    
    message_tools->addAction( send_mail );
    message_tools->addAction( save_contact );
@@ -155,6 +156,7 @@ void ContactView::onSave()
     _current_contact.first_name     = ui->firstname->text().toStdString();
     _current_contact.last_name      = ui->lastname->text().toStdString();
     _current_contact.dac_id_string  = ui->id_edit->text().toStdString();
+    _current_contact.setIcon (ui->icon_view->icon ());
     if( _current_record )
     {
        //_current_contact.bit_id_hash = _current_record->name_hash;
@@ -190,6 +192,7 @@ void ContactView::onSave()
 
 void ContactView::onCancel()
 {
+   setModyfied (false);
    if (isAddingNewContact()) {
       this->setVisible (false);
       emit canceledAddContact ();
@@ -236,54 +239,56 @@ ContactView::~ContactView()
 }
 
 void ContactView::setContact( const Contact& current_contact)
-{ try {
-    _current_contact = current_contact;
-    bool has_null_public_key = _current_contact.public_key == fc::ecc::public_key_data();
-    if ( has_null_public_key )
-    {
-        elog( "********* null public key!" );
-        save_contact->setEnabled (false);
-        ui->contact_pages->setCurrentIndex (info);
+{
+   try {
+      _current_contact = current_contact;
+      bool has_null_public_key = _current_contact.public_key == fc::ecc::public_key_data();
+      if ( has_null_public_key )
+      {
+         elog( "********* null public key!" );
+         setValid (false);
+         ui->contact_pages->setCurrentIndex (info);
 
-        if (gMiningIsPossible)
-           ui->id_status->setText( tr( "Please provide a valid ID or public key" ) );
-        else
-        {
-           ui->id_status->setText( tr( "Public Key Only Mode" ) );
-        }
+         if (gMiningIsPossible)
+            ui->id_status->setText( tr( "Please provide a valid ID or public key" ) );
+         else
+         {
+            ui->id_status->setText( tr( "Public Key Only Mode" ) );
+         }
 
-        if( _current_contact.first_name == std::string() && _current_contact.last_name == std::string() )
-        {
+         if( _current_contact.first_name == std::string() && _current_contact.last_name == std::string() )
+         {
             ui->id_edit->setText( QString() );
             ui->public_key->setText( QString() );
             //keyhoteeIds don't function when mining is not possible
             if (!gMiningIsPossible)
                ui->id_edit->setEnabled(false);
-        }
-    }
-    else
-    {
-        /// note: you cannot change the id of a contact once it has been
-        /// set... you must create a new contact anytime their public key
-        /// changes.
-        ui->id_edit->setEnabled(false);
-        save_contact->setEnabled (true);
-        /** TODO... restore this kind of check
-        if( _current_contact.bit_id_public_key != _current_contact.public_key  )
-        {
+         }
+      }
+      else
+      {
+         /// note: you cannot change the id of a contact once it has been
+         /// set... you must create a new contact anytime their public key
+         /// changes.
+         ui->id_edit->setEnabled(false);
+         setValid (true);
+         /** TODO... restore this kind of check
+         if( _current_contact.bit_id_public_key != _current_contact.public_key  )
+         {
             ui->id_status->setText( 
-                    tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
-        }
-        */
-    }
+                     tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
+         }
+         */
+      }
 
-    ui->firstname->setText( _current_contact.first_name.c_str() );
-    ui->lastname->setText( _current_contact.last_name.c_str() );
+      ui->firstname->setText( _current_contact.first_name.c_str() );
+      ui->lastname->setText( _current_contact.last_name.c_str() );
    // ui->email->setText( _current_contact.email_address );
    // ui->phone->setText( _current_contact.phone_number );
-    std::string public_key_string = public_key_address( _current_contact.public_key );
-    ui->public_key->setText( public_key_string.c_str() );
-    ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
+      std::string public_key_string = public_key_address( _current_contact.public_key );
+      ui->public_key->setText( public_key_string.c_str() );
+      ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
+      ui->icon_view->setIcon( _current_contact.getIcon() );
 } FC_RETHROW_EXCEPTIONS( warn, "" ) }
 
 Contact ContactView::getContact()const
@@ -439,7 +444,7 @@ void ContactView::publicKeyEdited( const QString& public_key_string )
       ui->id_status->setText( tr("Public Key Only Mode: not a valid key") );
       ui->id_status->setStyleSheet("QLabel { color : red; }");
    }
-   save_contact->setEnabled(public_key_is_valid);
+   setValid (public_key_is_valid);
 }
 
 void ContactView::lookupId()
@@ -449,7 +454,7 @@ void ContactView::lookupId()
        if( current_id.empty() )
        {
             ui->id_status->setText( QString() );
-            save_contact->setEnabled(false);
+            setValid (false);
             return;
        }
        _current_record = bts::application::instance()->lookup_name( current_id );
@@ -460,14 +465,14 @@ void ContactView::lookupId()
             std::string public_key_string = public_key_address(_current_record->active_key);
             ui->public_key->setText( public_key_string.c_str() );
             if( _address_book != nullptr )
-               save_contact->setEnabled(true);
+               setValid (true);
        }
        else
        {
             ui->id_status->setStyleSheet("QLabel { color : red; }");
             ui->id_status->setText( tr( "Unable to find ID" ) );
             ui->public_key->setText(QString());
-            save_contact->setEnabled(false);
+            setValid (false);
        }
    } 
    catch ( const fc::exception& e )
@@ -517,6 +522,7 @@ void ContactView::keyEdit (bool enable)
    ui->email->setEnabled (enable);
    ui->phone->setEnabled (enable);
    ui->notes->setEnabled (enable);
+   ui->icon_view->setEnabled (enable);
 
    ui->id_status->setVisible (enable);
    save_contact->setVisible (enable);
@@ -550,13 +556,48 @@ bool ContactView::CheckSaving()
       QMessageBox::StandardButton ret;
       ret = QMessageBox::question(this, tr("Application"),
                                  tr("The contact has been modified.\nDo you want to save your changes ?"),
-                                 QMessageBox::Yes | QMessageBox::No);
-      if (ret == QMessageBox::Yes) onSave ();
-      else onCancel ();
-      setModyfied (false);
+                                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+      if (ret == QMessageBox::Cancel) {
+         ui->firstname->setFocus ();
+         return false;
+      }
+      else {         
+         if (ret == QMessageBox::Yes) {
+            if (isValid ()) {
+               onSave ();
+            }
+            else {
+               ui->id_edit->setFocus ();
+               ui->id_edit->selectAll();
+               QMessageBox::warning(this, tr("Application"),
+                                 tr("Please correct the Keyhotee ID."),
+                                 QMessageBox::Ok);               
+               return false;
+            }
+         }
+         else onCancel ();
+         setModyfied (false);
+      }
    }
    else if (isEditing() && ! isModyfied())
       keyEdit (false);
 
    return true;
+}
+
+
+void ContactView::setValid (bool valid)
+{
+   _validForm = valid;
+   save_contact->setEnabled (valid);
+}
+
+
+void ContactView::onIconSearch()
+{
+   auto writableLocation = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+   auto fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), writableLocation, 
+                   tr("Image Files (*.png *.jpg *.bmp)"));
+   if (! fileName.isEmpty())
+      ui->icon_view->setIcon(QIcon(fileName));
 }

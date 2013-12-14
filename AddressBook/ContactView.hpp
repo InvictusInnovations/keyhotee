@@ -68,6 +68,9 @@ Q_SIGNALS:
       bool isModyfied () const {return _modyfied;};
       bool isEditing () const {return _editing;};            
       void onTabChanged(int index);
+      void setValid (bool valid);
+      bool isValid () const {return _validForm;};
+      void onIconSearch ();
 
      fc::time_point                            _last_validate;
      Contact                                   _current_contact;
@@ -84,4 +87,5 @@ Q_SIGNALS:
      bool                                      _addingNewContact;
      bool                                      _modyfied;
      bool                                      _editing;
+     bool                                      _validForm;
 };
