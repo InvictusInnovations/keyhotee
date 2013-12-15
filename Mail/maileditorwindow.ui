@@ -117,9 +117,9 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QToolBar" name="formatToolbar">
+  <widget class="QToolBar" name="adjustToolbar">
    <property name="windowTitle">
-    <string>Format</string>
+    <string>Adjust</string>
    </property>
    <property name="movable">
     <bool>true</bool>
@@ -137,10 +137,6 @@
    <addaction name="actionCenter"/>
    <addaction name="actionRight"/>
    <addaction name="actionJustify"/>
-   <addaction name="separator"/>
-   <addaction name="actionBold"/>
-   <addaction name="actionItalic"/>
-   <addaction name="actionUnderline"/>
   </widget>
   <widget class="QToolBar" name="mailToolBar">
    <property name="windowTitle">
@@ -157,7 +153,7 @@
   </widget>
   <widget class="QToolBar" name="mailFieldSelectorToolBar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>Recipient fields</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -165,6 +161,20 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+  </widget>
+  <widget class="QToolBar" name="formatToolBar">
+   <property name="windowTitle">
+    <string>Format</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionBold"/>
+   <addaction name="actionItalic"/>
+   <addaction name="actionUnderline"/>
   </widget>
   <action name="actionSave">
    <property name="enabled">
@@ -706,6 +716,70 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>adjustToolbar</sender>
+   <signal>actionTriggered(QAction*)</signal>
+   <receiver>MailEditorWindow</receiver>
+   <slot>onTextAlignTriggerred(QAction*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>234</x>
+     <y>108</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-5</x>
+     <y>178</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionBold</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>MailEditorWindow</receiver>
+   <slot>onTextBoldTriggerred(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionItalic</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>MailEditorWindow</receiver>
+   <slot>onTextItalicTriggerred(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionUnderline</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>MailEditorWindow</receiver>
+   <slot>onTextUnderlineTriggerred(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onCursorPositionChanged()</slot>
@@ -713,5 +787,9 @@
   <slot>onCcTriggered(bool)</slot>
   <slot>onFromTriggered(bool)</slot>
   <slot>onSave()</slot>
+  <slot>onTextAlignTriggerred(QAction*)</slot>
+  <slot>onTextBoldTriggerred(bool)</slot>
+  <slot>onTextUnderlineTriggerred(bool)</slot>
+  <slot>onTextItalicTriggerred(bool)</slot>
  </slots>
 </ui>

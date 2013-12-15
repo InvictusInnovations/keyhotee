@@ -41,10 +41,10 @@ class MailEditorMainWindow : public QMainWindow
     void onCursorPositionChanged();
 
   /// Text formatting slots:
-    void onTextAlignTriggered(QAction* a);
-    void onTextBoldTrigerred();
-    void onTextUnderlineTrigerred();
-    void onTextItalicTrigerred();
+    void onTextAlignTriggerred(QAction* a);
+    void onTextBoldTriggerred(bool checked);
+    void onTextUnderlineTriggerred(bool checked);
+    void onTextItalicTriggerred(bool checked);
 
   /// Mail receipents controls selection:
     void onCcTriggered(bool checked);
@@ -55,6 +55,8 @@ class MailEditorMainWindow : public QMainWindow
     void onMoneyAttachementTriggered();
     /// Allows to send mail document prepared in current window.
     void on_actionSend_triggered();
+    /// Notification for subject changes needed to update window title.
+    void onSubjectChanged(const QString& subject);
 
   private:
     Ui::MailEditorWindow* ui;

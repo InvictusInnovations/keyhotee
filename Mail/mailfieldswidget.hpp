@@ -20,6 +20,11 @@ class MailFieldsWidget : public QWidget
     void showCcControls(bool show);
     void showBccControls(bool show);
 
+    /// Returns currently set subject text.
+    QString getSubject() const;
+
+  Q_SIGNAL void subjectChanged(const QString& subject);
+
   private:
     /// Allows to show/hide given layout & all widgets associated with it.
     void showChildLayout(QLayout* layout, bool show, int preferredPosition);
@@ -29,12 +34,10 @@ class MailFieldsWidget : public QWidget
 
   private slots:
     void on_sendButton_clicked();
-
     void on_toEdit_textChanged(const QString &arg1);
-
     void on_bccEdit_textChanged(const QString &arg1);
-
     void on_ccEdit_textChanged(const QString &arg1);
+    void onSubjectChanged(const QString& subject);
 
   private:
     Ui::MailFieldsWidget *ui;

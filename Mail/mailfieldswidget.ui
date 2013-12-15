@@ -250,7 +250,24 @@
  <resources>
   <include location="../Keyhotee.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>subjectEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>MailFieldsWidget</receiver>
+   <slot>onSubjectChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>252</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>189</x>
+     <y>76</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
  <designerdata>
   <property name="gridDeltaX">
    <number>10</number>
@@ -268,4 +285,8 @@
    <bool>true</bool>
   </property>
  </designerdata>
+ <slots>
+  <signal>subjectChanged(QString)</signal>
+  <slot>onSubjectChanged(QString)</slot>
+ </slots>
 </ui>

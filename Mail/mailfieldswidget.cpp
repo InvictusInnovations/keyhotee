@@ -32,6 +32,11 @@ void MailFieldsWidget::showBccControls(bool show)
   showChildLayout(ui->bccLayout, show, 3);
   }
 
+QString MailFieldsWidget::getSubject() const
+  {
+  return ui->subjectEdit->text();
+  }
+
 void MailFieldsWidget::showChildLayout(QLayout* layout, bool show, int preferredPosition)
   {
   ui->mailFieldsLayout->setEnabled(false);
@@ -100,5 +105,10 @@ void MailFieldsWidget::on_bccEdit_textChanged(const QString&)
 void MailFieldsWidget::on_ccEdit_textChanged(const QString&)
   {
   validateSendButtonState();
+  }
+
+void MailFieldsWidget::onSubjectChanged(const QString &subject)
+  {
+  emit subjectChanged(subject);
   }
 

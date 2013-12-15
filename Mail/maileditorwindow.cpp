@@ -28,6 +28,8 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent /*= nullptr*/) :
 
   ui->mailFieldsToolBar->addWidget(MailFields);
 
+  connect(MailFields, SIGNAL(subjectChanged(QString)), this, SLOT(onSubjectChanged(QString)));
+
   /** Supplement definition of mailFieldSelectorToolbar since Qt Creator doesn't support putting
       into its context dedicated controls (like preconfigured toolbutton).
 
@@ -48,6 +50,9 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent /*= nullptr*/) :
   fontChanged(ui->messageEdit->font());
   colorChanged(ui->messageEdit->textColor());
   alignmentChanged(ui->messageEdit->alignment());
+
+  QString subject = MailFields->getSubject();
+  onSubjectChanged(subject);
 
   setWindowModified(ui->messageEdit->document()->isModified());
   ui->actionSave->setEnabled(ui->messageEdit->document()->isModified());
@@ -166,7 +171,7 @@ void MailEditorMainWindow::onCursorPositionChanged()
   alignmentChanged(ui->messageEdit->alignment());
   }
 
-void MailEditorMainWindow::onTextAlignTriggered(QAction *a)
+void MailEditorMainWindow::onTextAlignTriggerred(QAction *a)
   {
   QTextEdit* edit = ui->messageEdit;
   if (a == ui->actionLeft)
@@ -179,24 +184,24 @@ void MailEditorMainWindow::onTextAlignTriggered(QAction *a)
     edit->setAlignment(Qt::AlignJustify);
   }
 
-void MailEditorMainWindow::onTextBoldTrigerred()
+void MailEditorMainWindow::onTextBoldTriggerred(bool checked)
   {
   QTextCharFormat fmt;
-  fmt.setFontWeight(ui->actionBold->isChecked() ? QFont::Bold : QFont::Normal);
+  fmt.setFontWeight(checked ? QFont::Bold : QFont::Normal);
   mergeFormatOnWordOrSelection(fmt);
   }
 
-void MailEditorMainWindow::onTextUnderlineTrigerred()
+void MailEditorMainWindow::onTextUnderlineTriggerred(bool checked)
   {
   QTextCharFormat fmt;
-  fmt.setFontUnderline(ui->actionUnderline->isChecked());
+  fmt.setFontUnderline(checked);
   mergeFormatOnWordOrSelection(fmt);
   }
 
-void MailEditorMainWindow::onTextItalicTrigerred()
+void MailEditorMainWindow::onTextItalicTriggerred(bool checked)
   {
   QTextCharFormat fmt;
-  fmt.setFontItalic(ui->actionItalic->isChecked());
+  fmt.setFontItalic(checked);
   mergeFormatOnWordOrSelection(fmt);
   }
 
@@ -227,3 +232,9 @@ void MailEditorMainWindow::on_actionSend_triggered()
   {
   /// TODO implement actual mail send operation
   }
+
+void MailEditorMainWindow::onSubjectChanged(const QString& subject)
+  {
+  setWindowTitle(tr("%1[*]").arg(subject));
+  }
+
