@@ -22,7 +22,6 @@ class ContactsTable  : public QWidget
     void showView( ContactView& view ) const;
     void addNewContact( ContactView& view ) const;
     bool isShowDetailsHidden();
-    void onCanceledAddContact ();
     bool CheckSaving( ContactView& newView ) const;
   Q_SIGNALS:
     void contactOpened( int contact_id );
@@ -38,4 +37,6 @@ class ContactsTable  : public QWidget
     void onDeleteContact();
     void on_actionShow_details_toggled(bool checked);
     void onCurrentViewChanged (int index);
+  private slots:
+    void onCanceledAddContact ();
 };

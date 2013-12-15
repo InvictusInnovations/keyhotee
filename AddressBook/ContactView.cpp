@@ -129,7 +129,7 @@ ContactView::ContactView( QWidget* parent )
    connect( ui->id_edit, &QLineEdit::textEdited, this, &ContactView::keyhoteeIdEdited );
    connect( ui->public_key, &QLineEdit::textEdited, this, &ContactView::publicKeyEdited );
    connect( ui->public_key, &QLineEdit::textChanged, this, &ContactView::publicKeyChanged );
-   connect( ui->privacy_comboBox, &QComboBox::editTextChanged, this, &ContactView::privacyLevelChanged );   
+   connect( ui->privacy_comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(privacyLevelChanged(int)));
    connect( ui->email, &QLineEdit::textChanged, this, &ContactView::emailChanged );
    connect( ui->phone, &QLineEdit::textChanged, this, &ContactView::phoneChanged );
    connect( ui->notes, &QPlainTextEdit::textChanged, this, &ContactView::notesChanged );
@@ -152,11 +152,8 @@ void ContactView::onEdit()
 }
 
 void ContactView::onSave()
-{ try {
-    _current_contact.first_name     = ui->firstname->text().toStdString();
-    _current_contact.last_name      = ui->lastname->text().toStdString();
-    _current_contact.dac_id_string  = ui->id_edit->text().toStdString();
-    _current_contact.setIcon (ui->icon_view->icon ());
+{ try {    
+    doDataExchange (true);
     if( _current_record )
     {
        //_current_contact.bit_id_hash = _current_record->name_hash;
@@ -198,12 +195,9 @@ void ContactView::onCancel()
       emit canceledAddContact ();
    }
    else //editing contact
-   {
+   {            
       keyEdit (false);
-      ui->firstname->setText( _current_contact.first_name.c_str() );
-      ui->lastname->setText( _current_contact.last_name.c_str() );
-      ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
-      updateNameLabel();
+      doDataExchange (false);
    }
 }
 
@@ -280,15 +274,7 @@ void ContactView::setContact( const Contact& current_contact)
          }
          */
       }
-
-      ui->firstname->setText( _current_contact.first_name.c_str() );
-      ui->lastname->setText( _current_contact.last_name.c_str() );
-   // ui->email->setText( _current_contact.email_address );
-   // ui->phone->setText( _current_contact.phone_number );
-      std::string public_key_string = public_key_address( _current_contact.public_key );
-      ui->public_key->setText( public_key_string.c_str() );
-      ui->id_edit->setText( _current_contact.dac_id_string.c_str() );
-      ui->icon_view->setIcon( _current_contact.getIcon() );
+      doDataExchange (false);
 } FC_RETHROW_EXCEPTIONS( warn, "" ) }
 
 Contact ContactView::getContact()const
@@ -298,35 +284,16 @@ Contact ContactView::getContact()const
 
 void ContactView::firstNameChanged( const QString& /*name*/ )
 {
-    updateNameLabel();
     setModyfied ();
 }
 
 void ContactView::keyhoteeIdChanged( const QString& /*name*/ )
 {
-    updateNameLabel();
     setModyfied ();
-}
-
-void ContactView::updateNameLabel()
-{
-   /*auto full_name = ui->firstname->text() + " " + ui->lastname->text();
-   QString dac_id = ui->id_edit->text();
-   if (dac_id != QString())
-     full_name += "(" + dac_id + ")";
-   if( full_name != " " )
-   {
-       ui->name_label->setText(full_name);
-   }
-   else
-   {
-       ui->name_label->setText(tr( "New Contact" ));
-   }*/
 }
 
 void ContactView::lastNameChanged( const QString& /*name*/ )
 {
-   updateNameLabel();
    setModyfied ();
 }
 
@@ -416,7 +383,6 @@ void ContactView::keyhoteeIdEdited( const QString& id )
           }
       } );
    }
-   updateNameLabel();
 }
 
 //implement real version and put in bitshares or fc (probably should be in fc)
@@ -434,27 +400,31 @@ void ContactView::publicKeyEdited( const QString& public_key_string )
    }
    //check for validly hashed public key and enable/disable save button accordingly
    bool public_key_is_valid = public_key_address::is_valid(public_key_string.toStdString());
+   bool doubleContact = false;
    if (public_key_is_valid)
    {
-      ui->id_status->setText( tr("Public Key Only Mode: valid key") );
-      ui->id_status->setStyleSheet("QLabel { color : green; }");
+      if (! (doubleContact = existContactWithPublicKey (public_key_string.toStdString())))
+      {
+         ui->id_status->setText( tr("Public Key Only Mode: valid key") );
+         ui->id_status->setStyleSheet("QLabel { color : green; }");      
+      }
    }
    else
    {
       ui->id_status->setText( tr("Public Key Only Mode: not a valid key") );
       ui->id_status->setStyleSheet("QLabel { color : red; }");
    }
-   setValid (public_key_is_valid);
+   setValid (public_key_is_valid && ! doubleContact);
 }
 
 void ContactView::lookupId()
 {
    try {
        auto current_id = ui->id_edit->text().toStdString();
+       setValid (false);
        if( current_id.empty() )
        {
-            ui->id_status->setText( QString() );
-            setValid (false);
+            ui->id_status->setText( QString() );            
             return;
        }
        _current_record = bts::application::instance()->lookup_name( current_id );
@@ -465,14 +435,16 @@ void ContactView::lookupId()
             std::string public_key_string = public_key_address(_current_record->active_key);
             ui->public_key->setText( public_key_string.c_str() );
             if( _address_book != nullptr )
-               setValid (true);
+            {
+               if (! existContactWithPublicKey (public_key_string))
+                  setValid (true);
+            }
        }
        else
        {
             ui->id_status->setStyleSheet("QLabel { color : red; }");
             ui->id_status->setText( tr( "Unable to find ID" ) );
             ui->public_key->setText(QString());
-            setValid (false);
        }
    } 
    catch ( const fc::exception& e )
@@ -600,4 +572,72 @@ void ContactView::onIconSearch()
                    tr("Image Files (*.png *.jpg *.bmp)"));
    if (! fileName.isEmpty())
       ui->icon_view->setIcon(QIcon(fileName));
+}
+
+
+bool ContactView::doDataExchange (bool valid)
+{
+   if (! valid)
+   {
+      if (isAddingNewContact ()) 
+      {
+         ui->firstname->setText("");
+         ui->lastname->setText("");
+         ui->id_edit->setText("");
+         ui->icon_view->setIcon( QIcon(":/images/user.png") );
+         ui->notes->setPlainText("");
+         ui->email->setText("");
+         ui->phone->setText("");
+         ui->public_key->setText ("");
+         ui->privacy_comboBox->setCurrentIndex (0);
+      }
+      else 
+      {
+         ui->firstname->setText( _current_contact.first_name.c_str() );
+         ui->lastname->setText( _current_contact.last_name.c_str() );
+         ui->id_edit->setText( _current_contact.dac_id_string.c_str() );      
+         ui->icon_view->setIcon( _current_contact.getIcon() );
+         ui->notes->setPlainText( _current_contact.notes.c_str() );
+         //ui->email->setText( _current_contact.email_address );
+         //ui->phone->setText( _current_contact.phone_number );
+         //privacy_comboBox
+         std::string public_key_string = public_key_address( _current_contact.public_key );
+         ui->public_key->setText( public_key_string.c_str() );
+      }      
+   }
+   else
+   {
+      _current_contact.first_name     = ui->firstname->text().toStdString();
+      _current_contact.last_name      = ui->lastname->text().toStdString();
+      _current_contact.dac_id_string  = ui->id_edit->text().toStdString();
+      _current_contact.setIcon (ui->icon_view->icon ());
+      _current_contact.notes  = ui->notes->toPlainText().toStdString();
+      //_current_contact.email_address = ui->email->text().toStdString();
+      //_current_contact.phone_number = ui->phone->text().toStdString();
+      //privacy_comboBox
+   }
+
+   return true;
+}
+
+
+bool ContactView::existContactWithPublicKey (const std::string& public_key_string)
+{
+   std::string my_public_key = public_key_address( _current_contact.public_key );
+   if (public_key_string != my_public_key)
+   {
+      auto addressbook = bts::get_profile()->get_addressbook();
+      if(! public_key_string.empty())
+      {
+         public_key_address key_address(public_key_string);
+         auto findContact = addressbook->get_contact_by_public_key( key_address.key );
+         if (findContact)
+         {
+            ui->id_status->setText( tr("This contact is already added to the list") );
+            ui->id_status->setStyleSheet("QLabel { color : red; }");
+            return true;
+         }
+      }     
+   }
+   return false;
 }

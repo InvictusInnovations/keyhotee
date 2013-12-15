@@ -32,20 +32,6 @@ Q_OBJECT
      void onShareContact();
      void onRequestContact();
 
-     void firstNameChanged( const QString& name );
-     void lastNameChanged( const QString& name );
-     void keyhoteeIdChanged( const QString& name );
-     void keyhoteeIdEdited( const QString& name );
-     void publicKeyEdited( const QString& public_key_string );
-     void publicKeyChanged( const QString&) {setModyfied ();};
-     void emailChanged( const QString&) {setModyfied ();};
-     void phoneChanged( const QString&) {setModyfied ();};
-     void notesChanged() {setModyfied ();};
-     void privacyLevelChanged( const QString&) {setModyfied ();};
-     void onPublicKeyToClipboard ();
-
-     void updateNameLabel();
-
      void lookupId();
      void lookupPublicKey();
 
@@ -57,11 +43,24 @@ Q_OBJECT
      void keyEdit (bool enable);
      bool CheckSaving();
 
-Q_SIGNALS:
-    void canceledAddContact();
-
   protected:
       bool eventFilter(QObject *obj, QEvent *event);
+
+Q_SIGNALS:
+    void canceledAddContact();
+    void addedNewContact (int idx);
+private slots:
+     void firstNameChanged( const QString& name );
+     void lastNameChanged( const QString& name );
+     void keyhoteeIdChanged( const QString& name );
+     void keyhoteeIdEdited( const QString& name );
+     void publicKeyEdited( const QString& public_key_string );
+     void publicKeyChanged( const QString&) {setModyfied ();};
+     void emailChanged( const QString&) {setModyfied ();};
+     void phoneChanged( const QString&) {setModyfied ();};
+     void notesChanged() {setModyfied ();};
+     void privacyLevelChanged(int) {setModyfied ();};
+     void onPublicKeyToClipboard ();
 
   private:
       void setModyfied (bool modyfied = true) {_modyfied = modyfied;};
@@ -71,6 +70,8 @@ Q_SIGNALS:
       void setValid (bool valid);
       bool isValid () const {return _validForm;};
       void onIconSearch ();
+      bool doDataExchange (bool valid);
+      bool existContactWithPublicKey (const std::string& public_key_string);
 
      fc::time_point                            _last_validate;
      Contact                                   _current_contact;
