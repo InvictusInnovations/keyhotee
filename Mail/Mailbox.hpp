@@ -9,50 +9,61 @@ class QSortFilterProxyModel;
 
 class Mailbox : public QWidget
 {
-   Q_OBJECT
-   public:
-      enum InboxType
-      {
-          Inbox,
-          Drafts,
-          Sent
-      };
+  Q_OBJECT
+public:
+  enum InboxType
+    {
+    Inbox,
+    Drafts,
+    Sent
+    };
 
-       Mailbox( QWidget* parent = nullptr );
-      ~Mailbox();
+  Mailbox(QWidget* parent = nullptr);
+  ~Mailbox();
 
-      void setModel( MailboxModel* model, InboxType type = Inbox );
-      void searchEditChanged(QString search_string);
+  void setModel(MailboxModel* model, InboxType type = Inbox);
+  void searchEditChanged(QString search_string);
 
-      bool isShowDetailsHidden();
-   private slots:
-      void onDoubleClickedItem(QModelIndex);
+  bool isShowDetailsHidden();
+private slots:
+  void onDoubleClickedItem(QModelIndex);
 
-   private:
-      enum ReplyType { reply, reply_all, forward };
-      void setupActions();
-      QModelIndex getSelectedMail();
-      void showCurrentMail(const QModelIndex &selected, const QModelIndex &deselected);
-      void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+private:
+  enum ReplyType { reply, reply_all, forward };
+  void setupActions();
+  QModelIndex getSelectedMail();
+  void showCurrentMail(const QModelIndex &selected, const QModelIndex &deselected);
+  void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
-      void duplicateMail(ReplyType);
-      void onReplyMail()    { duplicateMail(ReplyType::reply); }
-      void onReplyAllMail() { duplicateMail(ReplyType::reply_all); }
-      void onForwardMail()  { duplicateMail(ReplyType::forward); }
+  void duplicateMail(ReplyType);
+  void onReplyMail()
+    {
+    duplicateMail(ReplyType::reply);
+    }
 
-   public slots:
-      void onDeleteMail();
-      void on_actionShow_details_toggled(bool checked);
-  private:
-      QSortFilterProxyModel* sortedModel();
+  void onReplyAllMail()
+    {
+    duplicateMail(ReplyType::reply_all);
+    }
+
+  void onForwardMail()
+    {
+    duplicateMail(ReplyType::forward);
+    }
+
+public slots:
+  void onDeleteMail();
+  void on_actionShow_details_toggled(bool checked);
+private:
+  QSortFilterProxyModel* sortedModel();
 
 
-      std::unique_ptr<Ui::Mailbox> ui;
-      InboxType                      _type;
-      MailboxModel*                  _sourceModel;
+  std::unique_ptr<Ui::Mailbox> ui;
+  InboxType                    _type;
+  MailboxModel*                _sourceModel;
 
-      QAction*                        reply_mail;
-      QAction*                        reply_all_mail;
-      QAction*                        forward_mail;
-      QAction*                        delete_mail;
+  QAction*                     reply_mail;
+  QAction*                     reply_all_mail;
+  QAction*                     forward_mail;
+  QAction*                     delete_mail;
 };

@@ -24,109 +24,115 @@ extern "C" {
 }
 
 #include <iostream>
-	#define MAX_MOMENTUM_NONCE  (1<<26)
-	#define SEARCH_SPACE_BITS 50
-	#define BIRTHDAYS_PER_HASH 8
-   
-   volatile bool cancel_search = false;
-   uint64_t& get_thread_count()
-   {
-      static uint64_t thread_count = boost::thread::hardware_concurrency();
-      return thread_count;
-   }
+        #define MAX_MOMENTUM_NONCE  (1 << 26)
+        #define SEARCH_SPACE_BITS 50
+        #define BIRTHDAYS_PER_HASH 8
 
-   std::vector< std::pair<uint32_t,uint32_t> > search( uint32_t offset, hashtable& found, fc::sha256 head )
-   {
-      std::vector<std::pair<uint32_t,uint32_t> > results;
-      results.reserve(16);
-      for( uint32_t i = offset*8; !cancel_search && i < MAX_MOMENTUM_NONCE;  )
-      {
-     //     fc::sha512::encoder enc;
-     //     enc.write( (char*)&i, sizeof(i) );
-     //     enc.write( (char*)&head, sizeof(head) );
-          sph_sha512_context context;
-          sph_sha512_init( &context );
-          sph_sha512(&context, (char*)&i, sizeof(i) );
-          sph_sha512(&context, (char*)&head, sizeof(head) );
-          fc::sha512 result;
-          sph_sha512_close( &context, (char*)&result );
-         /*
-         sha512_ctx ctx;
-         sha512_init( &ctx );
-          sha512_update(&ctx, (unsigned char*)&i, sizeof(i) );
-          sha512_update(&ctx, (unsigned char*)&head, sizeof(head) );
-          fc::sha512 result;
-          sha512_final(&ctx, (unsigned char*)&result );
-          */
-      
-     //     auto result = enc.result();
-        
-          for( uint32_t x = 0; x < 8; ++x )
-          {
-              uint64_t birthday = result._hash[x] >> 14;
-              if( birthday != 0 )
-              {
-                 uint32_t nonce = i+x;
-                 uint32_t cur = found.store( birthday, nonce );
-                 if( cur != uint32_t(-1) )
-                 {
-                     results.push_back( std::make_pair( cur, nonce ) );
-                     results.push_back( std::make_pair( nonce, cur ) );
-                 }
-              }
-          }
-          i += 8*get_thread_count();
-      }
-      return results;
-   }
-    
-   std::vector< std::pair<uint32_t,uint32_t> > momentum_search( pow_seed_type head, int instance  )
-   {
-      static hashtable found[1];
-      found[instance].reset();
-      std::vector< std::pair<uint32_t,uint32_t> > results;
-      results.reserve(16);
-      fc::spin_lock m;
-
-      static fc::thread       mothreads[32];
-      fc::future<std::vector<std::pair<uint32_t,uint32_t>> > done[32];
-      
-      for( uint32_t i = 0; i < get_thread_count(); ++i )
-      {
-         done[i]=mothreads[i].async( [&,i](){ return search( i, found[instance], head ); });
-      }
-      
-      for( uint32_t t = 0; t < get_thread_count(); ++t )
-      {
-          auto r = done[t].wait();
-          results.insert( results.end(), r.begin(), r.end() );
-      }
-      
-      return results;
-   }
-
-	uint64_t getBirthdayHash(pow_seed_type midHash, uint32_t a)
+volatile bool cancel_search = false;
+uint64_t&     get_thread_count()
   {
-      uint32_t index = a - a%BIRTHDAYS_PER_HASH;
-      char  hash_tmp[sizeof(midHash)+4];
-      memcpy( (char*)&hash_tmp[4], (char*)&midHash, sizeof(midHash) );
-      memcpy( (char*)&hash_tmp[0], (char*)&index, sizeof(index) );
-      
-      uint64_t  result_hash[8];
-		  SHA512((unsigned char*)hash_tmp, sizeof(hash_tmp), (unsigned char*)&result_hash);
-      
-      return result_hash[a%BIRTHDAYS_PER_HASH]>>(64-SEARCH_SPACE_BITS);
-	}
+  static uint64_t thread_count = boost::thread::hardware_concurrency();
+  return thread_count;
+  }
 
-   bool momentum_verify( pow_seed_type head, uint32_t a, uint32_t b )
-   {
-      if( a == b ) return false;
-      if( a == 0 ) return false;
-      if( b == 0 ) return false;
-      if( a > MAX_MOMENTUM_NONCE ) return false;
-      if( b > MAX_MOMENTUM_NONCE ) return false;
+std::vector< std::pair<uint32_t, uint32_t> > search(uint32_t offset, hashtable& found, fc::sha256 head)
+  {
+  std::vector<std::pair<uint32_t, uint32_t> > results;
+  results.reserve(16);
+  for (uint32_t i = offset * 8; !cancel_search && i < MAX_MOMENTUM_NONCE; )
+    {
+    //     fc::sha512::encoder enc;
+    //     enc.write( (char*)&i, sizeof(i) );
+    //     enc.write( (char*)&head, sizeof(head) );
+    sph_sha512_context context;
+    sph_sha512_init(&context);
+    sph_sha512(&context, (char*)&i, sizeof(i) );
+    sph_sha512(&context, (char*)&head, sizeof(head) );
+    fc::sha512 result;
+    sph_sha512_close(&context, (char*)&result);
+    /*
+       sha512_ctx ctx;
+       sha512_init( &ctx );
+       sha512_update(&ctx, (unsigned char*)&i, sizeof(i) );
+       sha512_update(&ctx, (unsigned char*)&head, sizeof(head) );
+       fc::sha512 result;
+       sha512_final(&ctx, (unsigned char*)&result );
+     */
 
-      auto r = (getBirthdayHash(head,a) == getBirthdayHash(head,b));
-      return r;
-   }
+    //     auto result = enc.result();
+
+    for (uint32_t x = 0; x < 8; ++x)
+      {
+      uint64_t birthday = result._hash[x] >> 14;
+      if (birthday != 0)
+        {
+        uint32_t nonce = i + x;
+        uint32_t cur = found.store(birthday, nonce);
+        if (cur != uint32_t(-1) )
+          {
+          results.push_back(std::make_pair(cur, nonce) );
+          results.push_back(std::make_pair(nonce, cur) );
+          }
+        }
+      }
+    i += 8 * get_thread_count();
+    }
+  return results;
+  }
+
+std::vector< std::pair<uint32_t, uint32_t> > momentum_search(pow_seed_type head, int instance)
+  {
+  static hashtable                                         found[1];
+  found[instance].reset();
+  std::vector< std::pair<uint32_t, uint32_t> >             results;
+  results.reserve(16);
+  fc::spin_lock                                            m;
+
+  static fc::thread                                        mothreads[32];
+  fc::future<std::vector<std::pair<uint32_t, uint32_t> > > done[32];
+
+  for (uint32_t i = 0; i < get_thread_count(); ++i)
+    {
+    done[i] = mothreads[i].async( [&, i](){ return search(i, found[instance], head); }
+                                  );
+    }
+
+  for (uint32_t t = 0; t < get_thread_count(); ++t)
+    {
+    auto r = done[t].wait();
+    results.insert(results.end(), r.begin(), r.end() );
+    }
+
+  return results;
+  }
+
+uint64_t getBirthdayHash(pow_seed_type midHash, uint32_t a)
+  {
+  uint32_t index = a - a % BIRTHDAYS_PER_HASH;
+  char     hash_tmp[sizeof(midHash) + 4];
+  memcpy( (char*)&hash_tmp[4], (char*)&midHash, sizeof(midHash) );
+  memcpy( (char*)&hash_tmp[0], (char*)&index, sizeof(index) );
+
+  uint64_t result_hash[8];
+  SHA512((unsigned char*)hash_tmp, sizeof(hash_tmp), (unsigned char*)&result_hash);
+
+  return result_hash[a % BIRTHDAYS_PER_HASH] >> (64 - SEARCH_SPACE_BITS);
+  }
+
+bool momentum_verify(pow_seed_type head, uint32_t a, uint32_t b)
+  {
+  if (a == b)
+    return false;
+  if (a == 0)
+    return false;
+  if (b == 0)
+    return false;
+  if (a > MAX_MOMENTUM_NONCE)
+    return false;
+  if (b > MAX_MOMENTUM_NONCE)
+    return false;
+
+  auto r = (getBirthdayHash(head, a) == getBirthdayHash(head, b));
+  return r;
+  }
 

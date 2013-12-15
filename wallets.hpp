@@ -4,15 +4,15 @@
 #include <QWidget>
 
 namespace Ui {
-class Wallets;
-}
+  class Wallets;
+  }
 
 class Wallets : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit Wallets( QWidget* parent = nullptr );
+  explicit Wallets(QWidget* parent = nullptr);
   ~Wallets();
 
 private:
