@@ -259,14 +259,14 @@
   </action>
   <action name="actionSend">
    <property name="icon">
-    <iconset resource="../Keyhotee.qrc">
+    <iconset theme="mail-send" resource="../Keyhotee.qrc">
      <normaloff>:/images/128x128/contact_info_send_mail.png</normaloff>:/images/128x128/contact_info_send_mail.png</iconset>
    </property>
    <property name="text">
     <string>Send</string>
    </property>
    <property name="toolTip">
-    <string>Send mail</string>
+    <string>Allows to send given mail document</string>
    </property>
    <property name="statusTip">
     <string>Allows to send currently edited message</string>
@@ -690,11 +690,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSave</sender>
+   <signal>triggered()</signal>
+   <receiver>MailEditorWindow</receiver>
+   <slot>onSave()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onCursorPositionChanged()</slot>
   <slot>onBccTriggered(bool)</slot>
   <slot>onCcTriggered(bool)</slot>
   <slot>onFromTriggered(bool)</slot>
+  <slot>onSave()</slot>
  </slots>
 </ui>

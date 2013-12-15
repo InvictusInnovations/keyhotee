@@ -8,14 +8,12 @@ namespace Ui
 class MailFieldsWidget;
 }
 
-class MailEditorMainWindow;
-
 class MailFieldsWidget : public QWidget
   {
     Q_OBJECT
 
   public:
-    explicit MailFieldsWidget(MailEditorMainWindow& parent);
+    MailFieldsWidget(QWidget& parent, QAction& actionSend);
     virtual ~MailFieldsWidget();
 
     void showFromControls(bool show);
@@ -27,13 +25,20 @@ class MailFieldsWidget : public QWidget
     void showChildLayout(QLayout* layout, bool show, int preferredPosition);
     /// Helper for showChildLayout.
     void showLayoutWidgets(QLayout* layout, bool show);
+    void validateSendButtonState();
 
   private slots:
     void on_sendButton_clicked();
 
+    void on_toEdit_textChanged(const QString &arg1);
+
+    void on_bccEdit_textChanged(const QString &arg1);
+
+    void on_ccEdit_textChanged(const QString &arg1);
+
   private:
-    MailEditorMainWindow& MainEditor;
     Ui::MailFieldsWidget *ui;
+    QAction&              ActionSend;
   };
 
 #endif // MAILFIELDSWIDGET_HPP

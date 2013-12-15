@@ -1,15 +1,13 @@
 #include "mailfieldswidget.hpp"
 
-#include "maileditorwindow.hpp"
-
 #include "ui_mailfieldswidget.h"
 
-#include <QMenu>
+#include <QAction>
 
-MailFieldsWidget::MailFieldsWidget(MailEditorMainWindow& parent) :
-    QWidget(&parent),
-    MainEditor(parent),
-    ui(new Ui::MailFieldsWidget)
+MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend) :
+  QWidget(&parent),
+  ui(new Ui::MailFieldsWidget),
+  ActionSend(actionSend)
   {
   ui->setupUi(this);
   }
@@ -36,32 +34,31 @@ void MailFieldsWidget::showBccControls(bool show)
 
 void MailFieldsWidget::showChildLayout(QLayout* layout, bool show, int preferredPosition)
   {
-  ui->gridLayout->setEnabled(false);
+  ui->mailFieldsLayout->setEnabled(false);
   if(show)
     {
-    int maxCnt = ui->gridLayout->rowCount();
+    int maxCnt = ui->mailFieldsLayout->count();
     if(preferredPosition >= maxCnt)
-       preferredPosition = maxCnt - 1;
+      preferredPosition = maxCnt;
 
-    ui->gridLayout->addLayout(layout, preferredPosition, 1, 1, 1);
+    ui->mailFieldsLayout->insertLayout(preferredPosition, layout);
     }
   else
     {
     int itemIdx = 0;
-    for(itemIdx = 0; itemIdx < ui->gridLayout->count(); ++itemIdx)
+    for(itemIdx = 0; itemIdx < ui->mailFieldsLayout->count(); ++itemIdx)
       {
-      if(ui->gridLayout->itemAt(itemIdx) == layout)
+      if(ui->mailFieldsLayout->itemAt(itemIdx) == layout)
         break;
       }
 
-    ui->gridLayout->takeAt(itemIdx);
+    ui->mailFieldsLayout->takeAt(itemIdx);
     }
 
   showLayoutWidgets(layout, show);
 
-  ui->gridLayout->setEnabled(true);
-  ui->gridLayout->invalidate();
-
+  ui->mailFieldsLayout->setEnabled(true);
+  ui->mailFieldsLayout->invalidate();
   }
 
 void MailFieldsWidget::showLayoutWidgets(QLayout* layout, bool show)
@@ -75,7 +72,33 @@ void MailFieldsWidget::showLayoutWidgets(QLayout* layout, bool show)
     }
   }
 
-void MailFieldsWidget::on_sendButton_clicked()
-{
+void MailFieldsWidget::validateSendButtonState()
+  {
+  bool anyRecipient = ui->toEdit->text().isEmpty() == false;
+  anyRecipient = anyRecipient || ui->ccEdit->text().isEmpty() == false;
+  anyRecipient = anyRecipient || ui->bccEdit->text().isEmpty() == false;
 
-}
+  /// Make the send button enabled only if there is any recipient
+  ui->sendButton->setEnabled(anyRecipient);
+  }
+
+void MailFieldsWidget::on_sendButton_clicked()
+  {
+  ActionSend.trigger();
+  }
+
+void MailFieldsWidget::on_toEdit_textChanged(const QString&)
+  {
+  validateSendButtonState();
+  }
+
+void MailFieldsWidget::on_bccEdit_textChanged(const QString&)
+  {
+  validateSendButtonState();
+  }
+
+void MailFieldsWidget::on_ccEdit_textChanged(const QString&)
+  {
+  validateSendButtonState();
+  }
+

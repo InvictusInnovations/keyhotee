@@ -19,7 +19,13 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent /*= nullptr*/) :
   {
   ui->setupUi(this);
 
-  MailFields = new MailFieldsWidget(*this);
+  MailFields = new MailFieldsWidget(*this, *ui->actionSend);
+
+  /// Initially only basic mail fields (To: and Subject:) should be visible
+  MailFields->showFromControls(false);
+  MailFields->showCcControls(false);
+  MailFields->showBccControls(false);
+
   ui->mailFieldsToolBar->addWidget(MailFields);
 
   /** Supplement definition of mailFieldSelectorToolbar since Qt Creator doesn't support putting
@@ -47,6 +53,12 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent /*= nullptr*/) :
   ui->actionSave->setEnabled(ui->messageEdit->document()->isModified());
   ui->actionUndo->setEnabled(ui->messageEdit->document()->isUndoAvailable());
   ui->actionRedo->setEnabled(ui->messageEdit->document()->isRedoAvailable());
+
+  /// Setup command update ui related to 'save' option activity control and window modify marker.
+  connect(ui->messageEdit->document(), SIGNAL(modificationChanged(bool)), ui->actionSave,
+    SLOT(setEnabled(bool)));
+  connect(ui->messageEdit->document(), SIGNAL(modificationChanged(bool)), this,
+    SLOT(setWindowModified(bool)));
 
 #ifndef QT_NO_CLIPBOARD
   connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(onClipboardDataChanged()));
@@ -127,6 +139,8 @@ void MailEditorMainWindow::mergeFormatOnWordOrSelection(const QTextCharFormat &f
 
 void MailEditorMainWindow::onSave()
   {
+  ui->messageEdit->document()->setModified(false);
+
   /// FIXME do actual save operation
   }
 
@@ -209,7 +223,7 @@ void MailEditorMainWindow::onMoneyAttachementTriggered()
   {
   }
 
-void MailEditorMainWindow::onSendTriggered()
+void MailEditorMainWindow::on_actionSend_triggered()
   {
+  /// TODO implement actual mail send operation
   }
-

@@ -39,6 +39,7 @@ class MailEditorMainWindow : public QMainWindow
   /// Cursor positioning slots to update text formatting controls
     void onCurrentCharFormatChanged(const QTextCharFormat& format);
     void onCursorPositionChanged();
+
   /// Text formatting slots:
     void onTextAlignTriggered(QAction* a);
     void onTextBoldTrigerred();
@@ -52,7 +53,8 @@ class MailEditorMainWindow : public QMainWindow
 
     void onFileAttachementTriggered();
     void onMoneyAttachementTriggered();
-    void onSendTriggered();
+    /// Allows to send mail document prepared in current window.
+    void on_actionSend_triggered();
 
   private:
     Ui::MailEditorWindow* ui;
