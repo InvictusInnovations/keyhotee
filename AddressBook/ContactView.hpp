@@ -32,6 +32,29 @@ public:
   void onShareContact();
   void onRequestContact();
 
+  void onPublicKeyToClipboard();
+  void lookupId();
+  void lookupPublicKey();
+
+  bool isChatSelected();
+  void sendChatMessage();
+  void appendChatMessage(const QString& from, const QString& msg, const QDateTime& date_time = QDateTime::currentDateTime() );
+  void setAddingNewContact(bool addNew)
+    {
+    _addingNewContact = addNew;
+    }
+
+  bool isAddingNewContact() const
+    {
+    return _addingNewContact;
+    }
+
+  void keyEdit(bool enable);
+  bool CheckSaving();
+
+Q_SIGNALS:
+  void canceledAddContact();
+private slots:
   void firstNameChanged(const QString& name);
   void lastNameChanged(const QString& name);
   void keyhoteeIdChanged(const QString& name);
@@ -57,36 +80,10 @@ public:
     setModyfied();
     }
 
-  void privacyLevelChanged(const QString&)
+  void privacyLevelChanged(int)
     {
     setModyfied();
     }
-
-  void onPublicKeyToClipboard();
-
-  void updateNameLabel();
-
-  void lookupId();
-  void lookupPublicKey();
-
-  bool isChatSelected();
-  void sendChatMessage();
-  void appendChatMessage(const QString& from, const QString& msg, const QDateTime& date_time = QDateTime::currentDateTime() );
-  void setAddingNewContact(bool addNew)
-    {
-    _addingNewContact = addNew;
-    }
-
-  bool isAddingNewContact() const
-    {
-    return _addingNewContact;
-    }
-
-  void keyEdit(bool enable);
-  bool CheckSaving();
-
-Q_SIGNALS:
-  void canceledAddContact();
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event);
@@ -115,6 +112,8 @@ private:
     }
 
   void onIconSearch();
+  bool doDataExchange (bool valid);
+  bool existContactWithPublicKey (const std::string& public_key_string);
 
   fc::time_point                          _last_validate;
   Contact                                 _current_contact;
