@@ -20,7 +20,9 @@ public:
   QString getLabel() const;
   const QIcon& getIcon() const;
   void setIcon(const QIcon& icon);
-  
+  int getAge()const;
+  int getRepute()const;
+ 
   QString getEmail() const;
   void setEmail(const QString& email);
   QString getPhone() const;

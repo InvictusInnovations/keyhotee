@@ -22,11 +22,28 @@ public:
     QIcon                             _ownership_no;
     std::vector<Contact>              _contacts;
     bts::addressbook::addressbook_ptr _address_book;
-    QStringListModel                  _contact_completion_model;
+          ContactCompletionModel                  _contact_completion_model;
     QCompleter*                       _contact_completer;
   };
   }
 
+ContactCompletionModel::ContactCompletionModel(QObject* parent) 
+  : QStringListModel(parent)
+{
+}
+ContactCompletionModel::~ContactCompletionModel()
+{
+}
+QVariant ContactCompletionModel::data( const QModelIndex& index, int role )const
+{
+  if( !index.isValid() )
+    return QVariant();
+  if (role == Qt::DisplayRole || role == Qt::EditRole)
+   return QStringListModel::data(index, role);
+  else if( role == Qt::UserRole )
+    return index.row();
+  return QVariant();
+}
 
 
 AddressBookModel::AddressBookModel(QObject* parent, bts::addressbook::addressbook_ptr address_book)
@@ -184,9 +201,9 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
     case Id:
       return current_contact.dac_id_string.c_str();
     case Age:
-      return 0;
+                 return current_contact.getAge();
     case Repute:
-      return 0;
+                 return current_contact.getRepute();
 
     case Ownership:
     case UserIcon:
@@ -204,12 +221,21 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
       return current_contact.last_name.c_str();
     case Id:
       return current_contact.dac_id_string.c_str();
-    case Age:
-      return 0;
+             case Age:
+                 return current_contact.getAge();
     case Repute:
-      return 0;
+                 return current_contact.getRepute();
     default:
-      return QVariant();
+              return QVariant();
+         }
+       case Qt::BackgroundRole:
+         if (current_contact.getAge() == 1)
+         {
+           return QVariant(QColor(231, 190, 66));
+         }
+         else
+         {
+           return QVariant();
       }
     }
   return QVariant();

@@ -6,6 +6,8 @@
 #include <QPainter>
 
 #include <fc/log/logger.hpp>
+#include <bts/profile.hpp>
+#include "AddressBook/Contact.hpp"
 
 ContactListEdit::ContactListEdit(QWidget* parent)
   : QTextEdit(parent)
@@ -40,8 +42,8 @@ void ContactListEdit::setCompleter(QCompleter* completer)
   _completer->setCompletionMode(QCompleter::PopupCompletion);
   _completer->setCaseSensitivity(Qt::CaseInsensitive);
 
-  connect(_completer, SIGNAL(activated(const QString &)),
-          this, SLOT(insertCompletion(const QString &)));
+   connect(_completer, SIGNAL(activated(const QModelIndex&)),
+           this, SLOT(insertCompletion(const QModelIndex&)));
   }
 
 QCompleter* ContactListEdit::getCompleter()
@@ -49,16 +51,30 @@ QCompleter* ContactListEdit::getCompleter()
   return _completer;
   }
 
-void ContactListEdit::insertCompletion(const QString& completion)
+void ContactListEdit::insertCompletion( const QModelIndex& completionIndex )
+{
+  if( !completionIndex.isValid())
+    return;
+  QString completion = completionIndex.data().toString();
+  int row = completionIndex.data(Qt::UserRole).toInt();
+  row = row / 2;
+  auto addressbook = bts::get_profile()->get_addressbook();
+  auto contacts = addressbook->get_contacts();
+  bool isKeyhoteeFounder = false;
+  if( Contact(contacts[row]).getAge() == 1 )
+    isKeyhoteeFounder = true;  
+  insertCompletion( completion, isKeyhoteeFounder );
+}
+void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhoteeFounder )
   {
-  ilog("insertCompletion ${c}", ("c", completion.toStdString() ) );
+  ilog( "insertCompletion ${c}", ("c", completion.toStdString() ) );
   // remove existing text
   // create image, attach meta data for on-click menus
 
   if (_completer->widget() != this)
     return;
   QFont        default_font;
-  default_font.setPointSize(default_font.pointSize() - 2);
+    default_font.setPointSize( default_font.pointSize() - 1 );
   QFontMetrics font_metrics(default_font);
   QRect        bounding = font_metrics.boundingRect(completion);
   int          completion_width = font_metrics.width(completion);
@@ -74,9 +90,22 @@ void ContactListEdit::insertCompletion(const QString& completion)
   painter.setRenderHint(QPainter::Antialiasing);
 
   QBrush brush(Qt::SolidPattern);
-  brush.setColor(QColor(205, 220, 241) );
+    brush.setColor( QColor( 205, 220, 241 ) );
   QPen   pen;
-  pen.setColor(QColor(105, 110, 180) );
+    if(isKeyhoteeFounder)
+    {
+      QLinearGradient grad(QPointF(0, 0), QPointF(0, 1));
+      grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+      grad.setColorAt(0.3, QColor(231, 190, 66));
+      grad.setColorAt(1.0, QColor(103, 51, 1));
+      brush = QBrush(grad);
+      pen.setColor( QColor( 103, 51, 1 ) );
+    }
+    else
+    {
+      brush.setColor( QColor( 205, 220, 241 ) );
+      pen.setColor( QColor( 105,110,180 ) );
+    }
 
   painter.setBrush(brush);
   painter.setPen(pen);

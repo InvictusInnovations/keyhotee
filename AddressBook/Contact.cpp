@@ -118,3 +118,13 @@ bool Contact::isOwn() const
     }
   }
 
+int Contact::getAge() const
+{
+  return (getLabel().size()%2);
+}
+
+int Contact::getRepute() const
+{
+  return 0;
+}
+
