@@ -20,6 +20,13 @@ public:
   QString getLabel() const;
   const QIcon& getIcon() const;
   void setIcon(const QIcon& icon);
+  
+  QString getEmail() const;
+  void setEmail(const QString& email);
+  QString getPhone() const;
+  void setPhone(const QString& phone);
+  QString getNotes() const;
+  void setNotes(const QString& phone);
 
 private:
   /// cache the icon we want to use.

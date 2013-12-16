@@ -30,8 +30,6 @@ Contact::Contact(const bts::addressbook::wallet_contact& contact)
     }
   }
 
-
-
 void Contact::setIcon(const QIcon& icon)
   {
   this->icon = icon;
@@ -50,6 +48,34 @@ void Contact::setIcon(const QIcon& icon)
     {
     icon_png.resize(0);
     }
+  }
+
+QString Contact::getEmail() const
+  {
+  return QString();
+  }
+
+void Contact::setEmail(const QString& email)
+  {
+  }
+
+QString Contact::getPhone() const
+  {
+  return QString();
+  }
+
+void Contact::setPhone(const QString& phone)
+  {
+  }
+
+QString Contact::getNotes() const
+  {
+  return QString(notes.c_str());
+  }
+
+void Contact::setNotes(const QString& phone)
+  {
+  notes = phone.toStdString();
   }
 
 QString Contact::getLabel() const

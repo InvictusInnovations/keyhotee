@@ -101,7 +101,7 @@ ContactView::ContactView(QWidget* parent)
   grid_layout->addWidget(message_tools, 0, 0);
   
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
-  edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png.png"), tr("Edit"), this);
+  edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png"), tr("Edit"), this);
   share_contact = new QAction(QIcon(":/images/read-icon.png"), tr("Share (need new icon)"), this);
   request_contact = new QAction( QIcon(":/images/128x128/contact_info_request_authorisation.png"), tr("Request authorisation"), this);
   save_contact = new QAction( QIcon(":/images/128x128/contact_info_save.png"), tr( "Save"), this );
@@ -284,8 +284,8 @@ void ContactView::setContact(const Contact& current_contact)
 
     ui->firstname->setText(_current_contact.first_name.c_str() );
     ui->lastname->setText(_current_contact.last_name.c_str() );
-    // ui->email->setText( _current_contact.email_address );
-    // ui->phone->setText( _current_contact.phone_number );
+    //ui->email->setText( _current_contact.email_address );
+    //ui->phone->setText( _current_contact.phone_number );
     std::string public_key_string = public_key_address(_current_contact.public_key);
     ui->public_key->setText(public_key_string.c_str() );
     ui->id_edit->setText(_current_contact.dac_id_string.c_str() );
