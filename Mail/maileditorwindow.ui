@@ -176,6 +176,34 @@
    <addaction name="actionItalic"/>
    <addaction name="actionUnderline"/>
   </widget>
+  <widget class="QToolBar" name="fileAttachementToolBar">
+   <property name="windowTitle">
+    <string>File attachement</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>BottomToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QToolBar" name="moneyAttachementToolBar">
+   <property name="minimumSize">
+    <size>
+     <width>100</width>
+     <height>34</height>
+    </size>
+   </property>
+   <property name="windowTitle">
+    <string>Money attachement</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>BottomToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
   <action name="actionSave">
    <property name="enabled">
     <bool>false</bool>
@@ -283,6 +311,9 @@
    </property>
   </action>
   <action name="actionLeft">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../Keyhotee.qrc">
      <normaloff>:/images/win/textleft.png</normaloff>:/images/win/textleft.png</iconset>
@@ -292,6 +323,9 @@
    </property>
   </action>
   <action name="actionCenter">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../Keyhotee.qrc">
      <normaloff>:/images/win/textcenter.png</normaloff>:/images/win/textcenter.png</iconset>
@@ -301,6 +335,9 @@
    </property>
   </action>
   <action name="actionRight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../Keyhotee.qrc">
      <normaloff>:/images/win/textright.png</normaloff>:/images/win/textright.png</iconset>
@@ -310,6 +347,9 @@
    </property>
   </action>
   <action name="actionJustify">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../Keyhotee.qrc">
      <normaloff>:/images/win/textjustify.png</normaloff>:/images/win/textjustify.png</iconset>
@@ -412,6 +452,9 @@
    </property>
   </action>
   <action name="actionAttachement">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../Keyhotee.qrc">
      <normaloff>:/images/paperclip-icon.png</normaloff>:/images/paperclip-icon.png</iconset>
@@ -424,6 +467,9 @@
    </property>
   </action>
   <action name="actionMoney">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../Keyhotee.qrc">
      <normaloff>:/images/money-in-envelope.png</normaloff>:/images/money-in-envelope.png</iconset>
@@ -780,6 +826,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionAttachement</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>MailEditorWindow</receiver>
+   <slot>onFileAttachementTriggered(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionMoney</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>MailEditorWindow</receiver>
+   <slot>onMoneyAttachementTriggered(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onCursorPositionChanged()</slot>
@@ -791,5 +869,7 @@
   <slot>onTextBoldTriggerred(bool)</slot>
   <slot>onTextUnderlineTriggerred(bool)</slot>
   <slot>onTextItalicTriggerred(bool)</slot>
+  <slot>onFileAttachementTriggered(bool)</slot>
+  <slot>onMoneyAttachementTriggered(bool)</slot>
  </slots>
 </ui>

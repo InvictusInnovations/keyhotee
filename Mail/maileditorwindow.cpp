@@ -3,6 +3,7 @@
 #include "ui_maileditorwindow.h"
 
 #include "mailfieldswidget.hpp"
+#include "moneyattachementwidget.hpp"
 
 #include <QApplication>
 #include <QClipboard>
@@ -18,6 +19,15 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent /*= nullptr*/) :
   ui(new Ui::MailEditorWindow())
   {
   ui->setupUi(this);
+
+  /** Disable these toolbars by default. They should be showed up on demand, when given action will
+      be trigerred.
+  */
+  ui->fileAttachementToolBar->hide();
+
+  ui->moneyAttachementToolBar->hide();
+  MoneyAttachement = new TMoneyAttachementWidget(ui->moneyAttachementToolBar);
+  ui->moneyAttachementToolBar->addWidget(MoneyAttachement);
 
   MailFields = new MailFieldsWidget(*this, *ui->actionSend);
 
@@ -107,7 +117,12 @@ void MailEditorMainWindow::setupEditorCommands()
 
 void MailEditorMainWindow::alignmentChanged(Qt::Alignment a)
   {
-  if (a & Qt::AlignLeft)
+  ui->actionLeft->setChecked(false);
+  ui->actionCenter->setChecked(false);
+  ui->actionRight->setChecked(false);
+  ui->actionJustify->setChecked(false);
+
+  if(a & Qt::AlignLeft)
     ui->actionLeft->setChecked(true);
   else if (a & Qt::AlignHCenter)
     ui->actionCenter->setChecked(true);
@@ -169,6 +184,8 @@ void MailEditorMainWindow::onCursorPositionChanged()
       of text under cursor.
   */
   alignmentChanged(ui->messageEdit->alignment());
+  QTextCursor cursor = ui->messageEdit->textCursor();
+  fontChanged(cursor.charFormat().font());
   }
 
 void MailEditorMainWindow::onTextAlignTriggerred(QAction *a)
@@ -182,6 +199,8 @@ void MailEditorMainWindow::onTextAlignTriggerred(QAction *a)
     edit->setAlignment(Qt::AlignRight | Qt::AlignAbsolute);
   else if (a == ui->actionJustify)
     edit->setAlignment(Qt::AlignJustify);
+
+  alignmentChanged(edit->alignment());
   }
 
 void MailEditorMainWindow::onTextBoldTriggerred(bool checked)
@@ -220,12 +239,14 @@ void MailEditorMainWindow::onFromTriggered(bool checked)
   MailFields->showFromControls(checked);
   }
 
-void MailEditorMainWindow::onFileAttachementTriggered()
+void MailEditorMainWindow::onFileAttachementTriggered(bool checked)
   {
+  ui->fileAttachementToolBar->setVisible(checked);
   }
 
-void MailEditorMainWindow::onMoneyAttachementTriggered()
+void MailEditorMainWindow::onMoneyAttachementTriggered(bool checked)
   {
+  ui->moneyAttachementToolBar->setVisible(checked);
   }
 
 void MailEditorMainWindow::on_actionSend_triggered()

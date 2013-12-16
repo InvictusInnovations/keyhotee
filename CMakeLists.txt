@@ -123,6 +123,7 @@ qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
 qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
 qt5_wrap_ui( UiMailEditor                      Mail/maileditorwindow.ui )
 qt5_wrap_ui( UiMailFieldsWidgets               Mail/mailfieldswidget.ui )
+qt5_wrap_ui( UiMoneyAttachementWidget          Mail/moneyattachementwidget.ui )
 
 qt5_wrap_ui( UiWallets                         wallets.ui )
 
@@ -169,9 +170,14 @@ set( sources
         Mail/maileditorwindow.ui
         Mail/maileditorwindow.hpp
         Mail/maileditorwindow.cpp
+
         Mail/mailfieldswidget.ui
         Mail/mailfieldswidget.hpp
         Mail/mailfieldswidget.cpp
+
+        Mail/moneyattachementwidget.ui
+        Mail/moneyattachementwidget.hpp
+        Mail/moneyattachementwidget.cpp
 
         LoginDialog.ui
         LoginDialog.hpp

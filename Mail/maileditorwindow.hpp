@@ -10,6 +10,7 @@ class QFont;
 class QTextCharFormat;
 
 class MailFieldsWidget;
+class TMoneyAttachementWidget;
 
 class MailEditorMainWindow : public QMainWindow
   {
@@ -25,6 +26,7 @@ class MailEditorMainWindow : public QMainWindow
   /// Other helper methods:
     bool maybeSave();
     void setupEditorCommands();
+    /// Updates UI status regarding to chosen alignment.
     void alignmentChanged(Qt::Alignment a);
     void fontChanged(const QFont& f);
     void colorChanged(const QColor& c);
@@ -51,16 +53,17 @@ class MailEditorMainWindow : public QMainWindow
     void onBccTriggered(bool checked);
     void onFromTriggered(bool checked);
 
-    void onFileAttachementTriggered();
-    void onMoneyAttachementTriggered();
+    void onFileAttachementTriggered(bool checked);
+    void onMoneyAttachementTriggered(bool checked);
     /// Allows to send mail document prepared in current window.
     void on_actionSend_triggered();
     /// Notification for subject changes needed to update window title.
     void onSubjectChanged(const QString& subject);
 
   private:
-    Ui::MailEditorWindow* ui;
-    MailFieldsWidget*     MailFields;
+    Ui::MailEditorWindow*    ui;
+    MailFieldsWidget*        MailFields;
+    TMoneyAttachementWidget* MoneyAttachement;
   };
 
 #endif ///__MAILEDITORWINDOW_HPP
