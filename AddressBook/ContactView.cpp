@@ -99,6 +99,10 @@ ContactView::ContactView(QWidget* parent)
   grid_layout->setSpacing(0);
   ui->toolbar_container->setLayout(grid_layout);
   grid_layout->addWidget(message_tools, 0, 0);
+  ui->email->setVisible (false);
+  ui->phone->setVisible (false);
+  ui->phone_label->setVisible (false);
+  ui->email_label->setVisible (false);
   
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
   edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png"), tr("Edit"), this);
