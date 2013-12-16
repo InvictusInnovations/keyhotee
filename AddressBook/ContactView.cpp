@@ -615,6 +615,7 @@ bool ContactView::doDataExchange (bool valid)
       //privacy_comboBox
       std::string public_key_string = public_key_address( _current_contact.public_key );
       ui->public_key->setText( public_key_string.c_str() );
+      ui->keyhotee_founder->setVisible(!_editing && _current_contact.getAge() == 1);
       }
     }
     else
