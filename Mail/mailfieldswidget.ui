@@ -124,7 +124,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="toEdit">
+        <widget class="ContactListEdit" name="toEdit">
          <property name="minimumSize">
           <size>
            <width>230</width>
@@ -160,7 +160,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="ccEdit">
+        <widget class="ContactListEdit" name="ccEdit">
          <property name="minimumSize">
           <size>
            <width>230</width>
@@ -202,7 +202,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="bccEdit">
+        <widget class="ContactListEdit" name="bccEdit">
          <property name="minimumSize">
           <size>
            <width>230</width>
@@ -247,6 +247,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ContactListEdit</class>
+   <extends>QTextEdit</extends>
+   <header>ContactListEdit.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../Keyhotee.qrc"/>
  </resources>

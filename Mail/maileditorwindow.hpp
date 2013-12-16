@@ -5,10 +5,13 @@
 
 namespace Ui { class MailEditorWindow; }
 
+class QComboBox;
 class QColor;
 class QFont;
+class QFontComboBox;
 class QTextCharFormat;
 
+class AddressBookModel;
 class MailFieldsWidget;
 class TMoneyAttachementWidget;
 
@@ -16,7 +19,7 @@ class MailEditorMainWindow : public QMainWindow
   {
   Q_OBJECT
   public:
-    MailEditorMainWindow(QWidget* parent = nullptr);
+    MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel);
     virtual ~MailEditorMainWindow();
 
   private:
@@ -47,6 +50,9 @@ class MailEditorMainWindow : public QMainWindow
     void onTextBoldTriggerred(bool checked);
     void onTextUnderlineTriggerred(bool checked);
     void onTextItalicTriggerred(bool checked);
+    void onTextColorTriggerred();
+    void onTextFamilyChanged(const QString &f);
+    void onTextSizeChanged(const QString &p);
 
   /// Mail receipents controls selection:
     void onCcTriggered(bool checked);
@@ -62,8 +68,11 @@ class MailEditorMainWindow : public QMainWindow
 
   private:
     Ui::MailEditorWindow*    ui;
+    AddressBookModel&        ABModel;
     MailFieldsWidget*        MailFields;
     TMoneyAttachementWidget* MoneyAttachement;
+    QFontComboBox*           FontCombo;
+    QComboBox*               FontSize;
   };
 
 #endif ///__MAILEDITORWINDOW_HPP

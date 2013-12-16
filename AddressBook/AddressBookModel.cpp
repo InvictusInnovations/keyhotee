@@ -13,19 +13,19 @@
 
 
 namespace Detail
+{
+class AddressBookModelImpl
   {
-  class AddressBookModelImpl
-  {
-public:
+  public:
     QIcon                             _default_icon;
     QIcon                             _ownership_yes;
     QIcon                             _ownership_no;
     std::vector<Contact>              _contacts;
     bts::addressbook::addressbook_ptr _address_book;
-          ContactCompletionModel                  _contact_completion_model;
+    ContactCompletionModel            _contact_completion_model;
     QCompleter*                       _contact_completer;
   };
-  }
+}
 
 ContactCompletionModel::ContactCompletionModel(QObject* parent) 
   : QStringListModel(parent)

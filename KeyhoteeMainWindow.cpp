@@ -588,8 +588,8 @@ void KeyhoteeMainWindow::showContacts()
 
 void KeyhoteeMainWindow::newMailMessage()
   {
-//  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this);
-//  mailWindow->show();
+  //MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model);
+  //mailWindow->show();
   newMailMessageTo(-1);
   }
 

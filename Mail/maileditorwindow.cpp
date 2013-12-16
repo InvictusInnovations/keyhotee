@@ -8,15 +8,19 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QCloseEvent>
+#include <QColorDialog>
+#include <QFontComboBox>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMimeData>
 #include <QToolBar>
 #include <QToolButton>
 
-MailEditorMainWindow::MailEditorMainWindow(QWidget* parent /*= nullptr*/) :
+MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel) :
   QMainWindow(parent, Qt::WindowFlags(Qt::WindowType::Dialog)),
-  ui(new Ui::MailEditorWindow())
+  ui(new Ui::MailEditorWindow()),
+  ABModel(abModel),
+  FontCombo(nullptr)
   {
   ui->setupUi(this);
 
@@ -29,7 +33,7 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent /*= nullptr*/) :
   MoneyAttachement = new TMoneyAttachementWidget(ui->moneyAttachementToolBar);
   ui->moneyAttachementToolBar->addWidget(MoneyAttachement);
 
-  MailFields = new MailFieldsWidget(*this, *ui->actionSend);
+  MailFields = new MailFieldsWidget(*this, *ui->actionSend, abModel);
 
   /// Initially only basic mail fields (To: and Subject:) should be visible
   MailFields->showFromControls(false);
@@ -113,6 +117,25 @@ bool MailEditorMainWindow::maybeSave()
 
 void MailEditorMainWindow::setupEditorCommands()
   {
+  QPixmap pix(ui->formatToolBar->iconSize());
+  pix.fill(Qt::black);
+  ui->actionTextColor->setIcon(pix);
+
+  FontCombo = new QFontComboBox(ui->formatToolBar);
+  ui->formatToolBar->addWidget(FontCombo);
+  connect(FontCombo, SIGNAL(activated(QString)), this, SLOT(onTextFamilyChanged(QString)));
+
+  FontSize = new QComboBox(ui->formatToolBar);
+  FontSize->setObjectName("comboSize");
+  ui->formatToolBar->addWidget(FontSize);
+  FontSize->setEditable(true);
+
+  QFontDatabase db;
+  foreach(int size, db.standardSizes())
+    FontSize->addItem(QString::number(size));
+
+  connect(FontSize, SIGNAL(activated(QString)), this, SLOT(onTextSizeChanged(QString)));
+  FontSize->setCurrentIndex(FontSize->findText(QString::number(QApplication::font().pointSize())));
   }
 
 void MailEditorMainWindow::alignmentChanged(Qt::Alignment a)
@@ -134,18 +157,19 @@ void MailEditorMainWindow::alignmentChanged(Qt::Alignment a)
 
 void MailEditorMainWindow::fontChanged(const QFont &f)
   {
-//  comboFont->setCurrentIndex(comboFont->findText(QFontInfo(f).family()));
-//  comboSize->setCurrentIndex(comboSize->findText(QString::number(f.pointSize())));
+  FontCombo->setCurrentIndex(FontCombo->findText(QFontInfo(f).family()));
+  FontSize->setCurrentIndex(FontSize->findText(QString::number(f.pointSize())));
+
   ui->actionBold->setChecked(f.bold());
   ui->actionItalic->setChecked(f.italic());
   ui->actionUnderline->setChecked(f.underline());
   }
 
-void MailEditorMainWindow::colorChanged(const QColor &c)
+void MailEditorMainWindow::colorChanged(const QColor& c)
   {
   QPixmap pix(16, 16);
   pix.fill(c);
-  //actionTextColor->setIcon(pix);
+  ui->actionTextColor->setIcon(pix);
   }
 
 void MailEditorMainWindow::mergeFormatOnWordOrSelection(const QTextCharFormat &format)
@@ -224,6 +248,36 @@ void MailEditorMainWindow::onTextItalicTriggerred(bool checked)
   mergeFormatOnWordOrSelection(fmt);
   }
 
+void MailEditorMainWindow::onTextColorTriggerred()
+  {
+  QColor col = QColorDialog::getColor(ui->messageEdit->textColor(), this);
+  
+  if(col.isValid() == false)
+    return;
+  QTextCharFormat fmt;
+  fmt.setForeground(col);
+  mergeFormatOnWordOrSelection(fmt);
+  colorChanged(col);
+  }
+
+void MailEditorMainWindow::onTextFamilyChanged(const QString& f)
+  {
+  QTextCharFormat fmt;
+  fmt.setFontFamily(f);
+  mergeFormatOnWordOrSelection(fmt);
+  }
+
+void MailEditorMainWindow::onTextSizeChanged(const QString &p)
+  {
+  qreal pointSize = p.toFloat();
+  if(p.toFloat() > 0)
+    {
+    QTextCharFormat fmt;
+    fmt.setFontPointSize(pointSize);
+    mergeFormatOnWordOrSelection(fmt);
+    }
+  }
+
 void MailEditorMainWindow::onCcTriggered(bool checked)
   {
   MailFields->showCcControls(checked);
@@ -256,6 +310,6 @@ void MailEditorMainWindow::on_actionSend_triggered()
 
 void MailEditorMainWindow::onSubjectChanged(const QString& subject)
   {
-  setWindowTitle(tr("%1[*]").arg(subject));
+  setWindowTitle(tr("New mail message: %1[*]").arg(subject));
   }
 
