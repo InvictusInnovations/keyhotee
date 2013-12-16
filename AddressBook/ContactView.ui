@@ -584,14 +584,15 @@
   <tabstop>icon_view</tabstop>
   <tabstop>firstname</tabstop>
   <tabstop>lastname</tabstop>
+  <tabstop>id_edit</tabstop>
   <tabstop>public_key</tabstop>
   <tabstop>public_key_to_clipboard</tabstop>
   <tabstop>privacy_comboBox</tabstop>
   <tabstop>email</tabstop>
   <tabstop>phone</tabstop>
   <tabstop>notes</tabstop>
-  <tabstop>chat_input</tabstop>
   <tabstop>chat_conversation</tabstop>
+  <tabstop>chat_input</tabstop>
  </tabstops>
  <resources>
   <include location="../Keyhotee.qrc"/>
