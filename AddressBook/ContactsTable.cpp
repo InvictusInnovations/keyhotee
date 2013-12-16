@@ -112,7 +112,6 @@ void ContactsTable::on_actionShow_details_toggled(bool checked)
     ui->contact_details_view->show();
   else
     ui->contact_details_view->hide();
-
   }
 
 void ContactsTable::addContactView(ContactView& view) const
@@ -151,4 +150,4 @@ void ContactsTable::onCanceledAddContact()
   }
 
 void ContactsTable::onCurrentViewChanged(int index)
-  {}
+    {}

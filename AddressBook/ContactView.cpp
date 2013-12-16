@@ -237,7 +237,7 @@ void ContactView::onRequestContact()
   }
 
 ContactView::~ContactView()
-  {}
+    {}
 
 void ContactView::setContact(const Contact& current_contact)
   {
@@ -431,7 +431,7 @@ void ContactView::publicKeyEdited(const QString& public_key_string)
   ui->id_edit->clear();  //clear keyhotee id field
   if (gMiningIsPossible)
     lookupPublicKey();
-    //check for validly hashed public key and enable/disable save button accordingly
+  //check for validly hashed public key and enable/disable save button accordingly
   bool public_key_is_valid = public_key_address::is_valid(public_key_string.toStdString());
   if (public_key_is_valid)
     {
@@ -590,7 +590,6 @@ bool ContactView::CheckSaving()
     {
     keyEdit(false);
     }
-
   return true;
   }
 

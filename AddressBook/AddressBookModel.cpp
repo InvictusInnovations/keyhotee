@@ -63,7 +63,7 @@ AddressBookModel::AddressBookModel(QObject* parent, bts::addressbook::addressboo
   }
 
 AddressBookModel::~AddressBookModel()
-  {}
+    {}
 
 int AddressBookModel::rowCount(const QModelIndex& parent) const
   {
@@ -141,7 +141,7 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
       }
     }
   else
-            {}
+                {  }
   return QVariant();
   }
 
