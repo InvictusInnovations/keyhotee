@@ -588,9 +588,9 @@ void KeyhoteeMainWindow::showContacts()
 
 void KeyhoteeMainWindow::newMailMessage()
   {
-  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this);
-  mailWindow->show();
-  //newMailMessageTo(-1);
+//  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this);
+//  mailWindow->show();
+  newMailMessageTo(-1);
   }
 
 void KeyhoteeMainWindow::newMailMessageTo(int contact_id)
