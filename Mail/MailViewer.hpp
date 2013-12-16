@@ -9,17 +9,17 @@ class MailboxModel;
 
 class MailViewer : public QWidget
 {
-   Q_OBJECT
-   public:
-       MailViewer( QWidget* parent = nullptr );
-      ~MailViewer();
-      //displays mail and marks as having been read
-      void displayMailMessage(const QModelIndex& index, MailboxModel* mailbox);
-      void displayMailMessages(QModelIndexList,QItemSelectionModel* mailbox);
+  Q_OBJECT
+public:
+  MailViewer(QWidget* parent = nullptr);
+  ~MailViewer();
+  //displays mail and marks as having been read
+  void displayMailMessage(const QModelIndex& index, MailboxModel* mailbox);
+  void      displayMailMessages(QModelIndexList, QItemSelectionModel * mailbox);
 
-      QToolBar*                       message_tools;
-   private:
-      void displayAttachments(const MessageHeader& msg);
+  QToolBar* message_tools;
+private:
+  void displayAttachments(const MessageHeader& msg);
 
-      std::unique_ptr<Ui::MailViewer> ui;
+  std::unique_ptr<Ui::MailViewer> ui;
 };
