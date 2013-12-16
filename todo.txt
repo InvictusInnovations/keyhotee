@@ -28,11 +28,11 @@ Bug in serializing public key. Create unit test for DanL (DanN).
 * Check name chain on load to make sure all blocks are at least the min difficulty.. currently it does not check.
 #21 * Add button next to PublicKey to 'copy' to clipboard 
 * New Contact form… when a Keyhotee ID is entered an Invalid public key is displayed… 
-* Allow user to select their own ICON.
+#45 * Allow user to select their own ICON.
 * When a node on a longer name fork connects to a node on a shorter name fork the name databases do not seem to sync.
 * app_config.data_dir should not be specified in config file, it should be inferred from location of config file.
 * Just like text messages show 'unread count'….  there should be an unread email count.   Unread messages should be rendered in Bold in the list.
 * Add keyhotee Id field directly to emails being sent. This will allow user to see a human-readable name rather than just a public key address even when they don't have the sender's information in their contact list.
-* Should be able to select Icons for contacts (Sanjay)
+#45 * Should be able to select Icons for contacts (Sanjay)
 * Move attachment list to bottom of email, display in mail viewer, and add options to save attachments (Yuvaraj)
 * Option to preview or otherwise display attachments which are valid images, etc. Low priority.
