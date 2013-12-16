@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>562</width>
-    <height>400</height>
+    <width>898</width>
+    <height>425</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -27,7 +27,16 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <property name="spacing">
@@ -159,10 +168,279 @@
          <widget class="QWidget" name="info_status"/>
          <widget class="QWidget" name="info_edit">
           <layout class="QGridLayout" name="gridLayout_4">
-           <item row="7" column="2" colspan="2">
+           <item row="0" column="0" rowspan="2">
+            <widget class="QToolButton" name="icon_view">
+             <property name="minimumSize">
+              <size>
+               <width>48</width>
+               <height>48</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>48</width>
+               <height>48</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Keyhotee ID</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../Keyhotee.qrc">
+               <normaloff>:/images/user.png</normaloff>:/images/user.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonIconOnly</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1" colspan="2">
+            <widget class="QLabel" name="first_name_label">
+             <property name="text">
+              <string>First Name</string>
+             </property>
+             <property name="buddy">
+              <cstring>firstname</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QLineEdit" name="firstname">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="2">
+            <widget class="QLabel" name="last_name_label">
+             <property name="text">
+              <string>Last Name</string>
+             </property>
+             <property name="buddy">
+              <cstring>lastname</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QLineEdit" name="lastname">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="2">
+            <widget class="QLabel" name="public_key_label_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Keyhotee ID</string>
+             </property>
+             <property name="buddy">
+              <cstring>id_edit</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2" colspan="2">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QLineEdit" name="id_edit">
+               <property name="placeholderText">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="keyhotee_founder">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(35, 40, 3, 255), stop:0.102273 rgba(136, 106, 22, 255), stop:0.225 rgba(166, 140, 41, 255), stop:0.285 rgba(204, 181, 74, 255), stop:0.345 rgba(235, 219, 102, 255), stop:0.415 rgba(245, 236, 112, 255), stop:0.52 rgba(209, 190, 76, 255), stop:0.57 rgba(187, 156, 51, 255), stop:0.635 rgba(168, 142, 42, 255), stop:0.695 rgba(202, 174, 68, 255), stop:0.75 rgba(218, 202, 86, 255), stop:0.815 rgba(208, 187, 73, 255), stop:0.88 rgba(187, 156, 51, 255), stop:0.935 rgba(137, 108, 26, 255), stop:1 rgba(35, 40, 3, 255));</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::Panel</enum>
+               </property>
+               <property name="text">
+                <string>Keyhotee Founder</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+               <property name="textInteractionFlags">
+                <set>Qt::NoTextInteraction</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="2" column="4">
+            <widget class="QLabel" name="id_status">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>ID Status</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="public_key_label">
+             <property name="text">
+              <string>Public Key</string>
+             </property>
+             <property name="buddy">
+              <cstring>public_key</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2" colspan="2">
+            <widget class="QLineEdit" name="public_key"/>
+           </item>
+           <item row="3" column="4">
+            <widget class="QToolButton" name="public_key_to_clipboard">
+             <property name="maximumSize">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Copy to clipboard</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../Keyhotee.qrc">
+               <normaloff>:/images/win/editcopy.png</normaloff>:/images/win/editcopy.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="2">
+            <widget class="QLabel" name="privacy_level_label">
+             <property name="text">
+              <string>Privacy Level</string>
+             </property>
+             <property name="buddy">
+              <cstring>privacy_comboBox</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2" colspan="2">
+            <widget class="QComboBox" name="privacy_comboBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <item>
+              <property name="text">
+               <string>Blocked</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string extracomment="No one should know you have ever communicated with this individual.">Hidden Relationship</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string extracomment="The government knows you are in communication with this individual.">Public Relationship</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="email_label">
+             <property name="text">
+              <string>Email</string>
+             </property>
+             <property name="buddy">
+              <cstring>email</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="2" colspan="2">
+            <widget class="QLineEdit" name="email"/>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="phone_label">
+             <property name="text">
+              <string>Phone</string>
+             </property>
+             <property name="buddy">
+              <cstring>phone</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="2" colspan="2">
             <widget class="QLineEdit" name="phone"/>
            </item>
-           <item row="8" column="0" colspan="5">
+           <item row="7" column="0" colspan="5">
             <widget class="QGroupBox" name="notes_groupbox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -205,231 +483,6 @@
              </layout>
             </widget>
            </item>
-           <item row="0" column="0" rowspan="2">
-            <widget class="QToolButton" name="icon_view">
-             <property name="minimumSize">
-              <size>
-               <width>48</width>
-               <height>48</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>48</width>
-               <height>48</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Keyhotee ID</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../Keyhotee.qrc">
-               <normaloff>:/images/user.png</normaloff>:/images/user.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="toolButtonStyle">
-              <enum>Qt::ToolButtonIconOnly</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="phone_label">
-             <property name="text">
-              <string>Phone</string>
-             </property>
-             <property name="buddy">
-              <cstring>phone</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="2" colspan="2">
-            <widget class="QLineEdit" name="email"/>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="email_label">
-             <property name="text">
-              <string>Email</string>
-             </property>
-             <property name="buddy">
-              <cstring>email</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0" colspan="2">
-            <widget class="QLabel" name="public_key_label_2">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Keyhotee ID</string>
-             </property>
-             <property name="buddy">
-              <cstring>id_edit</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2" colspan="2">
-            <widget class="QLineEdit" name="id_edit">
-             <property name="placeholderText">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="2" colspan="2">
-            <widget class="QLineEdit" name="public_key"/>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QLabel" name="last_name_label">
-             <property name="text">
-              <string>Last Name</string>
-             </property>
-             <property name="buddy">
-              <cstring>lastname</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
-            <widget class="QLineEdit" name="firstname">
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="placeholderText">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1" colspan="2">
-            <widget class="QLabel" name="first_name_label">
-             <property name="text">
-              <string>First Name</string>
-             </property>
-             <property name="buddy">
-              <cstring>firstname</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0" colspan="2">
-            <widget class="QLabel" name="public_key_label">
-             <property name="text">
-              <string>Public Key</string>
-             </property>
-             <property name="buddy">
-              <cstring>public_key</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="4">
-            <widget class="QLabel" name="id_status">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>200</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>ID Status</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3">
-            <widget class="QLineEdit" name="lastname">
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="placeholderText">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0" colspan="2">
-            <widget class="QLabel" name="privacy_level_label">
-             <property name="text">
-              <string>Privacy Level</string>
-             </property>
-             <property name="buddy">
-              <cstring>privacy_comboBox</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="4">
-            <widget class="QToolButton" name="public_key_to_clipboard">
-             <property name="maximumSize">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Copy to clipboard</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../Keyhotee.qrc">
-               <normaloff>:/images/win/editcopy.png</normaloff>:/images/win/editcopy.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="2" colspan="3">
-            <widget class="QComboBox" name="privacy_comboBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <item>
-              <property name="text">
-               <string>Blocked</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string extracomment="No one should know you have ever communicated with this individual.">Hidden Relationship</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string extracomment="The government knows you are in communication with this individual.">Public Relationship</string>
-              </property>
-             </item>
-            </widget>
-           </item>
           </layout>
           <zorder>privacy_comboBox</zorder>
           <zorder>email_label</zorder>
@@ -439,7 +492,6 @@
           <zorder>public_key_label</zorder>
           <zorder>public_key</zorder>
           <zorder>notes_groupbox</zorder>
-          <zorder>id_status</zorder>
           <zorder>privacy_level_label</zorder>
           <zorder>public_key_label_2</zorder>
           <zorder>lastname</zorder>
@@ -449,6 +501,8 @@
           <zorder>public_key_to_clipboard</zorder>
           <zorder>icon_view</zorder>
           <zorder>id_edit</zorder>
+          <zorder>id_status</zorder>
+          <zorder>keyhotee_founder</zorder>
          </widget>
         </widget>
        </item>
@@ -463,7 +517,16 @@
        <string>Chat</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <property name="spacing">

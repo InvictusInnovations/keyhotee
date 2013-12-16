@@ -151,7 +151,7 @@ void MailEditor::addToContact(int contact_id)
     bool isKeyhoteeFounder = false;
     if(Contact(contacts[contact_id]).getAge() == 1)
       isKeyhoteeFounder = true;
-  to_field->insertCompletion(to_string);
+  to_field->insertCompletion(to_string, isKeyhoteeFounder);
   }
 
 void MailEditor::addToContact(fc::ecc::public_key public_key)

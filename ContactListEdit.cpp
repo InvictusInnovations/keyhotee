@@ -65,7 +65,7 @@ void ContactListEdit::insertCompletion( const QModelIndex& completionIndex )
     isKeyhoteeFounder = true;  
   insertCompletion( completion, isKeyhoteeFounder );
 }
-void ContactListEdit::insertCompletion( const QString& completion )
+void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhoteeFounder )
   {
   ilog( "insertCompletion ${c}", ("c", completion.toStdString() ) );
   // remove existing text
@@ -74,7 +74,7 @@ void ContactListEdit::insertCompletion( const QString& completion )
   if (_completer->widget() != this)
     return;
   QFont        default_font;
-    default_font.setPointSize( default_font.pointSize() - 2 );
+    default_font.setPointSize( default_font.pointSize() - 1 );
   QFontMetrics font_metrics(default_font);
   QRect        bounding = font_metrics.boundingRect(completion);
   int          completion_width = font_metrics.width(completion);
