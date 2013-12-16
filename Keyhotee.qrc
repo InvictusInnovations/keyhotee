@@ -38,10 +38,30 @@
       <file>images/win/editcut.png</file>
       <file>images/win/editpaste.png</file>
       <file>images/win/filesave.png</file>
+      <file>images/win/textbold.png</file>
+      <file>images/win/textcenter.png</file>
+      <file>images/win/textitalic.png</file>
+      <file>images/win/textjustify.png</file>
+      <file>images/win/textleft.png</file>
+      <file>images/win/textright.png</file>
+      <file>images/win/textunder.png</file>
+
       <file>images/showDetails.png</file>
       <file>images/16x16/connectionstatus.png</file>
       <file>images/16x16/no_connectionstatus.png</file>
       <file>images/ownership.png</file>
       <file>images/blank.png</file>
+   
+      <!-- Icons provided by http://findicons.com/pack/77/icandy_junior_toolbar -->
+      <file>images/128x128/contact_info_request_authorisation.png</file>
+      <file>images/128x128/contact_info_send_mail.png</file>
+      <file>images/128x128/contact_info_edit.png</file>
+      <file>images/128x128/contact_info_save.png</file>
+      <file>images/128x128/contact_info_cancel_edit.png</file>
+
+      <file>images/128x128/undo.png</file>
+      <file>images/128x128/redo.png</file>
+      <!-- End of icons provided by http://findicons.com/pack/77/icandy_junior_toolbar -->
+
  </qresource>
  </RCC>

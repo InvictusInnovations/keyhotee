@@ -50,6 +50,34 @@ void Contact::setIcon(const QIcon& icon)
     }
   }
 
+QString Contact::getEmail() const
+  {
+  return QString();
+  }
+
+void Contact::setEmail(const QString& email)
+  {
+  }
+
+QString Contact::getPhone() const
+  {
+  return QString();
+  }
+
+void Contact::setPhone(const QString& phone)
+  {
+  }
+
+QString Contact::getNotes() const
+  {
+  return QString(notes.c_str());
+  }
+
+void Contact::setNotes(const QString& phone)
+  {
+  notes = phone.toStdString();
+  }
+
 QString Contact::getLabel() const
   {
   QString label = (first_name + " " + last_name).c_str();

@@ -121,6 +121,9 @@ qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
 qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
 qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
 qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
+qt5_wrap_ui( UiMailEditor                      Mail/maileditorwindow.ui )
+qt5_wrap_ui( UiMailFieldsWidgets               Mail/mailfieldswidget.ui )
+
 qt5_wrap_ui( UiWallets                         wallets.ui )
 
 QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
@@ -130,15 +133,15 @@ set( library_sources
         AddressBook/AddressBookModel.cpp )
 
 set( sources  
-        Keyhotee.qrc 
-        images/shield.icns 
+        Keyhotee.qrc
+        images/shield.icns
         qrc_Keyhotee.cpp
 
         qtreusable/selfsizingmainwindow.cpp
 
-        profile_wizard/ProfileEditPage.ui 
-        profile_wizard/ProfileIntroPage.ui 
-        profile_wizard/ProfileNymPage.ui 
+        profile_wizard/ProfileEditPage.ui
+        profile_wizard/ProfileIntroPage.ui
+        profile_wizard/ProfileNymPage.ui
         profile_wizard/ProfileWizard.cpp
 
         AddressBook/ContactsTable.ui
@@ -163,22 +166,31 @@ set( sources
         Mail/MailViewer.hpp
         Mail/MailViewer.cpp
 
-        LoginDialog.ui 
+        Mail/maileditorwindow.ui
+        Mail/maileditorwindow.hpp
+        Mail/maileditorwindow.cpp
+        Mail/mailfieldswidget.ui
+        Mail/mailfieldswidget.hpp
+        Mail/mailfieldswidget.cpp
+
+        LoginDialog.ui
+        LoginDialog.hpp
         LoginDialog.cpp
 
         ContactListEdit.hpp
         ContactListEdit.cpp
 
-        KeyhoteeMainWindow.ui 
-        KeyhoteeMainWindow.cpp 
+        KeyhoteeMainWindow.ui
+        KeyhoteeMainWindow.hpp
+        KeyhoteeMainWindow.cpp
 
         connectionstatusframe.ui
         connectionstatusframe.h
         connectionstatusframe.cpp
-		
-		wallets.ui
-		wallets.hpp
-		wallets.cpp
+
+        wallets.ui
+        wallets.hpp
+        wallets.cpp
 
         dataaccessimpl.h
         dataaccessimpl.cpp
@@ -195,7 +207,7 @@ list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.h)
 IF(WIN32)
 ELSE(WIN32)
     #apparently this is needed for Ubuntu (see commit from jefferylee), but it causes problems for windows (lib is brought in via upnpc-static on windows at least)
-	set(MINIUPNP_LIB  miniupnpc)
+  set(MINIUPNP_LIB  miniupnpc)
 ENDIF(WIN32)
 
 # Configure dependencies of keyhotee_library module

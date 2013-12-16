@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MailFieldsWidget</class>
+ <widget class="QWidget" name="MailFieldsWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>380</width>
+    <height>154</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
+    <widget class="QToolButton" name="sendButton">
+     <property name="toolTip">
+      <string>Allows to send currently edited mail message</string>
+     </property>
+     <property name="text">
+      <string>Send</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../Keyhotee.qrc">
+       <normaloff>:/images/128x128/contact_info_send_mail.png</normaloff>:/images/128x128/contact_info_send_mail.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>48</width>
+       <height>48</height>
+      </size>
+     </property>
+     <property name="popupMode">
+      <enum>QToolButton::InstantPopup</enum>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonIconOnly</enum>
+     </property>
+     <property name="autoRaise">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <layout class="QVBoxLayout" name="mailFieldsLayout">
+     <item>
+      <layout class="QHBoxLayout" name="fromLayout">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QToolButton" name="fromButton">
+         <property name="minimumSize">
+          <size>
+           <width>55</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Allows to choose sender's identity</string>
+         </property>
+         <property name="text">
+          <string>From:</string>
+         </property>
+         <property name="popupMode">
+          <enum>QToolButton::MenuButtonPopup</enum>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="arrowType">
+          <enum>Qt::DownArrow</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="fromEdit">
+         <property name="minimumSize">
+          <size>
+           <width>230</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="toLayout">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QToolButton" name="toButton">
+         <property name="minimumSize">
+          <size>
+           <width>55</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Allows to choose mail recipients</string>
+         </property>
+         <property name="text">
+          <string>To: ...</string>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="toEdit">
+         <property name="minimumSize">
+          <size>
+           <width>230</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="ccLayout">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QToolButton" name="ccButton">
+         <property name="minimumSize">
+          <size>
+           <width>55</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Allows to choose mail recipients</string>
+         </property>
+         <property name="text">
+          <string>Cc: ...</string>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="ccEdit">
+         <property name="minimumSize">
+          <size>
+           <width>230</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="bccLayout">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QToolButton" name="bccButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>55</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Allows to choose mail recipients</string>
+         </property>
+         <property name="text">
+          <string>Bcc: ...</string>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="bccEdit">
+         <property name="minimumSize">
+          <size>
+           <width>230</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="subjectLayout">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="minimumSize">
+          <size>
+           <width>55</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Subject:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="subjectEdit">
+         <property name="minimumSize">
+          <size>
+           <width>230</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../Keyhotee.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>subjectEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>MailFieldsWidget</receiver>
+   <slot>onSubjectChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>252</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>189</x>
+     <y>76</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>10</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>10</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
+ <slots>
+  <signal>subjectChanged(QString)</signal>
+  <slot>onSubjectChanged(QString)</slot>
+ </slots>
+</ui>

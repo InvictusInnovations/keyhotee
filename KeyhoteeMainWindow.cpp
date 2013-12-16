@@ -1,10 +1,13 @@
+#include "KeyhoteeMainWindow.hpp"
 
 #include "ui_KeyhoteeMainWindow.h"
-#include "KeyhoteeMainWindow.hpp"
+
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/ContactView.hpp"
-#include "Mail/MailEditor.hpp"
+
 #include "Mail/MailboxModel.hpp"
+#include "Mail/MailEditor.hpp"
+#include "Mail/maileditorwindow.hpp"
 
 #include "connectionstatusframe.h"
 #include "GitSHA1.h"
@@ -585,6 +588,8 @@ void KeyhoteeMainWindow::showContacts()
 
 void KeyhoteeMainWindow::newMailMessage()
   {
+//  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this);
+//  mailWindow->show();
   newMailMessageTo(-1);
   }
 
