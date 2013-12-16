@@ -280,6 +280,7 @@ void ContactView::setContact( const Contact& current_contact)
     ui->lastname->setText( _current_contact.last_name.c_str() );
    // ui->email->setText( _current_contact.email_address );
    // ui->phone->setText( _current_contact.phone_number );
+    ui->keyhotee_founder->setVisible(_current_contact.getAge() == 1);
     std::string public_key_string = public_key_address( _current_contact.public_key );
     ui->public_key->setText( public_key_string.c_str() );
     ui->id_edit->setText( _current_contact.dac_id_string.c_str() );

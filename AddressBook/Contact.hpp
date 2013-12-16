@@ -20,6 +20,8 @@ class Contact : public bts::addressbook::wallet_contact
       QString        getLabel()const;
       const QIcon&   getIcon()const;
       void           setIcon( const QIcon& icon );
+      int            getAge()const;
+      int            getRepute()const;
     
    private:
       /// cache the icon we want to use.

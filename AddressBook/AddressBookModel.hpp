@@ -5,6 +5,17 @@
 
 class QCompleter;
 
+class ContactCompletionModel : public QStringListModel
+{
+public:
+  ContactCompletionModel(QObject *parent = 0);
+//  ContactCompletionModel(const QStringList &strings, QObject *parent = 0);
+
+  ~ContactCompletionModel();
+
+  QVariant data( const QModelIndex& index, int role )const;
+};
+
 namespace Detail { class AddressBookModelImpl; }
 
 /**
