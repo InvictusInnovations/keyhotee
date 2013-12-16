@@ -394,6 +394,11 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       {
       auto con_id = selected_items[0]->data(0, ContactIdRole).toInt();
       openContactGui(con_id);
+      connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
+      if(ui->contacts_page->isShowDetailsHidden())
+        ui->actionShow_details->setChecked(false);
+      else
+        ui->actionShow_details->setChecked(true);
       }
     else if (selected_items[0]->type() == IdentityItem)
       {
