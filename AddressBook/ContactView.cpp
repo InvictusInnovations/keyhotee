@@ -99,26 +99,28 @@ ContactView::ContactView(QWidget* parent)
   grid_layout->setSpacing(0);
   ui->toolbar_container->setLayout(grid_layout);
   grid_layout->addWidget(message_tools, 0, 0);
-  ui->email->setVisible (false);
+  ui->email->setVisible (false);              //unsupported
   ui->phone->setVisible (false);
   ui->phone_label->setVisible (false);
   ui->email_label->setVisible (false);
   ui->privacy_comboBox->setVisible (false);
-  ui->privacy_level_label->setVisible (false);
+  ui->privacy_level_label->setVisible (false);//unsupported
   
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
   edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png"), tr("Edit"), this);
   share_contact = new QAction(QIcon(":/images/read-icon.png"), tr("Share (need new icon)"), this);
+  share_contact->setVisible (false);//unsupported
   request_contact = new QAction( QIcon(":/images/128x128/contact_info_request_authorisation.png"), tr("Request authorisation"), this);
+  request_contact->setVisible (false);//unsupported
   save_contact = new QAction( QIcon(":/images/128x128/contact_info_save.png"), tr( "Save"), this );
   cancel_edit_contact = new QAction( QIcon(":/images/128x128/contact_info_cancel_edit.png"), tr("Discard changes"), this);
   connect(ui->icon_view, &QToolButton::clicked, this, &ContactView::onIconSearch);
 
-  message_tools->addAction(send_mail);
-  message_tools->addAction(save_contact);
+  message_tools->addAction(send_mail);  
   message_tools->addAction(edit_contact);
   message_tools->addAction(share_contact);
   message_tools->addAction(request_contact);
+  message_tools->addAction(save_contact);
   message_tools->addAction(cancel_edit_contact);
 
   //ui->chat_conversation->setHtml( "<html><head></head><body>Hello World<br/></body></html>" );
@@ -140,7 +142,6 @@ ContactView::ContactView(QWidget* parent)
   connect(ui->phone, &QLineEdit::textChanged, this, &ContactView::phoneChanged);
   connect(ui->notes, &QPlainTextEdit::textChanged, this, &ContactView::notesChanged);
   connect(ui->public_key_to_clipboard, &QToolButton::clicked, this, &ContactView::onPublicKeyToClipboard);
-  connect(ui->contact_pages, &QTabWidget::currentChanged, this, &ContactView::onTabChanged);
 
   keyEdit(false);
   ui->chat_input->installEventFilter(this);
@@ -150,48 +151,58 @@ ContactView::ContactView(QWidget* parent)
 
 void ContactView::onEdit()
   {
-  setAddingNewContact(false);   //editing
+  setAddingNewContact(false);   //editing  
+  doDataExchange (false);
   keyEdit(true);   //and set focus on the first field
   ui->contact_pages->setCurrentIndex(info);
   ui->info_stack->setCurrentWidget(ui->info_edit);
+  }
+
+void ContactView::addNewContact ()
+  {  
+  doDataExchange (false);
+  keyEdit(true);
   }
 
 void ContactView::onSave()
   {
   try
     {
-    doDataExchange (true);
-    if (_current_record)
+    if (doDataExchange (true))
       {
-      //_current_contact.bit_id_hash = _current_record->name_hash;
-      if (!_current_contact.public_key.valid() )
+      if (_current_record)
         {
-        _current_contact.public_key = _current_record->active_key;
-        FC_ASSERT(_current_contact.public_key.valid() );
+        //_current_contact.bit_id_hash = _current_record->name_hash;
+        if (!_current_contact.public_key.valid() )
+          {
+          _current_contact.public_key = _current_record->active_key;
+          FC_ASSERT(_current_contact.public_key.valid() );
+          }
+        // TODO: lookup block id / timestamp that registered this ID
+        // _current_contact.known_since.setMSecsSinceEpoch( );
         }
-      // TODO: lookup block id / timestamp that registered this ID
-      // _current_contact.known_since.setMSecsSinceEpoch( );
-      }
-    else if (!_current_record)  /// note: user is entering manual public key
-      {
-      elog("!current record??\n");
-      /*
-         if( _current_contact.known_since == QDateTime() )
-         {
-          _current_contact.known_since = QDateTime::currentDateTime();
-         }
-       */
-      std::string enteredPKey = ui->public_key->text().toStdString();
-      if (enteredPKey.empty() == false)
+      else if (!_current_record)  /// note: user is entering manual public key
         {
-        assert(public_key_address::is_valid(enteredPKey) && "Some bug in control validator");
-        public_key_address key_address(enteredPKey);
-        _current_contact.public_key = key_address.key;
+        elog("!current record??\n");
+        /*
+           if( _current_contact.known_since == QDateTime() )
+           {
+            _current_contact.known_since = QDateTime::currentDateTime();
+           }
+         */
+        std::string enteredPKey = ui->public_key->text().toStdString();
+        if (enteredPKey.empty() == false)
+          {
+          assert(public_key_address::is_valid(enteredPKey) && "Some bug in control validator");
+          public_key_address key_address(enteredPKey);
+          _current_contact.public_key = key_address.key;
+          }
         }
-      }
-    _current_contact.privacy_setting = bts::addressbook::secret_contact;
-    _address_book->storeContact(_current_contact);
-    keyEdit(false);
+      _current_contact.privacy_setting = bts::addressbook::secret_contact;
+      _address_book->storeContact(_current_contact);
+
+      keyEdit(false);
+      }    
     }
   FC_RETHROW_EXCEPTIONS(warn, "onSave")
   }
@@ -205,9 +216,9 @@ void ContactView::onCancel()
     emit canceledAddContact();
     }
   else  //editing contact
-    {
-    keyEdit(false);
+    {    
     doDataExchange (false);
+    keyEdit(false);
     }
   }
 
@@ -242,48 +253,8 @@ ContactView::~ContactView()
 
 void ContactView::setContact(const Contact& current_contact)
   {
-  try
-    {
     _current_contact = current_contact;
-    bool has_null_public_key = _current_contact.public_key == fc::ecc::public_key_data();
-    if (has_null_public_key)
-      {
-      elog("********* null public key!");
-      setValid(false);
-      ui->contact_pages->setCurrentIndex(info);
-
-      if (gMiningIsPossible)
-        ui->id_status->setText(tr("Please provide a valid ID or public key") );
-      else
-        ui->id_status->setText(tr("Public Key Only Mode") );
-
-      if (_current_contact.first_name == std::string() && _current_contact.last_name == std::string() )
-        {
-        ui->id_edit->setText(QString() );
-        ui->public_key->setText(QString() );
-        //keyhoteeIds don't function when mining is not possible
-        if (!gMiningIsPossible)
-          ui->id_edit->setEnabled(false);
-        }
-      }
-    else
-      {
-      /// note: you cannot change the id of a contact once it has been
-      /// set... you must create a new contact anytime their public key
-      /// changes.
-      ui->id_edit->setEnabled(false);
-      setValid(true);
-      /** TODO... restore this kind of check
-         if( _current_contact.bit_id_public_key != _current_contact.public_key  )
-         {
-         ui->id_status->setText(
-                  tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
-         }
-       */
-      }
     doDataExchange (false);
-    }
-  FC_RETHROW_EXCEPTIONS(warn, "")
   }
 
 Contact ContactView::getContact() const
@@ -493,8 +464,21 @@ void ContactView::keyEdit(bool enable)
   _editing = enable;
   ui->firstname->setEnabled(enable);
   ui->lastname->setEnabled(enable);
-  ui->id_edit->setEnabled(enable);
-  ui->public_key->setEnabled(enable);
+  if (isAddingNewContact ())
+    {
+    //keyhoteeIds don't function when mining is not possible
+    ui->id_edit->setEnabled(enable && gMiningIsPossible);
+    ui->public_key->setEnabled(enable);
+    }
+    else
+    {
+    /// note: you cannot change the id of a contact once it has been
+    /// set... you must create a new contact anytime their public key
+    /// changes.
+    ui->id_edit->setEnabled(false);
+    ui->public_key->setEnabled(false);
+    }
+   
   ui->privacy_comboBox->setEnabled(enable);
   ui->email->setEnabled(enable);
   ui->phone->setEnabled(enable);
@@ -503,12 +487,12 @@ void ContactView::keyEdit(bool enable)
 
   ui->id_status->setVisible(enable);
   ui->keyhotee_founder->setVisible(!enable && _current_contact.getAge() == 1);
-  save_contact->setVisible(enable);
-  cancel_edit_contact->setVisible(enable);
-  send_mail->setVisible(!enable);
-  edit_contact->setVisible(!enable);
-  share_contact->setVisible(!enable);
-  request_contact->setVisible(!enable);
+  save_contact->setEnabled(enable);
+  cancel_edit_contact->setEnabled(enable);
+  send_mail->setEnabled(!enable);
+  edit_contact->setEnabled(!enable);
+  //share_contact->setVisible(!enable);
+  //request_contact->setVisible(!enable);
 
   ui->contact_pages->setTabEnabled(chat, !enable);
 
@@ -517,13 +501,6 @@ void ContactView::keyEdit(bool enable)
     ui->firstname->setFocus();
     setModyfied(false);
     }
-  }
-
-void ContactView::onTabChanged(int index)
-  {
-  if (index == chat)
-    //Question wykrywanie zmian
-    keyEdit(false);
   }
 
 bool ContactView::CheckSaving()
@@ -574,7 +551,7 @@ bool ContactView::CheckSaving()
 void ContactView::setValid(bool valid)
   {
   _validForm = valid;
-  save_contact->setEnabled(valid);
+  save_contact->setEnabled(valid && isEditing());
   }
 
 void ContactView::onIconSearch()
@@ -593,6 +570,7 @@ bool ContactView::doDataExchange (bool valid)
     {
     if (isAddingNewContact ()) 
       {
+      setValid(false);
       ui->firstname->setText("");
       ui->lastname->setText("");
       ui->id_edit->setText("");
@@ -601,10 +579,24 @@ bool ContactView::doDataExchange (bool valid)
       ui->email->setText("");
       ui->phone->setText("");
       ui->public_key->setText ("");
-      ui->privacy_comboBox->setCurrentIndex (0);
+      ui->privacy_comboBox->setCurrentIndex (0);      
+      ui->contact_pages->setCurrentIndex(info);
+
+      if (gMiningIsPossible)
+        ui->id_status->setText(tr("Please provide a valid ID or public key") );
+      else
+        ui->id_status->setText(tr("Public Key Only Mode") );
       }
     else 
       {
+      setValid(true);
+      /** TODO... restore this kind of check
+         if( _current_contact.bit_id_public_key != _current_contact.public_key  )
+         {
+         ui->id_status->setText(
+                  tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
+         }
+       */
       ui->firstname->setText( _current_contact.first_name.c_str() );
       ui->lastname->setText( _current_contact.last_name.c_str() );
       ui->id_edit->setText( _current_contact.dac_id_string.c_str() );      
@@ -616,6 +608,7 @@ bool ContactView::doDataExchange (bool valid)
       std::string public_key_string = public_key_address( _current_contact.public_key );
       ui->public_key->setText( public_key_string.c_str() );
       ui->keyhotee_founder->setVisible(!_editing && _current_contact.getAge() == 1);
+      ui->id_status->setText(QString());
       }
     }
     else

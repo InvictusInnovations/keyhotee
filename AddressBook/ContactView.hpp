@@ -48,9 +48,8 @@ public:
     {
     return _addingNewContact;
     }
-
-  void keyEdit(bool enable);
   bool CheckSaving();
+  void addNewContact ();
 
 Q_SIGNALS:
   void canceledAddContact();
@@ -104,7 +103,6 @@ private:
     return _editing;
     }
 
-  void onTabChanged(int index);
   void setValid(bool valid);
   bool isValid() const
     {
@@ -114,6 +112,7 @@ private:
   void onIconSearch();
   bool doDataExchange (bool valid);
   bool existContactWithPublicKey (const std::string& public_key_string);
+  void keyEdit(bool enable);
 
   fc::time_point                          _last_validate;
   Contact                                 _current_contact;

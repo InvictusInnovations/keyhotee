@@ -141,7 +141,7 @@ void ContactsTable::addNewContact(ContactView& view) const
   {
   addContactView(view);
   showView(view);
-  view.keyEdit(true);
+  view.addNewContact ();
   }
 
 void ContactsTable::onCanceledAddContact()
