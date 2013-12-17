@@ -24,6 +24,9 @@ public:
   bool isShowDetailsHidden();
   void onCanceledAddContact();
   bool CheckSaving(ContactView& newView) const;
+
+  bool selectRow(int index);
+
 Q_SIGNALS:
   void contactOpened(int contact_id);
   void showPrevView();

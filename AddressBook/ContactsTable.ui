@@ -14,7 +14,16 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <property name="spacing">
@@ -24,6 +33,9 @@
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
      </property>
      <widget class="QTableView" name="contact_table">
       <property name="sizePolicy">
@@ -71,33 +83,33 @@
        </size>
       </property>
       <widget class="QWidget" name="page">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-              <widget class="QLabel" name="label">
-                 <property name="maximumSize">
-                    <size>
-                       <width>481</width>
-                       <height>16777215</height>
-                    </size>
-                 </property>
-                 <property name="font">
-                    <font>
-                       <pointsize>14</pointsize>
-                       <weight>75</weight>
-                       <bold>true</bold>
-                    </font>
-                 </property>
-                 <property name="text">
-                    <string>Please select the contact</string>
-                 </property>
-                 <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                 </property>
-              </widget>
-           </item>
-        </layout>
-     </widget>
-     <widget class="QWidget" name="page_2"/>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="maximumSize">
+           <size>
+            <width>481</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Please select the contact</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_2"/>
      </widget>
     </widget>
    </item>
