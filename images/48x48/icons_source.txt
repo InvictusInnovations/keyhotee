@@ -1,0 +1,5 @@
+author: http://www.userinterfaceicons.com/
+http://findicons.com/pack/1995/web_application
+
+attachment_add.png: http://findicons.com/icon/217892/attachment_add?id=325752
+attachment_remove.png: http://findicons.com/icon/217892/attachment_add?id=325752

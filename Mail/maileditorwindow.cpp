@@ -2,6 +2,7 @@
 
 #include "ui_maileditorwindow.h"
 
+#include "fileattachmentwidget.hpp"
 #include "mailfieldswidget.hpp"
 #include "moneyattachementwidget.hpp"
 
@@ -32,6 +33,9 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
   ui->moneyAttachementToolBar->hide();
   MoneyAttachement = new TMoneyAttachementWidget(ui->moneyAttachementToolBar);
   ui->moneyAttachementToolBar->addWidget(MoneyAttachement);
+
+  FileAttachment = new TFileAttachmentWidget(ui->fileAttachementToolBar);
+  ui->fileAttachementToolBar->addWidget(FileAttachment);
 
   MailFields = new MailFieldsWidget(*this, *ui->actionSend, abModel);
 

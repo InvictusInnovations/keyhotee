@@ -12,6 +12,7 @@ class QFontComboBox;
 class QTextCharFormat;
 
 class AddressBookModel;
+class TFileAttachmentWidget;
 class MailFieldsWidget;
 class TMoneyAttachementWidget;
 
@@ -71,6 +72,7 @@ class MailEditorMainWindow : public QMainWindow
     AddressBookModel&        ABModel;
     MailFieldsWidget*        MailFields;
     TMoneyAttachementWidget* MoneyAttachement;
+    TFileAttachmentWidget*   FileAttachment;
     QFontComboBox*           FontCombo;
     QComboBox*               FontSize;
   };
