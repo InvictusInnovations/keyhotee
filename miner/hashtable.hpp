@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-#if 1
+#ifndef WIN32
 const int TABLE_SIZE = ((1 << 26) * 1.5);
 
 class hashtable
@@ -42,7 +42,7 @@ private:
   std::array<  std::pair<uint64_t, uint32_t>, TABLE_SIZE >& table;
 };
 
-#else
+#else //WIN32
 //reduced memory block allocation size version for win32
 const size_t TABLE_SIZE = (1 << 25);
 
