@@ -484,8 +484,6 @@ void ContactView::onPublicKeyToClipboard()
   {
   QClipboard *clip = QApplication::clipboard();
   clip->setText(ui->public_key->text());
-  QMessageBox::information(this, tr("Clipboard"),
-                           tr("The Public Key has been copied to the clipboard."));
   }
 
 void ContactView::keyEdit(bool enable)
