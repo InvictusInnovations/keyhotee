@@ -16,18 +16,19 @@ const QIcon& Contact::getIcon() const
 Contact::Contact(const bts::addressbook::wallet_contact& contact)
   : bts::addressbook::wallet_contact(contact)
   {
-  if (contact.icon_png.size() )
+    if (contact.icon_png.size() )
     {
-    QImage image;
-    if (image.loadFromData( (unsigned char*)icon_png.data(), icon_png.size() ) )
-      icon = QIcon(QPixmap::fromImage(image) );
+        QImage image;
+        if (image.loadFromData( (unsigned char*)icon_png.data(), icon_png.size() ) )
+            icon = QIcon(QPixmap::fromImage(image) );
+        else
+            wlog("unable to load icon for contact ${c}", ("c", contact) );
+    }
     else
-      wlog("unable to load icon for contact ${c}", ("c", contact) );
-    }
-  else
     {
-    icon.addFile(QStringLiteral(":/images/user.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QStringLiteral(":/images/user.png"), QSize(), QIcon::Normal, QIcon::Off);
     }
+
   }
 
 void Contact::setIcon(const QIcon& icon)

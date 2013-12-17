@@ -280,7 +280,7 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
   return contact_to_store.wallet_index;
   }
 
-const Contact& AddressBookModel::getContactById(int contact_id)
+Contact& AddressBookModel::getContactById(int contact_id)
   {
   for (uint32_t i = 0; i < my->_contacts.size(); ++i)
     if (my->_contacts[i].wallet_index == contact_id)

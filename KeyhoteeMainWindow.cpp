@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QFileDialog>
 
 extern std::string gApplication_name;
 extern std::string gProfile_name;
@@ -554,7 +555,36 @@ void KeyhoteeMainWindow::on_actionSave_attachement_triggered()
 // Menu Contact
 void KeyhoteeMainWindow::on_actionset_Icon_triggered()
   {
-  notSupported();
+    //  notSupported();
+        QList<QTreeWidgetItem*> selected_items = ui->side_bar->selectedItems();
+
+        if(selected_items.size() == 0)
+        {
+            return;
+        }
+
+        QString selected_image_path =QFileDialog::getOpenFileName(
+                            ui->menuContact,
+                            *new QString("Select Icon"),
+                            ".");
+
+        for(int i = 0; i < selected_items.size(); i++)
+        {
+            auto contact_id = selected_items[i]->data(0, ContactIdRole ).toInt();
+            selected_items[i]->setIcon(0,QIcon(selected_image_path));
+            Contact& contact = _addressbook_model->getContactById( contact_id );
+            contact.setIcon(QIcon(selected_image_path));
+            QImage image(selected_image_path);
+            QByteArray byte_array;
+            QBuffer buffer(&byte_array);
+            buffer.open(QIODevice::WriteOnly);
+            image.save(&buffer, "PNG");
+
+            contact.icon_png.resize( byte_array.size() );
+            memcpy( contact.icon_png.data(), byte_array.data(), byte_array.size() );
+            _addressbook->store_contact(contact );
+        }
+
   }
 
 // Menu Help
