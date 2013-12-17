@@ -11,7 +11,7 @@ QString makeContactListString(std::vector<fc::ecc::public_key> key_list);
 
 
 MailViewer::MailViewer(QWidget* parent)
-: QWidget(parent), ui( new Ui::MailViewer() )
+: /*QWidget(parent),*/ ui( new Ui::MailViewer() )
   {
   ui->setupUi(this);
   message_tools = new QToolBar(ui->toolbar_container);

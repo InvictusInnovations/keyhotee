@@ -17,13 +17,20 @@ class TFileAttachmentWidget : public QWidget
     explicit TFileAttachmentWidget(QWidget* parent);
     virtual ~TFileAttachmentWidget();
 
+  private:
+    void ConfigureAttachmentTable();
+
   private slots:
     void onAddTriggered();
     void onDelTriggered();
     void onSaveTriggered();
+    void onAttachementTableSelectionChanged();
 
   private:
     Ui::TFileAttachmentWidget *ui;
+
+    QStringList                SelectedFiles;
+
   };
 
 #endif // FILEATTACHMENTWIDGET_H

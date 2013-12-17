@@ -32,11 +32,7 @@
       <string>Allows to add new file to mail attachment</string>
      </property>
      <property name="text">
-      <string>Add</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../Keyhotee.qrc">
-       <normaloff>:/images/48x48/attachment_add.png</normaloff>:/images/48x48/attachment_add.png</iconset>
+      <string>add</string>
      </property>
      <property name="iconSize">
       <size>
@@ -72,6 +68,9 @@
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
      </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
      <column>
       <property name="text">
        <string extracomment="Number of attachement items">Total count</string>
@@ -85,7 +84,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QToolButton" name="delAllButton">
+    <widget class="QToolButton" name="delButton">
      <property name="minimumSize">
       <size>
        <width>32</width>
@@ -97,10 +96,6 @@
      </property>
      <property name="text">
       <string>Del</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../Keyhotee.qrc">
-       <normaloff>:/images/48x48/attachment_remove.png</normaloff>:/images/48x48/attachment_remove.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -114,7 +109,7 @@
     </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QToolButton" name="toolButton">
+    <widget class="QToolButton" name="saveButton">
      <property name="minimumSize">
       <size>
        <width>32</width>
@@ -126,10 +121,6 @@
      </property>
      <property name="text">
       <string>Save</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../Keyhotee.qrc">
-       <normaloff>:/images/48x48/attachment_save.png</normaloff>:/images/48x48/attachment_save.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -143,13 +134,125 @@
     </widget>
    </item>
   </layout>
-  <zorder>delAllButton</zorder>
-  <zorder>toolButton</zorder>
+  <action name="actionAdd">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/48x48/attachment_add.png</normaloff>:/images/48x48/attachment_add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add</string>
+   </property>
+   <property name="toolTip">
+    <string>Allows to add new file(s) to the emai's attachement</string>
+   </property>
+  </action>
+  <action name="actionDel">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/48x48/attachment_remove.png</normaloff>:/images/48x48/attachment_remove.png</iconset>
+   </property>
+   <property name="text">
+    <string>Del</string>
+   </property>
+   <property name="toolTip">
+    <string>Allows to remove selected items from the email's attachment</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/48x48/attachment_save.png</normaloff>:/images/48x48/attachment_save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Allows to save selected items from email's attachment</string>
+   </property>
+  </action>
+  <action name="actionSelectAll">
+   <property name="text">
+    <string>SelectAll</string>
+   </property>
+  </action>
+  <zorder>delButton</zorder>
+  <zorder>saveButton</zorder>
   <zorder>attachmentTable</zorder>
   <zorder>addButton</zorder>
  </widget>
  <resources>
   <include location="../Keyhotee.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionAdd</sender>
+   <signal>triggered()</signal>
+   <receiver>TFileAttachmentWidget</receiver>
+   <slot>onAddTriggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDel</sender>
+   <signal>triggered()</signal>
+   <receiver>TFileAttachmentWidget</receiver>
+   <slot>onDelTriggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSave</sender>
+   <signal>triggered()</signal>
+   <receiver>TFileAttachmentWidget</receiver>
+   <slot>onSaveTriggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>attachmentTable</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>TFileAttachmentWidget</receiver>
+   <slot>onAttachementTableSelectionChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>188</x>
+     <y>51</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onAddTriggered()</slot>
+  <slot>onDelTriggered()</slot>
+  <slot>onSaveTriggered()</slot>
+  <slot>onAttachementTableSelectionChanged()</slot>
+ </slots>
 </ui>
