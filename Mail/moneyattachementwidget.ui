@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MoneyAttachementWidget</class>
+ <widget class="QWidget" name="MoneyAttachementWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>290</width>
+    <height>32</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>230</width>
+    <height>32</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Money attachement</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="margin">
+    <number>5</number>
+   </property>
+   <property name="spacing">
+    <number>5</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QDoubleSpinBox" name="amountBox">
+     <property name="minimumSize">
+      <size>
+       <width>70</width>
+       <height>20</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="currencyComboBox">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>20</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="balanceLabel">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Wallet balance</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>currencyComboBox</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MoneyAttachementWidget</receiver>
+   <slot>onCurrencyTypeChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>112</x>
+     <y>11</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>114</x>
+     <y>12</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onCurrencyTypeChanged(int)</slot>
+ </slots>
+</ui>

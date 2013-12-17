@@ -1,19 +1,25 @@
 #ifndef MAILFIELDSWIDGET_HPP
 #define MAILFIELDSWIDGET_HPP
 
+#include <bts/profile.hpp>
+
 #include <QWidget>
+
+#include <map>
 
 namespace Ui 
 {
 class MailFieldsWidget;
 }
 
+class AddressBookModel;
+
 class MailFieldsWidget : public QWidget
   {
-    Q_OBJECT
+  Q_OBJECT
 
   public:
-    MailFieldsWidget(QWidget& parent, QAction& actionSend);
+    MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel);
     virtual ~MailFieldsWidget();
 
     void showFromControls(bool show);
@@ -22,6 +28,10 @@ class MailFieldsWidget : public QWidget
 
     /// Returns currently set subject text.
     QString getSubject() const;
+    const bts::identity& getSelectedSenderIdentity() const
+      {
+      return SenderIdentity;
+      }
 
   Q_SIGNAL void subjectChanged(const QString& subject);
 
@@ -31,17 +41,21 @@ class MailFieldsWidget : public QWidget
     /// Helper for showChildLayout.
     void showLayoutWidgets(QLayout* layout, bool show);
     void validateSendButtonState();
+    void fillSenderIdentities();
 
   private slots:
     void on_sendButton_clicked();
-    void on_toEdit_textChanged(const QString &arg1);
-    void on_bccEdit_textChanged(const QString &arg1);
-    void on_ccEdit_textChanged(const QString &arg1);
+    void onRecipientListChanged();
     void onSubjectChanged(const QString& subject);
+    void onFromBtnTriggered(QAction* action);
 
   private:
+    typedef std::map<QAction*, bts::identity> TAction2IdentityIndex;
     Ui::MailFieldsWidget *ui;
     QAction&              ActionSend;
+    /// Helper map to associate action for created 'from-sub-menu' item to given identity.
+    TAction2IdentityIndex Action2Identity;
+    bts::identity         SenderIdentity;
   };
 
 #endif // MAILFIELDSWIDGET_HPP

@@ -5,17 +5,21 @@
 
 namespace Ui { class MailEditorWindow; }
 
+class QComboBox;
 class QColor;
 class QFont;
+class QFontComboBox;
 class QTextCharFormat;
 
+class AddressBookModel;
 class MailFieldsWidget;
+class TMoneyAttachementWidget;
 
 class MailEditorMainWindow : public QMainWindow
   {
   Q_OBJECT
   public:
-    MailEditorMainWindow(QWidget* parent = nullptr);
+    MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel);
     virtual ~MailEditorMainWindow();
 
   private:
@@ -25,6 +29,7 @@ class MailEditorMainWindow : public QMainWindow
   /// Other helper methods:
     bool maybeSave();
     void setupEditorCommands();
+    /// Updates UI status regarding to chosen alignment.
     void alignmentChanged(Qt::Alignment a);
     void fontChanged(const QFont& f);
     void colorChanged(const QColor& c);
@@ -45,22 +50,29 @@ class MailEditorMainWindow : public QMainWindow
     void onTextBoldTriggerred(bool checked);
     void onTextUnderlineTriggerred(bool checked);
     void onTextItalicTriggerred(bool checked);
+    void onTextColorTriggerred();
+    void onTextFamilyChanged(const QString &f);
+    void onTextSizeChanged(const QString &p);
 
   /// Mail receipents controls selection:
     void onCcTriggered(bool checked);
     void onBccTriggered(bool checked);
     void onFromTriggered(bool checked);
 
-    void onFileAttachementTriggered();
-    void onMoneyAttachementTriggered();
+    void onFileAttachementTriggered(bool checked);
+    void onMoneyAttachementTriggered(bool checked);
     /// Allows to send mail document prepared in current window.
     void on_actionSend_triggered();
     /// Notification for subject changes needed to update window title.
     void onSubjectChanged(const QString& subject);
 
   private:
-    Ui::MailEditorWindow* ui;
-    MailFieldsWidget*     MailFields;
+    Ui::MailEditorWindow*    ui;
+    AddressBookModel&        ABModel;
+    MailFieldsWidget*        MailFields;
+    TMoneyAttachementWidget* MoneyAttachement;
+    QFontComboBox*           FontCombo;
+    QComboBox*               FontSize;
   };
 
 #endif ///__MAILEDITORWINDOW_HPP

@@ -1,15 +1,40 @@
 #include "mailfieldswidget.hpp"
 
+#include "AddressBook/AddressBookModel.hpp"
+
 #include "ui_mailfieldswidget.h"
 
-#include <QAction>
+#include <bts/application.hpp>
+#include <bts/profile.hpp>
+#include <bts/address.hpp>
 
-MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend) :
+/// QT headers:
+#include <QAction>
+#include <QMenu>
+
+MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel) :
   QWidget(&parent),
   ui(new Ui::MailFieldsWidget),
   ActionSend(actionSend)
   {
   ui->setupUi(this);
+
+  fillSenderIdentities();
+  validateSendButtonState();
+
+  ContactListEdit* recipientEdits[3];
+  recipientEdits[0] = ui->toEdit;
+  recipientEdits[1] = ui->ccEdit;
+  recipientEdits[2] = ui->bccEdit;
+
+  QCompleter* completer = abModel.getContactCompleter();
+
+  for(unsigned int i = 0; i < sizeof(recipientEdits)/sizeof(ContactListEdit*); ++i)
+    {
+    ContactListEdit* edit = recipientEdits[i];
+    edit->setCompleter(completer);
+    connect(edit->document(), SIGNAL(contentsChanged()), this, SLOT(onRecipientListChanged()));
+    }
   }
 
 MailFieldsWidget::~MailFieldsWidget()
@@ -79,12 +104,46 @@ void MailFieldsWidget::showLayoutWidgets(QLayout* layout, bool show)
 
 void MailFieldsWidget::validateSendButtonState()
   {
-  bool anyRecipient = ui->toEdit->text().isEmpty() == false;
-  anyRecipient = anyRecipient || ui->ccEdit->text().isEmpty() == false;
-  anyRecipient = anyRecipient || ui->bccEdit->text().isEmpty() == false;
+  bool anyRecipient = ui->toEdit->document()->isEmpty() == false;
+  anyRecipient = anyRecipient || ui->ccEdit->document()->isEmpty() == false;
+  anyRecipient = anyRecipient || ui->bccEdit->document()->isEmpty() == false;
 
   /// Make the send button enabled only if there is any recipient
   ui->sendButton->setEnabled(anyRecipient);
+  }
+
+void MailFieldsWidget::fillSenderIdentities()
+  {
+  QMenu* menu = new QMenu(this);
+  ui->fromButton->setMenu(menu);
+
+  QAction* first = nullptr;
+
+  std::vector<bts::identity> identities = bts::application::instance()->get_profile()->identities();
+  for(const auto& identity : identities)
+    {
+    std::string entry(identity.label);
+
+    if(identity.label.empty() == false)
+      entry += '(';
+
+    entry += identity.dac_id;
+
+    if(identity.label.empty() == false)
+      entry += ')';
+
+    QAction* action = menu->addAction(tr(entry.c_str()));
+    action->setCheckable(true);
+    Action2Identity.insert(TAction2IdentityIndex::value_type(action, identity));
+    
+    if(first == nullptr)
+      first = action;
+    }
+
+  connect(menu, SIGNAL(triggered(QAction*)), this, SLOT(onFromBtnTriggered(QAction*)));
+
+  onFromBtnTriggered(first);
+  menu->setActiveAction(first);
   }
 
 void MailFieldsWidget::on_sendButton_clicked()
@@ -92,17 +151,7 @@ void MailFieldsWidget::on_sendButton_clicked()
   ActionSend.trigger();
   }
 
-void MailFieldsWidget::on_toEdit_textChanged(const QString&)
-  {
-  validateSendButtonState();
-  }
-
-void MailFieldsWidget::on_bccEdit_textChanged(const QString&)
-  {
-  validateSendButtonState();
-  }
-
-void MailFieldsWidget::on_ccEdit_textChanged(const QString&)
+void MailFieldsWidget::onRecipientListChanged()
   {
   validateSendButtonState();
   }
@@ -110,5 +159,21 @@ void MailFieldsWidget::on_ccEdit_textChanged(const QString&)
 void MailFieldsWidget::onSubjectChanged(const QString &subject)
   {
   emit subjectChanged(subject);
+  }
+
+void MailFieldsWidget::onFromBtnTriggered(QAction* action)
+  {
+  /// Clear checked state for all identities
+  for(const auto& v : Action2Identity)
+    v.first->setChecked(false);
+
+  action->setChecked(true);
+
+  TAction2IdentityIndex::const_iterator foundPos = Action2Identity.find(action);
+  assert(foundPos != Action2Identity.end());
+
+  SenderIdentity = foundPos->second;
+
+  ui->fromEdit->setText(action->text());
   }
 
