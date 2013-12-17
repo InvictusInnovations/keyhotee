@@ -221,8 +221,10 @@ void ProfileWizard::createProfile(int result)
     myself.first_name = conf.firstname;
     myself.last_name = conf.lastname;
     myself.set_dac_id(new_ident.dac_id);
-    myself.public_key = profile->get_keychain().get_identity_key(myself.dac_id_string).get_public_key();
+    auto priv_key = profile->get_keychain().get_identity_key(myself.dac_id_string);
+    myself.public_key = priv_key.get_public_key();
     abook->store_contact(myself);
+    bts::application::instance()->add_receive_key(priv_key);
 
     display_main_window();
     }
