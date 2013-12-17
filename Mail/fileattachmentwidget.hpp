@@ -18,7 +18,11 @@ class TFileAttachmentWidget : public QWidget
     virtual ~TFileAttachmentWidget();
 
   private:
+    /// Allows to prebuild context menu specific to attachment table.
+    void ConfigureContextMenu();
+    /// Configures other properties of attachment table.
     void ConfigureAttachmentTable();
+    void UpdateColumnHeaders(unsigned int count, unsigned long long totalSize);
 
   private slots:
     void onAddTriggered();
@@ -27,8 +31,8 @@ class TFileAttachmentWidget : public QWidget
     void onAttachementTableSelectionChanged();
 
   private:
-    Ui::TFileAttachmentWidget *ui;
-
+    Ui::TFileAttachmentWidget* ui;
+//    QMenu*                     ContextMenu;
     QStringList                SelectedFiles;
 
   };

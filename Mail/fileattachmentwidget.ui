@@ -53,6 +53,12 @@
        <height>45</height>
       </size>
      </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::ActionsContextMenu</enum>
+     </property>
+     <property name="showGrid">
+      <bool>false</bool>
+     </property>
      <property name="sortingEnabled">
       <bool>true</bool>
      </property>
@@ -157,6 +163,12 @@
    <property name="toolTip">
     <string>Allows to remove selected items from the email's attachment</string>
    </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
   </action>
   <action name="actionSave">
    <property name="icon">
@@ -169,10 +181,36 @@
    <property name="toolTip">
     <string>Allows to save selected items from email's attachment</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
   </action>
   <action name="actionSelectAll">
    <property name="text">
     <string>SelectAll</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
+  </action>
+  <action name="actionRename">
+   <property name="text">
+    <string>Rename</string>
+   </property>
+   <property name="toolTip">
+    <string>Allows to rename attached file</string>
+   </property>
+   <property name="shortcut">
+    <string>F2</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
    </property>
   </action>
   <zorder>delButton</zorder>
