@@ -103,6 +103,8 @@ ContactView::ContactView(QWidget* parent)
   ui->phone->setVisible (false);
   ui->phone_label->setVisible (false);
   ui->email_label->setVisible (false);
+  ui->privacy_comboBox->setVisible (false);
+  ui->privacy_level_label->setVisible (false);
   
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
   edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png"), tr("Edit"), this);
