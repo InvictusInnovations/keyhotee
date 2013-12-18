@@ -109,19 +109,17 @@ ContactView::ContactView(QWidget* parent)
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
   edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png"), tr("Edit"), this);
   share_contact = new QAction(QIcon(":/images/read-icon.png"), tr("Share (need new icon)"), this);
-  share_contact->setVisible (false);//unsupported
   request_contact = new QAction( QIcon(":/images/128x128/contact_info_request_authorisation.png"), tr("Request authorisation"), this);
-  request_contact->setVisible (false);//unsupported
   save_contact = new QAction( QIcon(":/images/128x128/contact_info_save.png"), tr( "Save"), this );
   cancel_edit_contact = new QAction( QIcon(":/images/128x128/contact_info_cancel_edit.png"), tr("Discard changes"), this);
   connect(ui->icon_view, &QToolButton::clicked, this, &ContactView::onIconSearch);
 
-  message_tools->addAction(send_mail);  
+  message_tools->addAction(cancel_edit_contact);
+  message_tools->addAction(save_contact);  
   message_tools->addAction(edit_contact);
+  message_tools->addAction(send_mail);  
   message_tools->addAction(share_contact);
   message_tools->addAction(request_contact);
-  message_tools->addAction(save_contact);
-  message_tools->addAction(cancel_edit_contact);
 
   //ui->chat_conversation->setHtml( "<html><head></head><body>Hello World<br/></body></html>" );
   connect(save_contact, &QAction::triggered, this, &ContactView::onSave);
@@ -491,8 +489,8 @@ void ContactView::keyEdit(bool enable)
   cancel_edit_contact->setEnabled(enable);
   send_mail->setEnabled(!enable);
   edit_contact->setEnabled(!enable);
-  //share_contact->setVisible(!enable);
-  //request_contact->setVisible(!enable);
+  share_contact->setEnabled(false);
+  request_contact->setEnabled(false);
 
   ui->contact_pages->setTabEnabled(chat, !enable);
 
