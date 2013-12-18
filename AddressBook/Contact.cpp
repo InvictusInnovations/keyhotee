@@ -101,7 +101,7 @@ bool Contact::isOwn() const
 
     for (const auto& id : currentProfile->identities())
       {
-      auto                     myPublicKey = keyChain.get_identity_key(id.dac_id).get_public_key();
+      auto                     myPublicKey = keyChain.get_identity_key(id.dac_id_string).get_public_key();
       fc::ecc::public_key_data keyData = myPublicKey;
 
       myPublicKeys.insert(keyData);
@@ -118,13 +118,28 @@ bool Contact::isOwn() const
     }
   }
 
+
 int Contact::getAge() const
   {
-  return (getLabel().size()%2);
+  auto app = bts::application::instance();
+  fc::optional<bts::bitname::name_record> oname_record =  app->lookup_name( dac_id_string );
+  if (oname_record)
+    {
+    return oname_record->age;
+    }
+  else
+    return 0;
   }
 
 int Contact::getRepute() const
   {
-  return 0;
+  auto app = bts::application::instance();
+  fc::optional<bts::bitname::name_record> oname_record =  app->lookup_name( dac_id_string );
+  if (oname_record)
+    {
+    return oname_record->repute;
+    }
+  else
+    return 0;
   }
 
