@@ -235,7 +235,7 @@ void ContactView::onChat()
 
 void ContactView::onMail()
   {
-  GetKeyhoteeWindow()->newMailMessageTo(_current_contact.wallet_index);
+  GetKeyhoteeWindow()->newMailMessageTo(_current_contact);
   }
 
 void ContactView::onShareContact()

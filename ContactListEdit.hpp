@@ -1,6 +1,8 @@
 #pragma once
 #include <QTextEdit>
 
+#include "ch/mailprocessor.hpp"
+
 class QCompleter;
 
 /**
@@ -19,6 +21,11 @@ public:
   /** Allows to explicitly show completer control and start search with given completion prefix.
   */
   void showCompleter(const QString& completionPrefix);
+
+  /// Allows to fill control with previously collected list of contacts.
+  void SetCollectedContacts(const IMailProcessor::TRecipientPublicKeys& storage);
+  /// Allows to get all collected contacts
+  void GetCollectedContacts(IMailProcessor::TRecipientPublicKeys* storage) const;
 
   QSize sizeHint() const;
   QSize maximumSizeHint() const
@@ -42,7 +49,9 @@ private Q_SLOTS:
   void fitHeightToDocument();
 
 private:
-  QString textUnderCursor() const;
+  QString     textUnderCursor() const;
+  QStringList getListOfImageNames() const;
+  void        addContactEntry(const QString& contactText, bool isFounder);
 
 private:
   int         _fitted_height;

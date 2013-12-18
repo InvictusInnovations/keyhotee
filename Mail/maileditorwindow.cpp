@@ -17,10 +17,12 @@
 #include <QToolBar>
 #include <QToolButton>
 
-MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel, bool editMode) :
+MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel,
+  IMailProcessor& mailProcessor, bool editMode) :
   QMainWindow(parent, Qt::WindowFlags(Qt::WindowType::Dialog)),
   ui(new Ui::MailEditorWindow()),
   ABModel(abModel),
+  MailProcessor(mailProcessor),
   FontCombo(nullptr),
   EditMode(editMode)
   {
@@ -94,6 +96,12 @@ MailEditorMainWindow::~MailEditorMainWindow()
   delete ui;
   }
 
+void MailEditorMainWindow::SetRecipientList(const TRecipientPublicKeys& toList,
+  const TRecipientPublicKeys& ccList, const TRecipientPublicKeys& bccList)
+  {
+  MailFields->SetRecipientList(toList, ccList, bccList);
+  }
+
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
   {
   if(maybeSave())
@@ -105,7 +113,7 @@ void MailEditorMainWindow::closeEvent(QCloseEvent *e)
 bool MailEditorMainWindow::maybeSave()
   {
   if(ui->messageEdit->document()->isModified() == false)
-      return true;
+    return true;
 
   QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Keyhotee"),
     tr("The document has been modified.\nDo you want to save your changes ?"),
@@ -186,19 +194,44 @@ void MailEditorMainWindow::mergeFormatOnWordOrSelection(const QTextCharFormat &f
   ui->messageEdit->mergeCurrentCharFormat(format);
   }
 
-void MailEditorMainWindow::prepareMailMessage(TPhysicalMailMessage* storage) const
+bool MailEditorMainWindow::prepareMailMessage(TPhysicalMailMessage* storage,
+  TRecipientPublicKeys* bccList)
   {
-  //this->MailFields->GetS
-  //msg.subject = subject_field->text().toStdString();
-  //msg.body = textEdit->document()->toHtml().toStdString();
+  const bts::addressbook::wallet_identity& senderId = MailFields->GetSenderIdentity();
+  storage->subject = MailFields->getSubject().toStdString();
 
+  MailFields->FillRecipientLists(&storage->to_list, &storage->cc_list, bccList);
+  storage->body = ui->messageEdit->document()->toHtml().toStdString();
+
+  typedef TFileAttachmentWidget::TFileInfoList TFileInfoList;
+  TFileInfoList brokenFileInfos;
+  if(FileAttachment->GetAttachedFiles(&storage->attachments, &brokenFileInfos) == false)
+    {
+    /// Report a message about file attachment failure.
+    QString msg(tr("Following files doesn't exist or are not readable. Do you want to continue ?<br/>"));
+    for(auto fiIt = brokenFileInfos.cbegin(); fiIt != brokenFileInfos.cend(); ++fiIt)
+      {
+      const QFileInfo& fi = *fiIt;
+      msg += fi.absoluteFilePath() + tr("<br/>");
+      }
+    
+    if(QMessageBox::question(this, tr("File attachment"), msg) == QMessageBox::Button::No)
+      return false;
+    }
+
+  return true;
   }
 
 void MailEditorMainWindow::onSave()
   {
   ui->messageEdit->document()->setModified(false);
-
-  /// FIXME do actual save operation
+  TPhysicalMailMessage msg;
+  TRecipientPublicKeys bccList;
+  if(prepareMailMessage(&msg, &bccList))
+    {
+    const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
+    MailProcessor.Save(senderId, msg, bccList);
+    }
   }
 
 void MailEditorMainWindow::onClipboardDataChanged()
@@ -318,7 +351,16 @@ void MailEditorMainWindow::onMoneyAttachementTriggered(bool checked)
 
 void MailEditorMainWindow::on_actionSend_triggered()
   {
-  /// TODO implement actual mail send operation
+  TPhysicalMailMessage msg;
+  TRecipientPublicKeys bccList;
+  if(prepareMailMessage(&msg, &bccList))
+    {
+    const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
+    MailProcessor.Send(senderId, msg, bccList);
+    /// Clear potential modified flag to avoid asking for saving changes.
+    ui->messageEdit->document()->setModified(false);
+    close();
+    }
   }
 
 void MailEditorMainWindow::onSubjectChanged(const QString& subject)

@@ -124,8 +124,9 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
   return new QStringListModel(words, completer);
   }
 
-KeyhoteeMainWindow::KeyhoteeMainWindow()
-  : SelfSizingMainWindow()
+KeyhoteeMainWindow::KeyhoteeMainWindow() :
+  SelfSizingMainWindow(),
+  MailProcessor(this, bts::application::instance()->get_profile())
   {
   ui.reset(new Ui::KeyhoteeMainWindow() );
   ui->setupUi(this);
@@ -595,16 +596,25 @@ void KeyhoteeMainWindow::showContacts()
 
 void KeyhoteeMainWindow::newMailMessage()
   {
-  //MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model, true);
-  //mailWindow->show();
-  newMailMessageTo(-1);
+  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
+    MailProcessor, true);
+  mailWindow->show();
+  //newMailMessageTo(-1);
   }
 
-void KeyhoteeMainWindow::newMailMessageTo(int contact_id)
+void KeyhoteeMainWindow::newMailMessageTo(const Contact& contact)
   {
-  auto msg_window = new MailEditor(this);
-  msg_window->addToContact(contact_id);
-  msg_window->setFocusAndShow();
+  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
+    MailProcessor, true);
+
+  IMailProcessor::TRecipientPublicKeys toList, emptyList;
+  toList.push_back(contact.public_key);
+  mailWindow->SetRecipientList(toList, emptyList, emptyList);
+  mailWindow->show();
+
+  //auto msg_window = new MailEditor(this);
+  //msg_window->addToContact(contact_id);
+  //msg_window->setFocusAndShow();
   }
 
 ContactGui* KeyhoteeMainWindow::getContactGui(int contact_id)

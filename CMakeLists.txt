@@ -205,8 +205,11 @@ set( sources
 
         dataaccessimpl.h
         dataaccessimpl.cpp
+        mailprocessorimpl.hpp
+        mailprocessorimpl.cpp
 
         ch/connectionstatusds.h
+        ch/mailprocessor.hpp
 
         main.cpp )
 

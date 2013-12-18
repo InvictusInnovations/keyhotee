@@ -118,7 +118,6 @@ bool Contact::isOwn() const
     }
   }
 
-
 int Contact::getAge() const
   {
   auto app = bts::application::instance();

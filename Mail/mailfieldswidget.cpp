@@ -42,6 +42,20 @@ MailFieldsWidget::~MailFieldsWidget()
   delete ui;
   }
 
+void MailFieldsWidget::SetRecipientList(const TRecipientPublicKeys& toList,
+  const TRecipientPublicKeys& ccList, const TRecipientPublicKeys& bccList)
+  {
+  ui->toEdit->SetCollectedContacts(toList);
+  ui->ccEdit->SetCollectedContacts(ccList);
+  ui->bccEdit->SetCollectedContacts(bccList);
+
+  if(ccList.empty() == false)
+    showCcControls(true);
+
+  if(ccList.empty() == false)
+    showBccControls(true);
+  }
+
 void MailFieldsWidget::showFromControls(bool show)
   {
   showChildLayout(ui->fromLayout, show, 0);
@@ -60,6 +74,14 @@ void MailFieldsWidget::showBccControls(bool show)
 QString MailFieldsWidget::getSubject() const
   {
   return ui->subjectEdit->text();
+  }
+
+void MailFieldsWidget::FillRecipientLists(TRecipientPublicKeys* toList, TRecipientPublicKeys* ccList,
+  TRecipientPublicKeys* bccList) const
+  {
+  ui->toEdit->GetCollectedContacts(toList);
+  ui->ccEdit->GetCollectedContacts(ccList);
+  ui->bccEdit->GetCollectedContacts(bccList);
   }
 
 void MailFieldsWidget::showChildLayout(QLayout* layout, bool show, int preferredPosition)

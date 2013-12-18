@@ -3,16 +3,21 @@
 #include <unordered_map>
 #include <bts/addressbook/addressbook.hpp>
 #include <bts/application.hpp>
-#include <qtreusable/selfsizingmainwindow.h>
+
+#include "qtreusable/selfsizingmainwindow.h"
 
 #include "dataaccessimpl.h"
+#include "mailprocessorimpl.hpp"
 
 namespace Ui { class KeyhoteeMainWindow; }
+
 class QTreeWidgetItem;
 class QLineEdit;
-class ContactView;
-class AddressBookModel;
 class QCompleter;
+
+class AddressBookModel;
+class Contact;
+class ContactView;
 class InboxView;
 class MailboxModel;
 class KeyhoteeMainWindow;
@@ -50,7 +55,7 @@ public:
   virtual ~KeyhoteeMainWindow();
 
   void newMailMessage();
-  void newMailMessageTo(int contact_id);
+  void newMailMessageTo(const Contact& contact);
   void addContact();
   void showContacts();
   void onSidebarSelectionChanged();
@@ -136,6 +141,7 @@ private:
   QLineEdit*                              _search_edit;
   std::unique_ptr<Ui::KeyhoteeMainWindow> ui;
   TConnectionStatusDS                     ConnectionStatusDS;
+  TMailProcessor                          MailProcessor;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* GetKeyhoteeWindow();
