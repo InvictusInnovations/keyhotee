@@ -68,10 +68,13 @@
      <property name="columnCount">
       <number>2</number>
      </property>
-     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+     <attribute name="horizontalHeaderCascadingSectionResizes">
       <bool>true</bool>
      </attribute>
-     <attribute name="horizontalHeaderStretchLastSection">
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>200</number>
+     </attribute>
+     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
       <bool>true</bool>
      </attribute>
      <attribute name="verticalHeaderVisible">
@@ -190,7 +193,10 @@
   </action>
   <action name="actionSelectAll">
    <property name="text">
-    <string>SelectAll</string>
+    <string>Select all</string>
+   </property>
+   <property name="toolTip">
+    <string>Select all items in attachment</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
@@ -282,6 +288,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>171</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSelectAll</sender>
+   <signal>triggered()</signal>
+   <receiver>attachmentTable</receiver>
+   <slot>selectAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>190</x>
      <y>51</y>
     </hint>
    </hints>

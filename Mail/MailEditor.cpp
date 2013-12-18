@@ -438,7 +438,8 @@ void MailEditor::setupAttachmentTable()
     filename->setTextAlignment(Qt::AlignLeft);
     filename->setToolTip((*filename_Iterator).toLocal8Bit().constData());
 
-    QTableWidgetItem* size_of_file = new QTableWidgetItem(QString::number(size_file, 'f', 1) + QString::fromStdString(file_size_unit[index_file_size]));
+    QTableWidgetItem* size_of_file = new QTableWidgetItem(QString::number(size_file, 'f', 1) +
+      QString::fromStdString(file_size_unit[index_file_size]));
     size_of_file->setToolTip(QString((*filename_Iterator).toLocal8Bit().constData()));
     size_of_file->setTextAlignment(Qt::AlignRight);
 
