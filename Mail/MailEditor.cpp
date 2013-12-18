@@ -332,7 +332,7 @@ void MailEditor::setupAddressBar()
     {
     // TODO: add user icon?
     elog("From field... ");
-    from_field->insertItem(i, idents[i].dac_id.c_str() );
+    from_field->insertItem(i, idents[i].dac_id_string.c_str() );
     }
   subject_field = new QLineEdit(address_bar);
   setWindowTitle(tr("New Message") );
@@ -596,7 +596,7 @@ void MailEditor::updateAddressBarLayout()
       {
       // TODO: add user icon?
       elog("From field... ");
-      from_field->insertItem(i, idents[i].dac_id.c_str() );
+      from_field->insertItem(i, idents[i].dac_id_string.c_str() );
       }
     // from_field->setText( from_text );
     address_layout->addRow("From:", from_field);
@@ -946,7 +946,7 @@ void MailEditor::sendMailMessage()
     std::vector<fc::ecc::public_key> bcc_list;
     getRecipientKeys(bcc_field, bcc_list);
 
-    auto                             my_priv_key = profile->get_keychain().get_identity_key(identities[0].dac_id);
+    auto                             my_priv_key = profile->get_keychain().get_identity_key(identities[0].dac_id_string);
     foreach(auto public_key, msg.to_list)
     app->send_email(msg, public_key, my_priv_key);
     foreach(auto public_key, msg.cc_list)

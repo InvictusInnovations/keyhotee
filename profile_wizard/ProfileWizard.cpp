@@ -212,15 +212,15 @@ void ProfileWizard::createProfile(int result)
     auto                             profile = app->create_profile(conf, password);
     assert(profile != nullptr);
 
-    bts::identity                    new_ident;
-    new_ident.dac_id = _nym_page->_profile_nym_ui.keyhotee_id->text().toStdString();
+    bts::addressbook::wallet_identity                    new_ident;
+    new_ident.dac_id_string = _nym_page->_profile_nym_ui.keyhotee_id->text().toStdString();
     profile->store_identity(new_ident);
     auto                             abook = profile->get_addressbook();
     bts::addressbook::wallet_contact myself;
     myself.wallet_index = 0;
     myself.first_name = conf.firstname;
     myself.last_name = conf.lastname;
-    myself.set_dac_id(new_ident.dac_id);
+    myself.set_dac_id(new_ident.dac_id_string);
     auto priv_key = profile->get_keychain().get_identity_key(myself.dac_id_string);
     myself.public_key = priv_key.get_public_key();
     abook->store_contact(myself);

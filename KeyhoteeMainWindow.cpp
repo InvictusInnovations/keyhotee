@@ -274,8 +274,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
            new_ident_item->setText( 0, (idents[i].bit_id + " [" + std::to_string(id_rec->repute)+"]" ).c_str() );
         }
      */
-    app->mine_name(idents[i].dac_id,
-                   profile->get_keychain().get_identity_key(idents[i].dac_id).get_public_key(),
+    app->mine_name(idents[i].dac_id_string,
+                   profile->get_keychain().get_identity_key(idents[i].dac_id_string).get_public_key(),
                    idents[i].mining_effort);
   app->set_mining_intensity(0);
   ui->actionEnable_Mining->setChecked(app->get_mining_intensity() != 0);

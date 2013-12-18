@@ -28,7 +28,7 @@ class MailFieldsWidget : public QWidget
 
     /// Returns currently set subject text.
     QString getSubject() const;
-    const bts::identity& getSelectedSenderIdentity() const
+    const bts::addressbook::wallet_identity& getSelectedSenderIdentity() const
       {
       return SenderIdentity;
       }
@@ -50,12 +50,12 @@ class MailFieldsWidget : public QWidget
     void onFromBtnTriggered(QAction* action);
 
   private:
-    typedef std::map<QAction*, bts::identity> TAction2IdentityIndex;
+    typedef std::map<QAction*, bts::addressbook::wallet_identity> TAction2IdentityIndex;
     Ui::MailFieldsWidget *ui;
     QAction&              ActionSend;
-    /// Helper map to associate action for created 'from-sub-menu' item to given identity.
+    /// Helper map to associate action for created 'from-sub-menu' item to given wallet_identity.
     TAction2IdentityIndex Action2Identity;
-    bts::identity         SenderIdentity;
+    bts::addressbook::wallet_identity         SenderIdentity;
   };
 
 #endif // MAILFIELDSWIDGET_HPP

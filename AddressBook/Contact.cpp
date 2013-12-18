@@ -101,7 +101,7 @@ bool Contact::isOwn() const
 
     for (const auto& id : currentProfile->identities())
       {
-      auto                     myPublicKey = keyChain.get_identity_key(id.dac_id).get_public_key();
+      auto                     myPublicKey = keyChain.get_identity_key(id.dac_id_string).get_public_key();
       fc::ecc::public_key_data keyData = myPublicKey;
 
       myPublicKeys.insert(keyData);

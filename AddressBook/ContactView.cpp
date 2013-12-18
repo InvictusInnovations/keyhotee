@@ -52,7 +52,7 @@ void ContactView::sendChatMessage()
     bts::bitchat::private_text_message text_msg(msg.toStdString() );
     if (idents.size() )
       {
-      fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(idents[0].dac_id);
+      fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(idents[0].dac_id_string);
       app->send_text_message(text_msg, _current_contact.public_key, my_priv_key);
       appendChatMessage("me", msg);
       }
@@ -286,7 +286,7 @@ void ContactView::lastNameChanged(const QString& /*name*/)
 
    Some choices in Display Status for id not found on block chain: Available, Unable to find, Not registered
 
- *** When creating new identity (this is for later implementation and some details may change):
+ *** When creating new wallet_identity (this is for later implementation and some details may change):
 
    Note: Public key field is not editable (only keyhotee-generated public keys are allowed as they must be tied to wallet)
 

@@ -119,17 +119,18 @@ void MailFieldsWidget::fillSenderIdentities()
 
   QAction* first = nullptr;
 
-  std::vector<bts::identity> identities = bts::application::instance()->get_profile()->identities();
+  std::vector<bts::addressbook::wallet_identity> identities = bts::application::instance()->get_profile()->identities();
   for(const auto& identity : identities)
     {
-    std::string entry(identity.label);
+    std::string identity_label = identity.first_name + " " + identity.last_name;
+    std::string entry(identity_label);
 
-    if(identity.label.empty() == false)
+    if(identity_label.empty() == false)
       entry += '(';
 
-    entry += identity.dac_id;
+    entry += identity.dac_id_string;
 
-    if(identity.label.empty() == false)
+    if(identity_label.empty() == false)
       entry += ')';
 
     QAction* action = menu->addAction(tr(entry.c_str()));
