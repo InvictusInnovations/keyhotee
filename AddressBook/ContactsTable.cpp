@@ -152,8 +152,7 @@ void ContactsTable::onCanceledAddContact()
 void ContactsTable::onCurrentViewChanged(int index)
   {}
 
-bool ContactsTable::selectRow(int index)
+void ContactsTable::selectRow(int index)
 {
   ui->contact_table->selectRow(index);
-  return false;
 }

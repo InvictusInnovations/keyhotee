@@ -94,6 +94,8 @@ void Mailbox::setModel(MailboxModel* model, InboxType type)
   //ui->inbox_table->sortByColumn(0, Qt::AscendingOrder);
   //ui->inbox_table->setModel( model );
 
+  ui->inbox_table->setShowGrid(false);
+
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::To, 120);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::Subject, 300);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateReceived, 120);
@@ -133,6 +135,11 @@ void Mailbox::setModel(MailboxModel* model, InboxType type)
   connect(reply_all_mail, &QAction::triggered, this, &Mailbox::onReplyAllMail);
   connect(forward_mail, &QAction::triggered, this, &Mailbox::onForwardMail);
   connect(delete_mail, &QAction::triggered, this, &Mailbox::onDeleteMail);
+
+  // hidden Coin Attachment Column
+  ui->inbox_table->hideColumn(MailboxModel::Money);
+  // hidden Chat Column
+  ui->inbox_table->hideColumn(MailboxModel::Chat);
   }
 
 void Mailbox::setupActions()

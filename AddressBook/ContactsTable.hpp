@@ -25,7 +25,7 @@ public:
   void onCanceledAddContact();
   bool CheckSaving(ContactView& newView) const;
 
-  bool selectRow(int index);
+  void selectRow(int index);
 
 Q_SIGNALS:
   void contactOpened(int contact_id);
