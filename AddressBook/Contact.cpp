@@ -118,13 +118,28 @@ bool Contact::isOwn() const
     }
   }
 
+
 int Contact::getAge() const
   {
-  return (getLabel().size()%2);
+  auto app = bts::application::instance();
+  fc::optional<bts::bitname::name_record> oname_record =  app->lookup_name( dac_id_string );
+  if (oname_record)
+    {
+    return oname_record->age;
+    }
+  else
+    return 0;
   }
 
 int Contact::getRepute() const
   {
-  return 0;
+  auto app = bts::application::instance();
+  fc::optional<bts::bitname::name_record> oname_record =  app->lookup_name( dac_id_string );
+  if (oname_record)
+    {
+    return oname_record->repute;
+    }
+  else
+    return 0;
   }
 
