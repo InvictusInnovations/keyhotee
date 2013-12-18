@@ -17,11 +17,12 @@
 #include <QToolBar>
 #include <QToolButton>
 
-MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel) :
+MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel, bool editMode) :
   QMainWindow(parent, Qt::WindowFlags(Qt::WindowType::Dialog)),
   ui(new Ui::MailEditorWindow()),
   ABModel(abModel),
-  FontCombo(nullptr)
+  FontCombo(nullptr),
+  EditMode(editMode)
   {
   ui->setupUi(this);
 
@@ -34,7 +35,7 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
   MoneyAttachement = new TMoneyAttachementWidget(ui->moneyAttachementToolBar);
   ui->moneyAttachementToolBar->addWidget(MoneyAttachement);
 
-  FileAttachment = new TFileAttachmentWidget(ui->fileAttachementToolBar);
+  FileAttachment = new TFileAttachmentWidget(ui->fileAttachementToolBar, editMode);
   ui->fileAttachementToolBar->addWidget(FileAttachment);
 
   MailFields = new MailFieldsWidget(*this, *ui->actionSend, abModel);
@@ -183,6 +184,14 @@ void MailEditorMainWindow::mergeFormatOnWordOrSelection(const QTextCharFormat &f
     cursor.select(QTextCursor::WordUnderCursor);
   cursor.mergeCharFormat(format);
   ui->messageEdit->mergeCurrentCharFormat(format);
+  }
+
+void MailEditorMainWindow::prepareMailMessage(TPhysicalMailMessage* storage) const
+  {
+  //this->MailFields->GetS
+  //msg.subject = subject_field->text().toStdString();
+  //msg.body = textEdit->document()->toHtml().toStdString();
+
   }
 
 void MailEditorMainWindow::onSave()

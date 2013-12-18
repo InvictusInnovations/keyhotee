@@ -12,10 +12,13 @@ class ContactListEdit : public QTextEdit
   Q_OBJECT
 public:
   ContactListEdit(QWidget* parent = nullptr);
-  ~ContactListEdit();
+  virtual ~ContactListEdit();
 
   void setCompleter(QCompleter* completer);
-  QCompleter* getCompleter();
+
+  /** Allows to explicitly show completer control and start search with given completion prefix.
+  */
+  void showCompleter(const QString& completionPrefix);
 
   QSize sizeHint() const;
   QSize maximumSizeHint() const
@@ -30,8 +33,11 @@ protected:
   void resizeEvent(QResizeEvent* resize_event);
 
 public Q_SLOTS:
-       void insertCompletion( const QString& completion, bool isKeyhoteeFounder = false );
-       void insertCompletion( const QModelIndex& completion );
+  void insertCompletion( const QString& completion, bool isKeyhoteeFounder = false );
+  void insertCompletion( const QModelIndex& completion );
+  /// Slot to explicitly request to show a completer.
+  void onCompleterRequest();
+
 private Q_SLOTS:
   void fitHeightToDocument();
 

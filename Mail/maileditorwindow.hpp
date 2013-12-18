@@ -5,6 +5,16 @@
 
 namespace Ui { class MailEditorWindow; }
 
+namespace bts
+{
+
+namespace bitchat
+{
+struct private_email_message;
+} ///namespace bitchat
+
+} /// namespace bts
+
 class QComboBox;
 class QColor;
 class QFont;
@@ -20,10 +30,12 @@ class MailEditorMainWindow : public QMainWindow
   {
   Q_OBJECT
   public:
-    MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel);
+    MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel, bool editMode);
     virtual ~MailEditorMainWindow();
 
   private:
+    typedef bts::bitchat::private_email_message TPhysicalMailMessage;
+
     /// QWidget reimplementation to support query for save mod. contents.
     virtual void closeEvent(QCloseEvent* e) override;
     
@@ -35,6 +47,7 @@ class MailEditorMainWindow : public QMainWindow
     void fontChanged(const QFont& f);
     void colorChanged(const QColor& c);
     void mergeFormatOnWordOrSelection(const QTextCharFormat& format);
+    void prepareMailMessage(TPhysicalMailMessage* storage) const;
 
   private slots:
     /// Actual implementation of save operation.
@@ -75,6 +88,7 @@ class MailEditorMainWindow : public QMainWindow
     TFileAttachmentWidget*   FileAttachment;
     QFontComboBox*           FontCombo;
     QComboBox*               FontSize;
+    bool                     EditMode;
   };
 
 #endif ///__MAILEDITORWINDOW_HPP

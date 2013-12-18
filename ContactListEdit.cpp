@@ -46,11 +46,6 @@ void ContactListEdit::setCompleter(QCompleter* completer)
            this, SLOT(insertCompletion(const QModelIndex&)));
   }
 
-QCompleter* ContactListEdit::getCompleter()
-  {
-  return _completer;
-  }
-
 void ContactListEdit::insertCompletion( const QModelIndex& completionIndex )
 {
   if( !completionIndex.isValid())
@@ -74,7 +69,7 @@ void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhot
   if (_completer->widget() != this)
     return;
   QFont        default_font;
-    default_font.setPointSize( default_font.pointSize() - 1 );
+  default_font.setPointSize( default_font.pointSize() - 1 );
   QFontMetrics font_metrics(default_font);
   QRect        bounding = font_metrics.boundingRect(completion);
   int          completion_width = font_metrics.width(completion);
@@ -90,21 +85,21 @@ void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhot
   painter.setRenderHint(QPainter::Antialiasing);
 
   QBrush brush(Qt::SolidPattern);
-    brush.setColor( QColor( 205, 220, 241 ) );
-  QPen   pen;
-    if(isKeyhoteeFounder)
+  brush.setColor( QColor( 205, 220, 241 ) );
+  QPen  pen;
+  if(isKeyhoteeFounder)
     {
-      QLinearGradient grad(QPointF(0, 0), QPointF(0, 1));
-      grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-      grad.setColorAt(0.3, QColor(231, 190, 66));
-      grad.setColorAt(1.0, QColor(103, 51, 1));
-      brush = QBrush(grad);
-      pen.setColor( QColor( 103, 51, 1 ) );
+    QLinearGradient grad(QPointF(0, 0), QPointF(0, 1));
+    grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+    grad.setColorAt(0.3, QColor(231, 190, 66));
+    grad.setColorAt(1.0, QColor(103, 51, 1));
+    brush = QBrush(grad);
+    pen.setColor( QColor( 103, 51, 1 ) );
     }
-    else
+  else
     {
-      brush.setColor( QColor( 205, 220, 241 ) );
-      pen.setColor( QColor( 105,110,180 ) );
+    brush.setColor( QColor( 205, 220, 241 ) );
+    pen.setColor( QColor( 105,110,180 ) );
     }
 
   painter.setBrush(brush);
@@ -124,6 +119,12 @@ void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhot
   text_cursor.insertImage(completion_image, completion);
   text_cursor.insertText(" ");
   setTextCursor(text_cursor);
+  }
+
+void ContactListEdit::onCompleterRequest()
+  {
+  setFocus();
+  showCompleter(QString());
   }
 
 //! [5]
@@ -191,6 +192,11 @@ void ContactListEdit::keyPressEvent(QKeyEvent* key_event)
     return;
     }
 
+  showCompleter(completionPrefix);
+  }
+
+void ContactListEdit::showCompleter(const QString& completionPrefix)
+  {
   if (completionPrefix != _completer->completionPrefix())
     {
     _completer->setCompletionPrefix(completionPrefix);

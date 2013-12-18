@@ -595,7 +595,7 @@ void KeyhoteeMainWindow::showContacts()
 
 void KeyhoteeMainWindow::newMailMessage()
   {
-  //MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model);
+  //MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model, true);
   //mailWindow->show();
   newMailMessageTo(-1);
   }
