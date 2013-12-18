@@ -466,7 +466,7 @@ void ContactView::keyEdit(bool enable)
     {
     //keyhoteeIds don't function when mining is not possible
     ui->id_edit->setEnabled(enable && gMiningIsPossible);
-    ui->public_key->setEnabled(enable);
+    ui->public_key->setReadOnly(!enable);
     }
     else
     {
@@ -474,7 +474,7 @@ void ContactView::keyEdit(bool enable)
     /// set... you must create a new contact anytime their public key
     /// changes.
     ui->id_edit->setEnabled(false);
-    ui->public_key->setEnabled(false);
+    ui->public_key->setReadOnly (true);
     }
    
   ui->privacy_comboBox->setEnabled(enable);
