@@ -65,11 +65,11 @@ class MailFieldsWidget : public QWidget
 
   private:
     typedef std::map<QAction*, bts::addressbook::wallet_identity> TAction2IdentityIndex;
-    Ui::MailFieldsWidget *ui;
-    QAction&              ActionSend;
+    Ui::MailFieldsWidget*             ui;
+    QAction&                          ActionSend;
     /// Helper map to associate action for created 'from-sub-menu' item to given wallet_identity.
-    TAction2IdentityIndex Action2Identity;
-    bts::addressbook::wallet_identity         SenderIdentity;
+    TAction2IdentityIndex             Action2Identity;
+    bts::addressbook::wallet_identity SenderIdentity;
   };
 
 #endif // MAILFIELDSWIDGET_HPP

@@ -126,7 +126,7 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
 
 KeyhoteeMainWindow::KeyhoteeMainWindow() :
   SelfSizingMainWindow(),
-  MailProcessor(this, bts::application::instance()->get_profile())
+  MailProcessor(*this, bts::application::instance()->get_profile())
   {
   ui.reset(new Ui::KeyhoteeMainWindow() );
   ui->setupUi(this);
@@ -237,7 +237,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow() :
   app->set_application_delegate(this);
   auto profile = app->get_profile();
   auto idents = profile->identities();
-
 
   _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db());
   _draft_model = new MailboxModel(this, profile, profile->get_draft_db());
@@ -599,7 +598,10 @@ void KeyhoteeMainWindow::newMailMessage()
   MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
     MailProcessor, true);
   mailWindow->show();
-  //newMailMessageTo(-1);
+
+  //auto msg_window = new MailEditor(this);
+  //msg_window->addToContact(-1);
+  //msg_window->setFocusAndShow();
   }
 
 void KeyhoteeMainWindow::newMailMessageTo(const Contact& contact)
@@ -713,6 +715,48 @@ void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& m
   {
   auto header = bts::get_profile()->get_inbox_db()->store(msg);
   _inbox_model->addMailHeader(header);
+  }
+
+void KeyhoteeMainWindow::OnMessageSaving()
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSaved(const TStoredMailMessage& msg) 
+  {
+  /// FIXME - add some status bar messaging
+  _draft_model->addMailHeader(msg);
+  }
+
+void KeyhoteeMainWindow::OnMessageGroupPending(unsigned int count)
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessagePending(const TStoredMailMessage& msg)
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageGroupPendingEnd()
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSendingStart()
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
+  const TStoredMailMessage& sentMsg)
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSendingEnd()
+  {
+  /// FIXME - add some status bar messaging
   }
 
 void KeyhoteeMainWindow::notSupported()

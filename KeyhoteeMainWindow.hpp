@@ -48,7 +48,8 @@ private:
 };
 
 class KeyhoteeMainWindow  : public SelfSizingMainWindow,
-  protected bts::application_delegate
+                            protected bts::application_delegate,
+                            protected IMailProcessor::IUpdateSink
 {
 public:
   KeyhoteeMainWindow();
@@ -73,11 +74,29 @@ public:
   void openMail(int message_id);
   void openSent(int message_id);
 
-protected:
+private:
   /// application_delegate interface implementation
   virtual void received_text(const bts::bitchat::decrypted_message& msg);
   virtual void received_email(const bts::bitchat::decrypted_message& msg);
 
+private:
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageSaving() override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageSaved(const TStoredMailMessage& msg) override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageGroupPending(unsigned int count) override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessagePending(const TStoredMailMessage& msg) override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageGroupPendingEnd() override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageSendingStart() override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageSent(const TStoredMailMessage& pendingMsg,
+    const TStoredMailMessage& sentMsg) override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageSendingEnd() override;
 
 private slots:
   // ---------- MenuBar
