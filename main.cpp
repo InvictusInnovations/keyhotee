@@ -42,13 +42,16 @@ bts::application_config load_config(const std::string& profile_name)
     auto                    config_file = profileDir / "config.json";
     ilog("config_file: ${file}", ("file", config_file) );
     if (fc::exists(config_file) == false)
-      {
-      bts::application_config default_cfg;
-      default_cfg.data_dir = profileDir / "data";
-
-      fc::ofstream            out(config_file);
-      out << fc::json::to_pretty_string(default_cfg);
-      }
+    {
+       bts::application_config default_cfg;
+       default_cfg.data_dir = profileDir / "data";
+       default_cfg.network_port = 0;
+       default_cfg.rpc_config.port = 0;
+       default_cfg.default_nodes.push_back( fc::ip::endpoint( std::string("162.243.67.4"), 9876 ) );
+      
+       fc::ofstream            out(config_file);
+       out << fc::json::to_pretty_string(default_cfg);
+    }
 
     auto         app_config = fc::json::from_file(config_file).as<bts::application_config>();
     fc::ofstream out(config_file);
