@@ -4,6 +4,7 @@
 #include "Contact.hpp"
 #include <fc/time.hpp>
 #include <bts/application.hpp>
+#include "AddressBook/LineEditReadOnly.hpp"
 
 namespace Ui { class ContactView; }
 class AddressBookModel;
