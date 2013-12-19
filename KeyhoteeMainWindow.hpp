@@ -131,6 +131,7 @@ private:
 
   void createContactGui(int contact_id);
   void showContactGui(ContactGui& contact_gui);
+  void deleteContactGui(int contact_id);
   void setupStatusBar();
   void notSupported();
 

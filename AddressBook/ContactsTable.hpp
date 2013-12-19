@@ -29,6 +29,7 @@ public:
 
 Q_SIGNALS:
   void contactOpened(int contact_id);
+  void contactDeleted(int contact_id);
   void showPrevView();
 
 private:
