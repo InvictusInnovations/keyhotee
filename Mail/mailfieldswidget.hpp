@@ -1,10 +1,11 @@
 #ifndef MAILFIELDSWIDGET_HPP
 #define MAILFIELDSWIDGET_HPP
 
-#include <bts/profile.hpp>
+#include "ch/mailprocessor.hpp"
+
+#include <bts/addressbook/contact.hpp>
 
 #include <QWidget>
-
 #include <map>
 
 namespace Ui 
@@ -19,8 +20,17 @@ class MailFieldsWidget : public QWidget
   Q_OBJECT
 
   public:
+    typedef IMailProcessor::TRecipientPublicKeys TRecipientPublicKeys;
+
     MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel);
     virtual ~MailFieldsWidget();
+
+    /** Allows to explicityly fill recipient lists with given values.
+        For each nonempty optional lists, controls related to them (ie ccList) will be displayed
+        automatically.
+    */
+    void SetRecipientList(const TRecipientPublicKeys& toList, const TRecipientPublicKeys& ccList,
+      const TRecipientPublicKeys& bccList);
 
     void showFromControls(bool show);
     void showCcControls(bool show);
@@ -28,10 +38,14 @@ class MailFieldsWidget : public QWidget
 
     /// Returns currently set subject text.
     QString getSubject() const;
-    const bts::addressbook::wallet_identity& getSelectedSenderIdentity() const
+    /// Returns an identity of currently selected sender.
+    const bts::addressbook::wallet_identity& GetSenderIdentity() const
       {
       return SenderIdentity;
       }
+
+    void FillRecipientLists(TRecipientPublicKeys* toList, TRecipientPublicKeys* ccList,
+      TRecipientPublicKeys* bccList) const;
 
   Q_SIGNAL void subjectChanged(const QString& subject);
 
@@ -51,11 +65,11 @@ class MailFieldsWidget : public QWidget
 
   private:
     typedef std::map<QAction*, bts::addressbook::wallet_identity> TAction2IdentityIndex;
-    Ui::MailFieldsWidget *ui;
-    QAction&              ActionSend;
+    Ui::MailFieldsWidget*             ui;
+    QAction&                          ActionSend;
     /// Helper map to associate action for created 'from-sub-menu' item to given wallet_identity.
-    TAction2IdentityIndex Action2Identity;
-    bts::addressbook::wallet_identity         SenderIdentity;
+    TAction2IdentityIndex             Action2Identity;
+    bts::addressbook::wallet_identity SenderIdentity;
   };
 
 #endif // MAILFIELDSWIDGET_HPP

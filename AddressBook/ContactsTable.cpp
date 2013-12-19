@@ -68,12 +68,13 @@ void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
   ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-  connect(ui->contact_table, &QAbstractItemView::clicked, this, &ContactsTable::openContact);
+  QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
+  connect(selection_model, &QItemSelectionModel::currentRowChanged, this, &ContactsTable::openContact);
   }
 
-void ContactsTable::openContact(const QModelIndex& index)
+void ContactsTable::openContact(const QModelIndex &current, const QModelIndex &previous)
   {
-  QModelIndex mapped_index = _sorted_addressbook_model->mapToSource(index);
+  QModelIndex mapped_index = _sorted_addressbook_model->mapToSource(current);
   auto        contact_id = _addressbook_model->getContact(mapped_index).wallet_index;
   Q_EMIT      contactOpened(contact_id);
   }
@@ -95,7 +96,11 @@ void ContactsTable::onDeleteContact()
     return;
   auto sourceModel = model->sourceModel();
   for (int i = indexes.count() - 1; i > -1; --i)
+    {
+    auto contact_id = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).wallet_index;
     sourceModel->removeRows(indexes.at(i).row(), 1);
+    Q_EMIT contactDeleted(contact_id);
+    }
   //model->setUpdatesEnabled(true);
 
   //TODO Remove fullname/bitname for deleted contacts from QCompleter

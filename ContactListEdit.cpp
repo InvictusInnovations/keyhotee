@@ -4,6 +4,7 @@
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QPainter>
+#include <QTextBlock>
 
 #include <fc/log/logger.hpp>
 #include <bts/profile.hpp>
@@ -46,13 +47,8 @@ void ContactListEdit::setCompleter(QCompleter* completer)
            this, SLOT(insertCompletion(const QModelIndex&)));
   }
 
-QCompleter* ContactListEdit::getCompleter()
-  {
-  return _completer;
-  }
-
 void ContactListEdit::insertCompletion( const QModelIndex& completionIndex )
-{
+  {
   if( !completionIndex.isValid())
     return;
   QString completion = completionIndex.data().toString();
@@ -60,11 +56,10 @@ void ContactListEdit::insertCompletion( const QModelIndex& completionIndex )
   row = row / 2;
   auto addressbook = bts::get_profile()->get_addressbook();
   auto contacts = addressbook->get_contacts();
-  bool isKeyhoteeFounder = false;
-  if( Contact(contacts[row]).getAge() == 1 )
-    isKeyhoteeFounder = true;  
+  bool isKeyhoteeFounder = Contact(contacts[row]).isKeyhoteeFounder();
   insertCompletion( completion, isKeyhoteeFounder );
-}
+  }
+
 void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhoteeFounder )
   {
   ilog( "insertCompletion ${c}", ("c", completion.toStdString() ) );
@@ -73,11 +68,49 @@ void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhot
 
   if (_completer->widget() != this)
     return;
+
+  addContactEntry(completion, isKeyhoteeFounder);
+  }
+
+void ContactListEdit::onCompleterRequest()
+  {
+  setFocus();
+  showCompleter(QString());
+  }
+
+//! [5]
+QString ContactListEdit::textUnderCursor() const
+  {
+  QTextCursor text_cursor = textCursor();
+  text_cursor.select(QTextCursor::WordUnderCursor);
+  return text_cursor.selectedText();
+  }
+
+QStringList ContactListEdit::getListOfImageNames() const
+  {
+  QStringList image_names;
+  QTextBlock  block = document()->begin();
+  while (block.isValid())
+    {
+    for (QTextBlock::iterator i = block.begin(); !i.atEnd(); ++i)
+      {
+      QTextCharFormat format = i.fragment().charFormat();
+      bool            isImage = format.isImageFormat();
+      if (isImage)
+        image_names << format.toImageFormat().name();
+      }
+    block = block.next();
+    }
+  return image_names;
+  }
+
+void ContactListEdit::addContactEntry(const QString& contactText, bool isFounder)
+  {
   QFont        default_font;
-    default_font.setPointSize( default_font.pointSize() - 1 );
+  default_font.setPointSize( default_font.pointSize() - 1 );
   QFontMetrics font_metrics(default_font);
-  QRect        bounding = font_metrics.boundingRect(completion);
-  int          completion_width = font_metrics.width(completion);
+  QRect        bounding = font_metrics.boundingRect(contactText);
+  int          completion_width = font_metrics.width(contactText);
   int          completion_height = bounding.height();
 
   completion_width += 20;
@@ -90,28 +123,29 @@ void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhot
   painter.setRenderHint(QPainter::Antialiasing);
 
   QBrush brush(Qt::SolidPattern);
-    brush.setColor( QColor( 205, 220, 241 ) );
-  QPen   pen;
-    if(isKeyhoteeFounder)
+  brush.setColor( QColor( 205, 220, 241 ) );
+  QPen  pen;
+  if(isFounder)
     {
-      QLinearGradient grad(QPointF(0, 0), QPointF(0, 1));
-      grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-      grad.setColorAt(0.3, QColor(231, 190, 66));
-      grad.setColorAt(1.0, QColor(103, 51, 1));
-      brush = QBrush(grad);
-      pen.setColor( QColor( 103, 51, 1 ) );
+    QLinearGradient grad(QPointF(0, 0), QPointF(0, 1));
+    grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+    grad.setColorAt(0.3, QColor(231, 190, 66));
+    grad.setColorAt(1.0, QColor(103, 51, 1));
+    brush = QBrush(grad);
+    pen.setColor( QColor( 103, 51, 1 ) );
     }
-    else
+  else
     {
-      brush.setColor( QColor( 205, 220, 241 ) );
-      pen.setColor( QColor( 105,110,180 ) );
+    brush.setColor( QColor( 205, 220, 241 ) );
+    pen.setColor( QColor( 105,110,180 ) );
     }
 
   painter.setBrush(brush);
   painter.setPen(pen);
-  painter.drawRoundedRect(0, 0, completion_width - 1, completion_image.height() - 1, 8, 8, Qt::AbsoluteSize);
+  painter.drawRoundedRect(0, 0, completion_width - 1, completion_image.height() - 1, 8, 8,
+    Qt::AbsoluteSize);
   painter.setPen(QPen());
-  painter.drawText(QPoint(10, completion_height - 2), completion);
+  painter.drawText(QPoint(10, completion_height - 2), contactText);
 
   QTextCursor text_cursor = textCursor();
   uint32_t    prefix_len = _completer->completionPrefix().length();
@@ -121,17 +155,9 @@ void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhot
   // tc.movePosition(QTextCursor::Left);
   // tc.movePosition(QTextCursor::EndOfWord);
   // tc.insertText(completion.right(extra));
-  text_cursor.insertImage(completion_image, completion);
+  text_cursor.insertImage(completion_image, contactText);
   text_cursor.insertText(" ");
   setTextCursor(text_cursor);
-  }
-
-//! [5]
-QString ContactListEdit::textUnderCursor() const
-  {
-  QTextCursor text_cursor = textCursor();
-  text_cursor.select(QTextCursor::WordUnderCursor);
-  return text_cursor.selectedText();
   }
 
 //! [5]
@@ -191,6 +217,11 @@ void ContactListEdit::keyPressEvent(QKeyEvent* key_event)
     return;
     }
 
+  showCompleter(completionPrefix);
+  }
+
+void ContactListEdit::showCompleter(const QString& completionPrefix)
+  {
   if (completionPrefix != _completer->completionPrefix())
     {
     _completer->setCompletionPrefix(completionPrefix);
@@ -202,6 +233,46 @@ void ContactListEdit::keyPressEvent(QKeyEvent* key_event)
   _completer->complete(cr);   // popup it up!
   }
 
+void ContactListEdit::SetCollectedContacts(const IMailProcessor::TRecipientPublicKeys& storage)
+  {
+  auto aBook = bts::get_profile()->get_addressbook();
+  for(const auto& recipient : storage)
+    {
+    auto contact = aBook->get_contact_by_public_key(recipient);
+    /** Use kID as completion here - it is slight violation against source list but we don't know
+        here how it was originally entered (by kID or alias: fName lName)
+    */
+    QString kID(contact->dac_id_string.c_str());
+    Contact c(*contact);
+    addContactEntry(kID, c.isKeyhoteeFounder());
+    }
+  }
+
+void ContactListEdit::GetCollectedContacts(IMailProcessor::TRecipientPublicKeys* storage) const
+  {
+  /** FIXME - this code generally looks bad. It will don't work when in AB will be conflict between
+      kID and fName lName alias.
+      Whole completer <-> contact edit communication is wrong, since it should operate on Contact
+      objects not just strings (where noone knows it is a kID or alias).
+      Another problem is synchronization against AB changes. It is also did wrong. To do it correclty
+      instantiated completer should use dedicated model operating DIRECTLY on AB not copied string
+      list.
+  */
+  auto addressbook = bts::get_profile()->get_addressbook();
+  QStringList recipient_image_names = getListOfImageNames();
+  storage->reserve(recipient_image_names.size());
+
+  for(const auto& recipient : recipient_image_names)
+    {
+    std::string to_string = recipient.toStdString();
+    //check first to see if we have a dac_id
+    auto to_contact = addressbook->get_contact_by_dac_id(to_string);
+    if (!to_contact.valid()) // if not dac_id, check if we have a full name
+      to_contact = addressbook->get_contact_by_full_name(to_string);
+    assert(to_contact.valid());
+    storage->push_back(to_contact->public_key);
+    }
+  }
 //! [8]
 
 QSize ContactListEdit::sizeHint() const

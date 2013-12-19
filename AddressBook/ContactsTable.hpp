@@ -16,7 +16,7 @@ public:
   ~ContactsTable();
 
   void setAddressBook(AddressBookModel* addressbook_model);
-  void openContact(const QModelIndex& index);
+  void openContact(const QModelIndex &current, const QModelIndex &previous);
   void searchEditChanged(QString search_string);
   void addContactView(ContactView& view) const;
   void showView(ContactView& view) const;
@@ -29,6 +29,7 @@ public:
 
 Q_SIGNALS:
   void contactOpened(int contact_id);
+  void contactDeleted(int contact_id);
   void showPrevView();
 
 private:

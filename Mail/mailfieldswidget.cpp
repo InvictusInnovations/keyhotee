@@ -42,6 +42,20 @@ MailFieldsWidget::~MailFieldsWidget()
   delete ui;
   }
 
+void MailFieldsWidget::SetRecipientList(const TRecipientPublicKeys& toList,
+  const TRecipientPublicKeys& ccList, const TRecipientPublicKeys& bccList)
+  {
+  ui->toEdit->SetCollectedContacts(toList);
+  ui->ccEdit->SetCollectedContacts(ccList);
+  ui->bccEdit->SetCollectedContacts(bccList);
+
+  if(ccList.empty() == false)
+    showCcControls(true);
+
+  if(ccList.empty() == false)
+    showBccControls(true);
+  }
+
 void MailFieldsWidget::showFromControls(bool show)
   {
   showChildLayout(ui->fromLayout, show, 0);
@@ -60,6 +74,14 @@ void MailFieldsWidget::showBccControls(bool show)
 QString MailFieldsWidget::getSubject() const
   {
   return ui->subjectEdit->text();
+  }
+
+void MailFieldsWidget::FillRecipientLists(TRecipientPublicKeys* toList, TRecipientPublicKeys* ccList,
+  TRecipientPublicKeys* bccList) const
+  {
+  ui->toEdit->GetCollectedContacts(toList);
+  ui->ccEdit->GetCollectedContacts(ccList);
+  ui->bccEdit->GetCollectedContacts(bccList);
   }
 
 void MailFieldsWidget::showChildLayout(QLayout* layout, bool show, int preferredPosition)
@@ -119,19 +141,39 @@ void MailFieldsWidget::fillSenderIdentities()
 
   QAction* first = nullptr;
 
-  std::vector<bts::addressbook::wallet_identity> identities = bts::application::instance()->get_profile()->identities();
-  for(const auto& identity : identities)
+  auto profile = bts::application::instance()->get_profile();
+  std::vector<bts::addressbook::wallet_identity> identities = profile->identities();
+
+  for(const auto& srcIdentity : identities)
     {
-    std::string identity_label = identity.first_name + " " + identity.last_name;
+    auto contact = profile->get_addressbook()->get_contact_by_dac_id(srcIdentity.dac_id_string);
+
+    /** TEMPORARY WORKAROUND FOR BUG IN wallet_identity retrieved from identities() container which
+        are broken. To avoid crash I mix srcIdentity data with these stored in implicit contact but it will
+        work until someone delete this implicit contact.
+    */
+    bts::addressbook::wallet_identity identity(srcIdentity);
+    static_cast<bts::addressbook::contact&>(identity) = *contact;
+
+    bool noAlias = identity.first_name.empty() && identity.last_name.empty();
+    std::string identity_label;
+    if(noAlias == false)
+      identity_label = identity.first_name + " " + identity.last_name;
+
     std::string entry(identity_label);
 
-    if(identity_label.empty() == false)
+    if(noAlias == false)
       entry += '(';
 
     entry += identity.dac_id_string;
 
-    if(identity_label.empty() == false)
+    if(noAlias == false)
       entry += ')';
+
+    auto ipk = identity.public_key;
+    assert(ipk.valid());
+    auto pk = contact->public_key;
+    assert(pk.valid());
 
     QAction* action = menu->addAction(tr(entry.c_str()));
     action->setCheckable(true);

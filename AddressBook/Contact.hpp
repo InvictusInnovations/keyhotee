@@ -22,7 +22,12 @@ public:
   void setIcon(const QIcon& icon);
   int getAge()const;
   int getRepute()const;
- 
+
+  bool isKeyhoteeFounder() const
+    {
+    return getAge() == 1;
+    }
+
   QString getEmail() const;
   void setEmail(const QString& email);
   QString getPhone() const;

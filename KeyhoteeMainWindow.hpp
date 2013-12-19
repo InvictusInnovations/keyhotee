@@ -3,16 +3,21 @@
 #include <unordered_map>
 #include <bts/addressbook/addressbook.hpp>
 #include <bts/application.hpp>
-#include <qtreusable/selfsizingmainwindow.h>
+
+#include "qtreusable/selfsizingmainwindow.h"
 
 #include "dataaccessimpl.h"
+#include "mailprocessorimpl.hpp"
 
 namespace Ui { class KeyhoteeMainWindow; }
+
 class QTreeWidgetItem;
 class QLineEdit;
-class ContactView;
-class AddressBookModel;
 class QCompleter;
+
+class AddressBookModel;
+class Contact;
+class ContactView;
 class InboxView;
 class MailboxModel;
 class KeyhoteeMainWindow;
@@ -43,14 +48,15 @@ private:
 };
 
 class KeyhoteeMainWindow  : public SelfSizingMainWindow,
-  protected bts::application_delegate
+                            protected bts::application_delegate,
+                            protected IMailProcessor::IUpdateSink
 {
 public:
   KeyhoteeMainWindow();
   virtual ~KeyhoteeMainWindow();
 
   void newMailMessage();
-  void newMailMessageTo(int contact_id);
+  void newMailMessageTo(const Contact& contact);
   void addContact();
   void showContacts();
   void onSidebarSelectionChanged();
@@ -68,11 +74,29 @@ public:
   void openMail(int message_id);
   void openSent(int message_id);
 
-protected:
+private:
   /// application_delegate interface implementation
   virtual void received_text(const bts::bitchat::decrypted_message& msg);
   virtual void received_email(const bts::bitchat::decrypted_message& msg);
 
+private:
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageSaving() override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageSaved(const TStoredMailMessage& msg) override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageGroupPending(unsigned int count) override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessagePending(const TStoredMailMessage& msg) override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageGroupPendingEnd() override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageSendingStart() override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageSent(const TStoredMailMessage& pendingMsg,
+    const TStoredMailMessage& sentMsg) override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMessageSendingEnd() override;
 
 private slots:
   // ---------- MenuBar
@@ -107,6 +131,7 @@ private:
 
   void createContactGui(int contact_id);
   void showContactGui(ContactGui& contact_gui);
+  void deleteContactGui(int contact_id);
   void setupStatusBar();
   void notSupported();
 
@@ -136,6 +161,7 @@ private:
   QLineEdit*                              _search_edit;
   std::unique_ptr<Ui::KeyhoteeMainWindow> ui;
   TConnectionStatusDS                     ConnectionStatusDS;
+  TMailProcessor                          MailProcessor;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* GetKeyhoteeWindow();

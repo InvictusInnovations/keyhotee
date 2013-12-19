@@ -124,8 +124,9 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
   return new QStringListModel(words, completer);
   }
 
-KeyhoteeMainWindow::KeyhoteeMainWindow()
-  : SelfSizingMainWindow()
+KeyhoteeMainWindow::KeyhoteeMainWindow() :
+  SelfSizingMainWindow(),
+  MailProcessor(*this, bts::application::instance()->get_profile())
   {
   ui.reset(new Ui::KeyhoteeMainWindow() );
   ui->setupUi(this);
@@ -137,6 +138,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     }
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
+  connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
   connect(ui->contacts_page, &ContactsTable::showPrevView, this, &KeyhoteeMainWindow::onShowPrevView);
 
 #ifdef Q_OS_MAC
@@ -236,7 +238,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
   app->set_application_delegate(this);
   auto profile = app->get_profile();
   auto idents = profile->identities();
-
 
   _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db());
   _draft_model = new MailboxModel(this, profile, profile->get_draft_db());
@@ -595,16 +596,28 @@ void KeyhoteeMainWindow::showContacts()
 
 void KeyhoteeMainWindow::newMailMessage()
   {
-  //MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model);
-  //mailWindow->show();
-  newMailMessageTo(-1);
+  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
+    MailProcessor, true);
+  mailWindow->show();
+
+  //auto msg_window = new MailEditor(this);
+  //msg_window->addToContact(-1);
+  //msg_window->setFocusAndShow();
   }
 
-void KeyhoteeMainWindow::newMailMessageTo(int contact_id)
+void KeyhoteeMainWindow::newMailMessageTo(const Contact& contact)
   {
-  auto msg_window = new MailEditor(this);
-  msg_window->addToContact(contact_id);
-  msg_window->setFocusAndShow();
+  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
+    MailProcessor, true);
+
+  IMailProcessor::TRecipientPublicKeys toList, emptyList;
+  toList.push_back(contact.public_key);
+  mailWindow->SetRecipientList(toList, emptyList, emptyList);
+  mailWindow->show();
+
+  //auto msg_window = new MailEditor(this);
+  //msg_window->addToContact(contact_id);
+  //msg_window->setFocusAndShow();
   }
 
 ContactGui* KeyhoteeMainWindow::getContactGui(int contact_id)
@@ -651,8 +664,7 @@ void KeyhoteeMainWindow::createContactGui(int contact_id)
   auto       view = new ContactView(ui->widget_stack);
 
   //add new contactGui to map
-  ContactGui contact_gui(new_contact_item, view);
-  _contact_guis[contact_id] = contact_gui;
+  _contact_guis[contact_id] = ContactGui(new_contact_item, view);
 
   view->setAddressBook(_addressbook_model);
   const Contact& contact = _addressbook_model->getContactById(contact_id);
@@ -671,6 +683,13 @@ void KeyhoteeMainWindow::showContactGui(ContactGui& contact_gui)
     if (contact_gui.isChatVisible())
       contact_gui._view->onChat();
     }
+  }
+
+void KeyhoteeMainWindow::deleteContactGui(int contact_id)
+  {
+    ContactGui* contact_gui = getContactGui(contact_id);
+    _contacts_root->removeChild(contact_gui->_tree_item);
+    _contact_guis.erase(contact_id);
   }
 
 void KeyhoteeMainWindow::setupStatusBar()
@@ -703,6 +722,48 @@ void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& m
   {
   auto header = bts::get_profile()->get_inbox_db()->store(msg);
   _inbox_model->addMailHeader(header);
+  }
+
+void KeyhoteeMainWindow::OnMessageSaving()
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSaved(const TStoredMailMessage& msg) 
+  {
+  /// FIXME - add some status bar messaging
+  _draft_model->addMailHeader(msg);
+  }
+
+void KeyhoteeMainWindow::OnMessageGroupPending(unsigned int count)
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessagePending(const TStoredMailMessage& msg)
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageGroupPendingEnd()
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSendingStart()
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
+  const TStoredMailMessage& sentMsg)
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSendingEnd()
+  {
+  /// FIXME - add some status bar messaging
   }
 
 void KeyhoteeMainWindow::notSupported()
