@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
-    <height>154</height>
+    <width>404</width>
+    <height>307</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -252,6 +252,9 @@
    <class>ContactListEdit</class>
    <extends>QTextEdit</extends>
    <header>ContactListEdit.hpp</header>
+   <slots>
+    <slot>onCompleterRequest()</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources>
@@ -271,6 +274,54 @@
     <hint type="destinationlabel">
      <x>189</x>
      <y>76</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toButton</sender>
+   <signal>clicked()</signal>
+   <receiver>toEdit</receiver>
+   <slot>onCompleterRequest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>99</x>
+     <y>74</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>264</x>
+     <y>74</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ccEdit</receiver>
+   <slot>onCompleterRequest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>99</x>
+     <y>153</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>264</x>
+     <y>153</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bccButton</sender>
+   <signal>clicked()</signal>
+   <receiver>bccEdit</receiver>
+   <slot>onCompleterRequest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>99</x>
+     <y>232</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>264</x>
+     <y>232</y>
     </hint>
    </hints>
   </connection>
