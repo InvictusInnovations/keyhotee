@@ -95,7 +95,11 @@ void ContactsTable::onDeleteContact()
     return;
   auto sourceModel = model->sourceModel();
   for (int i = indexes.count() - 1; i > -1; --i)
+    {
+    auto contact_id = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).wallet_index;
     sourceModel->removeRows(indexes.at(i).row(), 1);
+    Q_EMIT contactDeleted(contact_id);
+    }
   //model->setUpdatesEnabled(true);
 
   //TODO Remove fullname/bitname for deleted contacts from QCompleter

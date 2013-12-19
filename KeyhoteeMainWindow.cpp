@@ -137,6 +137,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow()
     }
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
+  connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
   connect(ui->contacts_page, &ContactsTable::showPrevView, this, &KeyhoteeMainWindow::onShowPrevView);
 
 #ifdef Q_OS_MAC
@@ -651,8 +652,7 @@ void KeyhoteeMainWindow::createContactGui(int contact_id)
   auto       view = new ContactView(ui->widget_stack);
 
   //add new contactGui to map
-  ContactGui contact_gui(new_contact_item, view);
-  _contact_guis[contact_id] = contact_gui;
+  _contact_guis[contact_id] = ContactGui(new_contact_item, view);
 
   view->setAddressBook(_addressbook_model);
   const Contact& contact = _addressbook_model->getContactById(contact_id);
@@ -671,6 +671,13 @@ void KeyhoteeMainWindow::showContactGui(ContactGui& contact_gui)
     if (contact_gui.isChatVisible())
       contact_gui._view->onChat();
     }
+  }
+
+void KeyhoteeMainWindow::deleteContactGui(int contact_id)
+  {
+    ContactGui* contact_gui = getContactGui(contact_id);
+    _contacts_root->removeChild(contact_gui->_tree_item);
+    _contact_guis.erase(contact_id);
   }
 
 void KeyhoteeMainWindow::setupStatusBar()
