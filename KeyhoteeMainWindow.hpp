@@ -83,7 +83,8 @@ private:
   /// \see IMessageProcessor::IUpdateSink interface description.
   virtual void OnMessageSaving() override;
   /// \see IMessageProcessor::IUpdateSink interface description.
-  virtual void OnMessageSaved(const TStoredMailMessage& msg) override;
+  virtual void OnMessageSaved(const TStoredMailMessage& msg,
+    const TStoredMailMessage* overwrittenOne) override;
   /// \see IMessageProcessor::IUpdateSink interface description.
   virtual void OnMessageGroupPending(unsigned int count) override;
   /// \see IMessageProcessor::IUpdateSink interface description.

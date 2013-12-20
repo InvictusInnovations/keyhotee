@@ -27,6 +27,10 @@ class TFileAttachmentWidget : public QWidget
     TFileAttachmentWidget(QWidget* parent, bool editMode);
     virtual ~TFileAttachmentWidget();
 
+    /** Allows to load set of files attached to already existing email message (ie in Draft).
+    */
+    void LoadAttachedFiles(const TAttachmentContainer& attachedFiles);
+
     /** Retrieves attached files, reads them and puts their contents into specified container.
         Returns false if some of originally attached files is not readable or doesn't exists anymore.
 

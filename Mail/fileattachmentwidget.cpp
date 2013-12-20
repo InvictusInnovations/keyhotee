@@ -133,6 +133,10 @@ TFileAttachmentWidget::~TFileAttachmentWidget()
   delete ui;
   }
 
+void TFileAttachmentWidget::LoadAttachedFiles(const TAttachmentContainer& attachedFiles)
+  {
+  }
+
 bool TFileAttachmentWidget::GetAttachedFiles(TAttachmentContainer* storage,
   TFileInfoList* failedFilesStorage) const
   {

@@ -22,7 +22,8 @@ class TMailProcessor : public IMailProcessor
       const TRecipientPublicKeys& bccList) override;
     /// \see IMailProcessor interface description.
     virtual void Save(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TRecipientPublicKeys& bccList) override;
+      const TRecipientPublicKeys& bccList, const TStoredMailMessage* msgToOverwrite,
+      TStoredMailMessage* savedMsg) override;
 
   /// Other implementation helpers:
 

@@ -56,6 +56,16 @@ void MailFieldsWidget::SetRecipientList(const TRecipientPublicKeys& toList,
     showBccControls(true);
   }
 
+void MailFieldsWidget::LoadContents(const TRecipientPublicKey& senderPK,
+  const TPhysicalMailMessage& srcMsg)
+  {
+  TRecipientPublicKeys bccList;
+  SetRecipientList(srcMsg.to_list, srcMsg.cc_list, bccList);
+  selectSenderIdentity(senderPK);
+
+  ui->subjectEdit->setText(QString(srcMsg.subject.c_str()));
+  }
+
 void MailFieldsWidget::showFromControls(bool show)
   {
   showChildLayout(ui->fromLayout, show, 0);
@@ -187,6 +197,23 @@ void MailFieldsWidget::fillSenderIdentities()
 
   onFromBtnTriggered(first);
   menu->setActiveAction(first);
+  }
+
+void MailFieldsWidget::selectSenderIdentity(const TRecipientPublicKey& senderPK)
+  {
+  assert(senderPK.valid());
+
+  for(const auto& it : Action2Identity)
+    {
+    const IMailProcessor::TIdentity& id = it.second;
+    assert(id.public_key.valid());
+
+    if(id.public_key == senderPK)
+      {
+      onFromBtnTriggered(it.first);
+      return;
+      }
+    }
   }
 
 void MailFieldsWidget::on_sendButton_clicked()

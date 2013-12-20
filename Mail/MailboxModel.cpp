@@ -15,19 +15,21 @@
 using namespace bts::bitchat;
 
 namespace Detail
+{
+class MailboxModelImpl
   {
-  class MailboxModelImpl
-  {
-public:
+  public:
     bts::profile_ptr             _profile;
     bts::bitchat::message_db_ptr _mail_db;
+    /// FIXME - potential perf. problem while adding/removing message headers (while reallocating vector)
     std::vector<MessageHeader>   _headers;
     QIcon                        _attachment_icon;
     QIcon                        _chat_icon;
     QIcon                        _read_icon;
     QIcon                        _money_icon;
+    AddressBookModel*            _abModel;
   };
-  }
+}
 
 QDateTime toQDateTime(const fc::time_point_sec& time_in_seconds)
   {
@@ -59,7 +61,8 @@ QString makeContactListString(std::vector<fc::ecc::public_key> key_list)
   return to_list.join(',');
   }
 
-MailboxModel::MailboxModel(QObject* parent, const bts::profile_ptr& profile, bts::bitchat::message_db_ptr mail_db)
+MailboxModel::MailboxModel(QObject* parent, const bts::profile_ptr& profile,
+  bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel)
   : QAbstractTableModel(parent),
   my(new Detail::MailboxModelImpl() )
   {
@@ -69,6 +72,7 @@ MailboxModel::MailboxModel(QObject* parent, const bts::profile_ptr& profile, bts
   my->_chat_icon = QIcon(":/images/chat.png");
   my->_money_icon = QIcon(":/images/bitcoin.png");
   my->_read_icon = QIcon(":/images/read-icon.png");
+  my->_abModel = &abModel;
 
   readMailBoxHeadersDb(mail_db);
   }
@@ -111,6 +115,27 @@ void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
   beginInsertRows(QModelIndex(), newRow, newRow);
   my->_headers.push_back(mail_header);
   endInsertRows();
+  }
+
+void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
+  const TStoredMailMessage& msg)
+  {
+  for(auto& hdr : my->_headers)
+    {
+    if(hdr.header.digest == overwrittenMsg.digest)
+      {
+      hdr = MessageHeader();
+      fillMailHeader(msg, hdr);
+
+      /// Replace complete - return.
+      return;
+      }
+    }
+
+  /** At this point new message entry must be added since old one was not found (maybe deleted while
+      editing)
+  */
+  addMailHeader(msg);
   }
 
 void MailboxModel::readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db)
@@ -298,3 +323,19 @@ void MailboxModel::markMessageAsRead(const QModelIndex& index)
   msg.header.read_mark = true;
   my->_mail_db->store_message_header(msg.header);
   }
+
+void MailboxModel::getMessageData(const QModelIndex& index,
+  IMailProcessor::TStoredMailMessage* encodedMsg, IMailProcessor::TPhysicalMailMessage* decodedMsg)
+  {
+  const MessageHeader& cachedMsg = my->_headers[index.row()];
+  *encodedMsg = cachedMsg.header;
+
+  auto rawData = my->_mail_db->fetch_data(cachedMsg.header.digest);
+  *decodedMsg = fc::raw::unpack<private_email_message>(rawData);
+  }
+
+AddressBookModel& MailboxModel::getAddressBookModel() const
+  {
+  return *my->_abModel;
+  }
+

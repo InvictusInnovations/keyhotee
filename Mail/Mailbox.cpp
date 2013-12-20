@@ -1,13 +1,16 @@
 #include "Mailbox.hpp"
+
 #include "ui_Mailbox.h"
+
 #include "MailboxModel.hpp"
-#include <fc/reflect/variant.hpp>
 #include "MailEditor.hpp"
-#include <QToolBar>
+#include "maileditorwindow.hpp"
+
 #include <bts/profile.hpp>
+#include <fc/reflect/variant.hpp>
 
 #include <QMessageBox>
-
+#include <QToolBar>
 
 class MailSortFilterProxyModel : public QSortFilterProxyModel
 {
@@ -43,13 +46,26 @@ Mailbox::Mailbox(QWidget* parent)
 
 void Mailbox::onDoubleClickedItem(QModelIndex index)
   {
-  MessageHeader          message_header;
   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
   auto                   sourceModelIndex = model->mapToSource(index);
   auto                   sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
-  auto                   mailViewer = new MailViewer(this);
-  mailViewer->displayMailMessage(sourceModelIndex, sourceModel);
-  mailViewer->show();
+
+  if(_type == Drafts)
+    {
+    IMailProcessor::TPhysicalMailMessage decodedMsg;
+    IMailProcessor::TStoredMailMessage encodedMsg;
+    sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
+    MailEditorMainWindow* mailEditor = new MailEditorMainWindow(this,
+      sourceModel->getAddressBookModel(), *_mailProcessor, _type == Drafts);
+    mailEditor->LoadMessage(encodedMsg, decodedMsg);
+    mailEditor->show();
+    }
+  else
+    {
+    auto mailViewer = new MailViewer(this);
+    mailViewer->displayMailMessage(sourceModelIndex, sourceModel);
+    mailViewer->show();
+    }
   }
 
 void Mailbox::showCurrentMail(const QModelIndex &selected,
@@ -69,10 +85,7 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
   //display selected email(s) in message preview window
   if (oneEmailSelected)
     {
-    QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
-    auto                   sourceModelIndex = model->mapToSource(indexes[0]);
-    auto                   sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
-    ui->current_message->displayMailMessage(sourceModelIndex, sourceModel);
+    refreshMessageViewer();
     }
   else
     {
@@ -81,12 +94,16 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
   }
 
 Mailbox::~Mailbox()
-  {}
+  {
+  delete ui;
+  }
 
-void Mailbox::setModel(MailboxModel* model, InboxType type)
+void Mailbox::setModel(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type)
   {
   _type = type;
   _sourceModel = model;
+  _mailProcessor = &mailProcessor;
+
   //enable sorting the mailbox
   QSortFilterProxyModel* proxyModel = new MailSortFilterProxyModel();
   proxyModel->setSourceModel(model);
@@ -240,6 +257,22 @@ void Mailbox::onDeleteMail()
 bool Mailbox::isShowDetailsHidden()
   {
   return ui->current_message->isHidden();
+  }
+
+void Mailbox::refreshMessageViewer()
+  {
+  QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
+  QModelIndexList      indexes = selection_model->selectedRows();
+  //disable reply buttons if more than one email selected
+  bool                 oneEmailSelected = (indexes.size() == 1);
+  //display selected email(s) in message preview window
+  if (oneEmailSelected)
+    {
+    QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+    QModelIndex sourceModelIndex = model->mapToSource(indexes[0]);
+    MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
+    ui->current_message->displayMailMessage(sourceModelIndex, sourceModel);
+    }
   }
 
 void Mailbox::on_actionShow_details_toggled(bool checked)

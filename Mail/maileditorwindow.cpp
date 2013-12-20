@@ -32,8 +32,11 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
       be trigerred.
   */
   ui->fileAttachementToolBar->hide();
-
   ui->moneyAttachementToolBar->hide();
+  ui->editToolBar->hide();
+  ui->adjustToolbar->hide();
+  ui->formatToolBar->hide();
+
   MoneyAttachement = new TMoneyAttachementWidget(ui->moneyAttachementToolBar);
   ui->moneyAttachementToolBar->addWidget(MoneyAttachement);
 
@@ -63,7 +66,7 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
   mailFieldsMenu->addAction(ui->actionBCC);
 
   ui->actionMailFields->setMenu(mailFieldsMenu);
-  ui->mailFieldSelectorToolBar->addAction(ui->actionMailFields);
+  ui->mainToolBar->insertAction(ui->actionShowFormatOptions, ui->actionMailFields);
 
   setupEditorCommands();
 
@@ -102,6 +105,16 @@ void MailEditorMainWindow::SetRecipientList(const TRecipientPublicKeys& toList,
   MailFields->SetRecipientList(toList, ccList, bccList);
   }
 
+void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
+  const TPhysicalMailMessage& srcMsg)
+  {
+  DraftMessageInfo.first = srcMsgHeader;
+  DraftMessageInfo.second = true;
+
+  /// Now load source message contents into editor controls.
+  loadContents(srcMsgHeader.from_key, srcMsg);
+  }
+
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
   {
   if(maybeSave())
@@ -130,7 +143,7 @@ bool MailEditorMainWindow::maybeSave()
 
 void MailEditorMainWindow::setupEditorCommands()
   {
-  QPixmap pix(ui->formatToolBar->iconSize());
+  QPixmap pix(ui->editToolBar->iconSize());
   pix.fill(Qt::black);
   ui->actionTextColor->setIcon(pix);
 
@@ -222,6 +235,14 @@ bool MailEditorMainWindow::prepareMailMessage(TPhysicalMailMessage* storage,
   return true;
   }
 
+void MailEditorMainWindow::loadContents(const TRecipientPublicKey& senderId,
+  const TPhysicalMailMessage& srcMsg)
+  {
+  MailFields->LoadContents(senderId, srcMsg);
+  FileAttachment->LoadAttachedFiles(srcMsg.attachments);
+  ui->messageEdit->setText(QString(srcMsg.body.c_str()));
+  }
+
 void MailEditorMainWindow::onSave()
   {
   ui->messageEdit->document()->setModified(false);
@@ -230,7 +251,10 @@ void MailEditorMainWindow::onSave()
   if(prepareMailMessage(&msg, &bccList))
     {
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Save(senderId, msg, bccList);
+    MailProcessor.Save(senderId, msg, bccList,
+      DraftMessageInfo.second ? &DraftMessageInfo.first : nullptr, &DraftMessageInfo.first);
+
+    DraftMessageInfo.second = true;
     }
   }
 
@@ -337,6 +361,12 @@ void MailEditorMainWindow::onBccTriggered(bool checked)
 void MailEditorMainWindow::onFromTriggered(bool checked)
   {
   MailFields->showFromControls(checked);
+  }
+
+void MailEditorMainWindow::onShowFormattingControlsTriggered(bool checked)
+  {
+  ui->formatToolBar->setVisible(checked);
+  ui->adjustToolbar->setVisible(checked);
   }
 
 void MailEditorMainWindow::onFileAttachementTriggered(bool checked)

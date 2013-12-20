@@ -2,9 +2,12 @@
 #include <memory>
 
 namespace Ui { class Mailbox; }
+
+class IMailProcessor;
+class MailboxModel;
+
 class QAbstractItemModel;
 class QItemSelection;
-class MailboxModel;
 class QSortFilterProxyModel;
 
 class Mailbox : public QWidget
@@ -19,12 +22,15 @@ public:
     };
 
   Mailbox(QWidget* parent = nullptr);
-  ~Mailbox();
+  virtual ~Mailbox();
 
-  void setModel(MailboxModel* model, InboxType type = Inbox);
+  void setModel(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type = Inbox);
   void searchEditChanged(QString search_string);
 
   bool isShowDetailsHidden();
+  /// Allows to explicitly reread currently displayed message in the preview pane.
+  void refreshMessageViewer();
+
 private slots:
   void onDoubleClickedItem(QModelIndex);
 
@@ -56,12 +62,11 @@ public slots:
   void on_actionShow_details_toggled(bool checked);
 private:
   QSortFilterProxyModel* sortedModel();
-
-
-  std::unique_ptr<Ui::Mailbox> ui;
+  /// Don't change 'ui' declaration since it breaks QTCreator tools 
+  Ui::Mailbox*                 ui;
   InboxType                    _type;
   MailboxModel*                _sourceModel;
-
+  IMailProcessor*              _mailProcessor;
   QAction*                     reply_mail;
   QAction*                     reply_all_mail;
   QAction*                     forward_mail;

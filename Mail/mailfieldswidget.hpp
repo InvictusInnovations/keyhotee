@@ -20,6 +20,8 @@ class MailFieldsWidget : public QWidget
   Q_OBJECT
 
   public:
+    typedef IMailProcessor::TPhysicalMailMessage TPhysicalMailMessage;
+    typedef IMailProcessor::TRecipientPublicKey  TRecipientPublicKey;
     typedef IMailProcessor::TRecipientPublicKeys TRecipientPublicKeys;
 
     MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel);
@@ -31,6 +33,11 @@ class MailFieldsWidget : public QWidget
     */
     void SetRecipientList(const TRecipientPublicKeys& toList, const TRecipientPublicKeys& ccList,
       const TRecipientPublicKeys& bccList);
+
+    /** Loads 'to', 'cc' lists into proper controls.
+        Also initializes subject with this one stored in the srcMsg.
+    */
+    void LoadContents(const TRecipientPublicKey& senderPK, const TPhysicalMailMessage& srcMsg);
 
     void showFromControls(bool show);
     void showCcControls(bool show);
@@ -56,6 +63,8 @@ class MailFieldsWidget : public QWidget
     void showLayoutWidgets(QLayout* layout, bool show);
     void validateSendButtonState();
     void fillSenderIdentities();
+    /// Allows to select identity with given public key as current one.
+    void selectSenderIdentity(const TRecipientPublicKey& senderPK);
 
   private slots:
     void on_sendButton_clicked();
