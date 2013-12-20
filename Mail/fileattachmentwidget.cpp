@@ -11,37 +11,39 @@ const unsigned int UNIT_MAX_IDX = sizeof(fileSizeUnit)/sizeof(const char*);
 const int NAME_COLUMN_IDX = 0;
 const int SIZE_COLUMN_IDX = 1;
 
-/** Represents attachment table widget item holding additional data needed to simplify
-    operations performed over table items.
+/** Base class for all representations of attachment items.
+    Defines its base functionality, and holds common data.
 */
-class TFileAttachmentWidget::TFileAttachmentItem : public QTableWidgetItem
+class TFileAttachmentWidget::AAttachmentItem : public QTableWidgetItem
   {
   public:
-    /// Constructor to build item representing file name cell.
-    TFileAttachmentItem(const QFileInfo& fileInfo, TFileAttachmentWidget* owner) :
-      QTableWidgetItem(fileInfo.fileName()),
-      FileInfo(fileInfo),
-      Owner(owner),
-      FileNameInfo(nullptr)
+    /** Needed to unregister item instance from all helper containers it was registered to.
+    */
+    virtual void Unregister()
       {
-      assert(owner != nullptr);
-      
-      AttachmentListPos = owner->AttachmentList.insert(owner->AttachmentList.end(), this);
-      owner->TotalAttachmentSize += fileInfo.size();
+      if(FileNameInfo != nullptr)
+        {
+        FileNameInfo->Unregister();
+        FileNameInfo = nullptr;
+        }
+      else
+      if(Owner != nullptr)
+        {
+        Owner->AttachmentList.erase(AttachmentListPos);
 
-      setToolTip(fileInfo.absoluteFilePath());
+        AttachmentListPos = TFileAttachmentListPos();
+        /// To avoid multiple unregistrations.
+        Owner = nullptr;
+        }
       }
-
-    TFileAttachmentItem(TFileAttachmentItem* fileNameInfo, const TScaledSize& scaledSize) :
-      FileInfo(fileNameInfo->FileInfo),
-      Owner(nullptr),
-      FileNameInfo(fileNameInfo)
-      {
-      QString text = TFileAttachmentWidget::toString(scaledSize);
-      setText(text);
-      }
-
-    virtual ~TFileAttachmentItem() {}
+    
+    /** Implements pesistent storage specific to instantiated representation.
+        \param storage - physical storage for attachment, to be next saved in mail persistent
+                         representation,
+        \param failedFiles - list of file infos which attachment has been impossible since they
+                         not exists or are unreadable.
+    */
+    virtual void Store(TAttachmentContainer* storage, TFileInfoList* failedFiles) const = 0;
 
     /** Retrieves file name being displayed. It can be different than real underlying file name when
         user rename the attachment.
@@ -54,34 +56,118 @@ class TFileAttachmentWidget::TFileAttachmentItem : public QTableWidgetItem
       return text();
       }
 
-    /// Returns associated physical file info.
-    const QFileInfo& GetFileInfo() const
+  /// QTableWidgetItem override.
+    virtual void setData(int role, const QVariant& value)
       {
-      return FileInfo;
+      if(role == Qt::EditRole && value.toString().trimmed().isEmpty() == false)
+        {
+        QTableWidgetItem::setData(role, value);
+        Owner->OnAttachmentItemChanged();
+        }
       }
 
-    /// Unregisters item from file attachment list.
-    void Unregister()
+  protected:
+    /// Constructor to build item for name column.
+    AAttachmentItem(const QString& name, TFileAttachmentWidget* owner, AAttachmentItem* fileNameInfo) :
+      QTableWidgetItem(name),
+      Owner(owner),
+      FileNameInfo(fileNameInfo)
       {
-      if(FileNameInfo != nullptr)
-        {
-        FileNameInfo->Unregister();
-        FileNameInfo = nullptr;
-        }
-      else
+      assert(owner != nullptr);
+      /// Only items representing name should be registered.
+      AttachmentListPos = owner->AttachmentList.insert(owner->AttachmentList.end(), this);
+      }
+
+    /// Constructor to build item for size column.
+    AAttachmentItem(AAttachmentItem* fileNameInfo, const TScaledSize& scaledSize) :
+      QTableWidgetItem(TFileAttachmentWidget::toString(scaledSize)),
+      Owner(nullptr),
+      FileNameInfo(fileNameInfo) {}
+
+    virtual ~AAttachmentItem() {}
+
+  /// Class attributes:
+  protected:
+    typedef TFileAttachmentList::iterator TFileAttachmentListPos;
+
+    TFileAttachmentWidget*  Owner;
+    /// Non-null when this object represents a 'size' item.
+    AAttachmentItem*        FileNameInfo;
+    /// Filled in when item is attached to the list.
+    TFileAttachmentListPos  AttachmentListPos;
+  };
+
+/** Represents attachment table widget item holding additional data needed to simplify
+    operations performed over table items.
+    This implemention is dedicated to items built from physical files ie attached from disk.
+*/
+class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
+  {
+  public:
+    /// Constructor to build item representing file name cell.
+    TFileAttachmentItem(const QFileInfo& fileInfo, TFileAttachmentWidget* owner) :
+      AAttachmentItem(fileInfo.fileName().toStdString().c_str(), owner, nullptr),
+      FileInfo(fileInfo)
+      {
+      owner->TotalAttachmentSize += fileInfo.size();
+      setToolTip(fileInfo.absoluteFilePath());
+      }
+
+    /// Constructor to build file size cell.
+    TFileAttachmentItem(TFileAttachmentItem* fileNameItem, const TScaledSize& scaledSize) :
+      AAttachmentItem(fileNameItem, scaledSize),
+      FileInfo(fileNameItem->FileInfo) {}
+
+    virtual ~TFileAttachmentItem() {}
+
+  /// AAttachmentItem class reimplementation:
+
+    /// \see AAttachmentItem description.
+    virtual void Unregister() override
+      {
       if(Owner != nullptr)
         {
-        Owner->AttachmentList.erase(AttachmentListPos);
-
         TFileInfoList::iterator foundPos = std::find(Owner->AttachmentIndex.begin(),
           Owner->AttachmentIndex.end(), FileInfo);
-
         Owner->AttachmentIndex.erase(foundPos);
-        Owner->TotalAttachmentSize -= FileInfo.size();
 
-        AttachmentListPos = TFileAttachmentListPos();
-        /// To avoid multiple unregistrations.
-        Owner = nullptr;
+        Owner->TotalAttachmentSize -= FileInfo.size();
+        }
+
+      AAttachmentItem::Unregister();
+      }
+    
+    /// \see AAttachmentItem description.
+    virtual void Store(TAttachmentContainer* storage, TFileInfoList* failedFiles) const override
+      {
+      assert(storage != nullptr);
+      assert(failedFiles != nullptr);
+
+      const QFileInfo& fileInfo = FileInfo;
+
+      QFile file(fileInfo.absoluteFilePath());
+      bool success = file.open(QIODevice::ReadOnly);
+      if(success)
+        {
+        storage->push_back(TPhysicalAttachment());
+        TPhysicalAttachment& physicalAttachment = storage->back();
+
+        physicalAttachment.filename = GetDisplayedFileName().toStdString();
+        qint64 fileSize = file.size();
+        physicalAttachment.body.resize(fileSize);
+        qint64 readLen = file.read(physicalAttachment.body.data(), fileSize);
+        file.close();
+
+        if(readLen != fileSize)
+          {
+          /// File read was incomplete. Mark it as failure and remove from physical attachment.
+          storage->pop_back();
+          failedFiles->push_back(fileInfo);
+          }
+        }
+      else
+        {
+        failedFiles->push_back(fileInfo);
         }
       }
 
@@ -92,30 +178,59 @@ class TFileAttachmentWidget::TFileAttachmentItem : public QTableWidgetItem
       
       /// Cloned item should not be unregistered from containers.
       cloned->FileNameInfo = nullptr;
+      cloned->Owner = nullptr;
       cloned->AttachmentListPos = TFileAttachmentListPos();
       
       return cloned;
       }
 
-    virtual void setData(int role, const QVariant& value)
+  /// Class attributes:
+  private:
+    QFileInfo FileInfo;
+  };
+
+/** Represents attachment item built from already existing mail message contents, for example
+    by opening Draft mail to further edit purposes or to view received mail in read only mode.
+*/
+class TFileAttachmentWidget::TVirtualAttachmentItem : public AAttachmentItem
+  {
+  public:
+    /// Constructor to represent file name cell.
+    TVirtualAttachmentItem(const TPhysicalAttachment& sourceData, TFileAttachmentWidget* owner) :
+      AAttachmentItem(sourceData.filename.c_str(), owner, nullptr),
+      Data(sourceData)
       {
-      if(role == Qt::EditRole && value.toString().trimmed().isEmpty() == false)
-        {
-        QTableWidgetItem::setData(role, value);
-        Owner->OnAttachmentItemChanged();
-        }
+      owner->TotalAttachmentSize += Data.body.size();
+      }
+
+    TVirtualAttachmentItem(TVirtualAttachmentItem* fileNameItem, const TScaledSize& scaledSize) :
+      AAttachmentItem(fileNameItem, scaledSize) {}
+
+    virtual ~TVirtualAttachmentItem() {}
+
+  /// AAttachmentItem class reimplementation:
+    /// Unregisters item from file attachment list.
+    virtual void Unregister() override
+      {
+      if(Owner != nullptr)
+        Owner->TotalAttachmentSize -= Data.body.size();
+
+      AAttachmentItem::Unregister();
+      }
+
+    /// \see AAttachmentItem description.
+    virtual void Store(TAttachmentContainer* storage, TFileInfoList* failedFiles) const override
+      {
+      assert(storage != nullptr);
+      assert(failedFiles != nullptr);
+      storage->push_back(Data);
+      /// Always use name stored in the item since it could be changed.
+      storage->back().filename = GetDisplayedFileName().toStdString();
       }
 
   /// Class attributes:
   private:
-    typedef TFileAttachmentList::iterator TFileAttachmentListPos;
-
-    QFileInfo               FileInfo;
-    TFileAttachmentWidget*  Owner;
-    /// Non-null when this object represents a 'size' item.
-    TFileAttachmentItem*    FileNameInfo;
-    /// Filled in when item is attached to the list.
-    TFileAttachmentListPos  AttachmentListPos;
+    TPhysicalAttachment Data;
   };
 
 TFileAttachmentWidget::TFileAttachmentWidget(QWidget *parent, bool editMode) :
@@ -155,7 +270,7 @@ bool TFileAttachmentWidget::GetAttachedFiles(TAttachmentContainer* storage,
   storage->reserve(AttachmentList.size());
 
   for(const auto& item : AttachmentList)
-    AttachFile(*item, storage, failedFilesStorage);
+    item->Store(storage, failedFilesStorage);
 
   return failedFilesStorage->empty();
   }
@@ -239,37 +354,6 @@ void TFileAttachmentWidget::UnFreezeAttachmentTable(bool sortEnabled)
 void TFileAttachmentWidget::OnAttachmentItemChanged()
   {
   emit attachmentListChanged();
-  }
-
-void TFileAttachmentWidget::AttachFile(const TFileAttachmentItem& item, TAttachmentContainer* storage,
-  TFileInfoList* failedFilesStorage) const
-  {
-  const QFileInfo& fileInfo = item.GetFileInfo();
-
-  QFile file(fileInfo.absoluteFilePath());
-  bool success = file.open(QIODevice::ReadOnly);
-  if(success)
-    {
-    storage->push_back(TPhysicalAttachment());
-    TPhysicalAttachment& physicalAttachment = storage->back();
-
-    physicalAttachment.filename = item.GetDisplayedFileName().toStdString();
-    qint64 fileSize = file.size();
-    physicalAttachment.body.resize(fileSize);
-    qint64 readLen = file.read(physicalAttachment.body.data(), fileSize);
-    file.close();
-
-    if(readLen != fileSize)
-      {
-      /// File read was incomplete. Mark it as failure and remove from physical attachment.
-      storage->pop_back();
-      failedFilesStorage->push_back(fileInfo);
-      }
-    }
-  else
-    {
-    failedFilesStorage->push_back(fileInfo);
-    }
   }
 
 QString TFileAttachmentWidget::toString(const TScaledSize& scaledSize)

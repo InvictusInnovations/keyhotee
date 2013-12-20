@@ -44,7 +44,10 @@ class TFileAttachmentWidget : public QWidget
     Q_SIGNAL void attachmentListChanged();
 
   private:
+    class AAttachmentItem;
     class TFileAttachmentItem;
+    class TVirtualAttachmentItem;
+
     typedef bts::bitchat::attachment TPhysicalAttachment;
 
     /// Pair of scaled attachment size and its unit (KB, MB etc).
@@ -62,17 +65,8 @@ class TFileAttachmentWidget : public QWidget
     /// Called when attachment item name has been changed.
     void OnAttachmentItemChanged();
 
-    /** Physically attaches the file attachment to specified email storage.
-        \param item    - attachment item to be processed.
-        \param storage - final attachment storage,
-        \param failedFilesStorage - storage for file infos for which the attachment process failed.
-    */
-    void AttachFile(const TFileAttachmentItem& item, TAttachmentContainer* storage,
-      TFileInfoList* failedFilesStorage) const;
-
     /// Allows to convert given scaled size to the string format.
     static QString toString(const TScaledSize& size);
-
 
   private slots:
     void onAddTriggered();
@@ -83,7 +77,7 @@ class TFileAttachmentWidget : public QWidget
 
   /// Class attributes:
   private:
-    typedef std::list<TFileAttachmentItem*>  TFileAttachmentList;
+    typedef std::list<AAttachmentItem*> TFileAttachmentList;
 
     Ui::TFileAttachmentWidget* ui;
     QStringList                SelectedFiles;
