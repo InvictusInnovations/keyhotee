@@ -31,9 +31,8 @@ bool        gMiningIsPossible = true;
 
 
 bts::application_config load_config(const std::string& profile_name)
-  {
-  try
-    {
+{ try {
+
     auto                    strDataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdWString();
     boost::filesystem::path dataDir(strDataDir);
     boost::filesystem::path profileDataDir(dataDir / profile_name);
@@ -57,15 +56,13 @@ bts::application_config load_config(const std::string& profile_name)
     fc::ofstream out(config_file);
     out << fc::json::to_pretty_string(app_config);
     return app_config;
-    }
-  FC_RETHROW_EXCEPTIONS(warn, "")
-  }
+} FC_RETHROW_EXCEPTIONS(warn, "") }
 
 void start_profile_creation_wizard(const bts::application_ptr& btsapp);
 void display_login();
 
 void startup(const std::string& profile_name)
-  {
+{
   auto btsapp = bts::application::instance();
   auto app_config = load_config(profile_name);
   btsapp->configure(app_config);
@@ -74,10 +71,10 @@ void startup(const std::string& profile_name)
     display_login();
   else
     start_profile_creation_wizard(btsapp);
-  }
+}
 
 int main(int argc, char** argv)
-  {
+{
   #ifdef WIN32
 
   bool console_ok = AllocConsole();
@@ -90,7 +87,7 @@ int main(int argc, char** argv)
   fprintf(stderr, "testing stderr\n");
   #endif
   try
-    {
+  {
     QApplication app(argc, argv);
 
     app.setOrganizationDomain("invictus-innovations.com");
@@ -127,30 +124,32 @@ int main(int argc, char** argv)
     FreeConsole();
      #endif
     return result;
-    }
-  catch (const fc::exception& e)
-    {
-    elog("${e}", ("e", e.to_detail_string() ) );
-    }
-  return -1;
   }
+  catch (const fc::exception& e)
+  {
+    elog("${e}", ("e", e.to_detail_string() ) );
+  }
+  return -1;
+}
 
 void start_profile_creation_wizard(const bts::application_ptr& /*btsapp*/)
-  {
+{
   // TODO: figure out memory management here..
   auto profile_wizard = new ProfileWizard(nullptr);
   profile_wizard->resize(QSize(680, 600) );
   profile_wizard->show();
-  }
+}
 
 void display_main_window()
-  {
-  KeyhoteeMainWindow* main_window = GetKeyhoteeWindow();
-  main_window->show();
-  }
+{
+     KeyhoteeMainWindow* main_window = GetKeyhoteeWindow();
+     main_window->show();
+     auto btsapp = bts::application::instance();
+     btsapp->connect_to_network();
+}
 
 void display_login()
-  {
+{
   LoginDialog* login_dialog = new LoginDialog();
   login_dialog->connect(login_dialog, &QDialog::accepted,
                         [ = ](){
@@ -159,5 +158,5 @@ void display_login()
                           }
                         );
   login_dialog->show();
-  }
+}
 
