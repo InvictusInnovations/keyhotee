@@ -110,6 +110,10 @@ class MailEditorMainWindow : public QMainWindow
     void on_actionSend_triggered();
     /// Notification for subject changes needed to update window title.
     void onSubjectChanged(const QString& subject);
+    /// Notification from recipient list changes to update document modified state.
+    void onRecipientListChanged();
+    /// Notification from attachment list widget about attachment list changes.
+    void onAttachmentListChanged();
 
   private:
     /** pairs loaded encoded draft message & flag determining it was specified (it is impossible

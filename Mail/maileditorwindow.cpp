@@ -53,6 +53,8 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
   ui->mailFieldsToolBar->addWidget(MailFields);
 
   connect(MailFields, SIGNAL(subjectChanged(QString)), this, SLOT(onSubjectChanged(QString)));
+  connect(MailFields, SIGNAL(recipientListChanged()), this, SLOT(onRecipientListChanged()));
+  connect(FileAttachment, SIGNAL(attachmentListChanged()), this, SLOT(onAttachmentListChanged()));
 
   /** Supplement definition of mailFieldSelectorToolbar since Qt Creator doesn't support putting
       into its context dedicated controls (like preconfigured toolbutton).
@@ -77,8 +79,11 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
 
   QString subject = MailFields->getSubject();
   onSubjectChanged(subject);
-
+  
+  /// Clear modified flag
+  ui->messageEdit->document()->setModified(false);
   setWindowModified(ui->messageEdit->document()->isModified());
+  
   ui->actionSave->setEnabled(ui->messageEdit->document()->isModified());
   ui->actionUndo->setEnabled(ui->messageEdit->document()->isUndoAvailable());
   ui->actionRedo->setEnabled(ui->messageEdit->document()->isRedoAvailable());
@@ -395,6 +400,20 @@ void MailEditorMainWindow::on_actionSend_triggered()
 
 void MailEditorMainWindow::onSubjectChanged(const QString& subject)
   {
-  setWindowTitle(tr("New mail message: %1[*]").arg(subject));
+  setWindowTitle(tr("Mail message: %1[*]").arg(subject));
+  /// Let's treat subject change also as document modification.
+  ui->messageEdit->document()->setModified(true);
+  }
+
+void MailEditorMainWindow::onRecipientListChanged()
+  {
+  /// Let's treat recipient list change also as document modification.
+  ui->messageEdit->document()->setModified(true);
+  }
+
+void MailEditorMainWindow::onAttachmentListChanged()
+  {
+  /// Let's treat attachment list change also as document modification.
+  ui->messageEdit->document()->setModified(true);
   }
 

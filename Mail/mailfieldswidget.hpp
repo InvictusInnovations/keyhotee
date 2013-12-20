@@ -55,6 +55,7 @@ class MailFieldsWidget : public QWidget
       TRecipientPublicKeys* bccList) const;
 
   Q_SIGNAL void subjectChanged(const QString& subject);
+  Q_SIGNAL void recipientListChanged();
 
   private:
     /// Allows to show/hide given layout & all widgets associated with it.

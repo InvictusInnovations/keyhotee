@@ -97,6 +97,15 @@ class TFileAttachmentWidget::TFileAttachmentItem : public QTableWidgetItem
       return cloned;
       }
 
+    virtual void setData(int role, const QVariant& value)
+      {
+      if(role == Qt::EditRole && value.toString().trimmed().isEmpty() == false)
+        {
+        QTableWidgetItem::setData(role, value);
+        Owner->OnAttachmentItemChanged();
+        }
+      }
+
   /// Class attributes:
   private:
     typedef TFileAttachmentList::iterator TFileAttachmentListPos;
@@ -227,6 +236,11 @@ void TFileAttachmentWidget::UnFreezeAttachmentTable(bool sortEnabled)
   ui->attachmentTable->setDisabled(false);
   }
 
+void TFileAttachmentWidget::OnAttachmentItemChanged()
+  {
+  emit attachmentListChanged();
+  }
+
 void TFileAttachmentWidget::AttachFile(const TFileAttachmentItem& item, TAttachmentContainer* storage,
   TFileInfoList* failedFilesStorage) const
   {
@@ -306,6 +320,8 @@ void TFileAttachmentWidget::onAddTriggered()
   UnFreezeAttachmentTable(sortEnabled);
   
   UpdateColumnHeaders();
+
+  emit attachmentListChanged();
   }
 
 void TFileAttachmentWidget::onDelTriggered()
@@ -327,10 +343,21 @@ void TFileAttachmentWidget::onDelTriggered()
   UnFreezeAttachmentTable(sortEnabled);
 
   UpdateColumnHeaders();
+  
+  emit attachmentListChanged();
   }
 
 void TFileAttachmentWidget::onSaveTriggered()
   {
+  }
+
+void TFileAttachmentWidget::onRenameTriggered()
+  {
+  QList<QTableWidgetItem*> currentSelection = ui->attachmentTable->selectedItems();
+  assert(currentSelection.size() == 1 && "Bad code in command update ui (onAttachementTableSelectionChanged)");
+
+  QTableWidgetItem* item = currentSelection.first();
+  ui->attachmentTable->editItem(item);
   }
 
 void TFileAttachmentWidget::onAttachementTableSelectionChanged()

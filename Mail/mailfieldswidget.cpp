@@ -213,6 +213,7 @@ void MailFieldsWidget::on_sendButton_clicked()
 void MailFieldsWidget::onRecipientListChanged()
   {
   validateSendButtonState();
+  emit recipientListChanged();
   }
 
 void MailFieldsWidget::onSubjectChanged(const QString &subject)
