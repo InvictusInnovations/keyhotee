@@ -171,73 +171,73 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
   const Contact& current_contact = my->_contacts[index.row()];
   switch (role)
     {
-  case Qt::SizeHintRole:
-    switch ( (Columns)index.column() )
-      {
-    case UserIcon:
-      return QSize(48, 48);
-    case Ownership:
-      return QSize(48, 48);
-    default:
-      return QVariant();
-      }
-  case Qt::DecorationRole:
-    switch ( (Columns)index.column() )
-      {
-    case UserIcon:
-      return current_contact.getIcon();
-    case Ownership:
-      return current_contact.isOwn() ? my->_ownership_yes : my->_ownership_no;
-    default:
-      return QVariant();
-      }
-  case Qt::DisplayRole:
-    switch ( (Columns)index.column() )
-      {
-    case FirstName:
-      return current_contact.first_name.c_str();
-    case LastName:
-      return current_contact.last_name.c_str();
-    case Id:
-      return current_contact.dac_id_string.c_str();
-    case Age:
-                 return current_contact.getAge();
-    case Repute:
-                 return current_contact.getRepute();
-
-    case Ownership:
-    case UserIcon:
-    case NumColumns:
-      return QVariant();
-      }
-  case Qt::UserRole:
-    switch ( (Columns)index.column() )
-      {
-    case Ownership:
-      return current_contact.isOwn() ? true : false;
-    case FirstName:
-      return current_contact.first_name.c_str();
-    case LastName:
-      return current_contact.last_name.c_str();
-    case Id:
-      return current_contact.dac_id_string.c_str();
-             case Age:
-                 return current_contact.getAge();
-    case Repute:
-                 return current_contact.getRepute();
-    default:
-              return QVariant();
-         }
-       case Qt::BackgroundRole:
-         if (current_contact.getAge() == 1)
-         {
-           return QVariant(QColor(231, 190, 66));
-         }
-         else
-         {
+    case Qt::SizeHintRole:
+      switch ( (Columns)index.column() )
+        {
+        case UserIcon:
+          return QSize(48, 48);
+        case Ownership:
+          return QSize(48, 48);
+        default:
+          return QVariant();
+        }
+    case Qt::DecorationRole:
+      switch ( (Columns)index.column() )
+        {
+        case UserIcon:
+          return current_contact.getIcon();
+        case Ownership:
+          return current_contact.isOwn() ? my->_ownership_yes : my->_ownership_no;
+        default:
+          return QVariant();
+        }
+    case Qt::DisplayRole:
+      switch ( (Columns)index.column() )
+        {
+        case FirstName:
+          return current_contact.first_name.c_str();
+        case LastName:
+          return current_contact.last_name.c_str();
+        case Id:
+          return current_contact.dac_id_string.c_str();
+        case Age:
+          return current_contact.getAge();
+        case Repute:
+          return current_contact.getRepute();
+        case Ownership:
+        case UserIcon:
+        case NumColumns:
+          return QVariant();
+        }
+    case Qt::UserRole:
+      switch ( (Columns)index.column() )
+        {
+         case Ownership:
+           return current_contact.isOwn() ? true : false;
+         case FirstName:
+           return current_contact.first_name.c_str();
+         case LastName:
+           return current_contact.last_name.c_str();
+         case Id:
+           return current_contact.dac_id_string.c_str();
+         case Age:
+           return current_contact.getAge();
+         case Repute:
+           return current_contact.getRepute();
+         default:
            return QVariant();
-      }
-    }
+         }
+     case Qt::BackgroundRole:
+       if (current_contact.isKeyhoteeFounder())
+         {
+         return QVariant(QColor(231, 190, 66));
+         }
+       else
+         {
+         return QVariant();
+         }
+    } //switch
+
   return QVariant();
   }
 

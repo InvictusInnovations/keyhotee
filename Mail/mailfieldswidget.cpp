@@ -154,17 +154,8 @@ void MailFieldsWidget::fillSenderIdentities()
   auto profile = bts::application::instance()->get_profile();
   std::vector<bts::addressbook::wallet_identity> identities = profile->identities();
 
-  for(const auto& srcIdentity : identities)
+  for(const auto& identity : identities)
     {
-    auto contact = profile->get_addressbook()->get_contact_by_dac_id(srcIdentity.dac_id_string);
-
-    /** TEMPORARY WORKAROUND FOR BUG IN wallet_identity retrieved from identities() container which
-        are broken. To avoid crash I mix srcIdentity data with these stored in implicit contact but it will
-        work until someone delete this implicit contact.
-    */
-    bts::addressbook::wallet_identity identity(srcIdentity);
-    static_cast<bts::addressbook::contact&>(identity) = *contact;
-
     bool noAlias = identity.first_name.empty() && identity.last_name.empty();
     std::string identity_label;
     if(noAlias == false)
@@ -182,8 +173,6 @@ void MailFieldsWidget::fillSenderIdentities()
 
     auto ipk = identity.public_key;
     assert(ipk.valid());
-    auto pk = contact->public_key;
-    assert(pk.valid());
 
     QAction* action = menu->addAction(tr(entry.c_str()));
     action->setCheckable(true);
