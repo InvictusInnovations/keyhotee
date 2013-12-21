@@ -224,9 +224,9 @@ void Mailbox::duplicateMail(ReplyType reply_type)
     {
     //TODO add check to avoid replying to self as well
     foreach(auto to_key, header.to_list)
-    msg_window->addToContact(to_key);
+      msg_window->addToContact(to_key);
     foreach(auto cc_key, header.cc_list)
-    msg_window->addCcContact(cc_key);
+      msg_window->addCcContact(cc_key);
     }
   msg_window->SetSubject(new_subject);
   //TODO set focus to top of window
@@ -246,7 +246,7 @@ void Mailbox::onDeleteMail()
     return;
   QModelIndexList indexes;
   foreach(QModelIndex sortFilterIndex, sortFilterIndexes)
-  indexes.append(model->mapToSource(sortFilterIndex));
+    indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
   auto sourceModel = model->sourceModel();
   for (int i = indexes.count() - 1; i > -1; --i)

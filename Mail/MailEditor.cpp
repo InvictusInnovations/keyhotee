@@ -839,7 +839,7 @@ void MailEditor::setupTextActions()
 
   QFontDatabase db;
   foreach(int size, db.standardSizes())
-  comboSize->addItem(QString::number(size));
+    comboSize->addItem(QString::number(size));
 
   connect(comboSize, SIGNAL(activated(QString)), this, SLOT(textSize(QString)));
   comboSize->setCurrentIndex(comboSize->findText(QString::number(QApplication::font()
