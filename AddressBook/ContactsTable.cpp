@@ -123,6 +123,10 @@ bool ContactsTable::isShowDetailsHidden()
 
 void ContactsTable::on_actionShow_details_toggled(bool checked)
   {
+  if (ContactView * currentView = getCurrentView ())
+    if (currentView->isAddingNewContact ())
+      return;
+
   if (checked)
     ui->contact_details_view->show();
   else
@@ -132,17 +136,24 @@ void ContactsTable::on_actionShow_details_toggled(bool checked)
 void ContactsTable::addContactView(ContactView& view) const
   {
   ui->contact_details_view->addWidget(&view);
-  connect(&view, &ContactView::canceledAddContact, this, &ContactsTable::onCanceledAddContact);
   }
 
 void ContactsTable::showView(ContactView& view) const
   {
+  if (view.isAddingNewContact())
+    {
+    ui->contact_details_view->show();
+    ui->contact_table->hide ();    
+    }
+  else
+    ui->contact_table->show ();
+
   ui->contact_details_view->setCurrentWidget(&view);
   }
 
 bool ContactsTable::CheckSaving(ContactView& newView) const
   {
-  if (ContactView * currentView = qobject_cast<ContactView *>(ui->contact_details_view->currentWidget()))
+    if (ContactView * currentView = getCurrentView ())
     {
     int idxCurrentView = ui->contact_details_view->indexOf(currentView);
     int idxNewView = ui->contact_details_view->indexOf(&newView);
@@ -159,9 +170,14 @@ void ContactsTable::addNewContact(ContactView& view) const
   view.addNewContact ();
   }
 
-void ContactsTable::onCanceledAddContact()
+void ContactsTable::onCanceledNewContact()
   {
-  Q_EMIT showPrevView();
+  ui->contact_table->show ();
+  }
+
+void ContactsTable::onSavedNewContact()
+  {
+  ui->contact_table->show ();
   }
 
 void ContactsTable::onCurrentViewChanged(int index)
@@ -171,3 +187,8 @@ void ContactsTable::selectRow(int index)
 {
   ui->contact_table->selectRow(index);
 }
+
+ContactView* ContactsTable::getCurrentView() const
+  {
+  return qobject_cast<ContactView *>(ui->contact_details_view->currentWidget());
+  }
