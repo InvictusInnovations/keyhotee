@@ -97,11 +97,8 @@ bool AddressBookModel::removeRows(int row, int count, const QModelIndex& parent)
   beginRemoveRows(QModelIndex(), row, row + count - 1);
   for (int i = row; i < row + count; ++i)
     {
-    //#if 0 // DAN FIX ME
     // remove from addressbook database
-    uint32_t wallet_index = my->_contacts[i].wallet_index;
-    my->_address_book->remove_contact(wallet_index);
-    //#endif
+    my->_address_book->remove_contact(my->_contacts[i]);
     }
   //remove from in-memory contact list
   auto rowI = my->_contacts.begin() + row;
