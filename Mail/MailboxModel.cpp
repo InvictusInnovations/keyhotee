@@ -301,6 +301,15 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
     case NumColumns:
       return QVariant();           //DLNFIX what is this?
       }
+  case Qt::FontRole:
+    if (!header.header.read_mark)
+    {
+      QFont boldFont;
+      boldFont.setBold(true);
+      return boldFont;
+    }
+    else
+      return QVariant();
     }
   return QVariant();
   }
