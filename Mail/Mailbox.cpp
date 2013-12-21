@@ -98,7 +98,7 @@ void Mailbox::setModel(MailboxModel* model, InboxType type)
 
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::To, 120);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::Subject, 300);
-  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateReceived, 120);
+  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateReceived, 140);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::From, 120);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateSent, 120);
   if (_type == Inbox)

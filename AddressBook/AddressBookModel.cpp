@@ -94,6 +94,9 @@ int AddressBookModel::columnCount(const QModelIndex& parent) const
 
 bool AddressBookModel::removeRows(int row, int count, const QModelIndex& parent)
   {
+//  fc::ecc::public_key pubkey = getContactById(row).public_key;
+//  auto findContact_1 = my->_address_book->get_contact_by_public_key(pubkey);
+
   beginRemoveRows(QModelIndex(), row, row + count - 1);
   for (int i = row; i < row + count; ++i)
     {
@@ -109,6 +112,9 @@ bool AddressBookModel::removeRows(int row, int count, const QModelIndex& parent)
   //remove fullname and dac_id from Qcompleter
   my->_contact_completion_model.removeRows(row * 2, count * 2);
   endRemoveRows();
+
+//  auto findContact_2 = my->_address_book->get_contact_by_public_key(pubkey);
+
   return true;
   }
 
