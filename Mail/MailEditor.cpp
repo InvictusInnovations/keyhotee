@@ -839,7 +839,7 @@ void MailEditor::setupTextActions()
 
   QFontDatabase db;
   foreach(int size, db.standardSizes())
-  comboSize->addItem(QString::number(size));
+    comboSize->addItem(QString::number(size));
 
   connect(comboSize, SIGNAL(activated(QString)), this, SLOT(textSize(QString)));
   comboSize->setCurrentIndex(comboSize->findText(QString::number(QApplication::font()
@@ -940,17 +940,15 @@ void MailEditor::sendMailMessage()
     msg.attachments = _attachments;
     getRecipientKeys(to_field, msg.to_list);
     getRecipientKeys(cc_field, msg.cc_list);
-    //bcc addresses are not included in the email itself
-    std::vector<fc::ecc::public_key> bcc_list;
-    getRecipientKeys(bcc_field, bcc_list);
+    getRecipientKeys(bcc_field, msg.bcc_list);
 
-    auto                             my_priv_key = profile->get_keychain().get_identity_key(identities[0].dac_id_string);
+    auto my_priv_key = profile->get_keychain().get_identity_key(identities[0].dac_id_string);
     foreach(auto public_key, msg.to_list)
-    app->send_email(msg, public_key, my_priv_key);
+      app->send_email(msg, public_key, my_priv_key);
     foreach(auto public_key, msg.cc_list)
-    app->send_email(msg, public_key, my_priv_key);
-    foreach(auto public_key, bcc_list)
-    app->send_email(msg, public_key, my_priv_key);
+      app->send_email(msg, public_key, my_priv_key);
+    foreach(auto public_key, msg.bcc_list)
+      app->send_email(msg, public_key, my_priv_key);
 
     //TODO add code to save to SentItems
     textEdit->document()->setModified(false);

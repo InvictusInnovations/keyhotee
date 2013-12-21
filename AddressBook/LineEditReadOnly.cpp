@@ -4,7 +4,7 @@
 LineEditReadOnly::LineEditReadOnly(QWidget* parent)
   : QLineEdit(parent)
   {
-
+  _readOnly = true;
   }
 
 LineEditReadOnly::~LineEditReadOnly(){}

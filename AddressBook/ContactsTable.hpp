@@ -23,14 +23,15 @@ public:
   void showView(ContactView& view) const;
   void addNewContact(ContactView& view) const;
   bool isShowDetailsHidden();
-  void onCanceledAddContact();
   bool CheckSaving(ContactView& newView) const;
   void selectRow(int index);
+
+private:
+  ContactView* getCurrentView() const;
 
 Q_SIGNALS:
   void contactOpened(int contact_id);
   void contactDeleted(int contact_id);
-  void showPrevView();
 
 private:
   std::unique_ptr<Ui::ContactsTable> ui;
@@ -42,4 +43,6 @@ public slots:
   void onDeleteContact();
   void on_actionShow_details_toggled(bool checked);
   void onCurrentViewChanged(int index);
+  void onSavedNewContact();
+  void onCanceledNewContact();
 };

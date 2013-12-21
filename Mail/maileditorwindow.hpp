@@ -61,8 +61,6 @@ class MailEditorMainWindow : public QMainWindow
     void LoadMessage(const TStoredMailMessage& srcMsgHeader, const TPhysicalMailMessage& srcMsg);
 
   private:
-    typedef IMailProcessor::TPhysicalMailMessage TPhysicalMailMessage;
-
     /// QWidget reimplementation to support query for save mod. contents.
     virtual void closeEvent(QCloseEvent* e) override;
     
