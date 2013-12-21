@@ -56,6 +56,9 @@
      <property name="contextMenuPolicy">
       <enum>Qt::ActionsContextMenu</enum>
      </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
      <property name="showGrid">
       <bool>false</bool>
      </property>
@@ -75,6 +78,9 @@
       <number>200</number>
      </attribute>
      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
      </attribute>
      <attribute name="verticalHeaderVisible">
@@ -219,6 +225,20 @@
     <enum>Qt::WidgetWithChildrenShortcut</enum>
    </property>
   </action>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset theme="file-open"/>
+   </property>
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="toolTip">
+    <string>Opens the attachment using its default application</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
+   </property>
+  </action>
   <zorder>delButton</zorder>
   <zorder>saveButton</zorder>
   <zorder>attachmentTable</zorder>
@@ -324,6 +344,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionOpen</sender>
+   <signal>triggered()</signal>
+   <receiver>TFileAttachmentWidget</receiver>
+   <slot>onOpenTriggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>attachmentListChanged()</signal>
@@ -332,5 +368,6 @@
   <slot>onSaveTriggered()</slot>
   <slot>onAttachementTableSelectionChanged()</slot>
   <slot>onRenameTriggered()</slot>
+  <slot>onOpenTriggered()</slot>
  </slots>
 </ui>

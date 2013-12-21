@@ -19,16 +19,14 @@
 #include <boost/filesystem/path.hpp>
 
 #include <QApplication>
+#include <QDebug>
+#include <QFile>
 #include <QStandardPaths>
 #include <QTimer>
-
-#include <QFile>
-#include <QDebug>
 
 std::string gApplication_name = "Keyhotee";
 std::string gProfile_name = "default";
 bool        gMiningIsPossible = true;
-
 
 bts::application_config load_config(const std::string& profile_name)
 { try {
