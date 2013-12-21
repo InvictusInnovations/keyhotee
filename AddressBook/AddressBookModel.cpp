@@ -139,7 +139,7 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
         case FirstName:
           return tr("First Name");
         case Ownership:
-          return tr("Ownership");
+          return tr(" ");  // Ownership
         case LastName:
           return tr("Last Name");
         case Id:
@@ -183,7 +183,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
         case UserIcon:
           return QSize(48, 48);
         case Ownership:
-          return QSize(48, 48);
+          return QSize(32, 32);
         default:
           return QVariant();
         }
@@ -241,6 +241,14 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
        else
          {
          return QVariant();
+         }
+	 case Qt::ToolTipRole:
+      switch ( (Columns)index.column() )
+        {
+         case Ownership:
+           return tr("Ownership");
+         default:
+           return QVariant();
          }
     } //switch
 
