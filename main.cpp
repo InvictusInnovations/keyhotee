@@ -65,7 +65,15 @@ void startup(const std::string& profile_name)
 {
   auto btsapp = bts::application::instance();
   auto app_config = load_config(profile_name);
-  btsapp->configure(app_config);
+  try 
+  {
+    btsapp->configure(app_config);
+  }
+  catch (fc::exception& e)
+  {
+    elog( "Failed to configure Keyhotee: ${e}", ("e",e.to_detail_string() ) );
+    return;
+  }
 
   if (btsapp->has_profile() )
     display_login();
