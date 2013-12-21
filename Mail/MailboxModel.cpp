@@ -260,7 +260,7 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
     switch ( (Columns)index.column() )
       {
     case Read:
-      if (header.header.read_mark)
+      if (!header.header.read_mark)
         return my->_read_icon;
       else
         return "";
