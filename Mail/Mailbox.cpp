@@ -89,6 +89,10 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
     }
   else
     {
+    if (indexes.size() > 1)
+      ui->mail_viewer->setCurrentWidget(ui->info_2);
+    else
+      ui->mail_viewer->setCurrentWidget(ui->info_1);
     //TODO: not implemented ui->current_message->displayMailMessages(indexes,selection_model);
     }
   }
@@ -115,7 +119,7 @@ void Mailbox::setModel(IMailProcessor& mailProcessor, MailboxModel* model, Inbox
 
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::To, 120);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::Subject, 300);
-  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateReceived, 120);
+  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateReceived, 140);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::From, 120);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateSent, 120);
   if (_type == Inbox)
@@ -224,9 +228,9 @@ void Mailbox::duplicateMail(ReplyType reply_type)
     {
     //TODO add check to avoid replying to self as well
     foreach(auto to_key, header.to_list)
-    msg_window->addToContact(to_key);
+      msg_window->addToContact(to_key);
     foreach(auto cc_key, header.cc_list)
-    msg_window->addCcContact(cc_key);
+      msg_window->addCcContact(cc_key);
     }
   msg_window->SetSubject(new_subject);
   //TODO set focus to top of window
@@ -246,7 +250,7 @@ void Mailbox::onDeleteMail()
     return;
   QModelIndexList indexes;
   foreach(QModelIndex sortFilterIndex, sortFilterIndexes)
-  indexes.append(model->mapToSource(sortFilterIndex));
+    indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
   auto sourceModel = model->sourceModel();
   for (int i = indexes.count() - 1; i > -1; --i)
@@ -256,7 +260,7 @@ void Mailbox::onDeleteMail()
 
 bool Mailbox::isShowDetailsHidden()
   {
-  return ui->current_message->isHidden();
+  return ui->mail_viewer->isHidden();
   }
 
 void Mailbox::refreshMessageViewer()
@@ -271,6 +275,7 @@ void Mailbox::refreshMessageViewer()
     QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
     QModelIndex sourceModelIndex = model->mapToSource(indexes[0]);
     MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
+	ui->mail_viewer->setCurrentWidget(ui->current_message);
     ui->current_message->displayMailMessage(sourceModelIndex, sourceModel);
     }
   }
@@ -278,9 +283,9 @@ void Mailbox::refreshMessageViewer()
 void Mailbox::on_actionShow_details_toggled(bool checked)
   {
   if (checked)
-    ui->current_message->show();
+    ui->mail_viewer->show();
   else
-    ui->current_message->hide();
+    ui->mail_viewer->hide();
 
   }
 

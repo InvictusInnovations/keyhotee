@@ -98,7 +98,7 @@ void ContactsTable::onDeleteContact()
   QModelIndexList        sortFilterIndexes = selection_model->selectedRows();
   QModelIndexList        indexes;
   foreach(QModelIndex sortFilterIndex, sortFilterIndexes)
-  indexes.append(model->mapToSource(sortFilterIndex));
+    indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
   if (indexes.count() == 0)
     return;
