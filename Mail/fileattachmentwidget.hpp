@@ -27,6 +27,10 @@ class TFileAttachmentWidget : public QWidget
     TFileAttachmentWidget(QWidget* parent, bool editMode);
     virtual ~TFileAttachmentWidget();
 
+    /** Allows to load set of files attached to already existing email message (ie in Draft).
+    */
+    void LoadAttachedFiles(const TAttachmentContainer& attachedFiles);
+
     /** Retrieves attached files, reads them and puts their contents into specified container.
         Returns false if some of originally attached files is not readable or doesn't exists anymore.
 
@@ -35,6 +39,9 @@ class TFileAttachmentWidget : public QWidget
                          (because they don't exist anymore or are not readable).
     */
     bool GetAttachedFiles(TAttachmentContainer* storage, TFileInfoList* failedFilesStorage) const;
+    
+    /// Signal emitted when attachment list changes.
+    Q_SIGNAL void attachmentListChanged();
 
   private:
     class TFileAttachmentItem;
@@ -52,6 +59,8 @@ class TFileAttachmentWidget : public QWidget
     TScaledSize ScaleAttachmentSize(unsigned long long size) const;
     bool FreezeAttachmentTable();
     void UnFreezeAttachmentTable(bool sortEnabled);
+    /// Called when attachment item name has been changed.
+    void OnAttachmentItemChanged();
 
     /** Physically attaches the file attachment to specified email storage.
         \param item    - attachment item to be processed.
@@ -69,6 +78,7 @@ class TFileAttachmentWidget : public QWidget
     void onAddTriggered();
     void onDelTriggered();
     void onSaveTriggered();
+    void onRenameTriggered();
     void onAttachementTableSelectionChanged();
 
   /// Class attributes:

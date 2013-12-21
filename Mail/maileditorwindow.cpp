@@ -32,8 +32,11 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
       be trigerred.
   */
   ui->fileAttachementToolBar->hide();
-
   ui->moneyAttachementToolBar->hide();
+  ui->editToolBar->hide();
+  ui->adjustToolbar->hide();
+  ui->formatToolBar->hide();
+
   MoneyAttachement = new TMoneyAttachementWidget(ui->moneyAttachementToolBar);
   ui->moneyAttachementToolBar->addWidget(MoneyAttachement);
 
@@ -50,6 +53,8 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
   ui->mailFieldsToolBar->addWidget(MailFields);
 
   connect(MailFields, SIGNAL(subjectChanged(QString)), this, SLOT(onSubjectChanged(QString)));
+  connect(MailFields, SIGNAL(recipientListChanged()), this, SLOT(onRecipientListChanged()));
+  connect(FileAttachment, SIGNAL(attachmentListChanged()), this, SLOT(onAttachmentListChanged()));
 
   /** Supplement definition of mailFieldSelectorToolbar since Qt Creator doesn't support putting
       into its context dedicated controls (like preconfigured toolbutton).
@@ -63,7 +68,7 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
   mailFieldsMenu->addAction(ui->actionBCC);
 
   ui->actionMailFields->setMenu(mailFieldsMenu);
-  ui->mailFieldSelectorToolBar->addAction(ui->actionMailFields);
+  ui->mainToolBar->insertAction(ui->actionShowFormatOptions, ui->actionMailFields);
 
   setupEditorCommands();
 
@@ -74,8 +79,11 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
 
   QString subject = MailFields->getSubject();
   onSubjectChanged(subject);
-
+  
+  /// Clear modified flag
+  ui->messageEdit->document()->setModified(false);
   setWindowModified(ui->messageEdit->document()->isModified());
+  
   ui->actionSave->setEnabled(ui->messageEdit->document()->isModified());
   ui->actionUndo->setEnabled(ui->messageEdit->document()->isUndoAvailable());
   ui->actionRedo->setEnabled(ui->messageEdit->document()->isRedoAvailable());
@@ -100,6 +108,16 @@ void MailEditorMainWindow::SetRecipientList(const TRecipientPublicKeys& toList,
   const TRecipientPublicKeys& ccList, const TRecipientPublicKeys& bccList)
   {
   MailFields->SetRecipientList(toList, ccList, bccList);
+  }
+
+void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
+  const TPhysicalMailMessage& srcMsg)
+  {
+  DraftMessageInfo.first = srcMsgHeader;
+  DraftMessageInfo.second = true;
+
+  /// Now load source message contents into editor controls.
+  loadContents(srcMsgHeader.from_key, srcMsg);
   }
 
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
@@ -130,7 +148,7 @@ bool MailEditorMainWindow::maybeSave()
 
 void MailEditorMainWindow::setupEditorCommands()
   {
-  QPixmap pix(ui->formatToolBar->iconSize());
+  QPixmap pix(ui->editToolBar->iconSize());
   pix.fill(Qt::black);
   ui->actionTextColor->setIcon(pix);
 
@@ -222,6 +240,14 @@ bool MailEditorMainWindow::prepareMailMessage(TPhysicalMailMessage* storage,
   return true;
   }
 
+void MailEditorMainWindow::loadContents(const TRecipientPublicKey& senderId,
+  const TPhysicalMailMessage& srcMsg)
+  {
+  MailFields->LoadContents(senderId, srcMsg);
+  FileAttachment->LoadAttachedFiles(srcMsg.attachments);
+  ui->messageEdit->setText(QString(srcMsg.body.c_str()));
+  }
+
 void MailEditorMainWindow::onSave()
   {
   ui->messageEdit->document()->setModified(false);
@@ -230,7 +256,10 @@ void MailEditorMainWindow::onSave()
   if(prepareMailMessage(&msg, &bccList))
     {
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Save(senderId, msg, bccList);
+    MailProcessor.Save(senderId, msg, bccList,
+      DraftMessageInfo.second ? &DraftMessageInfo.first : nullptr, &DraftMessageInfo.first);
+
+    DraftMessageInfo.second = true;
     }
   }
 
@@ -339,6 +368,12 @@ void MailEditorMainWindow::onFromTriggered(bool checked)
   MailFields->showFromControls(checked);
   }
 
+void MailEditorMainWindow::onShowFormattingControlsTriggered(bool checked)
+  {
+  ui->formatToolBar->setVisible(checked);
+  ui->adjustToolbar->setVisible(checked);
+  }
+
 void MailEditorMainWindow::onFileAttachementTriggered(bool checked)
   {
   ui->fileAttachementToolBar->setVisible(checked);
@@ -365,6 +400,20 @@ void MailEditorMainWindow::on_actionSend_triggered()
 
 void MailEditorMainWindow::onSubjectChanged(const QString& subject)
   {
-  setWindowTitle(tr("New mail message: %1[*]").arg(subject));
+  setWindowTitle(tr("Mail message: %1[*]").arg(subject));
+  /// Let's treat subject change also as document modification.
+  ui->messageEdit->document()->setModified(true);
+  }
+
+void MailEditorMainWindow::onRecipientListChanged()
+  {
+  /// Let's treat recipient list change also as document modification.
+  ui->messageEdit->document()->setModified(true);
+  }
+
+void MailEditorMainWindow::onAttachmentListChanged()
+  {
+  /// Let's treat attachment list change also as document modification.
+  ui->messageEdit->document()->setModified(true);
   }
 

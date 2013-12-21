@@ -484,7 +484,7 @@ void ContactView::keyEdit(bool enable)
   ui->icon_view->setEnabled(enable);
 
   ui->id_status->setVisible(enable);
-  ui->keyhotee_founder->setVisible(!enable && _current_contact.getAge() == 1);
+  ui->keyhotee_founder->setVisible(!enable && _current_contact.isKeyhoteeFounder());
   save_contact->setEnabled(enable);
   cancel_edit_contact->setEnabled(enable);
   send_mail->setEnabled(!enable);
@@ -605,7 +605,7 @@ bool ContactView::doDataExchange (bool valid)
       //privacy_comboBox
       std::string public_key_string = public_key_address( _current_contact.public_key );
       ui->public_key->setText( public_key_string.c_str() );
-      ui->keyhotee_founder->setVisible(!_editing && _current_contact.getAge() == 1);
+      ui->keyhotee_founder->setVisible(!_editing && _current_contact.isKeyhoteeFounder());
       ui->id_status->setText(QString());
       }
     }

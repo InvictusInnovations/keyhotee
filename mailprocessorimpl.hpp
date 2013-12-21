@@ -5,8 +5,6 @@
 
 #include <bts/profile.hpp>
 
-class KeyhoteeMainWindow;
-
 /** Implementation of mail processor storing sent mail in actual folders (outbox and next in sent db).
     Send operation is performed in separate thread.
 
@@ -15,7 +13,7 @@ class KeyhoteeMainWindow;
 class TMailProcessor : public IMailProcessor
   {
   public:
-    TMailProcessor(KeyhoteeMainWindow* mainWindow, const bts::profile_ptr& loadedProfile);
+    TMailProcessor(IUpdateSink& updateSink, const bts::profile_ptr& loadedProfile);
     virtual ~TMailProcessor();
 
   /// IMailProcessor interface implementation:
@@ -24,7 +22,8 @@ class TMailProcessor : public IMailProcessor
       const TRecipientPublicKeys& bccList) override;
     /// \see IMailProcessor interface description.
     virtual void Save(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TRecipientPublicKeys& bccList) override;
+      const TRecipientPublicKeys& bccList, const TStoredMailMessage* msgToOverwrite,
+      TStoredMailMessage* savedMsg) override;
 
   /// Other implementation helpers:
 
@@ -33,13 +32,18 @@ class TMailProcessor : public IMailProcessor
     */
     bool CanQuit() const;
 
+  private:
+    typedef bts::bitchat::decrypted_message TStorableMessage;
+    void PrepareStorableMessage(const TIdentity& senderId, const TPhysicalMailMessage& msg,
+      TStorableMessage* storableMsg);
+
   /// Class attributes:
   private:
     class TOutboxQueue;
-
     typedef bts::bitchat::message_db_ptr TMessageDB;
-    /// Main window needed to display some notifications etc.
-    KeyhoteeMainWindow* MainWindow;
+
+    /// Sink to notify client about performed operations..
+    IUpdateSink&        Sink;
     bts::profile_ptr    Profile;
     TMessageDB          Drafts;
     TOutboxQueue*       OutboxQueue;

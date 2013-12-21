@@ -82,10 +82,10 @@
         <height>330</height>
        </size>
       </property>
-      <widget class="QWidget" name="page">
+      <widget class="QWidget" name="page_message">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="label_message">
           <property name="maximumSize">
            <size>
             <width>481</width>

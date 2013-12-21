@@ -56,6 +56,16 @@ void MailFieldsWidget::SetRecipientList(const TRecipientPublicKeys& toList,
     showBccControls(true);
   }
 
+void MailFieldsWidget::LoadContents(const TRecipientPublicKey& senderPK,
+  const TPhysicalMailMessage& srcMsg)
+  {
+  TRecipientPublicKeys bccList;
+  SetRecipientList(srcMsg.to_list, srcMsg.cc_list, bccList);
+  selectSenderIdentity(senderPK);
+
+  ui->subjectEdit->setText(QString(srcMsg.subject.c_str()));
+  }
+
 void MailFieldsWidget::showFromControls(bool show)
   {
   showChildLayout(ui->fromLayout, show, 0);
@@ -141,19 +151,28 @@ void MailFieldsWidget::fillSenderIdentities()
 
   QAction* first = nullptr;
 
-  std::vector<bts::addressbook::wallet_identity> identities = bts::application::instance()->get_profile()->identities();
+  auto profile = bts::application::instance()->get_profile();
+  std::vector<bts::addressbook::wallet_identity> identities = profile->identities();
+
   for(const auto& identity : identities)
     {
-    std::string identity_label = identity.first_name + " " + identity.last_name;
+    bool noAlias = identity.first_name.empty() && identity.last_name.empty();
+    std::string identity_label;
+    if(noAlias == false)
+      identity_label = identity.first_name + " " + identity.last_name;
+
     std::string entry(identity_label);
 
-    if(identity_label.empty() == false)
+    if(noAlias == false)
       entry += '(';
 
     entry += identity.dac_id_string;
 
-    if(identity_label.empty() == false)
+    if(noAlias == false)
       entry += ')';
+
+    auto ipk = identity.public_key;
+    assert(ipk.valid());
 
     QAction* action = menu->addAction(tr(entry.c_str()));
     action->setCheckable(true);
@@ -169,6 +188,23 @@ void MailFieldsWidget::fillSenderIdentities()
   menu->setActiveAction(first);
   }
 
+void MailFieldsWidget::selectSenderIdentity(const TRecipientPublicKey& senderPK)
+  {
+  assert(senderPK.valid());
+
+  for(const auto& it : Action2Identity)
+    {
+    const IMailProcessor::TIdentity& id = it.second;
+    assert(id.public_key.valid());
+
+    if(id.public_key == senderPK)
+      {
+      onFromBtnTriggered(it.first);
+      return;
+      }
+    }
+  }
+
 void MailFieldsWidget::on_sendButton_clicked()
   {
   ActionSend.trigger();
@@ -177,6 +213,7 @@ void MailFieldsWidget::on_sendButton_clicked()
 void MailFieldsWidget::onRecipientListChanged()
   {
   validateSendButtonState();
+  emit recipientListChanged();
   }
 
 void MailFieldsWidget::onSubjectChanged(const QString &subject)

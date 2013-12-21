@@ -308,11 +308,29 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionRename</sender>
+   <signal>triggered()</signal>
+   <receiver>TFileAttachmentWidget</receiver>
+   <slot>onRenameTriggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
+  <signal>attachmentListChanged()</signal>
   <slot>onAddTriggered()</slot>
   <slot>onDelTriggered()</slot>
   <slot>onSaveTriggered()</slot>
   <slot>onAttachementTableSelectionChanged()</slot>
+  <slot>onRenameTriggered()</slot>
  </slots>
 </ui>

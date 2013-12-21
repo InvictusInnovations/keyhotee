@@ -345,6 +345,7 @@
  </designerdata>
  <slots>
   <signal>subjectChanged(QString)</signal>
+  <signal>recipientListChanged()</signal>
   <slot>onSubjectChanged(QString)</slot>
  </slots>
 </ui>

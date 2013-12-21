@@ -126,7 +126,7 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
 
 KeyhoteeMainWindow::KeyhoteeMainWindow() :
   SelfSizingMainWindow(),
-  MailProcessor(this, bts::application::instance()->get_profile())
+  MailProcessor(*this, bts::application::instance()->get_profile())
   {
   ui.reset(new Ui::KeyhoteeMainWindow() );
   ui->setupUi(this);
@@ -239,23 +239,24 @@ KeyhoteeMainWindow::KeyhoteeMainWindow() :
   auto profile = app->get_profile();
   auto idents = profile->identities();
 
-
-  _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db());
-  _draft_model = new MailboxModel(this, profile, profile->get_draft_db());
-  _pending_model = new MailboxModel(this, profile, profile->get_pending_db());
-  _sent_model = new MailboxModel(this, profile, profile->get_sent_db());
-
   auto addressbook = profile->get_addressbook();
   _addressbook_model = new AddressBookModel(this, addressbook);
-  connect(_addressbook_model, &QAbstractItemModel::dataChanged, this, &KeyhoteeMainWindow::addressBookDataChanged);
+
+  _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db(), *_addressbook_model);
+  _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model);
+  _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model);
+  _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model);
+
+  connect(_addressbook_model, &QAbstractItemModel::dataChanged, this,
+    &KeyhoteeMainWindow::addressBookDataChanged);
 
   MailEditor::setContactCompleter(_addressbook_model->getContactCompleter() );
 
   ui->contacts_page->setAddressBook(_addressbook_model);
   ui->new_contact->setAddressBook(_addressbook_model);
-  ui->inbox_page->setModel(_inbox_model, Mailbox::Inbox);
-  ui->draft_box_page->setModel(_draft_model, Mailbox::Drafts);
-  ui->sent_box_page->setModel(_sent_model, Mailbox::Sent);
+  ui->inbox_page->setModel(MailProcessor, _inbox_model, Mailbox::Inbox);
+  ui->draft_box_page->setModel(MailProcessor, _draft_model, Mailbox::Drafts);
+  ui->sent_box_page->setModel(MailProcessor, _sent_model, Mailbox::Sent);
 
   ui->widget_stack->setCurrentWidget(ui->inbox_page);
   connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
@@ -600,7 +601,10 @@ void KeyhoteeMainWindow::newMailMessage()
   MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
     MailProcessor, true);
   mailWindow->show();
-  //newMailMessageTo(-1);
+
+  //auto msg_window = new MailEditor(this);
+  //msg_window->addToContact(-1);
+  //msg_window->setFocusAndShow();
   }
 
 void KeyhoteeMainWindow::newMailMessageTo(const Contact& contact)
@@ -720,6 +724,54 @@ void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& m
   {
   auto header = bts::get_profile()->get_inbox_db()->store(msg);
   _inbox_model->addMailHeader(header);
+  }
+
+void KeyhoteeMainWindow::OnMessageSaving()
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSaved(const TStoredMailMessage& msg,
+  const TStoredMailMessage* overwrittenOne) 
+  {
+  /// FIXME - add some status bar messaging
+  if(overwrittenOne != nullptr)
+    _draft_model->replaceMessage(*overwrittenOne, msg);
+  else
+    _draft_model->addMailHeader(msg);
+
+  ui->draft_box_page->refreshMessageViewer();
+  }
+
+void KeyhoteeMainWindow::OnMessageGroupPending(unsigned int count)
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessagePending(const TStoredMailMessage& msg)
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageGroupPendingEnd()
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSendingStart()
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
+  const TStoredMailMessage& sentMsg)
+  {
+  /// FIXME - add some status bar messaging
+  }
+
+void KeyhoteeMainWindow::OnMessageSendingEnd()
+  {
+  /// FIXME - add some status bar messaging
   }
 
 void KeyhoteeMainWindow::notSupported()

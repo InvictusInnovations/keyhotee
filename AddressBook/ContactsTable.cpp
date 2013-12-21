@@ -7,7 +7,6 @@
 
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
-
 #include <QMessageBox>
 
 class ContactsSortFilterProxyModel : public QSortFilterProxyModel
@@ -69,14 +68,25 @@ void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
   QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
-  connect(selection_model, &QItemSelectionModel::currentRowChanged, this, &ContactsTable::openContact);
+  connect(selection_model, &QItemSelectionModel::selectionChanged, this, &ContactsTable::onSelectionChanged);
   }
 
-void ContactsTable::openContact(const QModelIndex &current, const QModelIndex &previous)
+void ContactsTable::onSelectionChanged (const QItemSelection &selected, const QItemSelection &deselected)
   {
-  QModelIndex mapped_index = _sorted_addressbook_model->mapToSource(current);
-  auto        contact_id = _addressbook_model->getContact(mapped_index).wallet_index;
-  Q_EMIT      contactOpened(contact_id);
+  QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
+  QModelIndexList      indexes = selection_model->selectedRows();
+  bool                 oneRow = (indexes.size() == 1);
+
+  if (oneRow)
+    {
+    QModelIndex mapped_index = _sorted_addressbook_model->mapToSource(indexes[0]);
+    auto        contact_id = _addressbook_model->getContact(mapped_index).wallet_index;
+    Q_EMIT      contactOpened(contact_id);      
+    }
+  else
+    {
+    ui->contact_details_view->setCurrentWidget(ui->page_message);        
+    }
   }
 
 void ContactsTable::onDeleteContact()
@@ -88,7 +98,7 @@ void ContactsTable::onDeleteContact()
   QModelIndexList        sortFilterIndexes = selection_model->selectedRows();
   QModelIndexList        indexes;
   foreach(QModelIndex sortFilterIndex, sortFilterIndexes)
-  indexes.append(model->mapToSource(sortFilterIndex));
+    indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
   if (indexes.count() == 0)
     return;

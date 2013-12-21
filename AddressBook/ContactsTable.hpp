@@ -6,6 +6,7 @@ namespace Ui { class ContactsTable; }
 
 class AddressBookModel;
 class QSortFilterProxyModel;
+class QItemSelection;
 class ContactView;
 
 class ContactsTable  : public QWidget
@@ -16,7 +17,7 @@ public:
   ~ContactsTable();
 
   void setAddressBook(AddressBookModel* addressbook_model);
-  void openContact(const QModelIndex &current, const QModelIndex &previous);
+  void onSelectionChanged (const QItemSelection &selected, const QItemSelection &deselected);
   void searchEditChanged(QString search_string);
   void addContactView(ContactView& view) const;
   void showView(ContactView& view) const;
@@ -24,7 +25,6 @@ public:
   bool isShowDetailsHidden();
   void onCanceledAddContact();
   bool CheckSaving(ContactView& newView) const;
-
   void selectRow(int index);
 
 Q_SIGNALS:
