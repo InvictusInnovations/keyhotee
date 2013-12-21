@@ -38,7 +38,7 @@ public:
     };
 
   void addMailHeader(const bts::bitchat::message_header& header);
-  /** Allows to replace model internal data structures with new message.
+  /** Allows to replace model internal data structures with new message. Used for updating draft messages.
       \param overwrittenMsg - message to be replaced,
       \param msg - new message, to be stored & displayed by view associated with this model.
   */

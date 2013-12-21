@@ -96,20 +96,20 @@ void ContactsTable::onDeleteContact()
   //model->setUpdatesEnabled(false);
   QItemSelectionModel*   selection_model = ui->contact_table->selectionModel();
   QModelIndexList        sortFilterIndexes = selection_model->selectedRows();
+  if (sortFilterIndexes.count() == 0)
+    return;
+  if (QMessageBox::question(this, "Delete Contact", "Are you sure you want to delete this contact?") == QMessageBox::Button::No)
+    return;
   QModelIndexList        indexes;
   foreach(QModelIndex sortFilterIndex, sortFilterIndexes)
     indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
-  if (indexes.count() == 0)
-    return;
-  if (QMessageBox::question(this, "Delete Contact", "Are you sure you want to delete this contact?") == QMessageBox::Button::No)
-    return;
   auto sourceModel = model->sourceModel();
   for (int i = indexes.count() - 1; i > -1; --i)
     {
     auto contact_id = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).wallet_index;
-    sourceModel->removeRows(indexes.at(i).row(), 1);
-    Q_EMIT contactDeleted(contact_id);
+    sourceModel->removeRows(indexes.at(i).row(), 1);    
+    Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted
     }
   //model->setUpdatesEnabled(true);
 

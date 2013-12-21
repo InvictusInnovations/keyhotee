@@ -732,7 +732,7 @@ void KeyhoteeMainWindow::OnMessageSaving()
   }
 
 void KeyhoteeMainWindow::OnMessageSaved(const TStoredMailMessage& msg,
-  const TStoredMailMessage* overwrittenOne) 
+                                        const TStoredMailMessage* overwrittenOne) 
   {
   /// FIXME - add some status bar messaging
   if(overwrittenOne != nullptr)

@@ -92,26 +92,18 @@ int AddressBookModel::columnCount(const QModelIndex& parent) const
   return NumColumns;
   }
 
-bool AddressBookModel::removeRows(int row, int count, const QModelIndex& parent)
+bool AddressBookModel::removeRows(int row, int count, const QModelIndex&)
   {
-//  fc::ecc::public_key pubkey = getContactById(row).public_key;
-//  auto findContact_1 = my->_address_book->get_contact_by_public_key(pubkey);
-
   beginRemoveRows(QModelIndex(), row, row + count - 1);
+  // remove contacts from addressbook database
   for (int i = row; i < row + count; ++i)
-    {
-    // remove from addressbook database
     my->_address_book->remove_contact(my->_contacts[i]);
-    }
   //remove from in-memory contact list
   auto rowI = my->_contacts.begin() + row;
   my->_contacts.erase(rowI, rowI + count);
   //remove fullname and dac_id from Qcompleter
   my->_contact_completion_model.removeRows(row * 2, count * 2);
   endRemoveRows();
-
-//  auto findContact_2 = my->_address_book->get_contact_by_public_key(pubkey);
-
   return true;
   }
 

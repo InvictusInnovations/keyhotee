@@ -118,7 +118,7 @@ void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
   }
 
 void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
-  const TStoredMailMessage& msg)
+                                  const TStoredMailMessage& msg)
   {
   for(auto& hdr : my->_headers)
     {
@@ -161,7 +161,7 @@ bool MailboxModel::removeRows(int row, int count, const QModelIndex&)
   beginRemoveRows(QModelIndex(), row, row + count - 1);
   for (int i = row; i < row + count; ++i)
     my->_mail_db->remove(my->_headers[i].header);
-     //delete headers from my->_headers
+  //delete headers from in-memory my->_headers list
   auto rowI = my->_headers.begin() + row;
   my->_headers.erase(rowI, rowI + count);
   endRemoveRows();
@@ -250,67 +250,65 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
   //  const & current_contact = my->_contacts[index.row()];
   switch (role)
     {
-  case Qt::SizeHintRole:
-    switch ( (Columns)index.column() )
-      {
-    default:
-      return QVariant();
-      }
-  case Qt::DecorationRole:
-    switch ( (Columns)index.column() )
-      {
-    case Read:
-      if (!header.header.read_mark)
-        return my->_read_icon;
-      else
-        return "";
-    //            case Money:
-    //               return QVariant();
-    case Attachment:
-      if (header.hasAttachments)
-        return my->_attachment_icon;
-      else
-        return "";
-    default:
-      return QVariant();
-      }
-  case Qt::DisplayRole:
-    switch ( (Columns)index.column() )
-      {
-    case Read:
-      return header.header.read_mark;
-    case Money:
-      return header.money_amount;
-    case Attachment:
-      return header.hasAttachments;
-    //             case Chat:
-    case From:
-      return header.from;
-    case Subject:
-      return header.subject;
-    case DateReceived:
-      return header.date_received;
-    case To:
+    case Qt::SizeHintRole:
+      switch ( (Columns)index.column() )
         {
-        return makeContactListString(header.to_list);
+        default:
+          return QVariant();
+        } //switch (column)
+    case Qt::DecorationRole:
+      switch ( (Columns)index.column() )
+        {
+        case Read:
+          if (!header.header.read_mark)
+            return my->_read_icon;
+          else
+            return "";
+        //            case Money:
+        //               return QVariant();
+        case Attachment:
+          if (header.hasAttachments)
+            return my->_attachment_icon;
+          else
+            return "";
+        default:
+          return QVariant();
         }
-    case DateSent:
-      return header.date_sent;
-    case Status:
-      return QVariant();           //DLNFIX what is this?
-    case NumColumns:
-      return QVariant();           //DLNFIX what is this?
-      }
-  case Qt::FontRole:
-    if (!header.header.read_mark)
-    {
-      QFont boldFont;
-      boldFont.setBold(true);
-      return boldFont;
-    }
-    else
-      return QVariant();
-    }
+    case Qt::DisplayRole:
+      switch ( (Columns)index.column() )
+        {
+        case Read:
+          return header.header.read_mark;
+        case Money:
+          return header.money_amount;
+        case Attachment:
+          return header.hasAttachments;
+        //             case Chat:
+        case From:
+          return header.from;
+        case Subject:
+          return header.subject;
+        case DateReceived:
+          return header.date_received;
+        case To:
+          return makeContactListString(header.to_list);
+        case DateSent:
+          return header.date_sent;
+        case Status:
+          return QVariant();           //DLNFIX what is this?
+        case NumColumns:
+          return QVariant();           //DLNFIX what is this?
+        } //switch (column)
+    case Qt::FontRole:
+      if (!header.header.read_mark)
+        {
+        QFont boldFont;
+        boldFont.setBold(true);
+        return boldFont;
+        }
+      else
+        return QVariant();
+    } //switch (role)
   return QVariant();
   }
 
