@@ -8,6 +8,7 @@
 
 #include "dataaccessimpl.h"
 #include "mailprocessorimpl.hpp"
+#include "ch/ModificationsChecker.hpp"
 
 namespace Ui { class KeyhoteeMainWindow; }
 
@@ -49,7 +50,8 @@ private:
 
 class KeyhoteeMainWindow  : public SelfSizingMainWindow,
                             protected bts::application_delegate,
-                            protected IMailProcessor::IUpdateSink
+                            protected IMailProcessor::IUpdateSink,
+                            public IModificationsChecker
 {
 public:
   KeyhoteeMainWindow();
@@ -69,10 +71,13 @@ public:
   ContactGui* createContactGuiIfNecessary(int contact_id);
   bool isSelectedContactGui(ContactGui* contactGui);
 
-
   void openDraft(int draft_id);
   void openMail(int message_id);
   void openSent(int message_id);
+  virtual bool canContinue() const;
+
+protected:
+  virtual void closeEvent(QCloseEvent *);
 
 private:
   /// application_delegate interface implementation
@@ -136,6 +141,8 @@ private:
   void deleteContactGui(int contact_id);
   void setupStatusBar();
   void notSupported();
+  void enableMenu(bool enable);
+  bool checkSaving() const;
 
   /// Class attributes:
 

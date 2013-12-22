@@ -35,7 +35,7 @@
       <property name="handleWidth">
        <number>5</number>
       </property>
-      <widget class="QTreeWidget" name="side_bar">
+      <widget class="TreeWidgetCustom" name="side_bar">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
          <horstretch>10</horstretch>
@@ -619,6 +619,11 @@
    <extends>QWidget</extends>
    <header>wallets.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TreeWidgetCustom</class>
+   <extends>QTreeWidget</extends>
+   <header>TreeWidgetCustom.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

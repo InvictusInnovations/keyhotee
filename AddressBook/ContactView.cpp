@@ -218,15 +218,15 @@ void ContactView::onSave()
 void ContactView::onCancel()
   {
   setModyfied(false);
+  doDataExchange (false);
+  keyEdit(false);
   if (isAddingNewContact())
     {
-    this->setVisible(false);
+    this->setVisible(false);    
     emit canceledNewContact();
     }
   else  //editing contact
     {    
-    doDataExchange (false);
-    keyEdit(false);
     }
   }
 
@@ -563,7 +563,7 @@ bool ContactView::CheckSaving()
     }
   else if (isEditing() && !isModyfied())
     {
-    keyEdit(false);
+    onCancel();
     }
   return true;
   }
