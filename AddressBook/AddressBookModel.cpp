@@ -92,9 +92,12 @@ int AddressBookModel::columnCount(const QModelIndex& parent) const
   return NumColumns;
   }
 
-bool AddressBookModel::removeRows(int row, int count, const QModelIndex& parent)
+bool AddressBookModel::removeRows(int row, int count, const QModelIndex&)
   {
   beginRemoveRows(QModelIndex(), row, row + count - 1);
+  // remove contacts from addressbook database
+  for (int i = row; i < row + count; ++i)
+    my->_address_book->remove_contact(my->_contacts[i]);
   for (int i = row; i < row + count; ++i)
     {
     // remove from addressbook database
@@ -106,7 +109,6 @@ bool AddressBookModel::removeRows(int row, int count, const QModelIndex& parent)
   //remove fullname and dac_id from Qcompleter
   my->_contact_completion_model.removeRows(row * 2, count * 2);
   endRemoveRows();
-
   return true;
   }
 
@@ -242,6 +244,31 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
         default:
           return QVariant();
         }
+    } //switch
+         case Ownership:
+           return current_contact.isOwn() ? true : false;
+         case FirstName:
+           return current_contact.first_name.c_str();
+         case LastName:
+           return current_contact.last_name.c_str();
+         case Id:
+           return current_contact.dac_id_string.c_str();
+         case Age:
+           return current_contact.getAge();
+         case Repute:
+           return current_contact.getRepute();
+         default:
+           return QVariant();
+         }
+     case Qt::BackgroundRole:
+       if (current_contact.isKeyhoteeFounder())
+         {
+         return QVariant(QColor(231, 190, 66));
+         }
+       else
+         {
+         return QVariant();
+         }
     } //switch
 
   return QVariant();
