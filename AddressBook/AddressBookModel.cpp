@@ -245,31 +245,6 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return QVariant();
         }
     } //switch
-         case Ownership:
-           return current_contact.isOwn() ? true : false;
-         case FirstName:
-           return current_contact.first_name.c_str();
-         case LastName:
-           return current_contact.last_name.c_str();
-         case Id:
-           return current_contact.dac_id_string.c_str();
-         case Age:
-           return current_contact.getAge();
-         case Repute:
-           return current_contact.getRepute();
-         default:
-           return QVariant();
-         }
-     case Qt::BackgroundRole:
-       if (current_contact.isKeyhoteeFounder())
-         {
-         return QVariant(QColor(231, 190, 66));
-         }
-       else
-         {
-         return QVariant();
-         }
-    } //switch
 
   return QVariant();
   }
