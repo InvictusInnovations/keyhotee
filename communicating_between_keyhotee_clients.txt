@@ -32,6 +32,12 @@
   ]
 }
 This tells the second client to hook up to the default client.
+* Delete blockchain directories that your clients received from the remote server: 
+       delete C:\Users\Administrator\AppData\Local\Invictus Innovations, Inc\Keyhotee\default\data\bitname\bitname\channel
+       delete C:\Users\Administrator\AppData\Local\Invictus Innovations, Inc\Keyhotee\second\data\bitname\bitname\channel
+  Note: If you don't do this step, your clients probably won't sync up a block chain, since they may get slightly different block chains (because you
+        or someone else might mine on the server during the interval between connection of each of your clients to the server). If they don't sync
+		up, you won't be able to send msgs or email. So long story short: safest to delete these directories and start with a clean block chain.
 
 === Configuring the two clients to "know each other" so that they mine on same block chain ===
 * Run "keyhoteed" again to launch the default profile client (this client must be started first).
