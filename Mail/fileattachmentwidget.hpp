@@ -44,11 +44,23 @@ class TFileAttachmentWidget : public QWidget
     Q_SIGNAL void attachmentListChanged();
 
   private:
+    class AAttachmentItem;
     class TFileAttachmentItem;
-    typedef bts::bitchat::attachment TPhysicalAttachment;
+    class TVirtualAttachmentItem;
 
+    typedef bts::bitchat::attachment TPhysicalAttachment;
     /// Pair of scaled attachment size and its unit (KB, MB etc).
     typedef std::pair<double, const char*> TScaledSize;
+    /// Helper container to store currently selected items.
+    typedef std::vector<AAttachmentItem*>  TSelection;
+
+    /// Simple enum to return attachment item Save operation status.
+    enum TSaveStatus : int
+      {
+      READ_SOURCE_ERROR  = 1,
+      WRITE_TARGET_ERROR,
+      SUCCESS 
+      };
 
     /// Allows to prebuild context menu specific to attachment table.
     void ConfigureContextMenu();
@@ -61,29 +73,26 @@ class TFileAttachmentWidget : public QWidget
     void UnFreezeAttachmentTable(bool sortEnabled);
     /// Called when attachment item name has been changed.
     void OnAttachmentItemChanged();
-
-    /** Physically attaches the file attachment to specified email storage.
-        \param item    - attachment item to be processed.
-        \param storage - final attachment storage,
-        \param failedFilesStorage - storage for file infos for which the attachment process failed.
-    */
-    void AttachFile(const TFileAttachmentItem& item, TAttachmentContainer* storage,
-      TFileInfoList* failedFilesStorage) const;
+    void AddAttachmentItems(AAttachmentItem* fileNameItem, AAttachmentItem* fileSizeItem);
 
     /// Allows to convert given scaled size to the string format.
     static QString toString(const TScaledSize& size);
-
+    /// Helper function to implement attachment item saving.
+    bool SaveAttachmentItem(const AAttachmentItem* iten, const QFileInfo& targetPath,
+      bool checkForOverwrite);
+    void RetrieveSelection(TSelection* storage) const;
 
   private slots:
     void onAddTriggered();
     void onDelTriggered();
+    void onOpenTriggered();
     void onSaveTriggered();
     void onRenameTriggered();
     void onAttachementTableSelectionChanged();
 
   /// Class attributes:
   private:
-    typedef std::list<TFileAttachmentItem*>  TFileAttachmentList;
+    typedef std::list<AAttachmentItem*> TFileAttachmentList;
 
     Ui::TFileAttachmentWidget* ui;
     QStringList                SelectedFiles;

@@ -15,7 +15,8 @@
 MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel) :
   QWidget(&parent),
   ui(new Ui::MailFieldsWidget),
-  ActionSend(actionSend)
+  ActionSend(actionSend),
+  VisibleFields(0)
   {
   ui->setupUi(this);
 
@@ -52,33 +53,55 @@ void MailFieldsWidget::SetRecipientList(const TRecipientPublicKeys& toList,
   if(ccList.empty() == false)
     showCcControls(true);
 
-  if(ccList.empty() == false)
+  if(bccList.empty() == false)
     showBccControls(true);
   }
 
 void MailFieldsWidget::LoadContents(const TRecipientPublicKey& senderPK,
   const TPhysicalMailMessage& srcMsg)
   {
-  TRecipientPublicKeys bccList;
-  SetRecipientList(srcMsg.to_list, srcMsg.cc_list, bccList);
   selectSenderIdentity(senderPK);
+  if(senderPK.valid())
+    showFromControls(true);
+
+  SetRecipientList(srcMsg.to_list, srcMsg.cc_list, srcMsg.bcc_list);
 
   ui->subjectEdit->setText(QString(srcMsg.subject.c_str()));
   }
 
 void MailFieldsWidget::showFromControls(bool show)
   {
-  showChildLayout(ui->fromLayout, show, 0);
+  showChildLayout(ui->fromLayout, show, 0, TVisibleFields::FROM_FIELD);
   }
 
 void MailFieldsWidget::showCcControls(bool show)
   {
-  showChildLayout(ui->ccLayout, show, 2);
+  /** Check if field placed at previous position is displayed, if not decrease position to avoid
+      field order violation.
+  */
+  int preferredPosition = 2;
+  if(show && isFieldVisible(TVisibleFields::FROM_FIELD) == false)
+    --preferredPosition;
+
+  showChildLayout(ui->ccLayout, show, preferredPosition, TVisibleFields::CC_FIELD);
   }
 
 void MailFieldsWidget::showBccControls(bool show)
   {
-  showChildLayout(ui->bccLayout, show, 3);
+  /** Check if field placed at previous position is displayed, if not decrease position to avoid
+      field order violation.
+  */
+  int preferredPosition = 3;
+  if(show)
+    {
+    if(isFieldVisible(TVisibleFields::FROM_FIELD) == false)
+      --preferredPosition;
+
+    if(isFieldVisible(TVisibleFields::CC_FIELD) == false)
+      --preferredPosition;
+    }
+
+  showChildLayout(ui->bccLayout, show, preferredPosition, TVisibleFields::BCC_FIELDS);
   }
 
 QString MailFieldsWidget::getSubject() const
@@ -94,8 +117,14 @@ void MailFieldsWidget::FillRecipientLists(TRecipientPublicKeys* toList, TRecipie
   ui->bccEdit->GetCollectedContacts(bccList);
   }
 
-void MailFieldsWidget::showChildLayout(QLayout* layout, bool show, int preferredPosition)
+void MailFieldsWidget::showChildLayout(QLayout* layout, bool show, int preferredPosition,
+  unsigned int fieldFlag)
   {
+  if(show)
+    VisibleFields |= fieldFlag;
+  else
+    VisibleFields &= ~fieldFlag;
+
   ui->mailFieldsLayout->setEnabled(false);
   if(show)
     {
@@ -203,6 +232,12 @@ void MailFieldsWidget::selectSenderIdentity(const TRecipientPublicKey& senderPK)
       return;
       }
     }
+  }
+
+inline
+bool MailFieldsWidget::isFieldVisible(TVisibleFields field) const
+  {
+  return (VisibleFields & field) != 0;
   }
 
 void MailFieldsWidget::on_sendButton_clicked()

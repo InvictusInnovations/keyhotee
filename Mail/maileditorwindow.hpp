@@ -72,8 +72,8 @@ class MailEditorMainWindow : public QMainWindow
     void fontChanged(const QFont& f);
     void colorChanged(const QColor& c);
     void mergeFormatOnWordOrSelection(const QTextCharFormat& format);
-    /// Returns true if preparation succeeded or not.
-    bool prepareMailMessage(TPhysicalMailMessage* storage, TRecipientPublicKeys* bccList);
+    /// Returns true if preparation succeeded or false if not.
+    bool prepareMailMessage(TPhysicalMailMessage* storage);
     /// Loads given message contents into all editor controls.
     void loadContents(const TRecipientPublicKey& senderId, const TPhysicalMailMessage& srcMsg);
 

@@ -58,14 +58,22 @@ class MailFieldsWidget : public QWidget
   Q_SIGNAL void recipientListChanged();
 
   private:
+    enum TVisibleFields
+      {
+      FROM_FIELD  = 0x1,
+      CC_FIELD    = 0x2,
+      BCC_FIELDS  = 0x4
+      };
+
     /// Allows to show/hide given layout & all widgets associated with it.
-    void showChildLayout(QLayout* layout, bool show, int preferredPosition);
+    void showChildLayout(QLayout* layout, bool show, int preferredPosition, unsigned int fieldFlag);
     /// Helper for showChildLayout.
     void showLayoutWidgets(QLayout* layout, bool show);
     void validateSendButtonState();
     void fillSenderIdentities();
     /// Allows to select identity with given public key as current one.
     void selectSenderIdentity(const TRecipientPublicKey& senderPK);
+    bool isFieldVisible(TVisibleFields field) const;
 
   private slots:
     void on_sendButton_clicked();
@@ -77,6 +85,7 @@ class MailFieldsWidget : public QWidget
     typedef std::map<QAction*, bts::addressbook::wallet_identity> TAction2IdentityIndex;
     Ui::MailFieldsWidget*             ui;
     QAction&                          ActionSend;
+    unsigned int                      VisibleFields;
     /// Helper map to associate action for created 'from-sub-menu' item to given wallet_identity.
     TAction2IdentityIndex             Action2Identity;
     bts::addressbook::wallet_identity SenderIdentity;
