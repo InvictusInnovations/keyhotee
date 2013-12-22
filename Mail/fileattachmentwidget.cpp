@@ -726,9 +726,10 @@ void TFileAttachmentWidget::onAttachementTableSelectionChanged()
   bool anySelection = selectedCount != 0;
   bool singleSelection = selectedCount == 1;
 
+  ui->actionAdd->setEnabled(EditMode);
   ui->actionDel->setEnabled(anySelection && EditMode);
   ui->actionOpen->setEnabled(singleSelection);
-  ui->actionSave->setEnabled(anySelection && (EditMode == false));
+  ui->actionSave->setEnabled(anySelection);
   ui->actionRename->setEnabled(singleSelection && EditMode);
   }
 

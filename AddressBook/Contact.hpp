@@ -23,7 +23,16 @@ public:
   int getAge()const;
   int getRepute()const;
 
-  bool isKeyhoteeFounder() const { return getAge() == 1; }
+  static int  getAge(const bts::addressbook::contact& id);
+  static bool isKeyhoteeFounder(const bts::addressbook::contact& id)
+    {
+    return getAge(id) == 1;
+    }
+
+  bool isKeyhoteeFounder() const
+    {
+    return isKeyhoteeFounder(*this);
+    }
 
   QString getEmail() const;
   void setEmail(const QString& email);

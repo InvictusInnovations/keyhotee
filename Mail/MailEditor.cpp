@@ -147,10 +147,9 @@ void MailEditor::addToContact(int contact_id)
   if (contact_id < 0)
     return;
   auto  contacts = bts::get_profile()->get_addressbook()->get_contacts();
-  QString to_string = contacts[contact_id].getFullName().c_str();
-  bool isKeyhoteeFounder = Contact(contacts[contact_id]).isKeyhoteeFounder();
-  isKeyhoteeFounder = true;
-  to_field->insertCompletion(to_string, isKeyhoteeFounder);
+  auto contact = contacts[contact_id];
+  QString to_string = contact.getFullName().c_str();
+  to_field->insertCompletion(to_string, contact);
   }
 
 void MailEditor::addToContact(fc::ecc::public_key public_key)
@@ -163,7 +162,9 @@ void MailEditor::addToContact(fc::ecc::public_key public_key)
   else
     {
     std::string public_key_string = public_key_address(public_key);
-    to_field->insertCompletion(public_key_string.c_str());
+    bts::addressbook::contact c;
+    c.public_key = public_key;
+    to_field->insertCompletion(public_key_string.c_str(), c);
     }
   }
 
@@ -174,9 +175,9 @@ void MailEditor::addCcContact(int contact_id)
   if (!actionToggleCc->isChecked() )
     actionToggleCc->setChecked(true);
   auto    contacts = bts::get_profile()->get_addressbook()->get_contacts();
-  QString to_string = contacts[contact_id].getFullName().c_str();
-  bool isKeyhoteeFounder = (Contact(contacts[contact_id]).isKeyhoteeFounder());
-  cc_field->insertCompletion(to_string, isKeyhoteeFounder);
+  auto contact = contacts[contact_id];
+  QString to_string = contact.getFullName().c_str();
+  cc_field->insertCompletion(to_string, contact);
   }
 
 void MailEditor::addCcContact(fc::ecc::public_key public_key)
@@ -191,7 +192,9 @@ void MailEditor::addCcContact(fc::ecc::public_key public_key)
     if (!actionToggleCc->isChecked() )
       actionToggleCc->setChecked(true);
     std::string public_key_string = public_key_address(public_key);
-    cc_field->insertCompletion(public_key_string.c_str());
+    bts::addressbook::contact c;
+    c.public_key = public_key;
+    cc_field->insertCompletion(public_key_string.c_str(), c);
     }
   }
 

@@ -85,7 +85,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="fromEdit">
+        <widget class="ContactListEdit" name="fromEdit">
          <property name="minimumSize">
           <size>
            <width>230</width>

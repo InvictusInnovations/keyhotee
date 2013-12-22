@@ -38,26 +38,30 @@ QDateTime toQDateTime(const fc::time_point_sec& time_in_seconds)
   return date_time;
   }
 
+QString toString(const fc::ecc::public_key& pk)
+  {
+  auto address_book = bts::get_profile()->get_addressbook();
+  auto contact = address_book->get_contact_by_public_key(pk);
+  if (contact)
+    {
+    return QString(contact->dac_id_string.c_str());
+    }
+  else   //display public_key as base58
+    {
+    std::string public_key_string = public_key_address(pk);
+    return QString(public_key_string.c_str());
+    }
+  }
+
 //DLNFIX move this to utility function file
 QString makeContactListString(std::vector<fc::ecc::public_key> key_list)
   {
   QStringList to_list;
-  QString     to;
-  std::string public_key_string;
-  auto        address_book = bts::get_profile()->get_addressbook();
   foreach(auto public_key, key_list)
     {
-    auto contact = address_book->get_contact_by_public_key(public_key);
-    if (contact)
-      {
-      to_list.append(contact->dac_id_string.c_str());
-      }
-    else   //display public_key as base58
-      {
-      std::string public_key_string = public_key_address(public_key);
-      to_list.append(public_key_string.c_str());
-      }
+    to_list.append(toString(public_key));
     }
+
   return to_list.join(',');
   }
 
@@ -87,14 +91,7 @@ void MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
   auto addressbook = my->_profile->get_addressbook();
   mail_header.date_received = toQDateTime(header.received_time);
 
-  // Later, we might want to do this in data function instead (as we do for to_list)
-  // It would be slightly slower, but unknown keys would change to known contact names
-  // when added to contact list
-  auto from_contact = addressbook->get_contact_by_public_key(header.from_key);
-  if (from_contact)
-    mail_header.from = from_contact->dac_id_string.c_str();
-  else
-    mail_header.from = std::string(bts::address(header.from_key)).c_str();
+  mail_header.from = toString(header.from_key);
 
   mail_header.date_sent = toQDateTime(header.from_sig_time);
 
@@ -285,7 +282,7 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
           return header.hasAttachments;
         //             case Chat:
         case From:
-          return header.from;
+          return toString(header.header.from_key);
         case Subject:
           return header.subject;
         case DateReceived:

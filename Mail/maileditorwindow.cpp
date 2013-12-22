@@ -43,7 +43,7 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
   FileAttachment = new TFileAttachmentWidget(ui->fileAttachementToolBar, editMode);
   ui->fileAttachementToolBar->addWidget(FileAttachment);
 
-  MailFields = new MailFieldsWidget(*this, *ui->actionSend, abModel);
+  MailFields = new MailFieldsWidget(*this, *ui->actionSend, abModel, editMode);
 
   /// Initially only basic mail fields (To: and Subject:) should be visible
   MailFields->showFromControls(false);
@@ -56,19 +56,22 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
   connect(MailFields, SIGNAL(recipientListChanged()), this, SLOT(onRecipientListChanged()));
   connect(FileAttachment, SIGNAL(attachmentListChanged()), this, SLOT(onAttachmentListChanged()));
 
-  /** Supplement definition of mailFieldSelectorToolbar since Qt Creator doesn't support putting
-      into its context dedicated controls (like preconfigured toolbutton).
+  if(editMode)
+    {
+    /** Supplement definition of mailFieldSelectorToolbar since Qt Creator doesn't support putting
+        into its context dedicated controls (like preconfigured toolbutton).
 
-      Setup local menu for 'actionMailFields' toolButton (used to enable/disable additional mail
-      field selection).
-  */
-  QMenu* mailFieldsMenu = new QMenu(this);
-  mailFieldsMenu->addAction(ui->actionFrom);
-  mailFieldsMenu->addAction(ui->actionCC);
-  mailFieldsMenu->addAction(ui->actionBCC);
+        Setup local menu for 'actionMailFields' toolButton (used to enable/disable additional mail
+        field selection).
+    */
+    QMenu* mailFieldsMenu = new QMenu(this);
+    mailFieldsMenu->addAction(ui->actionFrom);
+    mailFieldsMenu->addAction(ui->actionCC);
+    mailFieldsMenu->addAction(ui->actionBCC);
 
-  ui->actionMailFields->setMenu(mailFieldsMenu);
-  ui->mainToolBar->insertAction(ui->actionShowFormatOptions, ui->actionMailFields);
+    ui->actionMailFields->setMenu(mailFieldsMenu);
+    ui->mainToolBar->insertAction(ui->actionShowFormatOptions, ui->actionMailFields);
+    }
 
   setupEditorCommands();
 
@@ -97,6 +100,8 @@ MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& ab
 #ifndef QT_NO_CLIPBOARD
   connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(onClipboardDataChanged()));
 #endif
+
+  toggleReadOnlyMode();
   }
 
 MailEditorMainWindow::~MailEditorMainWindow()
@@ -245,6 +250,15 @@ void MailEditorMainWindow::loadContents(const TRecipientPublicKey& senderId,
   MailFields->LoadContents(senderId, srcMsg);
   FileAttachment->LoadAttachedFiles(srcMsg.attachments);
   ui->messageEdit->setText(QString(srcMsg.body.c_str()));
+  }
+
+void MailEditorMainWindow::toggleReadOnlyMode()
+  {
+  ui->actionCut->setEnabled(EditMode);
+  ui->actionPaste->setEnabled(EditMode);
+  ui->messageEdit->setReadOnly(EditMode == false);
+  ui->formatToolBar->setEnabled(EditMode);
+  ui->adjustToolbar->setEnabled(EditMode);
   }
 
 void MailEditorMainWindow::onSave()

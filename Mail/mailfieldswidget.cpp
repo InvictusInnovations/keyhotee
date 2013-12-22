@@ -12,30 +12,50 @@
 #include <QAction>
 #include <QMenu>
 
-MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel) :
+MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel,
+  bool editMode) :
   QWidget(&parent),
   ui(new Ui::MailFieldsWidget),
   ActionSend(actionSend),
-  VisibleFields(0)
+  VisibleFields(0),
+  EditMode(editMode)
   {
   ui->setupUi(this);
 
-  fillSenderIdentities();
-  validateSendButtonState();
+  QCompleter* completer = abModel.getContactCompleter();
 
-  ContactListEdit* recipientEdits[3];
+  bool readOnly = editMode == false;
+
+  ContactListEdit* recipientEdits[4];
   recipientEdits[0] = ui->toEdit;
   recipientEdits[1] = ui->ccEdit;
   recipientEdits[2] = ui->bccEdit;
-
-  QCompleter* completer = abModel.getContactCompleter();
+  recipientEdits[3] = ui->fromEdit;
 
   for(unsigned int i = 0; i < sizeof(recipientEdits)/sizeof(ContactListEdit*); ++i)
     {
     ContactListEdit* edit = recipientEdits[i];
     edit->setCompleter(completer);
+    edit->setReadOnly(readOnly);
+
     connect(edit->document(), SIGNAL(contentsChanged()), this, SLOT(onRecipientListChanged()));
     }
+
+  ui->fromEdit->setCompleter(completer);
+  if(editMode)
+    fillSenderIdentities();
+
+  validateSendButtonState();
+
+  ui->fromButton->setEnabled(editMode);
+  ui->toButton->setEnabled(editMode);
+  ui->ccButton->setEnabled(editMode);
+  ui->bccButton->setEnabled(editMode);
+
+  ui->subjectEdit->setReadOnly(readOnly);
+  
+  ui->sendButton->setEnabled(editMode);
+  ui->sendButton->setVisible(editMode);
   }
 
 MailFieldsWidget::~MailFieldsWidget()
@@ -60,9 +80,13 @@ void MailFieldsWidget::SetRecipientList(const TRecipientPublicKeys& toList,
 void MailFieldsWidget::LoadContents(const TRecipientPublicKey& senderPK,
   const TPhysicalMailMessage& srcMsg)
   {
-  selectSenderIdentity(senderPK);
+  ui->fromEdit->clear();
+
   if(senderPK.valid())
+    {
+    selectSenderIdentity(senderPK);
     showFromControls(true);
+    }
 
   SetRecipientList(srcMsg.to_list, srcMsg.cc_list, srcMsg.bcc_list);
 
@@ -159,7 +183,6 @@ void MailFieldsWidget::showLayoutWidgets(QLayout* layout, bool show)
     QLayoutItem* li = layout->itemAt(i);
     QWidget* w = li->widget();
     w->setVisible(show);
-    w->setEnabled(show);
     }
   }
 
@@ -232,6 +255,18 @@ void MailFieldsWidget::selectSenderIdentity(const TRecipientPublicKey& senderPK)
       return;
       }
     }
+
+  assert(EditMode == false && "When editing an email only one of profile identities could be used"
+    "as sender.");
+
+  setChosenSender(senderPK);
+  }
+
+void MailFieldsWidget::setChosenSender(const TRecipientPublicKey& senderPK)
+  {
+  TRecipientPublicKeys sender;
+  sender.push_back(senderPK);
+  ui->fromEdit->SetCollectedContacts(sender);
   }
 
 inline
@@ -268,7 +303,6 @@ void MailFieldsWidget::onFromBtnTriggered(QAction* action)
   assert(foundPos != Action2Identity.end());
 
   SenderIdentity = foundPos->second;
-
-  ui->fromEdit->setText(action->text());
+  setChosenSender(SenderIdentity.public_key);
   }
 

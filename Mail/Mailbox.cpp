@@ -50,22 +50,13 @@ void Mailbox::onDoubleClickedItem(QModelIndex index)
   auto                   sourceModelIndex = model->mapToSource(index);
   auto                   sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
 
-  if(_type == Drafts)
-    {
-    IMailProcessor::TPhysicalMailMessage decodedMsg;
-    IMailProcessor::TStoredMailMessage encodedMsg;
-    sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
-    MailEditorMainWindow* mailEditor = new MailEditorMainWindow(this,
-      sourceModel->getAddressBookModel(), *_mailProcessor, _type == Drafts);
-    mailEditor->LoadMessage(encodedMsg, decodedMsg);
-    mailEditor->show();
-    }
-  else
-    {
-    auto mailViewer = new MailViewer(this);
-    mailViewer->displayMailMessage(sourceModelIndex, sourceModel);
-    mailViewer->show();
-    }
+  IMailProcessor::TPhysicalMailMessage decodedMsg;
+  IMailProcessor::TStoredMailMessage encodedMsg;
+  sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
+  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(this,
+    sourceModel->getAddressBookModel(), *_mailProcessor, _type == Drafts);
+  mailEditor->LoadMessage(encodedMsg, decodedMsg);
+  mailEditor->show();
   }
 
 void Mailbox::showCurrentMail(const QModelIndex &selected,

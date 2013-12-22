@@ -76,6 +76,7 @@ class MailEditorMainWindow : public QMainWindow
     bool prepareMailMessage(TPhysicalMailMessage* storage);
     /// Loads given message contents into all editor controls.
     void loadContents(const TRecipientPublicKey& senderId, const TPhysicalMailMessage& srcMsg);
+    void toggleReadOnlyMode();
 
   private slots:
     /// Actual implementation of save operation.

@@ -120,14 +120,7 @@ bool Contact::isOwn() const
 
 int Contact::getAge() const
   {
-  auto app = bts::application::instance();
-  fc::optional<bts::bitname::name_record> oname_record =  app->lookup_name( dac_id_string );
-  if (oname_record)
-    {
-    return oname_record->age;
-    }
-  else
-    return 0;
+  return getAge(*this);
   }
 
 int Contact::getRepute() const
@@ -137,6 +130,22 @@ int Contact::getRepute() const
   if (oname_record)
     {
     return oname_record->repute;
+    }
+  else
+    return 0;
+  }
+
+int Contact::getAge(const bts::addressbook::contact& id)
+  {
+  auto app = bts::application::instance();
+  /// FIXME reverse_name_lookup is not yet supported.
+  bool usePK = false; /// id.dac_id_string.empty() && id.public_key.valid()
+  fc::optional<bts::bitname::name_record> oname_record = usePK ?
+    app->reverse_name_lookup(id.public_key) : app->lookup_name(id.dac_id_string);
+
+  if (oname_record)
+    {
+    return oname_record->age;
     }
   else
     return 0;

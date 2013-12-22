@@ -1,4 +1,8 @@
 #include "ContactListEdit.hpp"
+
+#include "public_key_address.hpp"
+#include "AddressBook/Contact.hpp"
+
 #include <QCompleter>
 #include <QAbstractItemView>
 #include <QKeyEvent>
@@ -8,7 +12,6 @@
 
 #include <fc/log/logger.hpp>
 #include <bts/profile.hpp>
-#include "AddressBook/Contact.hpp"
 
 ContactListEdit::ContactListEdit(QWidget* parent)
   : QTextEdit(parent)
@@ -56,11 +59,12 @@ void ContactListEdit::insertCompletion( const QModelIndex& completionIndex )
   row = row / 2;
   auto addressbook = bts::get_profile()->get_addressbook();
   auto contacts = addressbook->get_contacts();
-  bool isKeyhoteeFounder = Contact(contacts[row]).isKeyhoteeFounder();
-  insertCompletion( completion, isKeyhoteeFounder );
+  auto contact = contacts[row];
+  
+  insertCompletion(completion, contact);
   }
 
-void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhoteeFounder )
+void ContactListEdit::insertCompletion( const QString& completion, const bts::addressbook::contact& c)
   {
   ilog( "insertCompletion ${c}", ("c", completion.toStdString() ) );
   // remove existing text
@@ -69,7 +73,7 @@ void ContactListEdit::insertCompletion( const QString& completion, bool isKeyhot
   if (_completer->widget() != this)
     return;
 
-  addContactEntry(completion, isKeyhoteeFounder);
+  addContactEntry(completion, c);
   }
 
 void ContactListEdit::onCompleterRequest()
@@ -104,7 +108,7 @@ QStringList ContactListEdit::getListOfImageNames() const
   return image_names;
   }
 
-void ContactListEdit::addContactEntry(const QString& contactText, bool isFounder)
+void ContactListEdit::addContactEntry(const QString& contactText, const bts::addressbook::contact& c)
   {
   QFont        default_font;
   default_font.setPointSize( default_font.pointSize() - 1 );
@@ -125,6 +129,9 @@ void ContactListEdit::addContactEntry(const QString& contactText, bool isFounder
   QBrush brush(Qt::SolidPattern);
   brush.setColor( QColor( 205, 220, 241 ) );
   QPen  pen;
+
+  bool isFounder = Contact::isKeyhoteeFounder(c);
+
   if(isFounder)
     {
     QLinearGradient grad(QPointF(0, 0), QPointF(0, 1));
@@ -158,6 +165,42 @@ void ContactListEdit::addContactEntry(const QString& contactText, bool isFounder
   text_cursor.insertImage(completion_image, contactText);
   text_cursor.insertText(" ");
   setTextCursor(text_cursor);
+  }
+
+QString ContactListEdit::toString(const bts::addressbook::wallet_identity& id) const
+  {
+  return toStringImpl(id);
+  }
+
+QString ContactListEdit::toString(const bts::addressbook::wallet_contact& id) const
+  {
+  return toStringImpl(id);
+  }
+
+template <class TContactStorage>
+inline
+QString ContactListEdit::toStringImpl(const TContactStorage& id) const
+  {
+  /** Use trivial encoding (as kID only) until some underlying storage for added contact
+      data will be implemented. Right now built text must allow successfull reverse parsing
+      what is completely wrong
+  */
+  bool noAlias = true;//id.first_name.empty() && id.last_name.empty();
+  std::string identity_label;
+  if(noAlias == false)
+    identity_label = id.first_name + " " + id.last_name;
+
+  std::string entry(identity_label);
+
+  if(noAlias == false)
+    entry += '(';
+
+  entry += id.dac_id_string;
+
+  if(noAlias == false)
+    entry += ')';
+
+  return QString(entry.c_str());
   }
 
 //! [5]
@@ -235,16 +278,50 @@ void ContactListEdit::showCompleter(const QString& completionPrefix)
 
 void ContactListEdit::SetCollectedContacts(const IMailProcessor::TRecipientPublicKeys& storage)
   {
-  auto aBook = bts::get_profile()->get_addressbook();
+  auto profile = bts::get_profile();
+  auto aBook = profile->get_addressbook();
   for(const auto& recipient : storage)
     {
+    assert(recipient.valid());
+
     auto contact = aBook->get_contact_by_public_key(recipient);
-    /** Use kID as completion here - it is slight violation against source list but we don't know
-        here how it was originally entered (by kID or alias: fName lName)
-    */
-    QString kID(contact->dac_id_string.c_str());
-    Contact c(*contact);
-    addContactEntry(kID, c.isKeyhoteeFounder());
+
+    if(contact)
+      {
+      /** Use kID as completion here - it is slight violation against source list but we don't know
+          here how it was originally entered (by kID or alias: fName lName)
+      */
+      QString entryText(toString(*contact));
+      addContactEntry(entryText, *contact);
+      }
+    else
+      {
+      bool known = false;
+      /// If no contact found try one of registered identities.
+      std::vector<bts::addressbook::wallet_identity> identities = profile->identities();
+      for(const auto& identity : identities)
+        {
+        assert(identity.public_key.valid());
+
+        if(identity.public_key == recipient)
+          {
+          QString entryText(toString(identity));
+          addContactEntry(entryText, identity);
+          known = true;
+          break;
+          }
+        }
+
+      if(known == false)
+        {
+        /// Some unknown contact. Lets show its public key in the list.
+        public_key_address pkAddress(recipient);
+        std::string textPK(pkAddress);
+        bts::addressbook::wallet_contact wc;
+        wc.public_key = recipient;
+        addContactEntry(QString(textPK.c_str()), wc);
+        }
+      }
     }
   }
 

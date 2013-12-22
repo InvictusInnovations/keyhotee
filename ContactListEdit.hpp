@@ -3,6 +3,16 @@
 
 #include "ch/mailprocessor.hpp"
 
+namespace bts
+{
+namespace addressbook
+{
+struct contact;
+struct wallet_contact;
+struct wallet_identity;
+} ///namespace addressbook
+} /// namespace bts
+
 class QCompleter;
 
 /**
@@ -40,7 +50,7 @@ protected:
   void resizeEvent(QResizeEvent* resize_event);
 
 public Q_SLOTS:
-  void insertCompletion( const QString& completion, bool isKeyhoteeFounder = false );
+  void insertCompletion( const QString& completion, const bts::addressbook::contact& c);
   void insertCompletion( const QModelIndex& completion );
   /// Slot to explicitly request to show a completer.
   void onCompleterRequest();
@@ -51,7 +61,11 @@ private Q_SLOTS:
 private:
   QString     textUnderCursor() const;
   QStringList getListOfImageNames() const;
-  void        addContactEntry(const QString& contactText, bool isFounder);
+  void        addContactEntry(const QString& contactText, const bts::addressbook::contact& c);
+  QString     toString(const bts::addressbook::wallet_identity& id) const;
+  QString     toString(const bts::addressbook::wallet_contact& id) const;
+  template <class TContactStorage>
+  QString     toStringImpl(const TContactStorage& id) const;
 
 private:
   int         _fitted_height;

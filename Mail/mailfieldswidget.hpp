@@ -24,7 +24,7 @@ class MailFieldsWidget : public QWidget
     typedef IMailProcessor::TRecipientPublicKey  TRecipientPublicKey;
     typedef IMailProcessor::TRecipientPublicKeys TRecipientPublicKeys;
 
-    MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel);
+    MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel, bool editMode);
     virtual ~MailFieldsWidget();
 
     /** Allows to explicityly fill recipient lists with given values.
@@ -71,8 +71,15 @@ class MailFieldsWidget : public QWidget
     void showLayoutWidgets(QLayout* layout, bool show);
     void validateSendButtonState();
     void fillSenderIdentities();
-    /// Allows to select identity with given public key as current one.
+    /** Allows to select identity with given public key as current one.
+        \warning This method can be used in 2 contexts:
+        - in context of active edit mode, when specified senderPK should point to one of registered
+          identities,
+        - in context of active read-only mode, when specified senderPK can point to any known
+          contact or even unknown one (then just public key should be displayed).
+    */
     void selectSenderIdentity(const TRecipientPublicKey& senderPK);
+    void setChosenSender(const TRecipientPublicKey& senderPK);
     bool isFieldVisible(TVisibleFields field) const;
 
   private slots:
@@ -82,13 +89,15 @@ class MailFieldsWidget : public QWidget
     void onFromBtnTriggered(QAction* action);
 
   private:
-    typedef std::map<QAction*, bts::addressbook::wallet_identity> TAction2IdentityIndex;
+    typedef std::map<QAction*, IMailProcessor::TIdentity> TAction2IdentityIndex;
     Ui::MailFieldsWidget*             ui;
     QAction&                          ActionSend;
     unsigned int                      VisibleFields;
     /// Helper map to associate action for created 'from-sub-menu' item to given wallet_identity.
     TAction2IdentityIndex             Action2Identity;
-    bts::addressbook::wallet_identity SenderIdentity;
+    /// Can store selected wallet_identity or just one of known contacts...
+    IMailProcessor::TIdentity         SenderIdentity;
+    bool                              EditMode;
   };
 
 #endif // MAILFIELDSWIDGET_HPP
