@@ -79,10 +79,8 @@ class IMailProcessor
     /** Allows to schedule given message send to the outbox queue.
         \param senderId - identity to be used as sender
         \param msg      - message to be sent.
-        \param bccList  - optional bcc list (which is not included in the email).
     */
-    virtual void Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TRecipientPublicKeys& bccList) = 0;
+    virtual void Send(const TIdentity& senderId, const TPhysicalMailMessage& msg) = 0;
 
     /** Allows to save given message into Drafts folder in the backend storage.
         \param msgToOverwrite - optional (can be null). If specified given message will be first
@@ -93,8 +91,7 @@ class IMailProcessor
         \see Send description for other parameter details.
     */
     virtual void Save(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TRecipientPublicKeys& bccList, const TStoredMailMessage* msgToOverwrite,
-      TStoredMailMessage* savedMsg) = 0;
+      const TStoredMailMessage* msgToOverwrite, TStoredMailMessage* savedMsg) = 0;
 
   protected:
     virtual ~IMailProcessor() {}

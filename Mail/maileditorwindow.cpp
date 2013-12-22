@@ -212,13 +212,12 @@ void MailEditorMainWindow::mergeFormatOnWordOrSelection(const QTextCharFormat &f
   ui->messageEdit->mergeCurrentCharFormat(format);
   }
 
-bool MailEditorMainWindow::prepareMailMessage(TPhysicalMailMessage* storage,
-  TRecipientPublicKeys* bccList)
+bool MailEditorMainWindow::prepareMailMessage(TPhysicalMailMessage* storage)
   {
   const bts::addressbook::wallet_identity& senderId = MailFields->GetSenderIdentity();
   storage->subject = MailFields->getSubject().toStdString();
 
-  MailFields->FillRecipientLists(&storage->to_list, &storage->cc_list, bccList);
+  MailFields->FillRecipientLists(&storage->to_list, &storage->cc_list, &storage->bcc_list);
   storage->body = ui->messageEdit->document()->toHtml().toStdString();
 
   typedef TFileAttachmentWidget::TFileInfoList TFileInfoList;
@@ -252,11 +251,10 @@ void MailEditorMainWindow::onSave()
   {
   ui->messageEdit->document()->setModified(false);
   TPhysicalMailMessage msg;
-  TRecipientPublicKeys bccList;
-  if(prepareMailMessage(&msg, &bccList))
+  if(prepareMailMessage(&msg))
     {
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Save(senderId, msg, bccList,
+    MailProcessor.Save(senderId, msg, 
       DraftMessageInfo.second ? &DraftMessageInfo.first : nullptr, &DraftMessageInfo.first);
 
     DraftMessageInfo.second = true;
@@ -387,11 +385,10 @@ void MailEditorMainWindow::onMoneyAttachementTriggered(bool checked)
 void MailEditorMainWindow::on_actionSend_triggered()
   {
   TPhysicalMailMessage msg;
-  TRecipientPublicKeys bccList;
-  if(prepareMailMessage(&msg, &bccList))
+  if(prepareMailMessage(&msg))
     {
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Send(senderId, msg, bccList);
+    MailProcessor.Send(senderId, msg);
     /// Clear potential modified flag to avoid asking for saving changes.
     ui->messageEdit->document()->setModified(false);
     close();

@@ -7,7 +7,6 @@
 
 /** Implementation of mail processor storing sent mail in actual folders (outbox and next in sent db).
     Send operation is performed in separate thread.
-
     Save operation puts given mail message into drafts db.
 */
 class TMailProcessor : public IMailProcessor
@@ -18,12 +17,10 @@ class TMailProcessor : public IMailProcessor
 
   /// IMailProcessor interface implementation:
     /// \see IMailProcessor interface description.
-    virtual void Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TRecipientPublicKeys& bccList) override;
+    virtual void Send(const TIdentity& senderId, const TPhysicalMailMessage& msg) override;
     /// \see IMailProcessor interface description.
     virtual void Save(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TRecipientPublicKeys& bccList, const TStoredMailMessage* msgToOverwrite,
-      TStoredMailMessage* savedMsg) override;
+      const TStoredMailMessage* msgToOverwrite, TStoredMailMessage* savedMsg) override;
 
   /// Other implementation helpers:
 
@@ -43,10 +40,10 @@ class TMailProcessor : public IMailProcessor
     typedef bts::bitchat::message_db_ptr TMessageDB;
 
     /// Sink to notify client about performed operations..
-    IUpdateSink&        Sink;
-    bts::profile_ptr    Profile;
-    TMessageDB          Drafts;
-    TOutboxQueue*       OutboxQueue;
+    IUpdateSink&      Sink;
+    bts::profile_ptr  Profile;
+    TMessageDB        Drafts;
+    TOutboxQueue*     OutboxQueue;
   };
 
 #endif /// __MAILPROCESSORIMPL_HPP

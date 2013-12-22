@@ -56,10 +56,14 @@ TMailProcessor::~TMailProcessor()
   OutboxQueue->Release();
   }
 
-void TMailProcessor::Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-  const TRecipientPublicKeys& bccList)
+void TMailProcessor::Send(const TIdentity& senderId, const TPhysicalMailMessage& msg)
   {
-  size_t totalRecipientCount = msg.to_list.size() + msg.cc_list.size() + bccList.size();
+  TPhysicalMailMessage msgToSend(msg);
+  TRecipientPublicKeys bccList(msg.bcc_list);
+  /// \warning Message to be sent must have cleared bcc list.
+  msgToSend.bcc_list.clear();
+
+  size_t totalRecipientCount = msgToSend.to_list.size() + msgToSend.cc_list.size() + bccList.size();
 
   //Sink.OnMessageGroupPending(totalRecipientCount);
 
@@ -68,19 +72,18 @@ void TMailProcessor::Send(const TIdentity& senderId, const TPhysicalMailMessage&
   auto my_priv_key = Profile->get_keychain().get_identity_key(senderId.dac_id_string);
   auto app = bts::application::instance();
 
-  for(const auto& public_key : msg.to_list)
-    app->send_email(msg, public_key, my_priv_key);
+  for(const auto& public_key : msgToSend.to_list)
+    app->send_email(msgToSend, public_key, my_priv_key);
 
-  for(const auto& public_key : msg.cc_list)
-    app->send_email(msg, public_key, my_priv_key);
+  for(const auto& public_key : msgToSend.cc_list)
+    app->send_email(msgToSend, public_key, my_priv_key);
 
   for(const auto& public_key : bccList)
-    app->send_email(msg, public_key, my_priv_key);
+    app->send_email(msgToSend, public_key, my_priv_key);
   }
 
 void TMailProcessor::Save(const TIdentity& senderId, const TPhysicalMailMessage& sourceMsg,
-  const TRecipientPublicKeys& bccList, const TStoredMailMessage* msgToOverwrite,
-  TStoredMailMessage* savedMsg)
+  const TStoredMailMessage* msgToOverwrite, TStoredMailMessage* savedMsg)
   {
   assert(savedMsg != nullptr);
 
@@ -117,7 +120,7 @@ void TMailProcessor::PrepareStorableMessage(const TIdentity& senderId,
   auto senderPrivKey = Profile->get_keychain().get_identity_key(senderId.dac_id_string);
   msg.sign(senderPrivKey);
   auto encMsg = msg.encrypt(senderId.public_key);
-  encMsg.timestamp = fc::time_point::min();//now();
+  encMsg.timestamp = fc::time_point::now();
 
   encMsg.decrypt(senderPrivKey, *storableMsg);
   }
