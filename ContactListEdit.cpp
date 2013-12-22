@@ -9,6 +9,7 @@
 #include <fc/log/logger.hpp>
 #include <bts/profile.hpp>
 #include "AddressBook/Contact.hpp"
+#include "public_key_address.hpp"
 
 ContactListEdit::ContactListEdit(QWidget* parent)
   : QTextEdit(parent)
@@ -242,9 +243,18 @@ void ContactListEdit::SetCollectedContacts(const IMailProcessor::TRecipientPubli
     /** Use kID as completion here - it is slight violation against source list but we don't know
         here how it was originally entered (by kID or alias: fName lName)
     */
-    QString kID(contact->dac_id_string.c_str());
-    Contact c(*contact);
-    addContactEntry(kID, c.isKeyhoteeFounder());
+    if (contact)
+      {
+      Contact tempContact(*contact);
+      bool isKeyhoteeFounder = tempContact.isKeyhoteeFounder();
+      QString contact_entry = contact->getDisplayName().c_str();
+      addContactEntry(contact_entry, isKeyhoteeFounder);
+      }
+    else //we don't have this public key in our contact list, so display it as raw public key
+      {
+      std::string public_key_string = public_key_address(recipient);
+      addContactEntry(public_key_string.c_str(),false);
+      }
     }
   }
 
