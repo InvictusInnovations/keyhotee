@@ -104,7 +104,7 @@ QStringList ContactListEdit::getListOfImageNames() const
   return image_names;
   }
 
-void ContactListEdit::addContactEntry(const QString& contactText, bool isFounder)
+void ContactListEdit::addContactEntry(const QString& contactText, bool isKeyhoteeFounder)
   {
   QFont        default_font;
   default_font.setPointSize( default_font.pointSize() - 1 );
@@ -125,7 +125,7 @@ void ContactListEdit::addContactEntry(const QString& contactText, bool isFounder
   QBrush brush(Qt::SolidPattern);
   brush.setColor( QColor( 205, 220, 241 ) );
   QPen  pen;
-  if(isFounder)
+  if (isKeyhoteeFounder)
     {
     QLinearGradient grad(QPointF(0, 0), QPointF(0, 1));
     grad.setCoordinateMode(QGradient::ObjectBoundingMode);

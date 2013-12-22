@@ -40,7 +40,7 @@ protected:
   void resizeEvent(QResizeEvent* resize_event);
 
 public Q_SLOTS:
-  void insertCompletion( const QString& completion, bool isKeyhoteeFounder = false );
+  void insertCompletion( const QString& completion, bool isKeyhoteeFounder = false);
   void insertCompletion( const QModelIndex& completion );
   /// Slot to explicitly request to show a completer.
   void onCompleterRequest();
@@ -51,7 +51,7 @@ private Q_SLOTS:
 private:
   QString     textUnderCursor() const;
   QStringList getListOfImageNames() const;
-  void        addContactEntry(const QString& contactText, bool isFounder);
+  void        addContactEntry(const QString& contactText, bool isKeyhoteeFounder);
 
 private:
   int         _fitted_height;
