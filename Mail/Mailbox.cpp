@@ -89,6 +89,10 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
     }
   else
     {
+    if (indexes.size() > 1)
+      ui->mail_viewer->setCurrentWidget(ui->info_2);
+    else
+      ui->mail_viewer->setCurrentWidget(ui->info_1);
     //TODO: not implemented ui->current_message->displayMailMessages(indexes,selection_model);
     }
   }
@@ -256,7 +260,7 @@ void Mailbox::onDeleteMail()
 
 bool Mailbox::isShowDetailsHidden()
   {
-  return ui->current_message->isHidden();
+  return ui->mail_viewer->isHidden();
   }
 
 void Mailbox::refreshMessageViewer()
@@ -271,6 +275,7 @@ void Mailbox::refreshMessageViewer()
     QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
     QModelIndex sourceModelIndex = model->mapToSource(indexes[0]);
     MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
+	ui->mail_viewer->setCurrentWidget(ui->current_message);
     ui->current_message->displayMailMessage(sourceModelIndex, sourceModel);
     }
   }
@@ -278,9 +283,9 @@ void Mailbox::refreshMessageViewer()
 void Mailbox::on_actionShow_details_toggled(bool checked)
   {
   if (checked)
-    ui->current_message->show();
+    ui->mail_viewer->show();
   else
-    ui->current_message->hide();
+    ui->mail_viewer->hide();
 
   }
 

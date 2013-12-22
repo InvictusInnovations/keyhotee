@@ -53,7 +53,9 @@ public:
   void addNewContact ();
 
 Q_SIGNALS:
-  void canceledAddContact();
+  void canceledNewContact();
+  void savedNewContact();
+
 private slots:
   void firstNameChanged(const QString& name);
   void lastNameChanged(const QString& name);
@@ -89,11 +91,7 @@ protected:
   bool eventFilter(QObject *obj, QEvent *event);
 
 private:
-  void setModyfied(bool modyfied = true)
-    {
-    _modyfied = modyfied;
-    }
-
+  void setModyfied(bool modyfied = true);
   bool isModyfied() const
     {
     return _modyfied;
@@ -113,7 +111,8 @@ private:
   void onIconSearch();
   bool doDataExchange (bool valid);
   bool existContactWithPublicKey (const std::string& public_key_string);
-  void keyEdit(bool enable);
+  void keyEdit(bool enable);  
+  void setEnabledSaveContact ();
 
   fc::time_point                          _last_validate;
   Contact                                 _current_contact;
@@ -127,6 +126,8 @@ private:
   QAction*                                share_contact;
   QAction*                                request_contact;
   QAction*                                cancel_edit_contact;
+  QAction*                                separatorToolBar;
+  QAction*                                label_createContact;
   bool                                    _addingNewContact;
   bool                                    _modyfied;
   bool                                    _editing;

@@ -139,7 +139,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow() :
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
   connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
-  connect(ui->contacts_page, &ContactsTable::showPrevView, this, &KeyhoteeMainWindow::onShowPrevView);
 
 #ifdef Q_OS_MAC
   //QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
@@ -313,27 +312,19 @@ KeyhoteeMainWindow::~KeyhoteeMainWindow()
 
 void KeyhoteeMainWindow::addContact()
   {
-  /*
-     EditContactDialog* editcon = new EditContactDialog(this);
-     editcon->show();
-     connect( editcon, &QDialog::finished, [=]( int result ){
-       if( result == QDialog::Accepted )
-       {
-          auto app    = bts::application::instance();
-          auto profile    = app->get_profile();
-          auto abook  = profile->get_addressbook();
-          abook->store_contact( editcon->getContact() );
-       }
-       editcon->deleteLater();
-     });
-   */
-
   if (ui->contacts_page->CheckSaving(*ui->new_contact))
     {
-    ui->new_contact->setAddingNewContact(true);
-    ui->new_contact->setContact(Contact() );
-    ui->contacts_page->addNewContact(*ui->new_contact);
-    ui->widget_stack->setCurrentWidget(ui->contacts_page);
+      connect(ui->new_contact, &ContactView::savedNewContact, this, &KeyhoteeMainWindow::onSavedNewContact);
+      connect(ui->new_contact, &ContactView::savedNewContact, ui->contacts_page, &ContactsTable::onSavedNewContact);
+      connect(ui->new_contact, &ContactView::canceledNewContact, this, &KeyhoteeMainWindow::onCanceledNewContact);
+      connect(ui->new_contact, &ContactView::canceledNewContact, ui->contacts_page, &ContactsTable::onCanceledNewContact);
+
+      ui->actionShow_details->setEnabled (false);
+      ui->new_contact->setAddingNewContact(true);
+      ui->new_contact->setContact(Contact());    
+      ui->contacts_page->addNewContact(*ui->new_contact);
+      ui->widget_stack->setCurrentWidget(ui->contacts_page);
+      //ui->widget_stack->setCurrentWidget( ui->new_contact);
     }
   }
 
@@ -632,6 +623,7 @@ ContactGui* KeyhoteeMainWindow::getContactGui(int contact_id)
 
 void KeyhoteeMainWindow::openContactGui(int contact_id)
   {
+  ui->actionShow_details->setEnabled (true);
   if (contact_id == -1)    // TODO: define -1 as AddressBookID
     {
     showContacts();
@@ -779,8 +771,15 @@ void KeyhoteeMainWindow::notSupported()
   QMessageBox::warning(this, "Warning", "Not supported");
   }
 
-void KeyhoteeMainWindow::onShowPrevView()
+void KeyhoteeMainWindow::onCanceledNewContact()
   {
-  onSidebarSelectionChanged();
+  ui->actionShow_details->setEnabled (true);
+  onSidebarSelectionChanged();  
   }
 
+
+void KeyhoteeMainWindow::onSavedNewContact()
+  {
+  ui->actionShow_details->setEnabled (true);
+  showContacts ();
+  }

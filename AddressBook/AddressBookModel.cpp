@@ -98,6 +98,11 @@ bool AddressBookModel::removeRows(int row, int count, const QModelIndex&)
   // remove contacts from addressbook database
   for (int i = row; i < row + count; ++i)
     my->_address_book->remove_contact(my->_contacts[i]);
+  for (int i = row; i < row + count; ++i)
+    {
+    // remove from addressbook database
+    my->_address_book->remove_contact(my->_contacts[i]);
+    }
   //remove from in-memory contact list
   auto rowI = my->_contacts.begin() + row;
   my->_contacts.erase(rowI, rowI + count);
@@ -128,7 +133,7 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
         case FirstName:
           return tr("First Name");
         case Ownership:
-          return tr("Ownership");
+          return tr(" ");  // Ownership
         case LastName:
           return tr("Last Name");
         case Id:
@@ -172,7 +177,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
         case UserIcon:
           return QSize(48, 48);
         case Ownership:
-          return QSize(48, 48);
+          return QSize(32, 32);
         default:
           return QVariant();
         }
@@ -207,6 +212,39 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
     case Qt::UserRole:
       switch ( (Columns)index.column() )
         {
+        case Ownership:
+          return current_contact.isOwn() ? true : false;
+        case FirstName:
+          return current_contact.first_name.c_str();
+        case LastName:
+          return current_contact.last_name.c_str();
+        case Id:
+          return current_contact.dac_id_string.c_str();
+        case Age:
+          return current_contact.getAge();
+        case Repute:
+          return current_contact.getRepute();
+        default:
+          return QVariant();
+        }
+    case Qt::BackgroundRole:
+      if (current_contact.isKeyhoteeFounder())
+        {
+        return QVariant(QColor(231, 190, 66));
+        }
+      else
+        {
+        return QVariant();
+        }
+    case Qt::ToolTipRole:
+      switch ( (Columns)index.column() )
+        {
+        case Ownership:
+          return tr("Ownership");
+        default:
+          return QVariant();
+        }
+    } //switch
          case Ownership:
            return current_contact.isOwn() ? true : false;
          case FirstName:

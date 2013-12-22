@@ -98,7 +98,7 @@ private:
     const TStoredMailMessage& sentMsg) override;
   /// \see IMessageProcessor::IUpdateSink interface description.
   virtual void OnMessageSendingEnd() override;
-
+  
 private slots:
   // ---------- MenuBar
   // File
@@ -123,7 +123,8 @@ private slots:
   void on_actionDiagnostic_triggered();
   void on_actionAbout_triggered();
 
-  void onShowPrevView();
+  void onCanceledNewContact();
+  void onSavedNewContact();
 
 private:
   void addressBookDataChanged(const QModelIndex& top_left, const QModelIndex& bottom_right,

@@ -88,11 +88,11 @@ ContactView::ContactView(QWidget* parent)
   : QWidget(parent),
   ui(new Ui::ContactView() )
   {
-  _address_book = nullptr;
-  _addingNewContact = false;
+  _address_book = nullptr;  
   ui->setupUi(this);
-  setModyfied(false);
+  _addingNewContact = false;
   _editing = false;
+  _modyfied = false;
    message_tools = new QToolBar( ui->toolbar_container );
   QGridLayout* grid_layout = new QGridLayout(ui->toolbar_container);
   grid_layout->setContentsMargins(0, 0, 0, 0);
@@ -114,12 +114,21 @@ ContactView::ContactView(QWidget* parent)
   cancel_edit_contact = new QAction( QIcon(":/images/128x128/contact_info_cancel_edit.png"), tr("Discard changes"), this);
   connect(ui->icon_view, &QToolButton::clicked, this, &ContactView::onIconSearch);
 
-  message_tools->addAction(cancel_edit_contact);
-  message_tools->addAction(save_contact);  
-  message_tools->addAction(edit_contact);
   message_tools->addAction(send_mail);  
   message_tools->addAction(share_contact);
   message_tools->addAction(request_contact);
+  separatorToolBar = message_tools->addSeparator ();
+  message_tools->addAction(edit_contact);
+  message_tools->addAction(save_contact);  
+  message_tools->addAction(cancel_edit_contact);
+
+  QLabel *label = new QLabel((tr("     Create new contact")));
+  label_createContact = message_tools->addWidget (label);
+  QFont font;  
+  font.setBold(true);
+  font.setPointSize (16);
+  label->setFont (font);
+  label_createContact->setFont (font);
 
   //ui->chat_conversation->setHtml( "<html><head></head><body>Hello World<br/></body></html>" );
   connect(save_contact, &QAction::triggered, this, &ContactView::onSave);
@@ -200,6 +209,7 @@ void ContactView::onSave()
       _address_book->storeContact(_current_contact);
 
       keyEdit(false);
+      emit savedNewContact();
       }    
     }
   FC_RETHROW_EXCEPTIONS(warn, "onSave")
@@ -211,7 +221,7 @@ void ContactView::onCancel()
   if (isAddingNewContact())
     {
     this->setVisible(false);
-    emit canceledAddContact();
+    emit canceledNewContact();
     }
   else  //editing contact
     {    
@@ -462,11 +472,18 @@ void ContactView::keyEdit(bool enable)
   _editing = enable;
   ui->firstname->setEnabled(enable);
   ui->lastname->setEnabled(enable);
+  setEnabledSaveContact ();
   if (isAddingNewContact ())
     {
     //keyhoteeIds don't function when mining is not possible
     ui->id_edit->setEnabled(enable && gMiningIsPossible);
     ui->public_key->setReadOnly(!enable);
+    send_mail->setVisible(false);
+    edit_contact->setVisible(false);
+    share_contact->setVisible(false);
+    request_contact->setVisible(false);
+    separatorToolBar->setVisible(false);
+    label_createContact->setVisible(true);
     }
     else
     {
@@ -475,6 +492,12 @@ void ContactView::keyEdit(bool enable)
     /// changes.
     ui->id_edit->setEnabled(false);
     ui->public_key->setReadOnly (true);
+    send_mail->setVisible(true);
+    edit_contact->setVisible(true);
+    share_contact->setVisible(true);
+    request_contact->setVisible(true);
+    separatorToolBar->setVisible(true);
+    label_createContact->setVisible(false);
     }
    
   ui->privacy_comboBox->setEnabled(enable);
@@ -485,7 +508,6 @@ void ContactView::keyEdit(bool enable)
 
   ui->id_status->setVisible(enable);
   ui->keyhotee_founder->setVisible(!enable && _current_contact.isKeyhoteeFounder());
-  save_contact->setEnabled(enable);
   cancel_edit_contact->setEnabled(enable);
   send_mail->setEnabled(!enable);
   edit_contact->setEnabled(!enable);
@@ -549,7 +571,7 @@ bool ContactView::CheckSaving()
 void ContactView::setValid(bool valid)
   {
   _validForm = valid;
-  save_contact->setEnabled(valid && isEditing());
+  setEnabledSaveContact ();
   }
 
 void ContactView::onIconSearch()
@@ -620,6 +642,7 @@ bool ContactView::doDataExchange (bool valid)
     //_current_contact.phone_number = ui->phone->text().toStdString();
     //privacy_comboBox
     }
+    setEnabledSaveContact ();
     return true;
   }
 
@@ -644,3 +667,17 @@ bool ContactView::existContactWithPublicKey (const std::string& public_key_strin
    }
    return false;
 }
+
+void ContactView::setEnabledSaveContact ()
+  {
+  save_contact->setEnabled(_validForm && isEditing() && isModyfied());
+  }
+
+void ContactView::setModyfied(bool modyfied)
+  {
+  if (isEditing())
+    {
+    _modyfied = modyfied;
+    setEnabledSaveContact ();
+    }
+  }
