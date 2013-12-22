@@ -151,14 +151,11 @@ void ContactsTable::showView(ContactView& view) const
   ui->contact_details_view->setCurrentWidget(&view);
   }
 
-bool ContactsTable::CheckSaving(ContactView& newView) const
+bool ContactsTable::checkSaving() const
   {
-    if (ContactView * currentView = getCurrentView ())
+  if (ContactView * currentView = getCurrentView ())
     {
-    int idxCurrentView = ui->contact_details_view->indexOf(currentView);
-    int idxNewView = ui->contact_details_view->indexOf(&newView);
-    if (idxCurrentView != idxNewView)
-      return currentView->CheckSaving();
+    return currentView->CheckSaving();
     }
   return true;
   }

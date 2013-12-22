@@ -23,7 +23,7 @@ public:
   void showView(ContactView& view) const;
   void addNewContact(ContactView& view) const;
   bool isShowDetailsHidden();
-  bool CheckSaving(ContactView& newView) const;
+  bool checkSaving() const;
   void selectRow(int index);
 
 private:

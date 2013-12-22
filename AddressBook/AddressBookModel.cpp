@@ -67,7 +67,7 @@ AddressBookModel::AddressBookModel(QObject* parent, bts::addressbook::addressboo
     //add dac_id to completion list
     completion_list.push_back(contact.dac_id_string.c_str() );
     //add fullname to completion list
-    QString fullName = contact.getFullName().c_str();
+    QString fullName = contact.getDisplayName().c_str();
     completion_list.push_back(fullName);
     }
   my->_contact_completion_model.setStringList(completion_list);
@@ -130,21 +130,21 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
         {
         switch ( (Columns)section)
           {
-        case FirstName:
-          return tr("First Name");
-        case Ownership:
-          return tr(" ");  // Ownership
-        case LastName:
-          return tr("Last Name");
-        case Id:
-          return tr("Id");
-        case Age:
-          return tr("Age");
-        case Repute:
-          return tr("Repute");
-        case UserIcon:
-        case NumColumns:
-          break;
+          case FirstName:
+            return tr("First Name");
+          case Ownership:
+            return tr(" ");  // Ownership
+          case LastName:
+            return tr("Last Name");
+          case Id:
+            return tr("Id");
+          case Age:
+            return tr("Age");
+          case Repute:
+            return tr("Repute");
+          case UserIcon:
+          case NumColumns:
+            break;
           }
         }
     case Qt::SizeHintRole:
@@ -180,7 +180,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return QSize(32, 32);
         default:
           return QVariant();
-        }
+        } //switch column in SizeHintRole
     case Qt::DecorationRole:
       switch ( (Columns)index.column() )
         {
@@ -190,7 +190,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return current_contact.isOwn() ? my->_ownership_yes : my->_ownership_no;
         default:
           return QVariant();
-        }
+        } //switch column in DecorationRole
     case Qt::DisplayRole:
       switch ( (Columns)index.column() )
         {
@@ -208,7 +208,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
         case UserIcon:
         case NumColumns:
           return QVariant();
-        }
+        } //switch column in DisplayRole
     case Qt::UserRole:
       switch ( (Columns)index.column() )
         {
@@ -226,7 +226,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return current_contact.getRepute();
         default:
           return QVariant();
-        }
+        } //switch column in UserRole
     case Qt::BackgroundRole:
       if (current_contact.isKeyhoteeFounder())
         {
@@ -243,7 +243,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return tr("Ownership");
         default:
           return QVariant();
-        }
+        } //switch column in ToolTipRole
     } //switch
 
   return QVariant();
@@ -265,7 +265,7 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
     completionIndex = my->_contact_completion_model.index(row_count);
     my->_contact_completion_model.setData(completionIndex, contact_to_store.dac_id_string.c_str());
     completionIndex = my->_contact_completion_model.index(row_count + 1);
-    my->_contact_completion_model.setData(completionIndex, contact_to_store.getFullName().c_str());
+    my->_contact_completion_model.setData(completionIndex, contact_to_store.getDisplayName().c_str());
 
     //add fullname to completion list
     my->_address_book->store_contact(my->_contacts.back() );
@@ -282,7 +282,7 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
   completionIndex = my->_contact_completion_model.index(completionRow);
   my->_contact_completion_model.setData(completionIndex, contact_to_store.dac_id_string.c_str());
   completionIndex = my->_contact_completion_model.index(completionRow + 1);
-  my->_contact_completion_model.setData(completionIndex, contact_to_store.getFullName().c_str());
+  my->_contact_completion_model.setData(completionIndex, contact_to_store.getDisplayName().c_str());
 
   Q_EMIT dataChanged(index(row, 0), index(row, NumColumns - 1) );
   return contact_to_store.wallet_index;

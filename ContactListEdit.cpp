@@ -130,9 +130,9 @@ void ContactListEdit::addContactEntry(const QString& contactText, const bts::add
   brush.setColor( QColor( 205, 220, 241 ) );
   QPen  pen;
 
-  bool isFounder = Contact::isKeyhoteeFounder(c);
+  bool isKeyhoteeFounder = Contact::isKeyhoteeFounder(c);
 
-  if(isFounder)
+  if (isKeyhoteeFounder)
     {
     QLinearGradient grad(QPointF(0, 0), QPointF(0, 1));
     grad.setCoordinateMode(QGradient::ObjectBoundingMode);
@@ -174,7 +174,7 @@ QString ContactListEdit::toString(const bts::addressbook::wallet_identity& id) c
 
 QString ContactListEdit::toString(const bts::addressbook::wallet_contact& id) const
   {
-  return toStringImpl(id);
+  return id.getDisplayName().c_str();//toStringImpl(id);
   }
 
 template <class TContactStorage>
@@ -345,7 +345,7 @@ void ContactListEdit::GetCollectedContacts(IMailProcessor::TRecipientPublicKeys*
     //check first to see if we have a dac_id
     auto to_contact = addressbook->get_contact_by_dac_id(to_string);
     if (!to_contact.valid()) // if not dac_id, check if we have a full name
-      to_contact = addressbook->get_contact_by_full_name(to_string);
+      to_contact = addressbook->get_contact_by_display_name(to_string);
     assert(to_contact.valid());
     storage->push_back(to_contact->public_key);
     }

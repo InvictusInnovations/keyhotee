@@ -193,6 +193,9 @@ set( sources
         ContactListEdit.hpp
         ContactListEdit.cpp
 
+        TreeWidgetCustom.hpp
+        TreeWidgetCustom.cpp
+
         KeyhoteeMainWindow.ui
         KeyhoteeMainWindow.hpp
         KeyhoteeMainWindow.cpp
@@ -212,6 +215,7 @@ set( sources
 
         ch/connectionstatusds.h
         ch/mailprocessor.hpp
+        ch/ModificationsChecker.hpp
 
         main.cpp )
 

@@ -205,10 +205,10 @@ void Mailbox::duplicateMail(ReplyType reply_type)
   if (reply_type == reply || reply_type == reply_all)
     {
     new_subject = "Re: " + header.subject;
-    auto reply_to_contact = addressbook->get_contact_by_public_key(header.header.from_key);
-    if (reply_to_contact)
-      msg_window->addToContact(reply_to_contact->wallet_index);
-    //TODO else we need way to show raw public key
+//    auto reply_to_contact = addressbook->get_contact_by_public_key(header.header.from_key);
+//    if (reply_to_contact)
+//      msg_window->addToContact(reply_to_contact->wallet_index);
+    msg_window->addToContact(header.header.from_key);
     }
   else if (reply_type == forward)
     {

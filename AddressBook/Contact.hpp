@@ -20,9 +20,10 @@ public:
   QString getLabel() const;
   const QIcon& getIcon() const;
   void setIcon(const QIcon& icon);
+
+  //these should probably be moved to bts::wallet_contact API...
   int getAge()const;
   int getRepute()const;
-
   static int  getAge(const bts::addressbook::contact& id);
   static bool isKeyhoteeFounder(const bts::addressbook::contact& id)
     {

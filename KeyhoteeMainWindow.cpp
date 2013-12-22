@@ -177,6 +177,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow() :
   ui->actionEnable_Mining->setEnabled(gMiningIsPossible);
   ui->actionEnable_Mining->setVisible(gMiningIsPossible);
 
+  ui->side_bar->setModificationsChecker (this);
+
   // ---------------------- MenuBar
   // File
   connect(ui->actionExit, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionExit_triggered);
@@ -312,14 +314,14 @@ KeyhoteeMainWindow::~KeyhoteeMainWindow()
 
 void KeyhoteeMainWindow::addContact()
   {
-  if (ui->contacts_page->CheckSaving(*ui->new_contact))
+  if (checkSaving())
     {
       connect(ui->new_contact, &ContactView::savedNewContact, this, &KeyhoteeMainWindow::onSavedNewContact);
       connect(ui->new_contact, &ContactView::savedNewContact, ui->contacts_page, &ContactsTable::onSavedNewContact);
       connect(ui->new_contact, &ContactView::canceledNewContact, this, &KeyhoteeMainWindow::onCanceledNewContact);
       connect(ui->new_contact, &ContactView::canceledNewContact, ui->contacts_page, &ContactsTable::onCanceledNewContact);
 
-      ui->actionShow_details->setEnabled (false);
+      enableMenu(false);
       ui->new_contact->setAddingNewContact(true);
       ui->new_contact->setContact(Contact());    
       ui->contacts_page->addNewContact(*ui->new_contact);
@@ -668,7 +670,7 @@ void KeyhoteeMainWindow::createContactGui(int contact_id)
 
 void KeyhoteeMainWindow::showContactGui(ContactGui& contact_gui)
   {
-  if (ui->contacts_page->CheckSaving(*contact_gui._view))
+  if (checkSaving())
     {
     ui->side_bar->setCurrentItem(contact_gui._tree_item);
     //ui->widget_stack->setCurrentWidget( contact_gui._view );
@@ -773,13 +775,41 @@ void KeyhoteeMainWindow::notSupported()
 
 void KeyhoteeMainWindow::onCanceledNewContact()
   {
-  ui->actionShow_details->setEnabled (true);
-  onSidebarSelectionChanged();  
+  enableMenu(true);
+  onSidebarSelectionChanged();
   }
-
 
 void KeyhoteeMainWindow::onSavedNewContact()
   {
-  ui->actionShow_details->setEnabled (true);
+  enableMenu(true);
   showContacts ();
   }
+
+void KeyhoteeMainWindow::enableMenu(bool enable)
+  {
+  ui->actionShow_details->setEnabled (enable);
+  ui->actionDelete->setEnabled (enable);
+  ui->actionNew_Contact->setEnabled (enable);
+  ui->actionShow_Contacts->setEnabled (enable);
+  _search_edit->setEnabled (enable);  
+  }
+
+void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
+  {
+  if (checkSaving())
+    closeEvent->accept();
+  else
+    closeEvent->ignore();
+  }
+
+bool KeyhoteeMainWindow::checkSaving() const
+  {
+  if (ui->widget_stack->currentWidget () == ui->contacts_page)
+    return ui->contacts_page->checkSaving();
+  return true;
+  }
+
+bool KeyhoteeMainWindow::canContinue() const
+{
+  return checkSaving();
+}
