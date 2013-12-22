@@ -185,21 +185,7 @@ void MailFieldsWidget::fillSenderIdentities()
 
   for(const auto& identity : identities)
     {
-    bool noAlias = identity.first_name.empty() && identity.last_name.empty();
-    std::string identity_label;
-    if(noAlias == false)
-      identity_label = identity.first_name + " " + identity.last_name;
-
-    std::string entry(identity_label);
-
-    if(noAlias == false)
-      entry += '(';
-
-    entry += identity.dac_id_string;
-
-    if(noAlias == false)
-      entry += ')';
-
+    std::string entry = identity.getDisplayName();
     auto ipk = identity.public_key;
     assert(ipk.valid());
 

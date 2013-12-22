@@ -147,7 +147,7 @@ void MailEditor::addToContact(int contact_id)
   if (contact_id < 0)
     return;
   auto  contacts = bts::get_profile()->get_addressbook()->get_contacts();
-  QString to_string = contacts[contact_id].getFullName().c_str();
+  QString to_string = contacts[contact_id].getDisplayName().c_str();
   bool isKeyhoteeFounder = Contact(contacts[contact_id]).isKeyhoteeFounder();
   isKeyhoteeFounder = true;
   to_field->insertCompletion(to_string, isKeyhoteeFounder);
@@ -174,7 +174,7 @@ void MailEditor::addCcContact(int contact_id)
   if (!actionToggleCc->isChecked() )
     actionToggleCc->setChecked(true);
   auto    contacts = bts::get_profile()->get_addressbook()->get_contacts();
-  QString to_string = contacts[contact_id].getFullName().c_str();
+  QString to_string = contacts[contact_id].getDisplayName().c_str();
   bool isKeyhoteeFounder = (Contact(contacts[contact_id]).isKeyhoteeFounder());
   cc_field->insertCompletion(to_string, isKeyhoteeFounder);
   }
