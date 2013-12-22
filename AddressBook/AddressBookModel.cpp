@@ -130,21 +130,21 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
         {
         switch ( (Columns)section)
           {
-        case FirstName:
-          return tr("First Name");
-        case Ownership:
-          return tr(" ");  // Ownership
-        case LastName:
-          return tr("Last Name");
-        case Id:
-          return tr("Id");
-        case Age:
-          return tr("Age");
-        case Repute:
-          return tr("Repute");
-        case UserIcon:
-        case NumColumns:
-          break;
+          case FirstName:
+            return tr("First Name");
+          case Ownership:
+            return tr(" ");  // Ownership
+          case LastName:
+            return tr("Last Name");
+          case Id:
+            return tr("Id");
+          case Age:
+            return tr("Age");
+          case Repute:
+            return tr("Repute");
+          case UserIcon:
+          case NumColumns:
+            break;
           }
         }
     case Qt::SizeHintRole:
@@ -180,7 +180,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return QSize(32, 32);
         default:
           return QVariant();
-        }
+        } //switch column in SizeHintRole
     case Qt::DecorationRole:
       switch ( (Columns)index.column() )
         {
@@ -190,7 +190,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return current_contact.isOwn() ? my->_ownership_yes : my->_ownership_no;
         default:
           return QVariant();
-        }
+        } //switch column in DecorationRole
     case Qt::DisplayRole:
       switch ( (Columns)index.column() )
         {
@@ -208,7 +208,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
         case UserIcon:
         case NumColumns:
           return QVariant();
-        }
+        } //switch column in DisplayRole
     case Qt::UserRole:
       switch ( (Columns)index.column() )
         {
@@ -226,7 +226,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return current_contact.getRepute();
         default:
           return QVariant();
-        }
+        } //switch column in UserRole
     case Qt::BackgroundRole:
       if (current_contact.isKeyhoteeFounder())
         {
@@ -243,32 +243,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return tr("Ownership");
         default:
           return QVariant();
-        }
-    } //switch
-         case Ownership:
-           return current_contact.isOwn() ? true : false;
-         case FirstName:
-           return current_contact.first_name.c_str();
-         case LastName:
-           return current_contact.last_name.c_str();
-         case Id:
-           return current_contact.dac_id_string.c_str();
-         case Age:
-           return current_contact.getAge();
-         case Repute:
-           return current_contact.getRepute();
-         default:
-           return QVariant();
-         }
-     case Qt::BackgroundRole:
-       if (current_contact.isKeyhoteeFounder())
-         {
-         return QVariant(QColor(231, 190, 66));
-         }
-       else
-         {
-         return QVariant();
-         }
+        } //switch column in ToolTipRole
     } //switch
 
   return QVariant();
