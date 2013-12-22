@@ -920,7 +920,7 @@ void getRecipientKeys(ContactListEdit* to_field, std::vector<fc::ecc::public_key
     //check first to see if we have a dac_id
     auto        to_contact = addressbook->get_contact_by_dac_id(to_string);
     if (!to_contact.valid()) // if not dac_id, check if we have a full name
-      to_contact = addressbook->get_contact_by_full_name(to_string);
+      to_contact = addressbook->get_contact_by_display_name(to_string);
     assert(to_contact.valid());
     to_list.push_back(to_contact->public_key);
     }
