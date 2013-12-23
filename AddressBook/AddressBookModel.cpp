@@ -67,7 +67,7 @@ AddressBookModel::AddressBookModel(QObject* parent, bts::addressbook::addressboo
     //add dac_id to completion list
     completion_list.push_back(contact.dac_id_string.c_str() );
     //add fullname to completion list
-    QString fullName = contact.getDisplayName().c_str();
+    QString fullName = contact.get_display_name().c_str();
     completion_list.push_back(fullName);
     }
   my->_contact_completion_model.setStringList(completion_list);
@@ -289,7 +289,7 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
     completionIndex = my->_contact_completion_model.index(row_count);
     my->_contact_completion_model.setData(completionIndex, contact_to_store.dac_id_string.c_str());
     completionIndex = my->_contact_completion_model.index(row_count + 1);
-    my->_contact_completion_model.setData(completionIndex, contact_to_store.getDisplayName().c_str());
+    my->_contact_completion_model.setData(completionIndex, contact_to_store.get_display_name().c_str());
 
     //add fullname to completion list
     my->_address_book->store_contact(my->_contacts.back() );
@@ -306,7 +306,7 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
   completionIndex = my->_contact_completion_model.index(completionRow);
   my->_contact_completion_model.setData(completionIndex, contact_to_store.dac_id_string.c_str());
   completionIndex = my->_contact_completion_model.index(completionRow + 1);
-  my->_contact_completion_model.setData(completionIndex, contact_to_store.getDisplayName().c_str());
+  my->_contact_completion_model.setData(completionIndex, contact_to_store.get_display_name().c_str());
 
   Q_EMIT dataChanged(index(row, 0), index(row, NumColumns - 1) );
   return contact_to_store.wallet_index;

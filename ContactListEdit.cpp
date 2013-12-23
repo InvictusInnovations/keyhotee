@@ -174,7 +174,7 @@ QString ContactListEdit::toString(const bts::addressbook::wallet_identity& id) c
 
 QString ContactListEdit::toString(const bts::addressbook::wallet_contact& id) const
   {
-  return id.getDisplayName().c_str();//toStringImpl(id);
+  return id.get_display_name().c_str();//toStringImpl(id);
   }
 
 template <class TContactStorage>

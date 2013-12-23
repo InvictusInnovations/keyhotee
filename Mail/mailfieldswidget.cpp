@@ -208,7 +208,7 @@ void MailFieldsWidget::fillSenderIdentities()
 
   for(const auto& identity : identities)
     {
-    std::string entry = identity.getDisplayName();
+    std::string entry = identity.get_display_name();
     auto ipk = identity.public_key;
     assert(ipk.valid());
 
