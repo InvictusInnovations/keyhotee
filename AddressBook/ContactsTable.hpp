@@ -25,6 +25,7 @@ public:
   bool isShowDetailsHidden();
   bool checkSaving() const;
   void selectRow(int index);
+  void selectChat();
 
 private:
   ContactView* getCurrentView() const;
