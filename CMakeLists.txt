@@ -51,9 +51,9 @@ IF( WIN32 )
   ADD_DEFINITIONS( -D_WIN32_WINNT=0x0501 )
   ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS )
   ADD_DEFINITIONS( -DLEVELDB_PLATFORM_WINDOWS )
-  # Activate C++ exception handling
-  IF (NOT CMAKE_CXX_FLAGS MATCHES "/EHsc")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+  # Activate C++ exception handling inc. SEH to catch GPFs
+  IF (NOT CMAKE_CXX_FLAGS MATCHES "/EHa")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHa")
   ENDIF()
   #boost
   SET(BOOST_ROOT $ENV{BOOST_ROOT})
@@ -185,6 +185,9 @@ set( sources
         Mail/fileattachmentwidget.ui
         Mail/fileattachmentwidget.hpp
         Mail/fileattachmentwidget.cpp
+
+        KeyhoteeApplication.hpp
+        KeyhoteeApplication.cpp
 
         LoginDialog.ui
         LoginDialog.hpp

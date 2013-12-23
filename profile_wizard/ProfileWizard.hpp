@@ -9,12 +9,11 @@ namespace Ui {
 class NymPage;
 class ProfileEditPage;
 
+class TKeyhoteeApplication;
+
 class ProfileWizard : public QWizard
 {
 public:
-  ProfileWizard(QWidget* parent);
-  ~ProfileWizard();
-
   enum Pages
     {
     Page_Intro,
@@ -27,7 +26,15 @@ public slots:
   void createProfile(int result);
 
 private:
-  NymPage*         _nym_page;
-  ProfileEditPage* _profile_edit;
-  Ui::IntroPage*   _profile_intro_ui;
+  /// Only main app is allowed to create this object.
+  friend class TKeyhoteeApplication;
+  ProfileWizard(TKeyhoteeApplication& mainApp);
+  virtual ~ProfileWizard();
+
+  /// Class attributes:
+private:
+  TKeyhoteeApplication& _mainApp;
+  NymPage*              _nym_page;
+  ProfileEditPage*      _profile_edit;
+  Ui::IntroPage*        _profile_intro_ui;
 };

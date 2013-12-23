@@ -2,15 +2,17 @@
 #include <ui_ProfileEditPage.h>
 #include <ui_ProfileIntroPage.h>
 #include <ui_ProfileNymPage.h>
+
 #include <QStandardPaths>
 #include <QFileDialog>
+
+#include "KeyhoteeApplication.hpp"
 
 #include <fc/thread/thread.hpp>
 
 #include <fc/log/logger.hpp>
 #include <bts/addressbook/addressbook.hpp>
 
-void display_main_window();
 class NymPage : public QWizardPage
 {
 public:
@@ -153,10 +155,9 @@ public:
   Ui::ProfileEditPage ui;
 };
 
-
-
-ProfileWizard::ProfileWizard(QWidget* parent)
-  : QWizard(parent)
+ProfileWizard::ProfileWizard(TKeyhoteeApplication& mainApp) :
+  QWizard(nullptr),
+  _mainApp(mainApp)
   {
   setAttribute(Qt::WA_DeleteOnClose);
   setOption(HaveHelpButton, true);
@@ -188,7 +189,7 @@ ProfileWizard::ProfileWizard(QWidget* parent)
 ProfileWizard::~ProfileWizard()
   {
   if (!_profile_edit->isComplete() )
-    qApp->quit();
+    _mainApp.Quit();
   }
 
 void ProfileWizard::showHelp()
@@ -230,7 +231,7 @@ void ProfileWizard::createProfile(int result)
 
     bts::application::instance()->add_receive_key(priv_key);
 
-    display_main_window();
+    _mainApp.DisplayMainWindow();
     }
   }
 

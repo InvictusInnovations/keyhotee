@@ -22,6 +22,7 @@ class ContactView;
 class InboxView;
 class MailboxModel;
 class KeyhoteeMainWindow;
+class TKeyhoteeApplication;
 
 /**
  *  GUI widgets and GUI state for a contact.
@@ -54,8 +55,6 @@ class KeyhoteeMainWindow  : public SelfSizingMainWindow,
                             public IModificationsChecker
 {
 public:
-  KeyhoteeMainWindow();
-  virtual ~KeyhoteeMainWindow();
 
   void newMailMessage();
   void newMailMessageTo(const Contact& contact);
@@ -103,7 +102,12 @@ private:
     const TStoredMailMessage& sentMsg) override;
   /// \see IMessageProcessor::IUpdateSink interface description.
   virtual void OnMessageSendingEnd() override;
-  
+
+  /// Only TKeyhoteeApplication can build main window object.
+  friend class TKeyhoteeApplication;
+  KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp);
+  virtual ~KeyhoteeMainWindow();
+
 private slots:
   // ---------- MenuBar
   // File

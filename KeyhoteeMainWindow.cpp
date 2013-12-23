@@ -11,6 +11,7 @@
 
 #include "connectionstatusframe.h"
 #include "GitSHA1.h"
+#include "KeyhoteeApplication.hpp"
 
 #include <bts/bitchat/bitchat_private_message.hpp>
 
@@ -27,16 +28,11 @@
 #include <QLineEdit>
 #include <QMessageBox>
 
-extern std::string gApplication_name;
-extern std::string gProfile_name;
 extern bool        gMiningIsPossible;
 
 KeyhoteeMainWindow* GetKeyhoteeWindow()
   {
-  static KeyhoteeMainWindow* keyhoteeMainWindow = 0;
-  if (!keyhoteeMainWindow)
-    keyhoteeMainWindow = new KeyhoteeMainWindow;
-  return keyhoteeMainWindow;
+  return TKeyhoteeApplication::GetInstance()->GetMainWindow();
   }
 
 enum SidebarItemRoles
@@ -124,16 +120,17 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
   return new QStringListModel(words, completer);
   }
 
-KeyhoteeMainWindow::KeyhoteeMainWindow() :
+KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   SelfSizingMainWindow(),
   MailProcessor(*this, bts::application::instance()->get_profile())
   {
   ui.reset(new Ui::KeyhoteeMainWindow() );
   ui->setupUi(this);
   setWindowIcon(QIcon(":/images/shield1024.png") );
-  if (gProfile_name != "default")
+
+  if(mainApp.IsDefaultProfileLoaded() == false)
     {
-    QString title = QString("%1 (%2)").arg(gApplication_name.c_str()).arg(gProfile_name.c_str());
+    QString title = QString("%1 (%2)").arg(mainApp.GetAppName()).arg(mainApp.GetLoadedProfileName());
     setWindowTitle(title);
     }
 
@@ -304,7 +301,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow() :
      }
    */
   QString settings_file = "keyhotee_";
-  settings_file.append(gProfile_name.c_str());
+  settings_file.append(mainApp.GetLoadedProfileName());
   setSettingsFile(settings_file);
   readSettings();
   }
