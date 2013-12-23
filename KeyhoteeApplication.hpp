@@ -70,6 +70,8 @@ class TKeyhoteeApplication : protected QApplication
     bts::application_config LoadConfig();
     void Startup();
 
+    static void LinuxSignalHandler(int);
+
   /// Overrided from QApplication to catch all exceptions.
     virtual bool notify(QObject * receiver, QEvent * e) override;
   

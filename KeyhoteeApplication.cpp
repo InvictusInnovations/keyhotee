@@ -23,10 +23,19 @@
 
 #include <assert.h>
 
+#ifndef WIN32
+  #include <signal.h>
+#endif
+
 static TKeyhoteeApplication* s_Instance = nullptr;
 
 #define APP_NAME "Keyhotee"
 #define DEF_PROFILE_NAME "default"
+
+namespace
+{
+class TSegmentationFaultException : public std::exception {};
+} ///namespace anonymous
 
 TKeyhoteeApplication* TKeyhoteeApplication::GetInstance()
   {
@@ -100,6 +109,10 @@ int TKeyhoteeApplication::Run()
   {
   int exitCode = TExitStatus::SUCCESS;
   
+#ifndef WIN32
+  signal(SIGSEGV, LinuxSignalHandler);
+#endif ///WIN32
+
   try
     {
     setOrganizationDomain("invictus-innovations.com");
@@ -257,4 +270,12 @@ void TKeyhoteeApplication::Startup()
   else
     DisplayProfileWizard();
   }
+
+void TKeyhoteeApplication::LinuxSignalHandler(int)
+  {
+  // note: to safely throw from a signal handler, you must compile with
+  // g++ -fnon-call-exceptions
+  throw TSegmentationFaultException();
+  }
+
 
