@@ -1,7 +1,7 @@
 #include "KeyhoteeMainWindow.hpp"
 
 #include "ui_KeyhoteeMainWindow.h"
-
+#include "diagnosticdialog.h"
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/ContactView.hpp"
 
@@ -567,7 +567,9 @@ void KeyhoteeMainWindow::on_actionset_Icon_triggered()
 // Menu Help
 void KeyhoteeMainWindow::on_actionDiagnostic_triggered()
   {
-  notSupported();
+    DiagnosticDialog diagnoslic_dialog;
+    diagnoslic_dialog.setModal(true);
+    diagnoslic_dialog.exec();
   }
 
 void KeyhoteeMainWindow::on_actionAbout_triggered()
