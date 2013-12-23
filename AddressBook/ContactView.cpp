@@ -577,7 +577,7 @@ void ContactView::setValid(bool valid)
 void ContactView::onIconSearch()
   {
   auto writableLocation = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
-  auto fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), writableLocation,
+  auto fileName = QFileDialog::getOpenFileName(this, tr("Select Avatar image for contact"), writableLocation,
                                                tr("Image Files (*.png *.jpg *.bmp)"));
   if (!fileName.isEmpty())
     ui->icon_view->setIcon(QIcon(fileName));

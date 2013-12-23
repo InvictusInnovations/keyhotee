@@ -211,6 +211,20 @@ QVariant MailboxModel::headerData(int section, Qt::Orientation orientation, int 
           break;
           }
         }
+    case Qt::TextAlignmentRole:
+      switch ((Columns)section)
+        {
+        case From:
+        case Subject:
+        case DateReceived:
+        case To:
+        case DateSent:
+        case Status:
+          return Qt::AlignLeft + Qt::AlignVCenter;
+        default:
+          return QVariant();
+        } //switch columns in TextAlignmentRole
+
     case Qt::SizeHintRole:
       switch ( (Columns)section)
         {

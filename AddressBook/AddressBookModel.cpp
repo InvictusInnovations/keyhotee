@@ -147,6 +147,19 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
             break;
           }
         }
+    case Qt::TextAlignmentRole:
+      switch ((Columns)section)
+        {
+        case FirstName:
+        case LastName:
+        case Id:
+          return Qt::AlignLeft + Qt::AlignVCenter;
+        case Age:
+        case Repute:
+          return Qt::AlignRight + Qt::AlignVCenter;
+        default:
+          return QVariant();
+        } //switch columns in TextAlignmentRole
     case Qt::SizeHintRole:
       switch ( (Columns)section)
         {
@@ -227,6 +240,19 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
         default:
           return QVariant();
         } //switch column in UserRole
+    case Qt::TextAlignmentRole:
+      switch ((Columns)index.column())
+        {
+        case FirstName:
+        case LastName:
+        case Id:
+          return Qt::AlignLeft + Qt::AlignVCenter;
+        case Age:
+        case Repute:
+          return Qt::AlignRight + Qt::AlignVCenter;
+        default:
+          return QVariant();
+        } //switch columns in TextAlignmentRole
     case Qt::BackgroundRole:
       if (current_contact.isKeyhoteeFounder())
         {
