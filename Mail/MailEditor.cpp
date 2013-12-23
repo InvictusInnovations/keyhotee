@@ -148,7 +148,7 @@ void MailEditor::addToContact(int contact_id)
     return;
   auto  contacts = bts::get_profile()->get_addressbook()->get_contacts();
   auto contact = contacts[contact_id];
-  QString to_string = contact.getDisplayName().c_str();
+  QString to_string = contact.get_display_name().c_str();
   to_field->insertCompletion(to_string, contact);
   }
 
@@ -176,7 +176,7 @@ void MailEditor::addCcContact(int contact_id)
     actionToggleCc->setChecked(true);
   auto    contacts = bts::get_profile()->get_addressbook()->get_contacts();
   auto contact = contacts[contact_id];
-  QString to_string = contact.getDisplayName().c_str();
+  QString to_string = contact.get_display_name().c_str();
   cc_field->insertCompletion(to_string, contact);
   }
 
