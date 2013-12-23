@@ -95,28 +95,6 @@
    <addaction name="actionAttachement"/>
    <addaction name="actionMoney"/>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>680</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="contextMenuPolicy">
-    <enum>Qt::DefaultContextMenu</enum>
-   </property>
-   <property name="acceptDrops">
-    <bool>false</bool>
-   </property>
-   <property name="nativeMenuBar">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QToolBar" name="adjustToolbar">
    <property name="windowTitle">
     <string>Text adjust</string>
