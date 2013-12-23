@@ -12,12 +12,14 @@
 #include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/reflect/variant.hpp>
+#include <fc/log/file_appender.hpp>
 
 #include <QDebug>
 #include <QFile>
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QTimer>
+#include <qtemporaryfile.h>
 
 #include <boost/filesystem/path.hpp>
 
@@ -32,26 +34,40 @@ static TKeyhoteeApplication* s_Instance = nullptr;
 #define APP_NAME "Keyhotee"
 #define DEF_PROFILE_NAME "default"
 
+QTemporaryFile gLogFile;
+
+void ConfigureLoggingToTemporaryFile()
+{
+  //create log file in temporary dir that lasts after application exits
+  //DLN later consider moving log to profile, but it's easier to create temporary file for now
+  gLogFile.setAutoRemove(false);
+  gLogFile.open();
+  gLogFile.close();
+
+  //configure logger to also write to log file
+  fc::file_appender::config ac;
+  ac.filename = gLogFile.fileName().toStdString().c_str();
+  ac.truncate = false;
+  ac.flush    = true;
+  fc::logger::get().add_appender( fc::shared_ptr<fc::file_appender>( new fc::file_appender( fc::variant(ac) ) ) );
+}
+
 namespace
 {
 class TSegmentationFaultException : public std::exception {};
 } ///namespace anonymous
 
-TKeyhoteeApplication* TKeyhoteeApplication::GetInstance()
-  {
-  return s_Instance;
-  }
+TKeyhoteeApplication* TKeyhoteeApplication::GetInstance() { return s_Instance; }
 
 int TKeyhoteeApplication::Run(int& argc, char** argv)
   {
-  TKeyhoteeApplication app(argc, argv);
-  
+  ConfigureLoggingToTemporaryFile();
+  TKeyhoteeApplication app(argc, argv);  
   if (argc > 1)
     {
     app.LoadedProfileName = argv[1];
     app.DefaultProfileLoaded = app.LoadedProfileName != DEF_PROFILE_NAME;
     }
-
   return app.Run();
   }
 
