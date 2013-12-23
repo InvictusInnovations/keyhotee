@@ -19,7 +19,7 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QTimer>
-#include <qtemporaryfile.h>
+#include <QTemporaryFile>
 
 #include <boost/filesystem/path.hpp>
 
@@ -62,12 +62,13 @@ TKeyhoteeApplication* TKeyhoteeApplication::GetInstance() { return s_Instance; }
 int TKeyhoteeApplication::Run(int& argc, char** argv)
   {
   ConfigureLoggingToTemporaryFile();
-  TKeyhoteeApplication app(argc, argv);  
+  TKeyhoteeApplication app(argc, argv);
   if (argc > 1)
     {
     app.LoadedProfileName = argv[1];
     app.DefaultProfileLoaded = app.LoadedProfileName == DEF_PROFILE_NAME;
     }
+
   return app.Run();
   }
 
