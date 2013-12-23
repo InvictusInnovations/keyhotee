@@ -169,87 +169,80 @@ QVariant MailboxModel::headerData(int section, Qt::Orientation orientation, int 
   {
   if (orientation == Qt::Horizontal)
     {
+    Columns column = (Columns)section;
     switch (role)
       {
-    case Qt::DecorationRole:
-      switch ( (Columns)section)
-        {
-      case Read:
-        return my->_read_icon;
-      case Money:
-        return my->_money_icon;
-      case Attachment:
-        return my->_attachment_icon;
-      case Chat:
-        return my->_chat_icon;
-      default:
-        return QVariant();
-        }
-    case Qt::DisplayRole:
-        {
-        switch ( (Columns)section)
+      case Qt::DecorationRole:
+        switch (column)
           {
-        case Read:
-        case Money:
-        case Attachment:
-        case Chat:
-          return QVariant();
-        case From:
-          return tr("From");
-        case Subject:
-          return tr("Subject");
-        case DateReceived:
-          return tr("Date Received");
-        case To:
-          return tr("To");
-        case DateSent:
-          return tr("Date Sent");
-        case Status:
-          return tr("Status");
-
-        case NumColumns:
-          break;
+          case Read:
+            return my->_read_icon;
+          case Money:
+            return my->_money_icon;
+          case Attachment:
+            return my->_attachment_icon;
+          case Chat:
+            return my->_chat_icon;
+          default:
+            return QVariant();
           }
-        }
-    case Qt::TextAlignmentRole:
-      switch ((Columns)section)
-        {
-        case From:
-        case Subject:
-        case DateReceived:
-        case To:
-        case DateSent:
-        case Status:
-          return Qt::AlignLeft + Qt::AlignVCenter;
-        default:
-          return QVariant();
-        } //switch columns in TextAlignmentRole
-
-    case Qt::SizeHintRole:
-      switch ( (Columns)section)
-        {
-      case Read:
-      case Money:
-      case Attachment:
-      case Chat:
-        return QSize(8, 8);
-      case From:
-        return QSize(120, 24);
-      case Subject:
-        return QSize(300, 24);
-      case DateReceived:
-        return QSize(120, 12);
-      case To:
-        return QSize(120, 12);
-      case Status:
-        return QSize(120, 12);
-      default:
-        return QSize(16, 16);
-        }
-      }
-    }
-  else
-            {}
+      case Qt::DisplayRole:
+        switch (column)
+          {
+          case Read:
+          case Money:
+          case Attachment:
+          case Chat:
+            return QVariant();
+          case From:
+            return tr("From");
+          case Subject:
+            return tr("Subject");
+          case DateReceived:
+            return tr("Date Received");
+          case To:
+            return tr("To");
+          case DateSent:
+            return tr("Date Sent");
+          case Status:
+            return tr("Status");
+          }
+      case Qt::TextAlignmentRole:
+        switch (column)
+          {
+          case From:
+          case Subject:
+          case DateReceived:
+          case To:
+          case DateSent:
+          case Status:
+            return Qt::AlignLeft + Qt::AlignVCenter;
+          default:
+            return QVariant();
+          } //switch columns in TextAlignmentRole
+      case Qt::SizeHintRole:
+        switch (column)
+          {
+          case Read:
+          case Money:
+          case Attachment:
+          case Chat:
+            return QSize(8, 8);
+          case From:
+            return QSize(120, 24);
+          case Subject:
+            return QSize(300, 24);
+          case DateReceived:
+            return QSize(120, 12);
+          case To:
+            return QSize(120, 12);
+          case Status:
+            return QSize(120, 12);
+          default:
+            return QSize(16, 16);
+          } //switch columns in SizeHintRole
+        } //switch role
+    } //if (orientation == Qt::Horizontal)
   return QVariant();
   }
 
@@ -258,17 +251,17 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
   if (!index.isValid() )
     return QVariant();
   MessageHeader& header = my->_headers[index.row()];
-  //  const & current_contact = my->_contacts[index.row()];
+  Columns column = (Columns)index.column();
   switch (role)
     {
     case Qt::SizeHintRole:
-      switch ( (Columns)index.column() )
+      switch (column)
         {
         default:
           return QVariant();
         } //switch (column)
     case Qt::DecorationRole:
-      switch ( (Columns)index.column() )
+      switch (column)
         {
         case Read:
           if (!header.header.read_mark)
@@ -286,7 +279,7 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
           return QVariant();
         }
     case Qt::DisplayRole:
-      switch ( (Columns)index.column() )
+      switch (column)
         {
         case Read:
           return header.header.read_mark;
@@ -306,8 +299,6 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
         case DateSent:
           return header.date_sent;
         case Status:
-          return QVariant();           //DLNFIX what is this?
-        case NumColumns:
           return QVariant();           //DLNFIX what is this?
         } //switch (column)
     case Qt::FontRole:

@@ -143,7 +143,6 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
           case Repute:
             return tr("Repute");
           case UserIcon:
-          case NumColumns:
             break;
           }
         }
@@ -219,7 +218,6 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return current_contact.getRepute();
         case Ownership:
         case UserIcon:
-        case NumColumns:
           return QVariant();
         } //switch column in DisplayRole
     case Qt::UserRole:
