@@ -82,8 +82,6 @@ void MailFieldsWidget::SetRecipientList(const TRecipientPublicKeys& toList,
 void MailFieldsWidget::LoadContents(const TRecipientPublicKey& senderPK,
   const TPhysicalMailMessage& srcMsg)
   {
-  ui->fromEdit->clear();
-
   if(senderPK.valid())
     {
     selectSenderIdentity(senderPK);
@@ -254,6 +252,7 @@ void MailFieldsWidget::setChosenSender(const TRecipientPublicKey& senderPK)
   {
   TRecipientPublicKeys sender;
   sender.push_back(senderPK);
+  ui->fromEdit->clear();
   ui->fromEdit->SetCollectedContacts(sender);
   }
 
