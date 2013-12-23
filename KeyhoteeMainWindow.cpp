@@ -204,6 +204,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   connect(ui->splitter, &QSplitter::splitterMoved, this, &KeyhoteeMainWindow::sideBarSplitterMoved);
   connect(ui->side_bar, &QTreeWidget::itemSelectionChanged, this, &KeyhoteeMainWindow::onSidebarSelectionChanged);
+  connect(ui->side_bar, &QTreeWidget::itemDoubleClicked, this, &KeyhoteeMainWindow::onSidebarDoubleClicked);
 
   //connect( _search_edit, SIGNAL(textChanged(QString)), this, SLOT(searchEditChanged(QString)) );
   connect(_search_edit, &QLineEdit::textChanged, this, &KeyhoteeMainWindow::searchEditChanged);
@@ -387,6 +388,8 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       {
       auto con_id = selected_items[0]->data(0, ContactIdRole).toInt();
       openContactGui(con_id);
+      //this makes overstack when contact_page table is sorted, 
+      //selectRow generate signal onSidebarSelectionChanged and openContactGui is call two or more
       ui->contacts_page->selectRow(con_id);
       connect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
       connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
@@ -473,6 +476,17 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     }
   }
 
+void KeyhoteeMainWindow::onSidebarDoubleClicked()
+  {
+  QList<QTreeWidgetItem*> selected_items = ui->side_bar->selectedItems();
+  if (selected_items.size() )
+    {
+    if (selected_items[0]->type() == ContactItem)
+      {        
+      ui->contacts_page->selectChat ();
+      }
+    }
+  }
 void KeyhoteeMainWindow::selectContactItem(QTreeWidgetItem* item)
   {}
 
@@ -673,7 +687,7 @@ void KeyhoteeMainWindow::showContactGui(ContactGui& contact_gui)
     //ui->widget_stack->setCurrentWidget( contact_gui._view );
     ui->widget_stack->setCurrentWidget(ui->contacts_page);
     ui->contacts_page->showView(*contact_gui._view);
-    if (contact_gui.isChatVisible())
+    if (contact_gui.isChatVisible() || contact_gui._unread_msg_count)
       contact_gui._view->onChat();
     }
   }
@@ -779,7 +793,9 @@ void KeyhoteeMainWindow::onCanceledNewContact()
 void KeyhoteeMainWindow::onSavedNewContact()
   {
   enableMenu(true);
-  showContacts ();
+  //Issue #43
+  //After saving just added contact, contact detail window should point to newly added record
+  ui->contacts_page->selectRow(0);
   }
 
 void KeyhoteeMainWindow::enableMenu(bool enable)

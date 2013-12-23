@@ -189,3 +189,10 @@ ContactView* ContactsTable::getCurrentView() const
   {
   return qobject_cast<ContactView *>(ui->contact_details_view->currentWidget());
   }
+
+void ContactsTable::selectChat()
+  {
+  if (ContactView * currentView = getCurrentView ())
+    if (!currentView->isAddingNewContact ())
+      currentView->onChat ();
+  }

@@ -107,6 +107,7 @@ ContactView::ContactView(QWidget* parent)
   ui->privacy_level_label->setVisible (false);//unsupported
   
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
+  chat_contact = new QAction( QIcon( ":/images/chat.png"), tr("Chat"), this);  
   edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png"), tr("Edit"), this);
   share_contact = new QAction(QIcon(":/images/read-icon.png"), tr("Share (need new icon)"), this);
   request_contact = new QAction( QIcon(":/images/128x128/contact_info_request_authorisation.png"), tr("Request authorisation"), this);
@@ -115,6 +116,7 @@ ContactView::ContactView(QWidget* parent)
   connect(ui->icon_view, &QToolButton::clicked, this, &ContactView::onIconSearch);
 
   message_tools->addAction(send_mail);  
+  message_tools->addAction(chat_contact);
   message_tools->addAction(share_contact);
   message_tools->addAction(request_contact);
   separatorToolBar = message_tools->addSeparator ();
@@ -135,6 +137,7 @@ ContactView::ContactView(QWidget* parent)
   connect(cancel_edit_contact, &QAction::triggered, this, &ContactView::onCancel);
   connect(edit_contact, &QAction::triggered, this, &ContactView::onEdit);
   connect(send_mail, &QAction::triggered, this, &ContactView::onMail);
+  connect(chat_contact, &QAction::triggered, this, &ContactView::onChat);
   connect(share_contact, &QAction::triggered, this, &ContactView::onShareContact);
   connect(request_contact, &QAction::triggered, this, &ContactView::onRequestContact);
 
@@ -479,6 +482,7 @@ void ContactView::keyEdit(bool enable)
     ui->id_edit->setEnabled(enable && gMiningIsPossible);
     ui->public_key->setReadOnly(!enable);
     send_mail->setVisible(false);
+    chat_contact->setVisible(false);
     edit_contact->setVisible(false);
     share_contact->setVisible(false);
     request_contact->setVisible(false);
@@ -493,6 +497,7 @@ void ContactView::keyEdit(bool enable)
     ui->id_edit->setEnabled(false);
     ui->public_key->setReadOnly (true);
     send_mail->setVisible(true);
+    chat_contact->setVisible(true);
     edit_contact->setVisible(true);
     share_contact->setVisible(true);
     request_contact->setVisible(true);
@@ -510,6 +515,7 @@ void ContactView::keyEdit(bool enable)
   ui->keyhotee_founder->setVisible(!enable && _current_contact.isKeyhoteeFounder());
   cancel_edit_contact->setEnabled(enable);
   send_mail->setEnabled(!enable);
+  chat_contact->setEnabled(!enable);
   edit_contact->setEnabled(!enable);
   share_contact->setEnabled(false);
   request_contact->setEnabled(false);

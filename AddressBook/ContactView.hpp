@@ -121,6 +121,7 @@ private:
   std::unique_ptr<Ui::ContactView>        ui;
   QToolBar*                               message_tools;
   QAction*                                send_mail;
+  QAction*                                chat_contact;
   QAction*                                save_contact;
   QAction*                                edit_contact;
   QAction*                                share_contact;

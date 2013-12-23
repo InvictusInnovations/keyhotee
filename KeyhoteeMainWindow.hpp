@@ -61,6 +61,7 @@ public:
   void addContact();
   void showContacts();
   void onSidebarSelectionChanged();
+  void onSidebarDoubleClicked();
   void selectContactItem(QTreeWidgetItem* item);
   void selectIdentityItem(QTreeWidgetItem* item);
   void sideBarSplitterMoved(int pos, int index);
