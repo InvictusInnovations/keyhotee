@@ -31,7 +31,7 @@ class TMoneyAttachementWidget;
       (contact)
     - with explicit recipient list when reply/reply-all options are in action.
 */
-class MailEditorMainWindow : public QWidget
+class MailEditorMainWindow : public QMainWindow
   {
   Q_OBJECT
   public:

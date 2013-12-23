@@ -41,6 +41,8 @@ MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, Address
     connect(edit->document(), SIGNAL(contentsChanged()), this, SLOT(onRecipientListChanged()));
     }
 
+  /// This edit must be always read only - it is automatically filled by 'from' tool button selection.
+  ui->fromEdit->setReadOnly(true);
   ui->fromEdit->setCompleter(completer);
   if(editMode)
     fillSenderIdentities();
