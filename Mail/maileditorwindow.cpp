@@ -19,7 +19,7 @@
 
 MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel,
   IMailProcessor& mailProcessor, bool editMode) :
-  QMainWindow(parent, Qt::WindowFlags(Qt::WindowType::Dialog)),
+  QWidget(parent, Qt::WindowFlags(Qt::WindowType::Dialog)),
   ui(new Ui::MailEditorWindow()),
   ABModel(abModel),
   MailProcessor(mailProcessor),

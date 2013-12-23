@@ -66,7 +66,7 @@ int TKeyhoteeApplication::Run(int& argc, char** argv)
   if (argc > 1)
     {
     app.LoadedProfileName = argv[1];
-    app.DefaultProfileLoaded = app.LoadedProfileName != DEF_PROFILE_NAME;
+    app.DefaultProfileLoaded = app.LoadedProfileName == DEF_PROFILE_NAME;
     }
   return app.Run();
   }
