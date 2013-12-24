@@ -118,6 +118,7 @@ qt5_wrap_ui( UiLoginDialog                     LoginDialog.ui )
 qt5_wrap_ui( UiConnectionStatusFrame           connectionstatusframe.ui )
 qt5_wrap_ui( UiKeyhoteeMainWindow              KeyhoteeMainWindow.ui )
 qt5_wrap_ui( Uidiagnosticdialog                diagnosticdialog.ui )
+qt5_wrap_ui( UiNewIdentityDialog               AddressBook/NewIdentityDialog.ui )
 qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
 qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
 qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
@@ -147,6 +148,9 @@ set( sources
         profile_wizard/ProfileNymPage.ui
         profile_wizard/ProfileWizard.cpp
 
+        AddressBook/NewIdentityDialog.ui
+        AddressBook/NewIdentityDialog.hpp
+        AddressBook/NewIdentityDialog.cpp
         AddressBook/ContactsTable.ui
         AddressBook/ContactsTable.hpp
         AddressBook/ContactsTable.cpp
