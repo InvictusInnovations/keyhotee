@@ -57,9 +57,9 @@ namespace
 class TSegmentationFaultException : public std::exception {};
 } ///namespace anonymous
 
-TKeyhoteeApplication* TKeyhoteeApplication::GetInstance() { return s_Instance; }
+TKeyhoteeApplication* TKeyhoteeApplication::getInstance() { return s_Instance; }
 
-int TKeyhoteeApplication::Run(int& argc, char** argv)
+int TKeyhoteeApplication::run(int& argc, char** argv)
 {
   ConfigureLoggingToTemporaryFile();
   TKeyhoteeApplication app(argc, argv);
@@ -69,10 +69,10 @@ int TKeyhoteeApplication::Run(int& argc, char** argv)
     app.DefaultProfileLoaded = app.LoadedProfileName == DEF_PROFILE_NAME;
   }
 
-  return app.Run();
+  return app.run();
 }
 
-void TKeyhoteeApplication::DisplayMainWindow()
+void TKeyhoteeApplication::displayMainWindow()
 {
   if(MainWindow == nullptr)
   {
@@ -82,22 +82,22 @@ void TKeyhoteeApplication::DisplayMainWindow()
   }
 }
 
-void TKeyhoteeApplication::Quit()
+void TKeyhoteeApplication::quit()
 {
-  quit();
+  QApplication::quit();
 }
 
-const char* TKeyhoteeApplication::GetAppName() const
+const char* TKeyhoteeApplication::getAppName() const
 {
   return APP_NAME;
 }
 
-const char* TKeyhoteeApplication::GetLoadedProfileName() const
+const char* TKeyhoteeApplication::getLoadedProfileName() const
 {
   return LoadedProfileName.c_str();
 }
 
-bool TKeyhoteeApplication::IsDefaultProfileLoaded() const
+bool TKeyhoteeApplication::isDefaultProfileLoaded() const
 {
   return DefaultProfileLoaded;
 }
@@ -122,12 +122,12 @@ TKeyhoteeApplication::~TKeyhoteeApplication()
   s_Instance = nullptr;
 }
 
-int TKeyhoteeApplication::Run()
+int TKeyhoteeApplication::run()
 {
   int exitCode = TExitStatus::SUCCESS;
   
 #ifndef WIN32
-  signal(SIGSEGV, LinuxSignalHandler);
+  signal(SIGSEGV, linuxSignalHandler);
 #endif ///WIN32
 
   try
@@ -136,7 +136,7 @@ int TKeyhoteeApplication::Run()
     setOrganizationName("Invictus Innovations, Inc");
     setApplicationName(APP_NAME);
 
-    fc::async( [ = ](){ Startup(); }
+    fc::async( [ = ](){ startup(); }
               );
 
     connect(this, &QApplication::aboutToQuit, [ = ](){ bts::application::instance()->quit(); }
@@ -151,56 +151,56 @@ int TKeyhoteeApplication::Run()
   }
   catch(const fc::exception& e)
   {
-    OnExceptionCaught(e);
+    onExceptionCaught(e);
   }
 
   catch(...)
   {
-    OnUnknownExceptionCaught();
+    onUnknownExceptionCaught();
   }
 
   return ExitStatus;
 }
 
-void TKeyhoteeApplication::DisplayLogin()
+void TKeyhoteeApplication::displayLogin()
 {
   LoginDialog* loginDialog = new LoginDialog();
   loginDialog->connect(loginDialog, &QDialog::accepted,
     [ = ]()
     {
       loginDialog->deleteLater();
-      DisplayMainWindow();
+      displayMainWindow();
     }
     );
   
   loginDialog->show();
 }
 
-void TKeyhoteeApplication::DisplayProfileWizard()
+void TKeyhoteeApplication::displayProfileWizard()
 {
   auto profile_wizard = new ProfileWizard(*this);
   profile_wizard->resize(QSize(680, 600) );
   profile_wizard->show();
 }
 
-void TKeyhoteeApplication::OnExceptionCaught(const fc::exception& e)
+void TKeyhoteeApplication::onExceptionCaught(const fc::exception& e)
 {
-  DisplayFailureInfo(e.to_detail_string());
+  displayFailureInfo(e.to_detail_string());
 }
 
-void TKeyhoteeApplication::OnUnknownExceptionCaught()
+void TKeyhoteeApplication::onUnknownExceptionCaught()
 {
   std::string detail("Unknown exception caught");
-  DisplayFailureInfo(detail);
+  displayFailureInfo(detail);
 }
 
-void TKeyhoteeApplication::DisplayFailureInfo(const std::string& detail)
+void TKeyhoteeApplication::displayFailureInfo(const std::string& detail)
 {
   elog("${e}", ("e", detail ) );
   ExitStatus = TExitStatus::INTERNAL_ERROR;
   QMessageBox::critical(nullptr, tr("Application internal error"),
     tr("Application encountered internal error.\nError details: ") + QString(detail.c_str()));
-  Quit();
+  quit();
 }
 
 bool TKeyhoteeApplication::notify(QObject* receiver, QEvent* e)
@@ -211,17 +211,17 @@ bool TKeyhoteeApplication::notify(QObject* receiver, QEvent* e)
   }
   catch (const fc::exception& e)
   {
-    OnExceptionCaught(e);
+    onExceptionCaught(e);
   }
   catch(...)
   {
-    OnUnknownExceptionCaught();
+    onUnknownExceptionCaught();
   }
 
   return true;
 }
 
-bts::application_config TKeyhoteeApplication::LoadConfig()
+bts::application_config TKeyhoteeApplication::loadConfig()
 {
   try 
   {
@@ -253,13 +253,13 @@ bts::application_config TKeyhoteeApplication::LoadConfig()
   FC_RETHROW_EXCEPTIONS(warn, "") 
 }
 
-void TKeyhoteeApplication::Startup()
+void TKeyhoteeApplication::startup()
 {
   ExitStatus = TExitStatus::LOAD_CONFIG_FAILURE;
 
   try 
   {
-    auto app_config = LoadConfig();
+    auto app_config = loadConfig();
     ExitStatus = TExitStatus::BACKEND_CONFIGURATION_FAILURE;
     BackendApp->configure(app_config);
     ExitStatus = TExitStatus::SUCCESS;
@@ -275,7 +275,7 @@ void TKeyhoteeApplication::Startup()
         elog("Failed to configure Keyhotee: ${e}", ("e",e.to_detail_string()));
         break;
       default:
-        elog("Failed to Startup Keyhotee: ${e}", ("e",e.to_detail_string()));
+        elog("Failed to startup Keyhotee: ${e}", ("e",e.to_detail_string()));
         break;
     }
 
@@ -283,12 +283,12 @@ void TKeyhoteeApplication::Startup()
   }
 
   if(BackendApp->has_profile() )
-    DisplayLogin();
+    displayLogin();
   else
-    DisplayProfileWizard();
+    displayProfileWizard();
 }
 
-void TKeyhoteeApplication::LinuxSignalHandler(int)
+void TKeyhoteeApplication::linuxSignalHandler(int)
 {
   // note: to safely throw from a signal handler, you must compile with
   // g++ -fnon-call-exceptions

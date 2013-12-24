@@ -22,26 +22,26 @@ class TKeyhoteeApplication : protected QApplication
 
   public:
     /// Returns instance of the app - non-null when app object has been built (app is running).
-    static TKeyhoteeApplication* GetInstance();
+    static TKeyhoteeApplication* getInstance();
 
     /** Builds & starts the app.
         When this function completes it also destroys application object.
 
         Returned value is application exit status.
     */
-    static int  Run(int& argc, char** argv);
+    static int  run(int& argc, char** argv);
 
-    void        DisplayMainWindow();
-    void        Quit();
+    void        displayMainWindow();
+    void        quit();
 
     /// Gives access to the application name.
-    const char* GetAppName() const;
+    const char* getAppName() const;
     /// Returns selected (from command line) current profile to load.
-    const char* GetLoadedProfileName() const;
+    const char* getLoadedProfileName() const;
     /// Tells if currently loaded profile is default one.
-    bool        IsDefaultProfileLoaded() const;
+    bool        isDefaultProfileLoaded() const;
 
-    KeyhoteeMainWindow* GetMainWindow() const
+    KeyhoteeMainWindow* getMainWindow() const
       {
       return MainWindow;
       }
@@ -59,18 +59,18 @@ class TKeyhoteeApplication : protected QApplication
     TKeyhoteeApplication(int& argc, char** argv);
     virtual ~TKeyhoteeApplication();
 
-    int  Run();
-    void DisplayLogin();
-    void DisplayProfileWizard();
+    int  run();
+    void displayLogin();
+    void displayProfileWizard();
 
-    void OnExceptionCaught(const fc::exception& e);
-    void OnUnknownExceptionCaught();
-    void DisplayFailureInfo(const std::string& detail);
+    void onExceptionCaught(const fc::exception& e);
+    void onUnknownExceptionCaught();
+    void displayFailureInfo(const std::string& detail);
 
-    bts::application_config LoadConfig();
-    void Startup();
+    bts::application_config loadConfig();
+    void startup();
 
-    static void LinuxSignalHandler(int);
+    static void linuxSignalHandler(int);
 
   /// Overrided from QApplication to catch all exceptions.
     virtual bool notify(QObject * receiver, QEvent * e) override;

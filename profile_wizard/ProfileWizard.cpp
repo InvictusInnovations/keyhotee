@@ -189,7 +189,7 @@ ProfileWizard::ProfileWizard(TKeyhoteeApplication& mainApp) :
 ProfileWizard::~ProfileWizard()
   {
   if (!_profile_edit->isComplete() )
-    _mainApp.Quit();
+    _mainApp.quit();
   }
 
 void ProfileWizard::showHelp()
@@ -231,7 +231,7 @@ void ProfileWizard::createProfile(int result)
 
     bts::application::instance()->add_receive_key(priv_key);
 
-    _mainApp.DisplayMainWindow();
+    _mainApp.displayMainWindow();
     }
   }
 

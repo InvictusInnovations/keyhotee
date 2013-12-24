@@ -178,4 +178,4 @@ private:
   TMailProcessor                          MailProcessor;
 }; //KeyhoteeMainWindow
 
-KeyhoteeMainWindow* GetKeyhoteeWindow();
+KeyhoteeMainWindow* getKeyhoteeWindow();

@@ -31,9 +31,9 @@
 
 extern bool        gMiningIsPossible;
 
-KeyhoteeMainWindow* GetKeyhoteeWindow()
+KeyhoteeMainWindow* getKeyhoteeWindow()
 {
-  return TKeyhoteeApplication::GetInstance()->GetMainWindow();
+  return TKeyhoteeApplication::getInstance()->getMainWindow();
 }
 
 enum SidebarItemRoles
@@ -76,7 +76,7 @@ void ContactGui::setUnreadMsgCount(unsigned int count)
 
 bool ContactGui::isChatVisible()
 {
-  return GetKeyhoteeWindow()->isSelectedContactGui(this) && _view->isChatSelected();
+  return getKeyhoteeWindow()->isSelectedContactGui(this) && _view->isChatSelected();
 }
 
 void ContactGui::receiveChatMessage(const QString& from, const QString& msg, const QDateTime& dateTime)
@@ -129,9 +129,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->setupUi(this);
   setWindowIcon(QIcon(":/images/shield1024.png") );
 
-  if(mainApp.IsDefaultProfileLoaded() == false)
+  if(mainApp.isDefaultProfileLoaded() == false)
   {
-    QString title = QString("%1 (%2)").arg(mainApp.GetAppName()).arg(mainApp.GetLoadedProfileName());
+    QString title = QString("%1 (%2)").arg(mainApp.getAppName()).arg(mainApp.getLoadedProfileName());
     setWindowTitle(title);
   }
 
@@ -303,7 +303,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
    }
    */
   QString settings_file = "keyhotee_";
-  settings_file.append(mainApp.GetLoadedProfileName());
+  settings_file.append(mainApp.getLoadedProfileName());
   setSettingsFile(settings_file);
   readSettings();
 }
