@@ -60,47 +60,47 @@ class TSegmentationFaultException : public std::exception {};
 TKeyhoteeApplication* TKeyhoteeApplication::GetInstance() { return s_Instance; }
 
 int TKeyhoteeApplication::Run(int& argc, char** argv)
-  {
+{
   ConfigureLoggingToTemporaryFile();
   TKeyhoteeApplication app(argc, argv);
   if (argc > 1)
-    {
+  {
     app.LoadedProfileName = argv[1];
     app.DefaultProfileLoaded = app.LoadedProfileName == DEF_PROFILE_NAME;
-    }
-
-  return app.Run();
   }
 
+  return app.Run();
+}
+
 void TKeyhoteeApplication::DisplayMainWindow()
-  {
+{
   if(MainWindow == nullptr)
-    {
+  {
     MainWindow = new KeyhoteeMainWindow(*this);
     MainWindow->show();
     BackendApp->connect_to_network();
-    }
   }
+}
 
 void TKeyhoteeApplication::Quit()
-  {
+{
   quit();
-  }
+}
 
 const char* TKeyhoteeApplication::GetAppName() const
-  {
+{
   return APP_NAME;
-  }
+}
 
 const char* TKeyhoteeApplication::GetLoadedProfileName() const
-  {
+{
   return LoadedProfileName.c_str();
-  }
+}
 
 bool TKeyhoteeApplication::IsDefaultProfileLoaded() const
-  {
+{
   return DefaultProfileLoaded;
-  }
+}
 
 TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv) :
   QApplication(argc, argv),
@@ -109,21 +109,21 @@ TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv) :
   ProfWizard(nullptr),
   ExitStatus(TExitStatus::SUCCESS),
   DefaultProfileLoaded(true)
-  {
+{
   assert(s_Instance == nullptr && "Only one instance allowed at time");
   s_Instance = this;
 
   BackendApp = bts::application::instance();
-  }
+}
 
 TKeyhoteeApplication::~TKeyhoteeApplication()
-  {
+{
   assert(s_Instance == this && "Only one instance allowed at time");
   s_Instance = nullptr;
-  }
+}
 
 int TKeyhoteeApplication::Run()
-  {
+{
   int exitCode = TExitStatus::SUCCESS;
   
 #ifndef WIN32
@@ -131,7 +131,7 @@ int TKeyhoteeApplication::Run()
 #endif ///WIN32
 
   try
-    {
+  {
     setOrganizationDomain("invictus-innovations.com");
     setOrganizationName("Invictus Innovations, Inc");
     setApplicationName(APP_NAME);
@@ -148,83 +148,83 @@ int TKeyhoteeApplication::Run()
     fc_exec.start(5);
     /// increment any QT specific status by last our one to avoid conflicts.
     ExitStatus = LAST_EXIT_STATUS + (unsigned int)exec();
-    }
+  }
   catch(const fc::exception& e)
-    {
+  {
     OnExceptionCaught(e);
-    }
-
-  catch(...)
-    {
-    OnUnknownExceptionCaught();
-    }
-
-  return ExitStatus;
   }
 
-void TKeyhoteeApplication::DisplayLogin()
+  catch(...)
   {
+    OnUnknownExceptionCaught();
+  }
+
+  return ExitStatus;
+}
+
+void TKeyhoteeApplication::DisplayLogin()
+{
   LoginDialog* loginDialog = new LoginDialog();
   loginDialog->connect(loginDialog, &QDialog::accepted,
     [ = ]()
-      {
+    {
       loginDialog->deleteLater();
       DisplayMainWindow();
-      }
+    }
     );
   
   loginDialog->show();
-  }
+}
 
 void TKeyhoteeApplication::DisplayProfileWizard()
-  {
+{
   auto profile_wizard = new ProfileWizard(*this);
   profile_wizard->resize(QSize(680, 600) );
   profile_wizard->show();
-  }
+}
 
 void TKeyhoteeApplication::OnExceptionCaught(const fc::exception& e)
-  {
+{
   DisplayFailureInfo(e.to_detail_string());
-  }
+}
 
 void TKeyhoteeApplication::OnUnknownExceptionCaught()
-  {
+{
   std::string detail("Unknown exception caught");
   DisplayFailureInfo(detail);
-  }
+}
 
 void TKeyhoteeApplication::DisplayFailureInfo(const std::string& detail)
-  {
+{
   elog("${e}", ("e", detail ) );
   ExitStatus = TExitStatus::INTERNAL_ERROR;
   QMessageBox::critical(nullptr, tr("Application internal error"),
     tr("Application encountered internal error.\nError details: ") + QString(detail.c_str()));
   Quit();
-  }
+}
 
 bool TKeyhoteeApplication::notify(QObject* receiver, QEvent* e)
-  {
+{
   try
-    {
+  {
     return QApplication::notify(receiver, e);
-    }
+  }
   catch (const fc::exception& e)
-    {
+  {
     OnExceptionCaught(e);
-    }
+  }
   catch(...)
-    {
+  {
     OnUnknownExceptionCaught();
-    }
-
-  return true;
   }
 
+  return true;
+}
+
 bts::application_config TKeyhoteeApplication::LoadConfig()
-  {
+{
   try 
-    {
+  {
     /// \warning use stdwstring to avoid problems related to paths containing native chars.
     auto strDataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdWString();
     boost::filesystem::path dataDir(strDataDir);
@@ -234,7 +234,7 @@ bts::application_config TKeyhoteeApplication::LoadConfig()
     auto config_file = profileDir / "config.json";
     ilog("config_file: ${file}", ("file", config_file) );
     if (fc::exists(config_file) == false)
-      {
+    {
       bts::application_config default_cfg;
       default_cfg.data_dir = profileDir / "data";
       default_cfg.network_port = 0;
@@ -243,31 +243,31 @@ bts::application_config TKeyhoteeApplication::LoadConfig()
       
       fc::ofstream out(config_file);
       out << fc::json::to_pretty_string(default_cfg);
-      }
+    }
 
     auto app_config = fc::json::from_file(config_file).as<bts::application_config>();
     fc::ofstream out(config_file);
     out << fc::json::to_pretty_string(app_config);
     return app_config;
-    }
-  FC_RETHROW_EXCEPTIONS(warn, "") 
   }
+  FC_RETHROW_EXCEPTIONS(warn, "") 
+}
 
 void TKeyhoteeApplication::Startup()
-  {
+{
   ExitStatus = TExitStatus::LOAD_CONFIG_FAILURE;
 
   try 
-    {
+  {
     auto app_config = LoadConfig();
     ExitStatus = TExitStatus::BACKEND_CONFIGURATION_FAILURE;
     BackendApp->configure(app_config);
     ExitStatus = TExitStatus::SUCCESS;
-    }
+  }
   catch (fc::exception& e)
-    {
+  {
     switch(ExitStatus)
-      {
+    {
       case TExitStatus::LOAD_CONFIG_FAILURE:
         elog("Failed to load Keyhotee configuration: ${e}", ("e",e.to_detail_string()));
         break;
@@ -277,22 +277,22 @@ void TKeyhoteeApplication::Startup()
       default:
         elog("Failed to Startup Keyhotee: ${e}", ("e",e.to_detail_string()));
         break;
-      }
+    }
 
     return;
-    }
+  }
 
   if(BackendApp->has_profile() )
     DisplayLogin();
   else
     DisplayProfileWizard();
-  }
+}
 
 void TKeyhoteeApplication::LinuxSignalHandler(int)
-  {
+{
   // note: to safely throw from a signal handler, you must compile with
   // g++ -fnon-call-exceptions
   throw TSegmentationFaultException();
-  }
+}
 
 

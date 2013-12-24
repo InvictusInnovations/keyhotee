@@ -3,6 +3,7 @@
 #include "ui_KeyhoteeMainWindow.h"
 #include "diagnosticdialog.h"
 #include "AddressBook/AddressBookModel.hpp"
+#include "AddressBook/NewIdentityDialog.hpp"
 #include "AddressBook/ContactView.hpp"
 
 #include "Mail/MailboxModel.hpp"
@@ -528,7 +529,8 @@ void KeyhoteeMainWindow::on_actionDelete_triggered()
 // Menu Identity
 void KeyhoteeMainWindow::on_actionNew_identity_triggered()
 {
-  notSupported();
+   NewIdentityDialog* ident_dialog = new NewIdentityDialog(this);
+   ident_dialog->show();
 }
 
 void KeyhoteeMainWindow::enableMining_toggled(bool enabled)
