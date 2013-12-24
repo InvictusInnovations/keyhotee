@@ -3,7 +3,7 @@ Coding Stanards
 
 All submitted code should follow the style indicated by the example below:
 
-   <code>
+   <pre>
 
    ClassName
    memberMethod()
@@ -22,6 +22,6 @@ All submitted code should follow the style indicated by the example below:
    {
    }
 
-   </code> 
+   </pre> 
 
 
