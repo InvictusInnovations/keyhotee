@@ -3,25 +3,23 @@ Coding Stanards
 
 All submitted code should follow the style indicated by the example below:
 
-   <pre>
+<pre>
+ClassName
+memberMethod()
+_member_variable
+local_variable
 
-   ClassName
-   memberMethod()
-   _member_variable
-   local_variable
+void method()
+{
+   ...
+}
 
-   void method()
-   {
-      ...
-   }
-
-   if( ... ) 
-   {
-   }
-   else
-   {
-   }
-
-   </pre> 
+if( ... ) 
+{
+}
+else
+{
+}
+</pre> 
 
 
