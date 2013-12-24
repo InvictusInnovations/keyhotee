@@ -1,5 +1,4 @@
-#ifndef __KEYHOTEEAPPLICATION_HPP
-#define __KEYHOTEEAPPLICATION_HPP
+#pragma once
 
 #include <bts/application.hpp>
 
@@ -17,7 +16,7 @@ class QTemporaryFile;
     opening attachement items.
 */
 class TKeyhoteeApplication : protected QApplication
-  {
+{
   Q_OBJECT
 
   public:
@@ -35,16 +34,11 @@ class TKeyhoteeApplication : protected QApplication
     void        quit();
 
     /// Gives access to the application name.
-    const char* getAppName() const;
+    std::string getAppName() const;
     /// Returns selected (from command line) current profile to load.
-    const char* getLoadedProfileName() const;
-    /// Tells if currently loaded profile is default one.
-    bool        isDefaultProfileLoaded() const;
+    std::string getLoadedProfileName() const;
 
-    KeyhoteeMainWindow* getMainWindow() const
-      {
-      return MainWindow;
-      }
+    KeyhoteeMainWindow* getMainWindow() const { return _main_window; }
 
   private:
     enum TExitStatus
@@ -79,15 +73,13 @@ class TKeyhoteeApplication : protected QApplication
   private:
     typedef std::vector<QTemporaryFile*> TTemporaryFileContainer;
 
-    TTemporaryFileContainer AllocatedTemps;
-    bts::application_ptr    BackendApp;
-    std::string             LoadedProfileName;
-    KeyhoteeMainWindow*     MainWindow;
-    ProfileWizard*          ProfWizard;
-    int                     ExitStatus;
-    bool                    DefaultProfileLoaded;
-  };
+    TTemporaryFileContainer _allocated_temps;
+    bts::application_ptr    _backend_app;
+    std::string             _loaded_profile_name;
+    KeyhoteeMainWindow*     _main_window;
+    ProfileWizard*          _profile_wizard;
+    int                     _exit_status;
+};
 
-#endif //__KEYHOTEEAPPLICATION_HPP
 
 

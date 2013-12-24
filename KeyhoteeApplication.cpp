@@ -65,8 +65,8 @@ int TKeyhoteeApplication::run(int& argc, char** argv)
   TKeyhoteeApplication app(argc, argv);
   if (argc > 1)
   {
-    app.LoadedProfileName = argv[1];
-    app.DefaultProfileLoaded = app.LoadedProfileName == DEF_PROFILE_NAME;
+    app._loaded_profile_name = argv[1];
+   // app.DefaultProfileLoaded = app.LoadedProfileName == DEF_PROFILE_NAME;
   }
 
   return app.run();
@@ -74,11 +74,11 @@ int TKeyhoteeApplication::run(int& argc, char** argv)
 
 void TKeyhoteeApplication::displayMainWindow()
 {
-  if(MainWindow == nullptr)
+  if(_main_window == nullptr)
   {
-    MainWindow = new KeyhoteeMainWindow(*this);
-    MainWindow->show();
-    BackendApp->connect_to_network();
+    _main_window = new KeyhoteeMainWindow(*this);
+    _main_window->show();
+    _backend_app->connect_to_network();
   }
 }
 
@@ -87,33 +87,27 @@ void TKeyhoteeApplication::quit()
   QApplication::quit();
 }
 
-const char* TKeyhoteeApplication::getAppName() const
+std::string TKeyhoteeApplication::getAppName() const
 {
   return APP_NAME;
 }
 
-const char* TKeyhoteeApplication::getLoadedProfileName() const
+std::string TKeyhoteeApplication::getLoadedProfileName() const
 {
-  return LoadedProfileName.c_str();
+  return _loaded_profile_name;
 }
 
-bool TKeyhoteeApplication::isDefaultProfileLoaded() const
-{
-  return DefaultProfileLoaded;
-}
-
-TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv) :
-  QApplication(argc, argv),
-  LoadedProfileName(DEF_PROFILE_NAME),
-  MainWindow(nullptr),
-  ProfWizard(nullptr),
-  ExitStatus(TExitStatus::SUCCESS),
-  DefaultProfileLoaded(true)
+TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv) 
+:QApplication(argc, argv),
+ _loaded_profile_name(DEF_PROFILE_NAME),
+ _main_window(nullptr),
+ _profile_wizard(nullptr),
+ _exit_status(TExitStatus::SUCCESS)
 {
   assert(s_Instance == nullptr && "Only one instance allowed at time");
   s_Instance = this;
 
-  BackendApp = bts::application::instance();
+  _backend_app = bts::application::instance();
 }
 
 TKeyhoteeApplication::~TKeyhoteeApplication()
@@ -147,7 +141,7 @@ int TKeyhoteeApplication::run()
                       );
     fc_exec.start(5);
     /// increment any QT specific status by last our one to avoid conflicts.
-    ExitStatus = LAST_EXIT_STATUS + (unsigned int)exec();
+    _exit_status = LAST_EXIT_STATUS + (unsigned int)exec();
   }
   catch(const fc::exception& e)
   {
@@ -159,7 +153,7 @@ int TKeyhoteeApplication::run()
     onUnknownExceptionCaught();
   }
 
-  return ExitStatus;
+  return _exit_status;
 }
 
 void TKeyhoteeApplication::displayLogin()
@@ -197,7 +191,7 @@ void TKeyhoteeApplication::onUnknownExceptionCaught()
 void TKeyhoteeApplication::displayFailureInfo(const std::string& detail)
 {
   elog("${e}", ("e", detail ) );
-  ExitStatus = TExitStatus::INTERNAL_ERROR;
+  _exit_status = TExitStatus::INTERNAL_ERROR;
   QMessageBox::critical(nullptr, tr("Application internal error"),
     tr("Application encountered internal error.\nError details: ") + QString(detail.c_str()));
   quit();
@@ -228,7 +222,7 @@ bts::application_config TKeyhoteeApplication::loadConfig()
     /// \warning use stdwstring to avoid problems related to paths containing native chars.
     auto strDataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdWString();
     boost::filesystem::path dataDir(strDataDir);
-    boost::filesystem::path profileDataDir(dataDir / LoadedProfileName);
+    boost::filesystem::path profileDataDir(dataDir / _loaded_profile_name);
     fc::path profileDir(profileDataDir);
     fc::create_directories(profileDir);
     auto config_file = profileDir / "config.json";
@@ -255,18 +249,18 @@ bts::application_config TKeyhoteeApplication::loadConfig()
 
 void TKeyhoteeApplication::startup()
 {
-  ExitStatus = TExitStatus::LOAD_CONFIG_FAILURE;
+  _exit_status = TExitStatus::LOAD_CONFIG_FAILURE;
 
   try 
   {
     auto app_config = loadConfig();
-    ExitStatus = TExitStatus::BACKEND_CONFIGURATION_FAILURE;
-    BackendApp->configure(app_config);
-    ExitStatus = TExitStatus::SUCCESS;
+    _exit_status = TExitStatus::BACKEND_CONFIGURATION_FAILURE;
+    _backend_app->configure(app_config);
+    _exit_status = TExitStatus::SUCCESS;
   }
   catch (fc::exception& e)
   {
-    switch(ExitStatus)
+    switch(_exit_status)
     {
       case TExitStatus::LOAD_CONFIG_FAILURE:
         elog("Failed to load Keyhotee configuration: ${e}", ("e",e.to_detail_string()));
@@ -282,7 +276,7 @@ void TKeyhoteeApplication::startup()
     return;
   }
 
-  if(BackendApp->has_profile() )
+  if(_backend_app->has_profile() )
     displayLogin();
   else
     displayProfileWizard();

@@ -129,11 +129,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->setupUi(this);
   setWindowIcon(QIcon(":/images/shield1024.png") );
 
-  if(mainApp.isDefaultProfileLoaded() == false)
-  {
-    QString title = QString("%1 (%2)").arg(mainApp.getAppName()).arg(mainApp.getLoadedProfileName());
-    setWindowTitle(title);
-  }
+  QString title = QString("%1 (%2)").arg(mainApp.getAppName().c_str()).arg(mainApp.getLoadedProfileName().c_str());
+  setWindowTitle(title);
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
   connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
@@ -303,7 +300,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
    }
    */
   QString settings_file = "keyhotee_";
-  settings_file.append(mainApp.getLoadedProfileName());
+  settings_file.append(mainApp.getLoadedProfileName().c_str());
   setSettingsFile(settings_file);
   readSettings();
 }
