@@ -4,6 +4,8 @@
 
 #include <fc/log/logger.hpp>
 #include <fc/thread/thread.hpp>
+#include <QApplication>
+#include "KeyhoteeApplication.hpp"
 
 LoginDialog::LoginDialog(QWidget* parent)
   : QDialog(parent)
@@ -48,6 +50,7 @@ void LoginDialog::onLogin()
 void LoginDialog::onNew()
 {
    close();
+   static_cast<TKeyhoteeApplication*>(qApp)->displayProfileWizard();
 }
 
 void LoginDialog::shake()

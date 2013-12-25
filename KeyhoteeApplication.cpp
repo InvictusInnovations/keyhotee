@@ -66,7 +66,6 @@ int TKeyhoteeApplication::run(int& argc, char** argv)
   if (argc > 1)
   {
     app._loaded_profile_name = argv[1];
-   // app.DefaultProfileLoaded = app.LoadedProfileName == DEF_PROFILE_NAME;
   }
 
   return app.run();
@@ -94,7 +93,7 @@ std::string TKeyhoteeApplication::getAppName() const
 
 std::string TKeyhoteeApplication::getLoadedProfileName() const
 {
-  return _loaded_profile_name;
+  return bts::application::instance()->get_profile()->get_name(); //_loaded_profile_name;
 }
 
 TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv) 

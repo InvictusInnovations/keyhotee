@@ -15,7 +15,7 @@ class QTemporaryFile;
     This class also is responsible for temporary files management (removing them) created while
     opening attachement items.
 */
-class TKeyhoteeApplication : protected QApplication
+class TKeyhoteeApplication : public QApplication
 {
   Q_OBJECT
 
@@ -39,6 +39,8 @@ class TKeyhoteeApplication : protected QApplication
     std::string getLoadedProfileName() const;
 
     KeyhoteeMainWindow* getMainWindow() const { return _main_window; }
+    void displayLogin();
+    void displayProfileWizard();
 
   private:
     enum TExitStatus
@@ -54,8 +56,6 @@ class TKeyhoteeApplication : protected QApplication
     virtual ~TKeyhoteeApplication();
 
     int  run();
-    void displayLogin();
-    void displayProfileWizard();
 
     void onExceptionCaught(const fc::exception& e);
     void onUnknownExceptionCaught();
