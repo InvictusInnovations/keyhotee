@@ -6,9 +6,9 @@
 
 
 == Profiles in Keyhotee ==
-* A profile is used by Keyhotee to store your identities, contacts, messages, etc. If multiple users plan to use Keyhotee on the same machine, each should generally create his own profile. 
-* If no command-line argument is used to launch Keyhotee, a profile named "default" will be used. Otherwise, the argument will specify the name of the profile.
+* A profile is used by Keyhotee to store your identities, contacts, messages, etc. If multiple users plan to use Keyhotee on the same machine, each should generally create his own profile. You have to also create at least one identity in each profile with "New Identity" menu before you can communicate with other users from that profile.
 * If the profile doesn't yet exist when Keyhotee is launched, a new profile will be created. In this case Keyhotee will launch a wizard to create your brain wallet and your first identity.
+* If profiles exist, a dialog pops up with a dropdown where you can select the profile you want to use. You can also create new profiles from this dialog.
 * For my profiles, I use: "default", "second", "third", etc.
 * For my identities, I use "first", "second", "third", etc.
 * I recommend using the same password for all your profiles, this makes it easier to remember.
@@ -16,12 +16,12 @@
 === Steps to setup communication between clients ===
 * Run "keyhotee" (or keyhoteed if you built a debug version) and create a new identity (this first profile is "default" profile). I typically call this identity "first".
 
-* Run a second copy of keyhotee by typing "keyhotee second" and create a new identity. I typically call this identity "second".
+* Run a second copy of keyhotee and create a new identity. I typically call this identity "second".
 * Shut down keyhotee (don't bother mining either identity yet).
-* On windows, launch an explorer window and go to "C:\Users\Administrator\AppData\Local\Invictus Innovations, Inc\Keyhotee\". You can get close to this directory by going to %appdata%. This directory stores your profile directories. You should see a default profile and a second profile directory. 
+* On windows, launch an explorer window and go to "C:\Users\Administrator\AppData\Local\KeyhoteeD\" (or Keyhotee if you build release version I guess, the "D" here is for debug). You can get close to this directory by going to %appdata%. This directory stores your profile directories. You should see a default profile and a second profile directory. 
 Go into the default directory and edit the config.json file. Change it to look like this:
 {
-  "data_dir": "C:/Users/Administrator/AppData/Local/Invictus Innovations, Inc/Keyhotee/default/data",
+  "data_dir": "C:/Users/Administrator/AppData/Local/KeyhoteeD/default/data",
   "network_port": 9876,
   "rpc_config": {
     "port": 9877,
@@ -36,7 +36,7 @@ This tells the default client to not hook up to the server and tells it to wait 
 
 Go into the second directory and edit the config.json file. Change it to look like this:
 {
-  "data_dir": "C:/Users/Administrator/AppData/Local/Invictus Innovations, Inc/Keyhotee/second/data",
+  "data_dir": "C:/Users/Administrator/AppData/Local/KeyhoteeD/second/data",
   "network_port": 10876,
   "rpc_config": {
     "port": 10877,
@@ -51,8 +51,8 @@ Go into the second directory and edit the config.json file. Change it to look li
 This tells the second client to hook up to the local default client on 9876.
 
 * Delete blockchain directories that your clients received from the remote server: 
-       delete C:\Users\Administrator\AppData\Local\Invictus Innovations, Inc\Keyhotee\default\data\bitname\bitname\channel
-       delete C:\Users\Administrator\AppData\Local\Invictus Innovations, Inc\Keyhotee\second\data\bitname\bitname\channel
+       delete C:\Users\Administrator\AppData\Local\KeyhoteeD\default\data\bitname\bitname\channel
+       delete C:\Users\Administrator\AppData\Local\KeyhoteeD\second\data\bitname\bitname\channel
   Note: If you don't do this step, your clients probably won't sync up a block chain, since they may get slightly different block chains (because you
         or someone else might mine on the server during the interval between connection of each of your clients to the server). If they don't sync
 		up, you won't be able to send msgs or email. So long story short: safest to delete these directories and start with a clean block chain.
