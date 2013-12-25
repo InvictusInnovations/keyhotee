@@ -49,7 +49,7 @@ void ContactView::sendChatMessage()
     auto                               app = bts::application::instance();
     auto                               profile = app->get_profile();
     auto                               idents = profile->identities();
-    bts::bitchat::private_text_message text_msg(msg.toStdString() );
+    bts::bitchat::private_text_message text_msg(msg.toUtf8().constData() );
     if (idents.size() )
     {
       fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(idents[0].dac_id_string);
@@ -63,7 +63,7 @@ void ContactView::sendChatMessage()
 
 void ContactView::appendChatMessage(const QString& from, const QString& msg, const QDateTime& date_time) //DLNFIX2 improve formatting later
 {
-  wlog("append... ${msg}", ("msg", msg.toStdString() ) );
+  wlog("append... ${msg}", ("msg", msg.toUtf8().constData() ) );
   QString formatted_msg = date_time.toString("hh:mm ap") + " " + from + ": " + msg;
     #if 1
   QColor  color;
@@ -391,7 +391,7 @@ void ContactView::publicKeyEdited(const QString& public_key_string)
   bool doubleContact = false;
   if (public_key_is_valid)
   {
-    if (! (doubleContact = existContactWithPublicKey (public_key_string.toStdString())))
+    if (! (doubleContact = existContactWithPublicKey(public_key_string.toStdString())))
     {
       ui->id_status->setText(tr("Public Key Only Mode: valid key") );
       ui->id_status->setStyleSheet("QLabel { color : green; }");
@@ -409,7 +409,7 @@ void ContactView::lookupId()
 {
   try
   {
-    auto current_id = ui->id_edit->text().toStdString();
+    std::string current_id = ui->id_edit->text().toUtf8().constData();
     setValid (false);
     if (current_id.empty() )
     {
@@ -639,11 +639,11 @@ bool ContactView::doDataExchange (bool valid)
    }
    else
    {
-     _current_contact.first_name     = ui->firstname->text().toStdString();
-     _current_contact.last_name      = ui->lastname->text().toStdString();
-     _current_contact.dac_id_string  = ui->id_edit->text().toStdString();
-     _current_contact.setIcon (ui->icon_view->icon ());
-     _current_contact.notes  = ui->notes->toPlainText().toStdString();
+     _current_contact.first_name     = ui->firstname->text().toUtf8().constData();
+     _current_contact.last_name      = ui->lastname->text().toUtf8().constData();
+     _current_contact.dac_id_string  = ui->id_edit->text().toUtf8().constData();
+     _current_contact.setIcon (ui->icon_view->icon());
+     _current_contact.notes  = ui->notes->toPlainText().toUtf8().constData();
      //_current_contact.email_address = ui->email->text().toStdString();
      //_current_contact.phone_number = ui->phone->text().toStdString();
      //privacy_comboBox
@@ -659,7 +659,7 @@ bool ContactView::existContactWithPublicKey (const std::string& public_key_strin
    if (public_key_string != my_public_key)
    {
       auto addressbook = bts::get_profile()->get_addressbook();
-      if(! public_key_string.empty())
+      if(! public_key_string.size()==0)
       {
          public_key_address key_address(public_key_string);
          auto findContact = addressbook->get_contact_by_public_key( key_address.key );

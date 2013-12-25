@@ -261,22 +261,17 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   wlog("idents: ${idents}", ("idents", idents) );
   for (size_t i = 0; i < idents.size(); ++i)
-    /*
-        auto new_ident_item = new QTreeWidgetItem(_identities_root, (QTreeWidgetItem::ItemType)IdentityItem );
-
-        auto id_rec = app->lookup_name( idents[i].bit_id );
-        if( !id_rec )
-      {
-           new_ident_item->setText( 0, (idents[i].bit_id + " [pending]").c_str() );
-      }
-        else
-      {
-           new_ident_item->setText( 0, (idents[i].bit_id + " [" + std::to_string(id_rec->repute)+"]" ).c_str() );
-      }
-     */
-    app->mine_name(idents[i].dac_id_string,
-                   profile->get_keychain().get_identity_key(idents[i].dac_id_string).get_public_key(),
-                   idents[i].mining_effort);
+  {
+     try {
+        app->mine_name(idents[i].dac_id_string,
+                       profile->get_keychain().get_identity_key(idents[i].dac_id_string).get_public_key(),
+                       idents[i].mining_effort);
+     } 
+     catch ( const fc::exception& e )
+     {
+        wlog( "${e}", ("e",e.to_detail_string()) );
+     }
+  }
   app->set_mining_intensity(0);
   ui->actionEnable_Mining->setChecked(app->get_mining_intensity() != 0);
   _addressbook = profile->get_addressbook();

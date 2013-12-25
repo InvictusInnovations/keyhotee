@@ -41,7 +41,7 @@ void LoginDialog::onLogin()
   }
   catch (const fc::exception& e)
   {
-    wlog("error ${w}", ("w", e.to_detail_string()) );
+    elog("error ${w}", ("w", e.to_detail_string()) );
   }
   ui->password->setText(QString());
   shake();

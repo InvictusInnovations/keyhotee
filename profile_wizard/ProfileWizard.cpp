@@ -207,16 +207,16 @@ void ProfileWizard::createProfile(int result)
   if (_profile_edit->isComplete() )
   {
     bts::profile_config conf;
-    conf.firstname  = _profile_edit->ui.first_name->text().toStdString();
+    conf.firstname  = _profile_edit->ui.first_name->text().toUtf8().constData();
     conf.firstname  = fc::trim( conf.firstname );
-    conf.middlename = _profile_edit->ui.middle_name->text().toStdString();
+    conf.middlename = _profile_edit->ui.middle_name->text().toUtf8().constData();
     conf.middlename = fc::trim( conf.middlename );
-    conf.lastname   = _profile_edit->ui.last_name->text().toStdString();
+    conf.lastname   = _profile_edit->ui.last_name->text().toUtf8().constData();
     conf.lastname   = fc::trim( conf.lastname );
-    conf.brainkey   = _profile_edit->ui.brainkey->text().toStdString();
+    conf.brainkey   = _profile_edit->ui.brainkey->text().toUtf8().constData();
     conf.brainkey   = fc::trim( conf.brainkey );
 
-    std::string                      password = _profile_edit->ui.local_password1->text().toStdString();
+    std::string                      password = _profile_edit->ui.local_password1->text().toUtf8().constData();
 
     std::string profile_name         = conf.firstname + " " + conf.lastname;
     auto                             app = bts::application::instance();
