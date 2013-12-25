@@ -108,6 +108,13 @@ TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv)
   s_Instance = this;
 
   _backend_app = bts::application::instance();
+
+  /// \warning use stdwstring to avoid problems related to paths containing native chars.
+  auto str_data_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdWString();
+  
+  boost::filesystem::path data_dir(str_data_dir);
+  fc::path profile_dir( data_dir / "profiles" );
+  _backend_app->set_profile_directory( profile_dir );
 }
 
 TKeyhoteeApplication::~TKeyhoteeApplication()
@@ -130,16 +137,16 @@ int TKeyhoteeApplication::run()
     setOrganizationName("Invictus Innovations, Inc");
     setApplicationName(APP_NAME);
 
-    fc::async( [ = ](){ startup(); }
-              );
+    startup();
 
-    connect(this, &QApplication::aboutToQuit, [ = ](){ bts::application::instance()->quit(); }
-                  );
+    connect(this, &QApplication::aboutToQuit, [=](){ bts::application::instance()->quit(); });
 
     QTimer fc_exec;
-    QObject::connect(&fc_exec, &QTimer::timeout, [] () { fc::usleep(fc::microseconds(30 * 1000) ); }
-                      );
-    fc_exec.start(5);
+    QObject::connect(&fc_exec, &QTimer::timeout, 
+                     [](){ fc::usleep(fc::microseconds(30 * 1000) ); }
+                    );
+    fc_exec.start(30);
+
     /// increment any QT specific status by last our one to avoid conflicts.
     _exit_status = LAST_EXIT_STATUS + (unsigned int)exec();
   }
@@ -158,6 +165,7 @@ int TKeyhoteeApplication::run()
 
 void TKeyhoteeApplication::displayLogin()
 {
+  ilog( "." );
   LoginDialog* loginDialog = new LoginDialog();
   loginDialog->connect(loginDialog, &QDialog::accepted,
     [ = ]()
@@ -172,6 +180,7 @@ void TKeyhoteeApplication::displayLogin()
 
 void TKeyhoteeApplication::displayProfileWizard()
 {
+  ilog( "." );
   auto profile_wizard = new ProfileWizard(*this);
   profile_wizard->resize(QSize(680, 600) );
   profile_wizard->show();
@@ -219,18 +228,15 @@ bts::application_config TKeyhoteeApplication::loadConfig()
 {
   try 
   {
-    /// \warning use stdwstring to avoid problems related to paths containing native chars.
-    auto strDataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdWString();
-    boost::filesystem::path dataDir(strDataDir);
-    boost::filesystem::path profileDataDir(dataDir / _loaded_profile_name);
-    fc::path profileDir(profileDataDir);
-    fc::create_directories(profileDir);
-    auto config_file = profileDir / "config.json";
+     /*
+    fc::create_directories(profile_dir);
+    auto config_file = profile_dir / "config.json";
+
     ilog("config_file: ${file}", ("file", config_file) );
     if (fc::exists(config_file) == false)
     {
       bts::application_config default_cfg;
-      default_cfg.data_dir = profileDir / "data";
+      default_cfg.data_dir = profile_dir / "data";
       default_cfg.network_port = 0;
       default_cfg.rpc_config.port = 0;
       default_cfg.default_nodes.push_back( fc::ip::endpoint( std::string("162.243.67.4"), 9876 ) );
@@ -242,6 +248,8 @@ bts::application_config TKeyhoteeApplication::loadConfig()
     auto app_config = fc::json::from_file(config_file).as<bts::application_config>();
     fc::ofstream out(config_file);
     out << fc::json::to_pretty_string(app_config);
+    */
+     bts::application_config app_config;
     return app_config;
   }
   FC_RETHROW_EXCEPTIONS(warn, "") 
@@ -249,8 +257,15 @@ bts::application_config TKeyhoteeApplication::loadConfig()
 
 void TKeyhoteeApplication::startup()
 {
+  ilog( "." );
   _exit_status = TExitStatus::LOAD_CONFIG_FAILURE;
 
+  if(_backend_app->has_profile() )
+    displayLogin();
+  else
+    displayProfileWizard();
+
+  /*
   try 
   {
     auto app_config = loadConfig();
@@ -275,11 +290,8 @@ void TKeyhoteeApplication::startup()
 
     return;
   }
+  */
 
-  if(_backend_app->has_profile() )
-    displayLogin();
-  else
-    displayProfileWizard();
 }
 
 void TKeyhoteeApplication::linuxSignalHandler(int)
