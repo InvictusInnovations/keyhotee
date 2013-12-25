@@ -62,40 +62,48 @@
        <height>32</height>
       </size>
      </property>
-     <widget class="QWidget" name="toolbar_container" native="true">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>471</width>
-        <height>32</height>
-       </rect>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <property name="leftMargin">
+       <number>0</number>
       </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+      <property name="topMargin">
+       <number>0</number>
       </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>32</height>
-       </size>
+      <property name="rightMargin">
+       <number>0</number>
       </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>32</height>
-       </size>
+      <property name="bottomMargin">
+       <number>0</number>
       </property>
-      <property name="autoFillBackground">
-       <bool>true</bool>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QWidget { background=qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255)) }</string>
-      </property>
-     </widget>
+      <item row="0" column="0">
+       <widget class="QWidget" name="toolbar_container" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QWidget { background=qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255)) }</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="1" column="0">
@@ -214,7 +222,7 @@
             <widget class="QLineEdit" name="firstname">
              <property name="font">
               <font>
-               <pointsize>8</pointsize>
+               <pointsize>13</pointsize>
                <weight>50</weight>
                <bold>false</bold>
               </font>
@@ -241,7 +249,7 @@
             <widget class="QLineEdit" name="lastname">
              <property name="font">
               <font>
-               <pointsize>8</pointsize>
+               <pointsize>13</pointsize>
                <weight>50</weight>
                <bold>false</bold>
               </font>
@@ -351,7 +359,16 @@
             </widget>
            </item>
            <item row="3" column="2" colspan="2">
-            <widget class="LineEditReadOnly" name="public_key"/>
+            <widget class="LineEditReadOnly" name="public_key">
+             <property name="font">
+              <font>
+               <family>Andale Mono</family>
+               <pointsize>10</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+            </widget>
            </item>
            <item row="3" column="4">
             <widget class="QToolButton" name="public_key_to_clipboard">
@@ -500,9 +517,7 @@
           <zorder>last_name_label</zorder>
           <zorder>public_key_to_clipboard</zorder>
           <zorder>icon_view</zorder>
-          <zorder>id_edit</zorder>
           <zorder>id_status</zorder>
-          <zorder>keyhotee_founder</zorder>
          </widget>
         </widget>
        </item>
