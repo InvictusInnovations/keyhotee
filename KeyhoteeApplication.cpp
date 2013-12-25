@@ -200,8 +200,8 @@ void TKeyhoteeApplication::displayFailureInfo(const std::string& detail)
 {
   elog("${e}", ("e", detail ) );
   _exit_status = TExitStatus::INTERNAL_ERROR;
-  QMessageBox::critical(nullptr, tr("Application internal error"),
-    tr("Application encountered internal error.\nError details: ") + QString(detail.c_str()));
+  elog("fatal error ${e}",("e",detail));
+  _main_window->displayDiagnosticLog();
   quit();
 }
 
