@@ -68,7 +68,7 @@ void NewIdentityDialog::onSave()
 
     std::string dac_id_string = ident.wallet_ident;
     bts::addressbook::wallet_contact myself;
-    myself.wallet_index = 0;
+    myself.wallet_index = WALLET_INVALID_INDEX;
     myself.first_name = ident.first_name;
     myself.last_name = ident.last_name;
     myself.set_dac_id(ident.wallet_ident);
