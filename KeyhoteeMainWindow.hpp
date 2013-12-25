@@ -76,6 +76,7 @@ public:
   void openSent(int message_id);
   virtual bool canContinue() const;
 
+  AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 protected:
   virtual void closeEvent(QCloseEvent *);
 
@@ -135,7 +136,6 @@ private slots:
 
   void onCanceledNewContact();
   void onSavedNewContact();
-
 private:
   void addressBookDataChanged(const QModelIndex& top_left, const QModelIndex& bottom_right,
                               const QVector<int>& roles);

@@ -57,6 +57,8 @@ public:
 
   QCompleter* getContactCompleter();
 
+  void reloadContacts();
+
 private:
   std::unique_ptr<Detail::AddressBookModelImpl> my;
 };

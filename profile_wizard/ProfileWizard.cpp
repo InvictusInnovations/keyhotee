@@ -2,6 +2,7 @@
 #include "ProfileWizard.hpp"
 #include <ui_ProfileEditPage.h>
 #include <ui_ProfileIntroPage.h>
+#include <QProgressBar>
 //#include <ui_ProfileNymPage.h>
 
 #include <QStandardPaths>
@@ -220,7 +221,23 @@ void ProfileWizard::createProfile(int result)
 
     std::string profile_name         = conf.firstname + " " + conf.lastname;
     auto                             app = bts::application::instance();
-    auto                             profile = app->create_profile(profile_name, conf, password);
+    fc::thread* main_thread = &fc::thread::current();
+    QProgressBar* progress = new QProgressBar();
+    progress->setWindowTitle( "Creating Profile" );
+    progress->setMaximum(1000);
+    progress->resize( 640, 20 );
+    progress->show();
+    auto                             profile = app->create_profile(profile_name, conf, password, 
+                                               [=]( double p )
+                                               {
+                                                  main_thread->async( [=](){ 
+                                                                      progress->setValue( 1000*p );
+                                                                      qApp->sendPostedEvents();
+                                                                      qApp->processEvents();
+                                                                      if( p >= 1.0 ) progress->deleteLater();
+                                                                      } ).wait();
+                                               }
+                                               );
     assert(profile != nullptr);
 
     //store myself as contact

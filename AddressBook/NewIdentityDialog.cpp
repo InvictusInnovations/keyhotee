@@ -5,6 +5,10 @@
 #include <QPushButton>
 #include <bts/addressbook/contact.hpp>
 
+#include "KeyhoteeApplication.hpp"
+#include "KeyhoteeMainWindow.hpp"
+#include "AddressBookModel.hpp"
+
 NewIdentityDialog::NewIdentityDialog( QWidget* parent_widget )
 :QDialog(parent_widget),ui( new Ui::NewIdentityDialog() )
 {
@@ -51,12 +55,28 @@ void NewIdentityDialog::onUserNameChanged( const QString& name )
 
 void NewIdentityDialog::onSave()
 {
-   auto trim_name = fc::trim(ui->username->text().toUtf8().constData());
-   bts::addressbook::wallet_identity ident;
-   ident.first_name = fc::trim( ui->firstname->text().toUtf8().constData() );
-   ident.last_name = fc::trim( ui->lastname->text().toUtf8().constData() );
-   ident.mining_effort = ui->register_checkbox->isChecked();
-   ident.wallet_ident = fc::trim( ui->username->text().toUtf8().constData() );
-   ident.set_dac_id( ident.wallet_ident );
-   bts::application::instance()->get_profile()->store_identity( ident );
+    auto trim_name = fc::trim(ui->username->text().toUtf8().constData());
+    bts::addressbook::wallet_identity ident;
+    ident.first_name = fc::trim( ui->firstname->text().toUtf8().constData() );
+    ident.last_name = fc::trim( ui->lastname->text().toUtf8().constData() );
+    ident.mining_effort = ui->register_checkbox->isChecked();
+    ident.wallet_ident = fc::trim( ui->username->text().toUtf8().constData() );
+    ident.set_dac_id( ident.wallet_ident );
+    auto profile = bts::application::instance()->get_profile();
+    profile->store_identity( ident );
+
+
+    std::string dac_id_string = ident.wallet_ident;
+    bts::addressbook::wallet_contact myself;
+    myself.wallet_index = 0;
+    myself.first_name = ident.first_name;
+    myself.last_name = ident.last_name;
+    myself.set_dac_id(ident.wallet_ident);
+    auto priv_key = profile->get_keychain().get_identity_key(myself.dac_id_string);
+    myself.public_key = priv_key.get_public_key();
+//    profile->get_addressbook()->store_contact(Contact(myself));
+
+    bts::application::instance()->add_receive_key(priv_key);
+
+    TKeyhoteeApplication::getInstance()->getMainWindow()->getAddressBookModel()->storeContact( Contact(myself) );
 }
