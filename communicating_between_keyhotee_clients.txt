@@ -18,10 +18,10 @@
 
 * Run a second copy of keyhotee and create a new identity. I typically call this identity "second".
 * Shut down keyhotee (don't bother mining either identity yet).
-* On windows, launch an explorer window and go to "C:\Users\Administrator\AppData\Local\KeyhoteeD\" (or Keyhotee if you build release version I guess, the "D" here is for debug). You can get close to this directory by going to %appdata%. This directory stores your profile directories. You should see a default profile and a second profile directory. 
+* On windows, launch an explorer window and go to "C:\Users\Administrator\AppData\Local\KeyhoteeD\profiles" (or Keyhotee if you build release version I guess, the "D" here is for debug). You can get close to this directory by going to %appdata%. This directory stores your profile directories. You should see a default profile and a second profile directory. 
 Go into the default directory and edit the config.json file. Change it to look like this:
 {
-  "data_dir": "C:/Users/Administrator/AppData/Local/KeyhoteeD/default/data",
+  "data_dir": "C:/Users/Administrator/AppData/Local/KeyhoteeD/profiles/default/data",
   "network_port": 9876,
   "rpc_config": {
     "port": 9877,
@@ -36,7 +36,7 @@ This tells the default client to not hook up to the server and tells it to wait 
 
 Go into the second directory and edit the config.json file. Change it to look like this:
 {
-  "data_dir": "C:/Users/Administrator/AppData/Local/KeyhoteeD/second/data",
+  "data_dir": "C:/Users/Administrator/AppData/Local/KeyhoteeD/profiles/second/data",
   "network_port": 10876,
   "rpc_config": {
     "port": 10877,
@@ -51,8 +51,8 @@ Go into the second directory and edit the config.json file. Change it to look li
 This tells the second client to hook up to the local default client on 9876.
 
 * Delete blockchain directories that your clients received from the remote server: 
-       delete C:\Users\Administrator\AppData\Local\KeyhoteeD\default\data\bitname\bitname\channel
-       delete C:\Users\Administrator\AppData\Local\KeyhoteeD\second\data\bitname\bitname\channel
+       delete C:\Users\Administrator\AppData\Local\KeyhoteeD\profiles\default\data\bitname\bitname\channel
+       delete C:\Users\Administrator\AppData\Local\KeyhoteeD\profiles\second\data\bitname\bitname\channel
   Note: If you don't do this step, your clients probably won't sync up a block chain, since they may get slightly different block chains (because you
         or someone else might mine on the server during the interval between connection of each of your clients to the server). If they don't sync
 		up, you won't be able to send msgs or email. So long story short: safest to delete these directories and start with a clean block chain.
