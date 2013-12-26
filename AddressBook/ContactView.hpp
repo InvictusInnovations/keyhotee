@@ -32,6 +32,7 @@ public:
   void onCancel();
   void onShareContact();
   void onRequestContact();
+  void onInfo();
 
   void onPublicKeyToClipboard();
   void lookupId();
@@ -86,6 +87,8 @@ private slots:
     {
     setModyfied();
     }
+
+  void currentTabChanged(int index);
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event);

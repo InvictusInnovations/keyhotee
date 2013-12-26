@@ -26,6 +26,7 @@ public:
   bool checkSaving() const;
   void selectRow(int index);
   void selectChat();
+  void contactRemoved ();
 
 private:
   ContactView* getCurrentView() const;
