@@ -76,6 +76,10 @@ public:
   void openSent(int message_id);
   virtual bool canContinue() const;
 
+  void displayDiagnosticLog();
+
+
+  AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 protected:
   virtual void closeEvent(QCloseEvent *);
 
@@ -179,4 +183,4 @@ private:
   TMailProcessor                          MailProcessor;
 }; //KeyhoteeMainWindow
 
-KeyhoteeMainWindow* GetKeyhoteeWindow();
+KeyhoteeMainWindow* getKeyhoteeWindow();

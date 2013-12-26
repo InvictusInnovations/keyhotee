@@ -23,7 +23,7 @@ int main(int argc, char** argv)
   fprintf(stderr, "testing stderr\n");
 #endif
   
-  int exitCode = TKeyhoteeApplication::Run(argc, argv);
+  int exitCode = TKeyhoteeApplication::run(argc, argv);
 
 #ifdef WIN32
   fclose(stdout);
