@@ -3,22 +3,46 @@
 #include <QTemporaryFile>
 #include <QTextDocumentWriter>
 #include <QFileDialog>
+#include <QPushButton>
 
 extern QTemporaryFile gLogFile;
 
 DiagnosticDialog::DiagnosticDialog(QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent),_filename(""),
     ui(new Ui::DiagnosticDialog)
 {
     ui->setupUi(this);
     this->setWindowTitle("Diagnostic");
+
     QFile* log_file = new QFile(gLogFile.fileName());
     log_file->open(QIODevice::ReadWrite);
-
     QString log(log_file->readAll());
     log_file->close();
-    ui->textEdit->setPlainText(log);
-    ui->textEdit->show();
+
+    _vboxlayout = new QVBoxLayout(this);
+
+    _log_textedit  = new QTextEdit();
+    _log_textedit->setText(log);
+    _log_textedit->setReadOnly(true);
+
+    _buttonbox = new QDialogButtonBox();
+    _ok_button = new QPushButton(tr("&OK"));
+    _save_button = new QPushButton(tr("&Save"));
+
+    _buttonbox->addButton(_ok_button, QDialogButtonBox::AcceptRole);
+    _buttonbox->addButton(_save_button,QDialogButtonBox::ActionRole);
+    _ok_button->setAutoDefault(true);
+
+    QObject::connect(_ok_button, SIGNAL(clicked()),  this, SLOT(onOkButtonClicked()));
+    QObject::connect(_save_button, SIGNAL(clicked()),  this, SLOT(onSaveButtonClicked()));
+
+    _vboxlayout->addWidget(_log_textedit);
+    _vboxlayout->addWidget(_buttonbox);
+
+    connect(_ok_button, SIGNAL(clicked()),  this, SLOT(onOkButtonClicked));
+    connect(_save_button, SIGNAL(clicked()),  this, SLOT(onSaveButtonClicked));
+
+    setLayout(_vboxlayout);
 }
 
 DiagnosticDialog::~DiagnosticDialog()
@@ -26,18 +50,17 @@ DiagnosticDialog::~DiagnosticDialog()
     delete ui;
 }
 
-void DiagnosticDialog::on_buttonBox_clicked(QAbstractButton *button)
+void DiagnosticDialog::onOkButtonClicked()
 {
-    if (button->text() == "&OK")
-    {
         this->close();
         return;
-    }
-    else if(button->text() == "&Save")
-    if( fileName.isEmpty() )
-        fileName = QFileDialog::getSaveFileName( this, tr("Save Diagnostic"), "." ,tr("All Files (*)"));
+}
 
-    QTextDocumentWriter writer(fileName);
-    writer.write(ui->textEdit->document());
+void DiagnosticDialog::onSaveButtonClicked()
+{
+    if( _filename.isEmpty() )
+        _filename = QFileDialog::getSaveFileName( this, tr("Save Diagnostic"), "." ,tr("All Files (*)"));
 
+    QTextDocumentWriter writer(_filename);
+    writer.write(_log_textedit->document());
 }
