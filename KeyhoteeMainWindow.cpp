@@ -558,12 +558,16 @@ void KeyhoteeMainWindow::on_actionset_Icon_triggered()
   notSupported();
 }
 
+void KeyhoteeMainWindow::displayDiagnosticLog()
+{
+  DiagnosticDialog diagnoslic_dialog;
+  diagnoslic_dialog.setModal(true);
+  diagnoslic_dialog.exec();
+}
 // Menu Help
 void KeyhoteeMainWindow::on_actionDiagnostic_triggered()
 {
-    DiagnosticDialog diagnoslic_dialog;
-    diagnoslic_dialog.setModal(true);
-    diagnoslic_dialog.exec();
+  displayDiagnosticLog();
 }
 
 void KeyhoteeMainWindow::on_actionAbout_triggered()
