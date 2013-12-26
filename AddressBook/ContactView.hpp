@@ -89,6 +89,7 @@ private slots:
     }
 
   void currentTabChanged(int index);
+  void onSend ();
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event);

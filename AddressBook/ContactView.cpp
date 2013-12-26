@@ -152,6 +152,7 @@ ContactView::ContactView(QWidget* parent)
   connect(ui->phone, &QLineEdit::textChanged, this, &ContactView::phoneChanged);
   connect(ui->notes, &QPlainTextEdit::textChanged, this, &ContactView::notesChanged);
   connect(ui->public_key_to_clipboard, &QToolButton::clicked, this, &ContactView::onPublicKeyToClipboard);
+  connect(ui->sendButton, &QPushButton::clicked, this, &ContactView::onSend);
 
   connect(ui->contact_pages, &QTabWidget::currentChanged, this, &ContactView::currentTabChanged);
 
@@ -699,4 +700,9 @@ void ContactView::currentTabChanged(int index)
   {
   if (index == chat)
     onChat ();
+  }
+
+void ContactView::onSend ()
+  {
+  sendChatMessage();
   }
