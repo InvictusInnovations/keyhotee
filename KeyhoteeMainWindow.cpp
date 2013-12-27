@@ -794,7 +794,10 @@ void KeyhoteeMainWindow::enableMenu(bool enable)
 void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
 {
   if (checkSaving())
+  {
+    writeSettings();
     closeEvent->accept();
+  }
   else
     closeEvent->ignore();
 }
