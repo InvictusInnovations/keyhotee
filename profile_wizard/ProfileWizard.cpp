@@ -218,9 +218,13 @@ void ProfileWizard::createProfile(int result)
     conf.brainkey   = _profile_edit->ui.brainkey->text().toUtf8().constData();
     conf.brainkey   = fc::trim( conf.brainkey );
 
-    std::string                      password = _profile_edit->ui.local_password1->text().toUtf8().constData();
+    std::string password = _profile_edit->ui.local_password1->text().toUtf8().constData();
 
-    std::string profile_name         = conf.firstname + " " + conf.lastname;
+    //set profile name from first and last name
+    std::string profile_name = conf.firstname;
+    if (!conf.lastname.empty())
+      profile_name += " " + conf.lastname;
+
     auto                             app = bts::application::instance();
     fc::thread* main_thread = &fc::thread::current();
     QProgressBar* progress = new QProgressBar();
