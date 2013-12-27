@@ -1,5 +1,4 @@
-#ifndef __KEYHOTEEAPPLICATION_HPP
-#define __KEYHOTEEAPPLICATION_HPP
+#pragma once
 
 #include <bts/application.hpp>
 
@@ -16,35 +15,32 @@ class QTemporaryFile;
     This class also is responsible for temporary files management (removing them) created while
     opening attachement items.
 */
-class TKeyhoteeApplication : protected QApplication
-  {
+class TKeyhoteeApplication : public QApplication
+{
   Q_OBJECT
 
   public:
     /// Returns instance of the app - non-null when app object has been built (app is running).
-    static TKeyhoteeApplication* GetInstance();
+    static TKeyhoteeApplication* getInstance();
 
     /** Builds & starts the app.
         When this function completes it also destroys application object.
 
         Returned value is application exit status.
     */
-    static int  Run(int& argc, char** argv);
+    static int  run(int& argc, char** argv);
 
-    void        DisplayMainWindow();
-    void        Quit();
+    void        displayMainWindow();
+    void        quit();
 
     /// Gives access to the application name.
-    const char* GetAppName() const;
+    std::string getAppName() const;
     /// Returns selected (from command line) current profile to load.
-    const char* GetLoadedProfileName() const;
-    /// Tells if currently loaded profile is default one.
-    bool        IsDefaultProfileLoaded() const;
+    std::string getLoadedProfileName() const;
 
-    KeyhoteeMainWindow* GetMainWindow() const
-      {
-      return MainWindow;
-      }
+    KeyhoteeMainWindow* getMainWindow() const { return _main_window; }
+    void displayLogin();
+    void displayProfileWizard();
 
   private:
     enum TExitStatus
@@ -59,16 +55,16 @@ class TKeyhoteeApplication : protected QApplication
     TKeyhoteeApplication(int& argc, char** argv);
     virtual ~TKeyhoteeApplication();
 
-    int  Run();
-    void DisplayLogin();
-    void DisplayProfileWizard();
+    int  run();
 
-    void OnExceptionCaught(const fc::exception& e);
-    void OnUnknownExceptionCaught();
-    void DisplayFailureInfo(const std::string& detail);
+    void onExceptionCaught(const fc::exception& e);
+    void onUnknownExceptionCaught();
+    void displayFailureInfo(const std::string& detail);
 
-    bts::application_config LoadConfig();
-    void Startup();
+    bts::application_config loadConfig();
+    void startup();
+
+    static void linuxSignalHandler(int);
 
   /// Overrided from QApplication to catch all exceptions.
     virtual bool notify(QObject * receiver, QEvent * e) override;
@@ -77,15 +73,13 @@ class TKeyhoteeApplication : protected QApplication
   private:
     typedef std::vector<QTemporaryFile*> TTemporaryFileContainer;
 
-    TTemporaryFileContainer AllocatedTemps;
-    bts::application_ptr    BackendApp;
-    std::string             LoadedProfileName;
-    KeyhoteeMainWindow*     MainWindow;
-    ProfileWizard*          ProfWizard;
-    int                     ExitStatus;
-    bool                    DefaultProfileLoaded;
-  };
+    TTemporaryFileContainer _allocated_temps;
+    bts::application_ptr    _backend_app;
+    std::string             _loaded_profile_name;
+    KeyhoteeMainWindow*     _main_window;
+    ProfileWizard*          _profile_wizard;
+    int                     _exit_status;
+};
 
-#endif //__KEYHOTEEAPPLICATION_HPP
 
 

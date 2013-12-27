@@ -12,6 +12,7 @@ public:
 
   void onLogin();
   void onQuit();
+  void onNew();
   void shake();
 
   std::string                      password;

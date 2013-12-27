@@ -32,6 +32,7 @@ public:
   void onCancel();
   void onShareContact();
   void onRequestContact();
+  void onInfo();
 
   void onPublicKeyToClipboard();
   void lookupId();
@@ -87,6 +88,9 @@ private slots:
     setModyfied();
     }
 
+  void currentTabChanged(int index);
+  void onSend ();
+
 protected:
   bool eventFilter(QObject *obj, QEvent *event);
 
@@ -121,6 +125,7 @@ private:
   std::unique_ptr<Ui::ContactView>        ui;
   QToolBar*                               message_tools;
   QAction*                                send_mail;
+  QAction*                                chat_contact;
   QAction*                                save_contact;
   QAction*                                edit_contact;
   QAction*                                share_contact;

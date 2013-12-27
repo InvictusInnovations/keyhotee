@@ -62,6 +62,7 @@ public:
   void addContact();
   void showContacts();
   void onSidebarSelectionChanged();
+  void onSidebarDoubleClicked();
   void selectContactItem(QTreeWidgetItem* item);
   void selectIdentityItem(QTreeWidgetItem* item);
   void sideBarSplitterMoved(int pos, int index);
@@ -76,6 +77,10 @@ public:
   void openSent(int message_id);
   virtual bool canContinue() const;
 
+  void displayDiagnosticLog();
+
+
+  AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 protected:
   virtual void closeEvent(QCloseEvent *);
 
@@ -135,6 +140,7 @@ private slots:
 
   void onCanceledNewContact();
   void onSavedNewContact();
+  void onItemContactRemoved (QTreeWidgetItem&);
 
 private:
   void addressBookDataChanged(const QModelIndex& top_left, const QModelIndex& bottom_right,
@@ -178,4 +184,4 @@ private:
   TMailProcessor                          MailProcessor;
 }; //KeyhoteeMainWindow
 
-KeyhoteeMainWindow* GetKeyhoteeWindow();
+KeyhoteeMainWindow* getKeyhoteeWindow();

@@ -71,7 +71,7 @@ ELSE(WIN32)
   include_directories( ${BITSHARES_DIR}/vendor/qtmacextras/include )
 
   MESSAGE(status "Compiling on UNIX")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -Wno-unused-local-typedefs -fmax-errors=3 ")#-msse4.2" ) 
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fnon-call-exceptions -std=c++0x -Wall -Wno-unused-local-typedefs -fmax-errors=3 ")#-msse4.2" ) 
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wno-unused-local-typedefs -fmax-errors=3 ") #-msse4.2" )
   #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -Wno-unused-local-typedefs" ) 
   #SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wno-unused-local-typedefs" )
@@ -117,6 +117,8 @@ qt5_wrap_ui( profile_wizard/UiNymPage          profile_wizard/ProfileNymPage.ui 
 qt5_wrap_ui( UiLoginDialog                     LoginDialog.ui )
 qt5_wrap_ui( UiConnectionStatusFrame           connectionstatusframe.ui )
 qt5_wrap_ui( UiKeyhoteeMainWindow              KeyhoteeMainWindow.ui )
+qt5_wrap_ui( Uidiagnosticdialog                diagnosticdialog.ui )
+qt5_wrap_ui( UiNewIdentityDialog               AddressBook/NewIdentityDialog.ui )
 qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
 qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
 qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
@@ -146,6 +148,9 @@ set( sources
         profile_wizard/ProfileNymPage.ui
         profile_wizard/ProfileWizard.cpp
 
+        AddressBook/NewIdentityDialog.ui
+        AddressBook/NewIdentityDialog.hpp
+        AddressBook/NewIdentityDialog.cpp
         AddressBook/ContactsTable.ui
         AddressBook/ContactsTable.hpp
         AddressBook/ContactsTable.cpp
@@ -202,6 +207,11 @@ set( sources
         KeyhoteeMainWindow.ui
         KeyhoteeMainWindow.hpp
         KeyhoteeMainWindow.cpp
+
+        diagnosticdialog.ui
+        diagnosticdialog.h
+        diagnosticdialog.cpp
+
 
         connectionstatusframe.ui
         connectionstatusframe.h
