@@ -121,7 +121,7 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
   }
 
 KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
-  SelfSizingMainWindow(),
+  ATopLevelWindowsContainer(),
   MailProcessor(*this, bts::application::instance()->get_profile())
   {
   ui.reset(new Ui::KeyhoteeMainWindow() );
@@ -252,9 +252,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   ui->contacts_page->setAddressBook(_addressbook_model);
   ui->new_contact->setAddressBook(_addressbook_model);
-  ui->inbox_page->setModel(MailProcessor, _inbox_model, Mailbox::Inbox);
-  ui->draft_box_page->setModel(MailProcessor, _draft_model, Mailbox::Drafts);
-  ui->sent_box_page->setModel(MailProcessor, _sent_model, Mailbox::Sent);
+  ui->inbox_page->initial(MailProcessor, _inbox_model, Mailbox::Inbox, this);
+  ui->draft_box_page->initial(MailProcessor, _draft_model, Mailbox::Drafts, this);
+  ui->sent_box_page->initial(MailProcessor, _sent_model, Mailbox::Sent, this);
 
   ui->widget_stack->setCurrentWidget(ui->inbox_page);
   connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
@@ -304,6 +304,11 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   settings_file.append(mainApp.GetLoadedProfileName());
   setSettingsFile(settings_file);
   readSettings();
+
+  QAction* actionMenu = new QAction(tr("Keyhotee"), this);
+  actionMenu->setCheckable(true);
+  this->setMenuWindow(ui->menuWindow);
+  this->registration(actionMenu);
   }
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
@@ -794,7 +799,10 @@ void KeyhoteeMainWindow::enableMenu(bool enable)
 void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
   {
   if (checkSaving())
+    {
     closeEvent->accept();
+    ATopLevelWindowsContainer::closeEvent(closeEvent);
+    }
   else
     closeEvent->ignore();
   }
