@@ -266,8 +266,26 @@ void Mailbox::refreshMessageViewer()
     QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
     QModelIndex sourceModelIndex = model->mapToSource(indexes[0]);
     MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
-	ui->mail_viewer->setCurrentWidget(ui->current_message);
+    ui->mail_viewer->setCurrentWidget(ui->current_message);
     ui->current_message->displayMailMessage(sourceModelIndex, sourceModel);
+    }
+  }
+
+void Mailbox::removeMessage(const IMailProcessor::TStoredMailMessage& msg)
+  {
+  QItemSelectionModel* selectionModel = ui->inbox_table->selectionModel();
+  QModelIndexList indexes = selectionModel->selectedRows();
+
+  QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+  QModelIndex selectedModelIndex = model->mapToSource(indexes[0]);
+  MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
+
+  QModelIndex foundModelIndex = sourceModel->findModelIndex(msg);
+  if(foundModelIndex.isValid())
+    {
+    QModelIndex proxyModelIndex = model->mapFromSource(foundModelIndex);
+    assert(proxyModelIndex.isValid());
+    model->removeRow(proxyModelIndex.row());
     }
   }
 

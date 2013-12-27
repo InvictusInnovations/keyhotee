@@ -108,7 +108,7 @@ TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv)
 
   _backend_app = bts::application::instance();
 
-  /// \warning use stdwstring to avoid problems related to paths containing native chars.
+  /// \warning use std::wstring to avoid problems related to paths containing native chars.
   auto str_data_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdWString();
   
   boost::filesystem::path data_dir(str_data_dir);

@@ -333,6 +333,20 @@ void MailboxModel::markMessageAsRead(const QModelIndex& index)
   my->_mail_db->store_message_header(msg.header);
   }
 
+QModelIndex MailboxModel::findModelIndex(const TStoredMailMessage& msg) const
+  {
+  int row = 0;
+  for(const auto& hdr : my->_headers)
+    {
+    if(hdr.header.digest == msg.digest)
+      {
+      /// Replace complete - return.
+      return index(row, 0);
+      }
+    ++row;
+    }
+  }
+
 void MailboxModel::getMessageData(const QModelIndex& index,
   IMailProcessor::TStoredMailMessage* encodedMsg, IMailProcessor::TPhysicalMailMessage* decodedMsg)
   {

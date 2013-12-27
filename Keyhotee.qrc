@@ -50,7 +50,6 @@
         <file>images/16x16/no_connectionstatus.png</file>
         <file>images/ownership.png</file>
         <file>images/blank.png</file>
-      <!-- Icons provided by http://findicons.com/pack/77/icandy_junior_toolbar -->
         <file>images/128x128/contact_info_request_authorisation.png</file>
         <file>images/128x128/contact_info_send_mail.png</file>
         <file>images/128x128/contact_info_edit.png</file>
@@ -58,12 +57,11 @@
         <file>images/128x128/contact_info_cancel_edit.png</file>
         <file>images/128x128/undo.png</file>
         <file>images/128x128/redo.png</file>
-      <!-- End of icons provided by http://findicons.com/pack/77/icandy_junior_toolbar -->
-
-      <!-- Icons provided by: http://findicons.com/pack/1995/web_application -->
         <file>images/48x48/attachment_add.png</file>
         <file>images/48x48/attachment_remove.png</file>
         <file>images/48x48/attachment_save.png</file>
-      <!-- End of icons provided by: http://findicons.com/pack/1995/web_application -->
+        <file>images/outbox.png</file>
+        <file>images/drafts.png</file>
+        <file>images/128x128/sent_items.png</file>
     </qresource>
 </RCC>

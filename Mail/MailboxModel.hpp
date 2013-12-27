@@ -45,7 +45,7 @@ public:
   void replaceMessage(const TStoredMailMessage& overwrittenMsg, const TStoredMailMessage& msg);
   void getFullMessage(const QModelIndex& index, MessageHeader& header) const;
   void markMessageAsRead(const QModelIndex& index);
-
+  QModelIndex findModelIndex(const TStoredMailMessage& msg) const;
   /** Allows to retrieve given message data in encoded & decoded from.
       Encoded form (the message_header) is needed to retrieve sender for example.
       Decoded message contains all others attributes.

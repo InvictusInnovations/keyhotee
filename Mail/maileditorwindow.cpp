@@ -402,7 +402,7 @@ void MailEditorMainWindow::on_actionSend_triggered()
   if(prepareMailMessage(&msg))
     {
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Send(senderId, msg);
+    MailProcessor.Send(senderId, msg, DraftMessageInfo.second ? &DraftMessageInfo.first : nullptr);
     /// Clear potential modified flag to avoid asking for saving changes.
     ui->messageEdit->document()->setModified(false);
     close();

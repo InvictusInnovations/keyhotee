@@ -1,9 +1,9 @@
 #include <QWidget>
-#include <memory>
 
 namespace Ui { class Mailbox; }
 
-class IMailProcessor;
+#include "ch/mailprocessor.hpp"
+
 class MailboxModel;
 
 class QAbstractItemModel;
@@ -18,6 +18,7 @@ public:
     {
     Inbox,
     Drafts,
+    Outbox,
     Sent
     };
 
@@ -30,6 +31,7 @@ public:
   bool isShowDetailsHidden();
   /// Allows to explicitly reread currently displayed message in the preview pane.
   void refreshMessageViewer();
+  void removeMessage(const IMailProcessor::TStoredMailMessage& msg);
 
 private slots:
   void onDoubleClickedItem(QModelIndex);

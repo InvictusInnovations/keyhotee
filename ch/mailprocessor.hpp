@@ -43,7 +43,9 @@ class IMailProcessor
     class IUpdateSink
       {
       public:
-        typedef IMailProcessor::TStoredMailMessage TStoredMailMessage;
+        typedef IMailProcessor::TPhysicalMailMessage TPhysicalMailMessage;
+        typedef IMailProcessor::TRecipientPublicKey  TRecipientPublicKey;
+        typedef IMailProcessor::TStoredMailMessage   TStoredMailMessage;
 
       /// Saving Drafts operation group:
         /// Notifies about start of message save operation
@@ -58,8 +60,13 @@ class IMailProcessor
       /// Message Outbox queuing operation group:
         /// Notifies about starting queing process for given number of messages.
         virtual void OnMessageGroupPending(unsigned int count) = 0;
-        /// Notifies about queuing a message in the outbox folder.
-        virtual void OnMessagePending(const TStoredMailMessage& msg) = 0;
+        /** Notifies about queuing a message in the outbox folder.
+            \param msg - message just stored in pending folder,
+            \param savedDraftMsg - optional (can be nullptr) draft message. If not null, it means that
+                         such draft message will be removed from Draft folder in a while.
+        */
+        virtual void OnMessagePending(const TStoredMailMessage& msg,
+          const TStoredMailMessage* savedDraftMsg) = 0;
         /// Notification about message queuing finished.
         virtual void OnMessageGroupPendingEnd() = 0;
 
@@ -71,16 +78,24 @@ class IMailProcessor
           const TStoredMailMessage& sentMsg) = 0;
         /// Notifies about message sending end (empty quite).
         virtual void OnMessageSendingEnd() = 0;
+        /** Called when there is no matching identity to specified sender PK. Implemented identity
+            management feature can lead to such state.
+        */
+        virtual void OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
+          const TPhysicalMailMessage& msg) = 0;
 
       protected:
         virtual ~IUpdateSink() {}
       };
     
     /** Allows to schedule given message send to the outbox queue.
-        \param senderId - identity to be used as sender
-        \param msg      - message to be sent.
+        \param senderId      - identity to be used as sender,
+        \param msg           - message to be sent,
+        \param savedDraftMsg - optional, should be passed not null if one of saved draft messages
+                               is about to send.
     */
-    virtual void Send(const TIdentity& senderId, const TPhysicalMailMessage& msg) = 0;
+    virtual void Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
+      const TStoredMailMessage* savedDraftMsg) = 0;
 
     /** Allows to save given message into Drafts folder in the backend storage.
         \param msgToOverwrite - optional (can be null). If specified given message will be first

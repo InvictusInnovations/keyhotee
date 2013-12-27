@@ -20,6 +20,7 @@ class AddressBookModel;
 class Contact;
 class ContactView;
 class InboxView;
+class Mailbox;
 class MailboxModel;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
@@ -97,7 +98,8 @@ private:
   /// \see IMessageProcessor::IUpdateSink interface description.
   virtual void OnMessageGroupPending(unsigned int count) override;
   /// \see IMessageProcessor::IUpdateSink interface description.
-  virtual void OnMessagePending(const TStoredMailMessage& msg) override;
+  virtual void OnMessagePending(const TStoredMailMessage& msg,
+    const TStoredMailMessage* savedDraftMsg) override;
   /// \see IMessageProcessor::IUpdateSink interface description.
   virtual void OnMessageGroupPendingEnd() override;
   /// \see IMessageProcessor::IUpdateSink interface description.
@@ -107,11 +109,16 @@ private:
     const TStoredMailMessage& sentMsg) override;
   /// \see IMessageProcessor::IUpdateSink interface description.
   virtual void OnMessageSendingEnd() override;
+  /// \see IMessageProcessor::IUpdateSink interface description.
+  virtual void OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
+    const TPhysicalMailMessage& msg) override;
 
   /// Only TKeyhoteeApplication can build main window object.
   friend class TKeyhoteeApplication;
   KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp);
   virtual ~KeyhoteeMainWindow();
+  /// Helper method to simplify onSidebarSelectionChanged code.
+  void activateMailboxPage(Mailbox* mailBox);
 
 private slots:
   // ---------- MenuBar
@@ -161,6 +168,7 @@ private:
   QTreeWidgetItem*                        _contacts_root;
   QTreeWidgetItem*                        _inbox_root;
   QTreeWidgetItem*                        _drafts_root;
+  QTreeWidgetItem*                        _out_box_root;
   QTreeWidgetItem*                        _sent_root;
   QTreeWidgetItem*                        _bitcoin_root;
   QTreeWidgetItem*                        _bitshares_root;
@@ -176,7 +184,7 @@ private:
   std::unordered_map<int, ContactGui>     _contact_guis;
 
   QLineEdit*                              _search_edit;
-  std::unique_ptr<Ui::KeyhoteeMainWindow> ui;
+  Ui::KeyhoteeMainWindow*                 ui;
   TConnectionStatusDS                     ConnectionStatusDS;
   TMailProcessor                          MailProcessor;
 }; //KeyhoteeMainWindow
