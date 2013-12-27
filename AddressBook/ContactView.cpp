@@ -152,6 +152,9 @@ ContactView::ContactView(QWidget* parent)
   connect(ui->phone, &QLineEdit::textChanged, this, &ContactView::phoneChanged);
   connect(ui->notes, &QPlainTextEdit::textChanged, this, &ContactView::notesChanged);
   connect(ui->public_key_to_clipboard, &QToolButton::clicked, this, &ContactView::onPublicKeyToClipboard);
+  connect(ui->sendButton, &QPushButton::clicked, this, &ContactView::onSend);
+
+  connect(ui->contact_pages, &QTabWidget::currentChanged, this, &ContactView::currentTabChanged);
 
   keyEdit(false);
   ui->chat_input->installEventFilter(this);
@@ -232,6 +235,11 @@ void ContactView::onCancel()
   {    
   }
 }
+
+void ContactView::onInfo()
+  {
+  ui->contact_pages->setCurrentIndex(info);
+  }
 
 void ContactView::onChat()
 {
@@ -685,5 +693,16 @@ void ContactView::setModyfied(bool modyfied)
   {
     _modyfied = modyfied;
     setEnabledSaveContact ();
+    }
   }
-}
+
+void ContactView::currentTabChanged(int index)
+  {
+  if (index == chat)
+    onChat ();
+  }
+
+void ContactView::onSend ()
+  {
+  sendChatMessage();
+  }

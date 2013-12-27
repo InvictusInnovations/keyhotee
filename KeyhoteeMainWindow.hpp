@@ -146,6 +146,8 @@ private slots:
 
   void onCanceledNewContact();
   void onSavedNewContact();
+  void onItemContactRemoved (QTreeWidgetItem&);
+
 private:
   void addressBookDataChanged(const QModelIndex& top_left, const QModelIndex& bottom_right,
                               const QVector<int>& roles);
