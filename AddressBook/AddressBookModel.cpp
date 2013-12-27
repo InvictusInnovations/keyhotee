@@ -264,13 +264,13 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
   QModelIndex completionIndex;
   if (contact_to_store.wallet_index == WALLET_INVALID_INDEX)
   {
-    auto                 num_contacts = my->_contacts.size();
+    auto num_contacts = my->_contacts.size();
     beginInsertRows(QModelIndex(), num_contacts, num_contacts);
     my->_contacts.push_back(contact_to_store);
     my->_contacts.back().wallet_index = my->_contacts.size() - 1;
     endInsertRows();
     //update completion model with new contact dac_id and fullname
-    int                  row_count = my->_contact_completion_model.rowCount();
+    int row_count = my->_contact_completion_model.rowCount();
     my->_contact_completion_model.insertRows(row_count, 2);
     completionIndex = my->_contact_completion_model.index(row_count);
     my->_contact_completion_model.setData(completionIndex, contact_to_store.dac_id_string.c_str());
