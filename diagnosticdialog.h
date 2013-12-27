@@ -3,6 +3,9 @@
 
 #include <QAbstractButton>
 #include <QDialog>
+#include <QTextEdit>
+#include <QDialogButtonBox>
+#include <QVBoxLayout>
 
 namespace Ui {
 class DiagnosticDialog;
@@ -18,11 +21,19 @@ public:
 
 private slots:
 
-    void on_buttonBox_clicked(QAbstractButton *button);
+    void onOkButtonClicked();
+    void onSaveButtonClicked();
 
 private:
-    QString fileName;
-    Ui::DiagnosticDialog *ui;
+    QTextEdit*          _log_textedit;
+    QDialogButtonBox*      _buttonbox;
+    QVBoxLayout*          _vboxlayout;
+    QPushButton*           _ok_button;
+    QPushButton*         _save_button;
+
+
+    QString                 _filename;
+    Ui::DiagnosticDialog          *ui;
 };
 
 #endif // DIAGNOSTICDIALOG_H

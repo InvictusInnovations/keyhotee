@@ -196,3 +196,9 @@ void ContactsTable::selectChat()
     if (!currentView->isAddingNewContact ())
       currentView->onChat ();
   }
+
+void ContactsTable::contactRemoved()
+  {
+  if (ContactView * currentView = getCurrentView ())
+      currentView->onInfo ();
+  }

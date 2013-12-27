@@ -49,24 +49,6 @@ enum TopLevelItemIndexes
   Space3,
   Contacts
 };
-enum MailboxChildren
-{
-  Inbox,
-  Drafts,
-  Sent
-};
-enum SidebarItemTypes
-{
-  IdentityItem = 2,
-  MailboxItem = 3,
-  ContactItem = 4
-};
-enum WalletsChildren
-{
-  Bitcoin,
-  BitShares,
-  Litecoin
-};
 
 void ContactGui::setUnreadMsgCount(unsigned int count)
 {
@@ -95,7 +77,8 @@ void ContactGui::updateTreeItemDisplay()
   else
     display_text = name;
   _tree_item->setText(0, display_text);
-}
+  _tree_item->setHidden (false);
+  }
 
 QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer)
 {
@@ -201,8 +184,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   connect(ui->actionAbout, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionAbout_triggered);
 
   connect(ui->splitter, &QSplitter::splitterMoved, this, &KeyhoteeMainWindow::sideBarSplitterMoved);
-  connect(ui->side_bar, &QTreeWidget::itemSelectionChanged, this, &KeyhoteeMainWindow::onSidebarSelectionChanged);
-  connect(ui->side_bar, &QTreeWidget::itemDoubleClicked, this, &KeyhoteeMainWindow::onSidebarDoubleClicked);
+  connect(ui->side_bar, &TreeWidgetCustom::itemSelectionChanged, this, &KeyhoteeMainWindow::onSidebarSelectionChanged);
+  connect(ui->side_bar, &TreeWidgetCustom::itemDoubleClicked, this, &KeyhoteeMainWindow::onSidebarDoubleClicked);
+  connect(ui->side_bar, &TreeWidgetCustom::itemContactRemoved, this, &KeyhoteeMainWindow::onItemContactRemoved);
 
   //connect( _search_edit, SIGNAL(textChanged(QString)), this, SLOT(searchEditChanged(QString)) );
   connect(_search_edit, &QLineEdit::textChanged, this, &KeyhoteeMainWindow::searchEditChanged);
@@ -823,6 +807,12 @@ bool KeyhoteeMainWindow::checkSaving() const
 }
 
 bool KeyhoteeMainWindow::canContinue() const
-{
+  {
   return checkSaving();
-}
+  }
+
+void KeyhoteeMainWindow::onItemContactRemoved (QTreeWidgetItem& itemContact)
+  {
+  itemContact.setHidden (true);
+  ui->contacts_page->contactRemoved();
+  }
