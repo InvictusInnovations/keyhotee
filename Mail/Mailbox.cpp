@@ -55,7 +55,7 @@ void Mailbox::onDoubleClickedItem(QModelIndex index)
   sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
   MailEditorMainWindow* mailEditor = new MailEditorMainWindow(this,
     sourceModel->getAddressBookModel(), *_mailProcessor, _type == Drafts);
-  mailEditor->LoadMessage(encodedMsg, decodedMsg);
+  mailEditor->LoadMessage(encodedMsg, decodedMsg, MailEditorMainWindow::TLoadForm::Draft);
   mailEditor->show();
   }
 
@@ -187,9 +187,42 @@ QSortFilterProxyModel* Mailbox::sortedModel()
   return static_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
   }
 
-void Mailbox::duplicateMail(ReplyType reply_type)
+void Mailbox::duplicateMail(ReplyType replyType)
   {
-  QModelIndex   index = getSelectedMail();
+  QModelIndex index = getSelectedMail();
+  if(index.isValid() == false)
+    return;
+
+  QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+  QModelIndex sourceModelIndex = model->mapToSource(index);
+
+  IMailProcessor::TPhysicalMailMessage decodedMsg;
+  IMailProcessor::TStoredMailMessage encodedMsg;
+  _sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
+  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(this,
+    _sourceModel->getAddressBookModel(), *_mailProcessor, true);
+
+  MailEditorMainWindow::TLoadForm loadForm = MailEditorMainWindow::TLoadForm::Draft;
+
+  switch(replyType)
+    {
+    case ReplyType::forward:
+      loadForm = MailEditorMainWindow::TLoadForm::Forward;
+      break;
+    case ReplyType::reply_all:
+      loadForm = MailEditorMainWindow::TLoadForm::ReplyAll;
+      break;
+    case ReplyType::reply:
+      loadForm = MailEditorMainWindow::TLoadForm::Reply;
+      break;
+    default:
+      assert(false);
+    }
+
+  mailEditor->LoadMessage(encodedMsg, decodedMsg, loadForm);
+  mailEditor->show();
+
+#if 0
   if (index == QModelIndex())
     return;
   MessageHeader header;
@@ -226,6 +259,7 @@ void Mailbox::duplicateMail(ReplyType reply_type)
   msg_window->SetSubject(new_subject);
   //TODO set focus to top of window
   msg_window->setFocusAndShow();
+#endif
   }
 
 void Mailbox::onDeleteMail()

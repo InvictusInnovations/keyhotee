@@ -8,6 +8,7 @@ enum MailboxChildren
   {
   Inbox,
   Drafts,
+  Outbox,
   Sent
   };
 

@@ -52,28 +52,6 @@ enum TopLevelItemIndexes
   Contacts
 };
 
-enum MailboxChildren
-{
-  Inbox,
-  Drafts,
-  Outbox,
-  Sent
-};
-
-enum SidebarItemTypes
-{
-  IdentityItem = 2,
-  MailboxItem = 3,
-  ContactItem = 4
-};
-
-enum WalletsChildren
-{
-  Bitcoin,
-  BitShares,
-  Litecoin
-};
-
 void ContactGui::setUnreadMsgCount(unsigned int count)
 {
   _unread_msg_count = count;

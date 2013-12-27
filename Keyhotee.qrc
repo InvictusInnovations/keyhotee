@@ -63,5 +63,6 @@
         <file>images/outbox.png</file>
         <file>images/drafts.png</file>
         <file>images/128x128/sent_items.png</file>
+        <file>Mail/RepliedMailPattern.html</file>
     </qresource>
 </RCC>

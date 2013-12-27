@@ -6,6 +6,8 @@
 #include "mailfieldswidget.hpp"
 #include "moneyattachementwidget.hpp"
 
+#include <bts/profile.hpp>
+
 #include <QApplication>
 #include <QClipboard>
 #include <QCloseEvent>
@@ -16,6 +18,23 @@
 #include <QMimeData>
 #include <QToolBar>
 #include <QToolButton>
+
+namespace
+{
+typedef IMailProcessor::TRecipientPublicKey TRecipientPublicKey;
+
+class TRecipientPublicKeyLess
+  {
+  public:
+    bool operator()(const TRecipientPublicKey& pk1, const TRecipientPublicKey& pk2) const
+      {
+      return pk1.serialize() < pk2.serialize();
+      }
+  };
+
+typedef std::set<TRecipientPublicKey, TRecipientPublicKeyLess> TPublicKeyIndex;
+typedef std::pair<TPublicKeyIndex::iterator, bool>             TInsertInfo;
+} ///namespace
 
 MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel,
   IMailProcessor& mailProcessor, bool editMode) :
@@ -112,17 +131,40 @@ MailEditorMainWindow::~MailEditorMainWindow()
 void MailEditorMainWindow::SetRecipientList(const TRecipientPublicKeys& toList,
   const TRecipientPublicKeys& ccList, const TRecipientPublicKeys& bccList)
   {
-  MailFields->SetRecipientList(toList, ccList, bccList);
+  TRecipientPublicKey emptyKey;
+  MailFields->SetRecipientList(emptyKey, toList, ccList, bccList);
   }
 
 void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
-  const TPhysicalMailMessage& srcMsg)
+  const TPhysicalMailMessage& srcMsg, TLoadForm loadForm)
   {
-  DraftMessageInfo.first = srcMsgHeader;
-  DraftMessageInfo.second = true;
+  TPublicKeyIndex allRecipients, toRecipients;
+  TRecipientPublicKeys sourceToList, sourceCCList;
+  std::string subjectPrefix;
 
-  /// Now load source message contents into editor controls.
-  loadContents(srcMsgHeader.from_key, srcMsg);
+  switch(loadForm)
+    {
+    case TLoadForm::Draft:
+      DraftMessageInfo.first = srcMsgHeader;
+      DraftMessageInfo.second = true;
+      /// Now load source message contents into editor controls.
+      loadContents(srcMsgHeader.from_key, srcMsg);
+      break;
+    case TLoadForm::ReplyAll:
+      sourceToList = srcMsg.to_list;
+      sourceCCList = srcMsg.cc_list;
+    case TLoadForm::Reply:
+      MailFields->SetSubject(tr("Re: ") + QString(srcMsg.subject.c_str()));
+      transformRecipientList(srcMsgHeader.from_key, sourceToList, sourceCCList);
+      transformMailBody(srcMsgHeader, srcMsg);
+      break;
+    case TLoadForm::Forward:
+      MailFields->SetSubject(tr("FW: ") + QString(srcMsg.subject.c_str()));
+      FileAttachment->LoadAttachedFiles(srcMsg.attachments);
+      transformMailBody(srcMsgHeader, srcMsg);
+      break;
+    }
+
   }
 
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
@@ -250,6 +292,69 @@ void MailEditorMainWindow::loadContents(const TRecipientPublicKey& senderId,
   MailFields->LoadContents(senderId, srcMsg);
   FileAttachment->LoadAttachedFiles(srcMsg.attachments);
   ui->messageEdit->setText(QString(srcMsg.body.c_str()));
+  }
+
+void MailEditorMainWindow::transformRecipientList(const TRecipientPublicKey& senderId,
+  const TRecipientPublicKeys& sourceToList, const TRecipientPublicKeys& sourceCCList)
+  {
+  TPublicKeyIndex allRecipients, myIdentities;
+
+  TRecipientPublicKeys toRecipients, ccRecipients, empty;
+  toRecipients.reserve(sourceToList.size() + 1);
+  ccRecipients.reserve(sourceCCList.size());
+
+  /** First fill allRecipient index with own identities public keys, to avoid sending replied
+      message to myself
+  */
+  for(const auto& id : bts::get_profile()->identities())
+    {
+    const auto& pk = id.public_key;
+    assert(pk.valid());
+    TInsertInfo ii = allRecipients.insert(pk);
+    assert(ii.second && "Redundant identity public keys");
+    }
+
+  myIdentities = allRecipients;
+
+  TRecipientPublicKey newSenderId;
+
+  toRecipients.push_back(senderId);
+  for(const auto& recipient : sourceToList)
+    {
+    TInsertInfo ii = allRecipients.insert(recipient);
+    if(ii.second)
+      toRecipients.push_back(recipient);
+
+    if(newSenderId.valid() == false && myIdentities.find(recipient) != myIdentities.end())
+      newSenderId = recipient;
+    }
+
+  for(const auto& recipient : sourceCCList)
+    {
+    TInsertInfo ii = allRecipients.insert(recipient);
+    if(ii.second)
+      ccRecipients.push_back(recipient);
+    }
+
+  MailFields->SetRecipientList(newSenderId, toRecipients, ccRecipients, empty);
+  }
+
+void MailEditorMainWindow::transformMailBody(const TStoredMailMessage& msgHeader,
+  const TPhysicalMailMessage& srcMsg)
+  {
+  QFile htmlPattern(":/RepliedMailPattern.html");
+  if(htmlPattern.open(QFile::ReadOnly) == false)
+    {
+    /// If pattern cannot be loaded for some reason just load original text :-(
+    ui->messageEdit->setText(QString(srcMsg.body.c_str()));
+    return;
+    }
+
+  QByteArray contents = htmlPattern.readAll();
+  QString patternHtml(contents);
+
+  QTextDocument* doc = ui->messageEdit->document();
+  doc->setHtml(patternHtml);
   }
 
 void MailEditorMainWindow::toggleReadOnlyMode()
