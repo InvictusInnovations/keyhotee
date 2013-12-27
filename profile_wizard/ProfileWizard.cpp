@@ -3,6 +3,7 @@
 #include <ui_ProfileEditPage.h>
 #include <ui_ProfileIntroPage.h>
 #include <QProgressBar>
+#include <QDesktopWidget>
 //#include <ui_ProfileNymPage.h>
 
 #include <QStandardPaths>
@@ -227,6 +228,9 @@ void ProfileWizard::createProfile(int result)
     progress->setMaximum(1000);
     progress->resize( 640, 20 );
     progress->show();
+    int x=(qApp->desktop()->width() - progress->width())/2;
+    int y=(qApp->desktop()->height() - progress->height())/2;
+    progress->move(x,y);
     auto                             profile = app->create_profile(profile_name, conf, password, 
                                                [=]( double p )
                                                {
