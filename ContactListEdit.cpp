@@ -9,6 +9,8 @@
 #include <QScrollBar>
 #include <QPainter>
 #include <QTextBlock>
+#include <QMimeData>
+#include <QDebug>
 
 #include <fc/log/logger.hpp>
 #include <bts/profile.hpp>
@@ -375,3 +377,42 @@ void ContactListEdit::resizeEvent(QResizeEvent* resize_event)
   QTextEdit::resizeEvent(resize_event);
   }
 
+
+QMimeData *ContactListEdit::createMimeDataFromSelection() const
+  {
+  //QTextEdit::createMimeDataFromSelection();
+  QString       textMime;
+  QMimeData     *mimeData = new QMimeData ();
+  QTextCursor   cursor = textCursor();
+  int           posStart = cursor.selectionStart();
+  int           posEnd = cursor.selectionEnd();  
+  QTextBlock    block = this->document()->findBlock(posStart);
+  QTextBlock    endBlock = this->document()->findBlock(posEnd);
+  endBlock = endBlock.next();
+
+  while (block.isValid() && block != endBlock)
+    {
+    for (QTextBlock::iterator i = block.begin(); !i.atEnd(); ++i)
+      {
+      int position = i.fragment().position();
+      //qDebug() << i.fragment().position();
+      if (position >= posEnd) break;
+      if (position >= posStart)
+        {
+        QTextCharFormat format = i.fragment().charFormat();
+        bool isImage = format.isImageFormat();
+        if (isImage)
+          {            
+          //qDebug() << format.toImageFormat().name();
+          textMime += format.toImageFormat().name();
+          }
+        else
+          textMime += i.fragment().text();
+        }
+      }
+      block = block.next();
+    }
+
+  mimeData->setText(textMime);
+  return mimeData;
+  }
