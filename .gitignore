@@ -4,7 +4,9 @@
 *.txt~
 #out-of-source build
 build/
+#ignore sub directories
 bitshares/
+BitShares/
 # Compiled Object files
 *.slo
 *.lo
