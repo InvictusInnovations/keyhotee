@@ -130,7 +130,6 @@ ContactView::ContactView(QWidget* parent)
   font.setBold(true);
   font.setPointSize (16);
   label->setFont (font);
-  label_createContact->setFont (font);
 
   //ui->chat_conversation->setHtml( "<html><head></head><body>Hello World<br/></body></html>" );
   connect(save_contact, &QAction::triggered, this, &ContactView::onSave);

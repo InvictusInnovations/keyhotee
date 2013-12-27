@@ -48,6 +48,7 @@ protected:
   void keyPressEvent(QKeyEvent* key_event);
   void focusInEvent(QFocusEvent* focus_event);
   void resizeEvent(QResizeEvent* resize_event);
+  virtual QMimeData *createMimeDataFromSelection() const;
 
 public Q_SLOTS:
   void insertCompletion( const QString& completion, const bts::addressbook::contact& c);
