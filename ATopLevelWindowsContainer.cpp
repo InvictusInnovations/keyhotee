@@ -2,8 +2,8 @@
 
 #include <QMenu>
 #include <QKeyEvent>
-#include <Qshortcut>
-#include <QactionGroup>
+#include <qshortcut.h>
+#include <qactiongroup.h>
 
 ATopLevelWindowsContainer::ATopLevelWindowsContainer(QWidget *parent):
   SelfSizingMainWindow(parent)
