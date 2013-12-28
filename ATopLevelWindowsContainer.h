@@ -1,7 +1,7 @@
 #ifndef __ATOPLEVELWINDOWSCONTAINER_HPP
 #define __ATOPLEVELWINDOWSCONTAINER_HPP
 
-#include "qtreusable\selfsizingmainwindow.h"
+#include "qtreusable/selfsizingmainwindow.h"
 
 namespace Ui { class ATopLevelWindowsContainer; }
 
