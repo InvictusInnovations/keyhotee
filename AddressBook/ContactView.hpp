@@ -55,7 +55,7 @@ public:
 
 Q_SIGNALS:
   void canceledNewContact();
-  void savedNewContact();
+  void savedNewContact(int idxNewContact);
 
 private slots:
   void firstNameChanged(const QString& name);

@@ -138,7 +138,7 @@ private slots:
   void on_actionAbout_triggered();
 
   void onCanceledNewContact();
-  void onSavedNewContact();
+  void onSavedNewContact(int idxNewContact);
   void onItemContactRemoved (QTreeWidgetItem&);
 
 private:

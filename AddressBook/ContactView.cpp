@@ -105,6 +105,8 @@ ContactView::ContactView(QWidget* parent)
   ui->email_label->setVisible (false);
   ui->privacy_comboBox->setVisible (false);
   ui->privacy_level_label->setVisible (false);//unsupported
+  //default contact view: info page
+  ui->contact_pages->setCurrentIndex(info);
   
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
   chat_contact = new QAction( QIcon( ":/images/chat.png"), tr("Chat"), this);  
@@ -211,10 +213,10 @@ void ContactView::onSave()
         }
       }
       _current_contact.privacy_setting = bts::addressbook::secret_contact;
-      _address_book->storeContact(_current_contact);
+      int idxNewContact = _address_book->storeContact(_current_contact);
 
       keyEdit(false);
-      emit savedNewContact();
+      emit savedNewContact(idxNewContact);
     }    
   }
   FC_RETHROW_EXCEPTIONS(warn, "onSave")

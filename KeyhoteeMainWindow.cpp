@@ -367,7 +367,8 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       openContactGui(con_id);
       //this makes overstack when contact_page table is sorted, 
       //selectRow generate signal onSidebarSelectionChanged and openContactGui is call two or more
-      ui->contacts_page->selectRow(con_id);
+      //issue #51: Selecting contact on recent list should synchronize it in main list
+      //ui->contacts_page->selectRow(con_id);
       connect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
       connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
       if(ui->contacts_page->isShowDetailsHidden())
@@ -774,12 +775,9 @@ void KeyhoteeMainWindow::onCanceledNewContact()
   onSidebarSelectionChanged();
 }
 
-void KeyhoteeMainWindow::onSavedNewContact()
+void KeyhoteeMainWindow::onSavedNewContact(int idxNewContact)
 {
   enableMenu(true);
-  //Issue #43
-  //After saving just added contact, contact detail window should point to newly added record
-  ui->contacts_page->selectRow(0);
 }
 
 void KeyhoteeMainWindow::enableMenu(bool enable)
