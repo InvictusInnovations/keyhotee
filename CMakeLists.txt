@@ -130,6 +130,22 @@ qt5_wrap_ui( UiFileAttachmentWidget            Mail/fileattachmentwidget.ui )
 
 qt5_wrap_ui( UiWallets                         wallets.ui )
 
+file(GLOB ui_files *.ui profile_wizard/*.ui AddressBook/*.ui Mail/*.ui)
+find_package( Qt5LinguistTools )
+set(FILES_TO_TRANSLATE ${ui_files})
+
+file (GLOB TRANSLATIONS_FILES translations/*.ts)
+
+option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts
+  files (WARNING: make clean will delete the source .ts files! Danger!)")
+if (UPDATE_TRANSLATIONS)
+  qt5_create_translation(QM_FILES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
+else (UPDATE_TRANSLATIONS)
+  qt5_add_translation(QM_FILES ${TRANSLATIONS_FILES})
+endif (UPDATE_TRANSLATIONS) 
+
+add_custom_target (translations_target DEPENDS ${QM_FILES})
+
 QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
 
 set( library_sources
@@ -261,6 +277,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
 
 # Configure dependencies of keyhotee main application module
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
+add_dependencies (Keyhotee translations_target)
 
 # Let's configure different target names for release and debug builds.
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_DEBUG KeyhoteeD )
