@@ -19,7 +19,7 @@
 
 MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel,
   IMailProcessor& mailProcessor, bool editMode) :
-  QMainWindow(parent),
+  ATopLevelWindow(parent),
   ui(new Ui::MailEditorWindow()),
   ABModel(abModel),
   MailProcessor(mailProcessor),
@@ -128,7 +128,10 @@ void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
   {
   if(maybeSave())
+  {
     e->accept();
+    ATopLevelWindow::closeEvent(e);
+  }
   else
     e->ignore();
   }
