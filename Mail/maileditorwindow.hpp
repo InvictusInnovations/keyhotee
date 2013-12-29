@@ -111,7 +111,8 @@ class MailEditorMainWindow : public QMainWindow
         containing original sender info etc).
         Next fills editor window with such transformed body.
     */
-    void transformMailBody(const TStoredMailMessage& msgHeader, const TPhysicalMailMessage& srcMsg);
+    QString transformMailBody(TLoadForm loadForm, const TStoredMailMessage& msgHeader,
+      const TPhysicalMailMessage& srcMsg);
     void toggleReadOnlyMode();
 
   private slots:

@@ -243,7 +243,7 @@ TMailProcessor::~TMailProcessor()
 void TMailProcessor::Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
   const TStoredMailMessage* savedDraftMsg)
   {
-  const bool outboxSupport = true;
+  const bool outboxSupport = false;
   if(outboxSupport)
     {
     OutboxQueue->AddPendingMessage(senderId, msg, savedDraftMsg);

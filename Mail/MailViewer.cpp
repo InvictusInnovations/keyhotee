@@ -1,14 +1,13 @@
-
 #include "MailViewer.hpp"
-#include "KeyhoteeMainWindow.hpp"
+
 #include "ui_MailViewer.h"
-#include <QToolBar>
+
+#include "KeyhoteeMainWindow.hpp"
 #include "MailboxModel.hpp"
+#include "utils.hpp"
+
 #include <QImageReader>
-
-//DLNFIX move this to utility function file
-QString makeContactListString(std::vector<fc::ecc::public_key> key_list);
-
+#include <QToolBar>
 
 MailViewer::MailViewer(QWidget* parent)
 : /*QWidget(parent),*/ ui( new Ui::MailViewer() )
@@ -39,7 +38,7 @@ void MailViewer::displayMailMessage(const QModelIndex& index, MailboxModel* mail
     {
     ui->to_prefix->show();
     ui->to_label->show();
-    ui->to_label->setText(makeContactListString(msg.to_list) );
+    ui->to_label->setText(Utils::makeContactListString(msg.to_list, ';', Utils::FULL_CONTACT_DETAILS));
     }
   else
     {
@@ -50,7 +49,7 @@ void MailViewer::displayMailMessage(const QModelIndex& index, MailboxModel* mail
     {
     ui->cc_prefix->show();
     ui->cc_label->show();
-    ui->cc_label->setText(makeContactListString(msg.cc_list) );
+    ui->cc_label->setText(Utils::makeContactListString(msg.cc_list, ';', Utils::FULL_CONTACT_DETAILS));
     }
   else
     {

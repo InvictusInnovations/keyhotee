@@ -1,22 +1,24 @@
-<!DOCTYPE html >
+<!DOCTYPE html>
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-</head>
-<body>
-  <div id="OldContents" style="border-left:3px solid green;margin-left:2px;padding-left:3px;">
-    <div id="Header">
-      <b>From:</b>&nbsp;$$SENDER$$<br/>
-      <b>Sent:</b>&nbsp;$$SENT_DATE$$<br/>
-      <b>To:</b>&nbsp;$$TO_RECIPIENT$$<br/>
-      <b>CC:</b>&nbsp;$$CC_RECIPIENTS$$<br/>
-      <b>Subject:</b>&nbsp;$$SUBJECT$$<br/>
-    <hr />
-    </div>
-    <p id="Body">
-      $$SOURCE_BODY$$
-      <br/>
-    </p>
-  </div>
+  <!-- Warning: HTML subset supported by QTextEdit is very limited.
+       To see details, consult: http://qt-project.org/doc/qt-5.1/qtgui/richtext-html-subset.html
+  -->
+<head><meta name="qrichtext" content="1" /><style type="text/css">
+  p.TMailHeaderItem { margin:0px; white-space: normal; }
+  td.THeaderItem {margin-left:2px;padding-left:2px;}
+  span.TBold {font-weight:bold; white-space: normal; }
+</style></head><body><hr />
+<table>
+<tr><td rowspan="2" width="3" bgcolor="darkGreen" />
+<td class="THeaderItem">
+<!-- It is important to place all of these fields in separate paragraphs -->
+<p class="TMailHeaderItem"><span class="TBold">From:&nbsp;</span>$$SENDER$$</p>
+<p class="TMailHeaderItem"><span class="TBold">Sent:&nbsp;</span>$$SENT_DATE$$</p>
+<p class="TMailHeaderItem"><span class="TBold">To:&nbsp;</span>$$TO_RECIPIENTS$$</p>
+<p class="TMailHeaderItem"><span class="TBold">Cc:&nbsp;</span>$$CC_RECIPIENTS$$</p>
+<p class="TMailHeaderItem"><span class="TBold">Subject:&nbsp;</span>$$SUBJECT$$</p>
+</td></tr>
+<tr><td class="THeaderItem"><br/>$$SOURCE_BODY$$<br/></td></tr>
+</table>
 </body>
 </html>

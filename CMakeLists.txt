@@ -212,6 +212,8 @@ set( sources
         diagnosticdialog.h
         diagnosticdialog.cpp
 
+        utils.hpp
+        utils.cpp
 
         connectionstatusframe.ui
         connectionstatusframe.h
