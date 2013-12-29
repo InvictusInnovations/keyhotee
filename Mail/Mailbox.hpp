@@ -1,3 +1,4 @@
+#include <KeyhoteeMainWindow.hpp>
 #include <QWidget>
 
 namespace Ui { class Mailbox; }
@@ -25,7 +26,8 @@ public:
   Mailbox(QWidget* parent = nullptr);
   virtual ~Mailbox();
 
-  void setModel(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type = Inbox);
+  // void setModel(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type = Inbox);
+  void initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type, KeyhoteeMainWindow* parentKehoteeMainW);
   void searchEditChanged(QString search_string);
 
   bool isShowDetailsHidden();

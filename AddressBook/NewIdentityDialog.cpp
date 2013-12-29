@@ -56,7 +56,8 @@ void NewIdentityDialog::onUserNameChanged( const QString& name )
 void NewIdentityDialog::onSave()
 {
     //store new identity in profile
-    auto profile = bts::application::instance()->get_profile();
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
     auto trim_dac_id = fc::trim(ui->username->text().toUtf8().constData());
     bts::addressbook::wallet_identity ident;
     ident.first_name = fc::trim( ui->firstname->text().toUtf8().constData() );
@@ -67,6 +68,9 @@ void NewIdentityDialog::onSave()
     auto priv_key = profile->get_keychain().get_identity_key(trim_dac_id);
     ident.public_key = priv_key.get_public_key();
     profile->store_identity( ident );
+    app->mine_name(trim_dac_id,
+                profile->get_keychain().get_identity_key(trim_dac_id).get_public_key(),
+                ident.mining_effort);
 
     //store contact for new identity
     bts::addressbook::wallet_contact myself;
@@ -78,6 +82,5 @@ void NewIdentityDialog::onSave()
 //    profile->get_addressbook()->store_contact(Contact(myself));
     TKeyhoteeApplication::getInstance()->getMainWindow()->getAddressBookModel()->storeContact( Contact(myself) );
 
-    bts::application::instance()->add_receive_key(priv_key);
-
+    app->add_receive_key(priv_key);
 }

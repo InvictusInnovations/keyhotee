@@ -384,11 +384,17 @@
     <addaction name="separator"/>
     <addaction name="actionEnable_Mining"/>
    </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>Window</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuIdentity"/>
    <addaction name="menuMail"/>
    <addaction name="menuContact"/>
+   <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

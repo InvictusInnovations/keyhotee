@@ -28,6 +28,7 @@
 #ifndef WIN32
   #include <signal.h>
 #endif
+#include <QTranslator>
 
 static TKeyhoteeApplication* s_Instance = nullptr;
 
@@ -135,6 +136,11 @@ int TKeyhoteeApplication::run()
     setOrganizationDomain("invictus-innovations.com");
     setOrganizationName("Invictus Innovations, Inc");
     setApplicationName(APP_NAME);
+
+    QString locale = QLocale::system().name();
+    QTranslator translator;
+    translator.load(QString("keyhotee_")+locale);
+    qApp->installTranslator(&translator);
 
     startup();
 

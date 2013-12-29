@@ -45,6 +45,6 @@ public slots:
   void onDeleteContact();
   void on_actionShow_details_toggled(bool checked);
   void onCurrentViewChanged(int index);
-  void onSavedNewContact();
+  void onSavedNewContact(int idxNewContact);
   void onCanceledNewContact();
 };

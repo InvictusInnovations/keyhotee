@@ -5,6 +5,8 @@
 
 #include <bts/bitchat/bitchat_message_db.hpp>
 
+#include "ATopLevelWindow.h"
+
 #include <QMainWindow>
 
 #include <utility>
@@ -31,7 +33,7 @@ class TMoneyAttachementWidget;
       (contact)
     - with explicit recipient list when reply/reply-all options are in action.
 */
-class MailEditorMainWindow : public QMainWindow
+class MailEditorMainWindow : public ATopLevelWindow
   {
   Q_OBJECT
   public:

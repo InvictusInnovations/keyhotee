@@ -9,6 +9,7 @@
 #include "dataaccessimpl.h"
 #include "mailprocessorimpl.hpp"
 #include "ch/ModificationsChecker.hpp"
+#include "ATopLevelWindowsContainer.h"
 
 namespace Ui { class KeyhoteeMainWindow; }
 
@@ -50,7 +51,7 @@ public:
 private:
 };
 
-class KeyhoteeMainWindow  : public SelfSizingMainWindow,
+class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
                             protected bts::application_delegate,
                             protected IMailProcessor::IUpdateSink,
                             public IModificationsChecker
@@ -145,7 +146,7 @@ private slots:
   void on_actionAbout_triggered();
 
   void onCanceledNewContact();
-  void onSavedNewContact();
+  void onSavedNewContact(int idxNewContact);
   void onItemContactRemoved (QTreeWidgetItem&);
 
 private:

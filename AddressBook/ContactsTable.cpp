@@ -172,8 +172,14 @@ void ContactsTable::onCanceledNewContact()
   ui->contact_table->show ();
   }
 
-void ContactsTable::onSavedNewContact()
+void ContactsTable::onSavedNewContact(int idxNewContact)
   {
+  QModelIndex idx;
+
+  idx = _addressbook_model->index (idxNewContact, 0);
+  QModelIndex mapped_index = _sorted_addressbook_model->mapFromSource(idx);
+  selectRow(mapped_index.row());
+
   ui->contact_table->show ();
   }
 
