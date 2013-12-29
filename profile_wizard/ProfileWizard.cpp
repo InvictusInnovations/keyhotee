@@ -218,9 +218,13 @@ void ProfileWizard::createProfile(int result)
     conf.brainkey   = _profile_edit->ui.brainkey->text().toUtf8().constData();
     conf.brainkey   = fc::trim( conf.brainkey );
 
-    std::string                      password = _profile_edit->ui.local_password1->text().toUtf8().constData();
+    std::string password = _profile_edit->ui.local_password1->text().toUtf8().constData();
 
-    std::string profile_name         = conf.firstname + " " + conf.lastname;
+    //set profile name from first and last name
+    std::string profile_name = conf.firstname;
+    if (!conf.lastname.empty())
+      profile_name += " " + conf.lastname;
+
     auto                             app = bts::application::instance();
     fc::thread* main_thread = &fc::thread::current();
     QProgressBar* progress = new QProgressBar();
@@ -243,26 +247,6 @@ void ProfileWizard::createProfile(int result)
                                                }
                                                );
     assert(profile != nullptr);
-
-    //store myself as contact
-  /*
-    std::string dac_id_string = _nym_page->_profile_nym_ui.keyhotee_id->text().toStdString();
-    bts::addressbook::wallet_contact myself;
-    myself.wallet_index = 0;
-    myself.first_name = conf.firstname;
-    myself.last_name = conf.lastname;
-    myself.set_dac_id(dac_id_string);
-    auto priv_key = profile->get_keychain().get_identity_key(myself.dac_id_string);
-    myself.public_key = priv_key.get_public_key();
-    profile->get_addressbook()->store_contact(myself);
-
-    //store myself as identity
-    bts::addressbook::wallet_identity new_identity;
-    static_cast<bts::addressbook::contact&>(new_identity) = myself;
-    profile->store_identity(new_identity);
-
-    bts::application::instance()->add_receive_key(priv_key);
-    */
 
     _mainApp.displayMainWindow();
   }

@@ -55,28 +55,32 @@ void NewIdentityDialog::onUserNameChanged( const QString& name )
 
 void NewIdentityDialog::onSave()
 {
-    auto trim_name = fc::trim(ui->username->text().toUtf8().constData());
+    //store new identity in profile
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+    auto trim_dac_id = fc::trim(ui->username->text().toUtf8().constData());
     bts::addressbook::wallet_identity ident;
     ident.first_name = fc::trim( ui->firstname->text().toUtf8().constData() );
     ident.last_name = fc::trim( ui->lastname->text().toUtf8().constData() );
     ident.mining_effort = ui->register_checkbox->isChecked();
-    ident.wallet_ident = fc::trim( ui->username->text().toUtf8().constData() );
-    ident.set_dac_id( ident.wallet_ident );
-    auto profile = bts::application::instance()->get_profile();
+    ident.wallet_ident = trim_dac_id;
+    ident.set_dac_id( trim_dac_id );
+    auto priv_key = profile->get_keychain().get_identity_key(trim_dac_id);
+    ident.public_key = priv_key.get_public_key();
     profile->store_identity( ident );
+    app->mine_name(trim_dac_id,
+                profile->get_keychain().get_identity_key(trim_dac_id).get_public_key(),
+                ident.mining_effort);
 
-
-    std::string dac_id_string = ident.wallet_ident;
+    //store contact for new identity
     bts::addressbook::wallet_contact myself;
-    myself.wallet_index = WALLET_INVALID_INDEX;
+    //copy common fields from new identity into contact
+    static_cast<bts::addressbook::contact&>(myself) = ident;
+    //fill in remaining fields for contact
     myself.first_name = ident.first_name;
     myself.last_name = ident.last_name;
-    myself.set_dac_id(ident.wallet_ident);
-    auto priv_key = profile->get_keychain().get_identity_key(myself.dac_id_string);
-    myself.public_key = priv_key.get_public_key();
 //    profile->get_addressbook()->store_contact(Contact(myself));
-
-    bts::application::instance()->add_receive_key(priv_key);
-
     TKeyhoteeApplication::getInstance()->getMainWindow()->getAddressBookModel()->storeContact( Contact(myself) );
+
+    app->add_receive_key(priv_key);
 }

@@ -93,7 +93,7 @@ Mailbox::~Mailbox()
   delete ui;
   }
 
-void Mailbox::setModel(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type)
+void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type, KeyhoteeMainWindow* parentKehoteeMainW)
   {
   _type = type;
   _sourceModel = model;
