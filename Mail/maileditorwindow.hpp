@@ -5,7 +5,7 @@
 
 #include <bts/bitchat/bitchat_message_db.hpp>
 
-#include "ATopLevelWindow.h"
+#include "ATopLevelWindow.hpp"
 
 #include <QMainWindow>
 
@@ -25,6 +25,8 @@ class TFileAttachmentWidget;
 class MailFieldsWidget;
 class TMoneyAttachementWidget;
 
+
+
 /** Mail message editor/viewer window.
     Contains rich editor, file attachment browser, money attachment browser.
     Can be spawned:
@@ -42,7 +44,7 @@ class MailEditorMainWindow : public ATopLevelWindow
     typedef IMailProcessor::TRecipientPublicKeys TRecipientPublicKeys;
     typedef IMailProcessor::TStoredMailMessage   TStoredMailMessage;
 
-    MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel, IMailProcessor& mailProcessor,
+    MailEditorMainWindow(ATopLevelWindowsContainer* parent, AddressBookModel& abModel, IMailProcessor& mailProcessor,
       bool editMode);
     virtual ~MailEditorMainWindow();
 

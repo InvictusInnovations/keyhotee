@@ -17,7 +17,7 @@
 #include <QToolBar>
 #include <QToolButton>
 
-MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel,
+MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, AddressBookModel& abModel,
   IMailProcessor& mailProcessor, bool editMode) :
   ATopLevelWindow(parent),
   ui(new Ui::MailEditorWindow()),
