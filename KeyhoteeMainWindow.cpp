@@ -728,9 +728,14 @@ void KeyhoteeMainWindow::showContactGui(ContactGui& contact_gui)
 
 void KeyhoteeMainWindow::deleteContactGui(int contact_id)
 {
-    ContactGui* contact_gui = getContactGui(contact_id);
+  ContactGui* contact_gui = getContactGui(contact_id);
+  if(contact_gui != nullptr)
+    {
     _contacts_root->removeChild(contact_gui->_tree_item);
     _contact_guis.erase(contact_id);
+    }
+
+  assert(_contact_guis.find(contact_id) == _contact_guis.end());
 }
 
 void KeyhoteeMainWindow::setupStatusBar()

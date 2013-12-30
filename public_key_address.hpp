@@ -27,6 +27,17 @@ struct public_key_address
       {
       std::vector<char> bin = fc::from_base58(keyStr);
       status = bin.size() == 37;
+      if(status)
+        {
+        /** Looks like fc::from_base58 is insufficient - it can accept invalid key values. To be
+            sure just try to construct actual public_key object.
+        */
+        fc::ecc::public_key_data rawData;
+        memcpy( (char*)&rawData, bin.data(), 33);
+
+        fc::ecc::public_key checker(rawData);
+        return checker.valid();
+        }
       }
     catch (const fc::exception&)
       {
