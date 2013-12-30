@@ -30,6 +30,7 @@ public:
 
 private:
   ContactView* getCurrentView() const;
+  void showContactsTable (bool visible) const;
 
 Q_SIGNALS:
   void contactOpened(int contact_id);
@@ -44,7 +45,6 @@ private:
 public slots:
   void onDeleteContact();
   void on_actionShow_details_toggled(bool checked);
-  void onCurrentViewChanged(int index);
   void onSavedNewContact(int idxNewContact);
   void onCanceledNewContact();
 };
