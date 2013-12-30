@@ -139,7 +139,7 @@ int TKeyhoteeApplication::run()
 
     QString locale = QLocale::system().name();
     QTranslator translator;
-    translator.load(QString("keyhotee_")+locale);
+    translator.load(QString(":/keyhotee_")+locale);
     qApp->installTranslator(&translator);
 
     startup();
