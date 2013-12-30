@@ -75,6 +75,11 @@ void ContactListEdit::insertCompletion( const QString& completion, const bts::ad
   if (_completer->widget() != this)
     return;
 
+  QTextCursor text_cursor = textCursor();
+  uint32_t    prefix_len = _completer->completionPrefix().length();
+  for (uint32_t i = 0; i < prefix_len; ++i)
+    text_cursor.deletePreviousChar();
+
   addContactEntry(completion, c);
   }
 
@@ -157,9 +162,6 @@ void ContactListEdit::addContactEntry(const QString& contactText, const bts::add
   painter.drawText(QPoint(10, completion_height - 2), contactText);
 
   QTextCursor text_cursor = textCursor();
-  uint32_t    prefix_len = _completer->completionPrefix().length();
-  for (uint32_t i = 0; i < prefix_len; ++i)
-    text_cursor.deletePreviousChar();
      // int extra = completion.length() -
   // tc.movePosition(QTextCursor::Left);
   // tc.movePosition(QTextCursor::EndOfWord);

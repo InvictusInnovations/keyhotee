@@ -42,6 +42,18 @@ public:
   QString getNotes() const;
   void setNotes(const QString& phone);
 
+  int getKeyhoteeStatus()
+    {
+    return 0;
+    }
+
+  float getMiningEffort() const
+    {
+    return 50;  // expected range 0 - 100 
+    }
+
+  void setMiningEffort(float miningEffort){} // range from 0 to 100 %
+
 private:
   /// cache the icon we want to use.
   QIcon icon;

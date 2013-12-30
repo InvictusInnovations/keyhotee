@@ -283,7 +283,15 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
   }
 
   FC_ASSERT(contact_to_store.wallet_index < int(my->_contacts.size()) );
-  auto row = contact_to_store.wallet_index;
+  auto row = -1;
+  for (uint32_t i = 0; i < my->_contacts.size(); ++i)
+    if (my->_contacts[i].wallet_index == contact_to_store.wallet_index)
+    {
+       row = i; 
+       break;
+    }
+  if(row == -1)
+    FC_ASSERT(!"invalid contact id");
   my->_contacts[row] = contact_to_store;
   my->_address_book->store_contact(my->_contacts[row]);
 
