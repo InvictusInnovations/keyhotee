@@ -131,20 +131,20 @@ qt5_wrap_ui( UiFileAttachmentWidget            Mail/fileattachmentwidget.ui )
 qt5_wrap_ui( UiWallets                         wallets.ui )
 
 file(GLOB ui_files *.ui profile_wizard/*.ui AddressBook/*.ui Mail/*.ui)
-#find_package( Qt5LinguistTools )
+find_package( Qt5LinguistTools )
 set(FILES_TO_TRANSLATE ${ui_files})
 
 file (GLOB TRANSLATIONS_FILES translations/*.ts)
 
-#option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts
-#  files (WARNING: make clean will delete the source .ts files! Danger!)")
-#if (UPDATE_TRANSLATIONS)
-#  qt5_create_translation(QM_FILES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
-#else (UPDATE_TRANSLATIONS)
-#  qt5_add_translation(QM_FILES ${TRANSLATIONS_FILES})
-#endif (UPDATE_TRANSLATIONS) 
+option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts
+  files (WARNING: make clean will delete the source .ts files! Danger!)")
+if (UPDATE_TRANSLATIONS)
+  qt5_create_translation(QM_FILES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
+else (UPDATE_TRANSLATIONS)
+  qt5_add_translation(QM_FILES ${TRANSLATIONS_FILES})
+endif (UPDATE_TRANSLATIONS) 
 
-#add_custom_target (translations_target DEPENDS ${QM_FILES})
+add_custom_target (translations_target DEPENDS ${QM_FILES})
 
 QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
 
@@ -223,11 +223,11 @@ set( sources
         KeyhoteeMainWindow.ui
         KeyhoteeMainWindow.hpp
         KeyhoteeMainWindow.cpp
-		
-		ATopLevelWindowsContainer.h
-		ATopLevelWindowsContainer.cpp
-		ATopLevelWindow.h
-		ATopLevelWindow.cpp
+
+        ATopLevelWindowsContainer.h
+        ATopLevelWindowsContainer.cpp
+        ATopLevelWindow.h
+        ATopLevelWindow.cpp
 
         diagnosticdialog.ui
         diagnosticdialog.h
