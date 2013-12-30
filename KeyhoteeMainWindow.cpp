@@ -116,6 +116,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   QString title = QString("%1 (%2)").arg(mainApp.getAppName().c_str()).arg(mainApp.getLoadedProfileName().c_str());
   setWindowTitle(title);
+  setEnabledAttachmentSaveOption(false);
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
   connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
@@ -305,6 +306,9 @@ void KeyhoteeMainWindow::activateMailboxPage(Mailbox* mailBox)
   connect(ui->actionShow_details, SIGNAL(toggled(bool)), mailBox, SLOT(on_actionShow_details_toggled(bool)));
   bool checked = mailBox->isShowDetailsHidden() == false;
   ui->actionShow_details->setChecked(checked);
+
+  _currentMailbox = mailBox;
+  setEnabledAttachmentSaveOption(_currentMailbox->isAttachmentSelected());
   }
 
 void KeyhoteeMainWindow::addContact()
@@ -384,6 +388,9 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->out_box_page, SLOT(on_actionShow_details_toggled(bool)));
     disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->sent_box_page, SLOT(on_actionShow_details_toggled(bool)));
 
+    setEnabledAttachmentSaveOption(false);
+    _currentMailbox = nullptr;
+
     QTreeWidgetItem* selectedItem = selected_items.first();
 
     if (selectedItem->type() == ContactItem)
@@ -413,13 +420,52 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       if (ui->contacts_page->isShowDetailsHidden())
         ui->actionShow_details->setChecked(false);
       else
-        ui->actionShow_details->setChecked(true);
+        ui->actionShow_details->setChecked(true);      
     }
     /*
        else if( selected_items[0] == _identities_root )
      {
      }
      */
+    else if (selected_items[0] == _inbox_root)
+    {
+      _currentMailbox = ui->inbox_page;
+      setEnabledAttachmentSaveOption(_currentMailbox->isAttachmentSelected());
+
+      ui->widget_stack->setCurrentWidget(ui->inbox_page);
+      connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
+      connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
+      if (ui->inbox_page->isShowDetailsHidden())
+        ui->actionShow_details->setChecked(false);
+      else
+        ui->actionShow_details->setChecked(true);
+    }
+    else if (selected_items[0] == _drafts_root)
+    {
+      _currentMailbox = ui->draft_box_page;
+      setEnabledAttachmentSaveOption(_currentMailbox->isAttachmentSelected());
+
+      ui->widget_stack->setCurrentWidget(ui->draft_box_page);
+      connect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
+      connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->draft_box_page, SLOT(on_actionShow_details_toggled(bool)));
+      if (ui->draft_box_page->isShowDetailsHidden())
+        ui->actionShow_details->setChecked(false);
+      else
+        ui->actionShow_details->setChecked(true);
+    }
+    else if (selected_items[0] == _sent_root)
+    {
+      _currentMailbox = ui->sent_box_page;
+      setEnabledAttachmentSaveOption(_currentMailbox->isAttachmentSelected());
+
+      ui->widget_stack->setCurrentWidget(ui->sent_box_page);
+      connect(ui->actionDelete, SIGNAL(triggered()), ui->sent_box_page, SLOT(onDeleteMail()));
+      connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->sent_box_page, SLOT(on_actionShow_details_toggled(bool)));
+      if (ui->sent_box_page->isShowDetailsHidden())
+        ui->actionShow_details->setChecked(false);
+      else
+        ui->actionShow_details->setChecked(true);
+    }
     /// For mailboxes root just select inbox root
     else if (selectedItem == _mailboxes_root || selectedItem == _inbox_root)
       {
@@ -536,7 +582,8 @@ void KeyhoteeMainWindow::on_actionForward_triggered()
 
 void KeyhoteeMainWindow::on_actionSave_attachement_triggered()
 {
-  notSupported();
+  assert (_currentMailbox != nullptr);
+  _currentMailbox->saveAttachment();
 }
 
 // Menu Contact
@@ -818,6 +865,7 @@ void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
 {
   if (checkSaving())
     {
+    writeSettings ();
     closeEvent->accept();
     ATopLevelWindowsContainer::closeEvent(closeEvent);
     }
@@ -841,4 +889,9 @@ void KeyhoteeMainWindow::onItemContactRemoved (QTreeWidgetItem& itemContact)
   {
   itemContact.setHidden (true);
   ui->contacts_page->contactRemoved();
+  }
+
+void KeyhoteeMainWindow::setEnabledAttachmentSaveOption( bool enable )
+  {
+  ui->actionSave_attachement->setEnabled (enable);
   }

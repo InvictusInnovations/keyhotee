@@ -568,7 +568,7 @@
      <normaloff>:/images/win/filesave.png</normaloff>:/images/win/filesave.png</iconset>
    </property>
    <property name="text">
-    <string>Save attachement</string>
+    <string>Save attachment</string>
    </property>
   </action>
   <action name="actionDiagnostic">
