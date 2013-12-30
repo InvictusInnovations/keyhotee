@@ -25,4 +25,4 @@ protected:
   virtual void closeEvent(QCloseEvent *event);
 };
 
-#endif __ATOPLEVELWINDOW_HPP
+#endif /// __ATOPLEVELWINDOW_HPP

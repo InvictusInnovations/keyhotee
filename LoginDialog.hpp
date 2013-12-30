@@ -1,21 +1,25 @@
 #pragma once
 #include <QDialog>
-#include <memory>
 
 namespace Ui { class LoginDialog; }
+
+class TKeyhoteeApplication;
 
 class LoginDialog : public QDialog
 {
 public:
-  LoginDialog(QWidget* parent = nullptr);
-  ~LoginDialog();
+  LoginDialog(TKeyhoteeApplication& mainApp, QWidget* parent = nullptr);
+  virtual ~LoginDialog();
 
+private slots:
   void onLogin();
   void onQuit();
   void onNew();
   void shake();
 
-  std::string                      password;
+  std::string            password;
 private:
-  std::unique_ptr<Ui::LoginDialog> ui;
+  /// Don't use unique_ptr here since it breaks QTCreator.
+  Ui::LoginDialog*       ui;
+  TKeyhoteeApplication&  _mainApp;
 };

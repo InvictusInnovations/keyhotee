@@ -6,6 +6,7 @@
 #include <fc/thread/thread.hpp>
 
 #include <atomic>
+#include <mutex>
 
 class TMailProcessor::TOutboxQueue
   {
@@ -18,11 +19,9 @@ class TMailProcessor::TOutboxQueue
 
       Outbox = profile->get_pending_db();
       Sent = profile->get_sent_db();
-      }
+      CancelPromise = new fc::promise<void>;
 
-    void StartTransmission()
-      {
-      TransferLoopComplete = fc::async([=]{ this->transmissionLoop(); });
+      //checkForAvailableConnection();
       }
 
     /** Allows to add new pending message to the sending queue.
@@ -50,6 +49,25 @@ class TMailProcessor::TOutboxQueue
     virtual ~TOutboxQueue() {}
 
     void transmissionLoop();
+    bool isConnected() const
+      {
+      auto network = App->get_network();
+      return static_cast<unsigned int>(network->get_connections().size()) > 0;
+      }
+
+    void connectionCheckingLoop();
+    void startTransmission()
+      {
+      if(TransferLoopComplete.valid() == false || TransferLoopComplete.ready())
+        TransferLoopComplete = fc::async([=]{ transmissionLoop(); });
+      }
+
+    void checkForAvailableConnection()
+      {
+      if(ConnectionCheckComplete.valid() == false || ConnectionCheckComplete.ready())
+        ConnectionCheckComplete = fc::async([=]{ connectionCheckingLoop(); });
+      }
+
     bool fetchNextMessage(TStoredMailMessage* storedMsg, TPhysicalMailMessage* storage);
     bool transferMessage(const TRecipientPublicKey& senderId, const TPhysicalMailMessage& msg);
     /** Allows to get identity associated to given public key. Returns false if there is no
@@ -71,12 +89,16 @@ class TMailProcessor::TOutboxQueue
     TMessageDB             Outbox;
     TMessageDB             Sent;
     fc::future<void>       TransferLoopComplete;
+    fc::future<void>       ConnectionCheckComplete;
     fc::promise<void>::ptr CancelPromise;
+    std::mutex             OutboxDbLock;
   };
 
 void TMailProcessor::TOutboxQueue::AddPendingMessage(const TIdentity& senderId,
   const TPhysicalMailMessage& msg, const TStoredMailMessage* savedDraftMsg)
   {
+  std::lock_guard<std::mutex> guard(OutboxDbLock);
+
   TStorableMessage storableMsg;
   Processor.PrepareStorableMessage(senderId, msg, &storableMsg);
   TStoredMailMessage storedMsg = Outbox->store_message(storableMsg, nullptr);
@@ -85,7 +107,7 @@ void TMailProcessor::TOutboxQueue::AddPendingMessage(const TIdentity& senderId,
 
 bool TMailProcessor::TOutboxQueue::AnyOperationsPending() const
   {
-  bool transferLoopCompleted =TransferLoopComplete.valid() == false || TransferLoopComplete.ready();
+  bool transferLoopCompleted = TransferLoopComplete.valid() == false || TransferLoopComplete.ready();
   return transferLoopCompleted ? false : Outbox->fetch_headers(TPhysicalMailMessage::type).empty();
   }
 
@@ -111,10 +133,27 @@ void TMailProcessor::TOutboxQueue::transmissionLoop()
     TStoredMailMessage   storedMsg;
     if(fetchNextMessage(&storedMsg, &msg) && transferMessage(storedMsg.from_key, msg))
       moveMsgToSentDB(storedMsg, msg);
+
+    fc::usleep(fc::milliseconds(250));
     }
 
   if(notificationSent)
     Processor.Sink.OnMessageSendingEnd();
+  }
+
+void TMailProcessor::TOutboxQueue::connectionCheckingLoop()
+  {
+  do
+    {
+    if(isConnected())
+      {
+      startTransmission();
+      break;
+      }
+
+    fc::usleep(fc::milliseconds(250));
+    }
+  while(1);
   }
 
 bool TMailProcessor::TOutboxQueue::fetchNextMessage(TStoredMailMessage* storedMsg,
@@ -122,6 +161,8 @@ bool TMailProcessor::TOutboxQueue::fetchNextMessage(TStoredMailMessage* storedMs
   {
   assert(storedMsg != nullptr);
   assert(storage != nullptr);
+
+  std::lock_guard<std::mutex> guard(OutboxDbLock);
 
   /// FIXME - message_db interface is terrible - there should be a way to query just for 1 object
   auto pendingMsgHeaders = Outbox->fetch_headers(TPhysicalMailMessage::type);
@@ -173,6 +214,8 @@ bool TMailProcessor::TOutboxQueue::transferMessage(const TRecipientPublicKey& se
     {
     sendStatus = false;
     elog("${e}", ("e", e.to_detail_string()));
+    /// Probably connection related error, try to start it again
+    checkForAvailableConnection();
     }
 
   return sendStatus;
@@ -224,6 +267,8 @@ void TMailProcessor::TOutboxQueue::moveMsgToSentDB(const TStoredMailMessage& pen
 
   TStoredMailMessage savedMsg = Sent->store_message(storableMsg, nullptr);
   Processor.Sink.OnMessageSent(pendingMsg, savedMsg);
+
+  std::lock_guard<std::mutex> guard(OutboxDbLock);
 
   Outbox->remove_message(pendingMsg);
   }
