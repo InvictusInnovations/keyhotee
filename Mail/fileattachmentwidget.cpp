@@ -687,6 +687,8 @@ void TFileAttachmentWidget::onSaveTriggered()
     /// If multiple items are selected ask for directory where files should be written to.
     QString storageDir = QFileDialog::getExistingDirectory(this,
       tr("Save selected file attachments..."), docPath, QFileDialog::ShowDirsOnly);
+    if(storageDir.length() == 0)
+      return;
     QDir dir(storageDir);
     for(const AAttachmentItem* attachmentItem : selection)
       {
@@ -697,7 +699,9 @@ void TFileAttachmentWidget::onSaveTriggered()
   else
     {
     /// If single item is selected just ask for direct path to save it
-    QString filePath = QFileDialog::getSaveFileName(this, "Save attachment file...", docPath);
+    QString filePath = QFileDialog::getSaveFileName(this, "Save attachment file...", QDir(docPath).filePath(selection.front()->GetDisplayedFileName()));
+    if(filePath.length() == 0)
+      return;
     const AAttachmentItem* attachmentItem = selection.front();
     QFileInfo fi(filePath);
     /// Here we don't need to check for file overwrite - it was done by QFileDialog.
