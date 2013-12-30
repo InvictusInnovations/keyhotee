@@ -15,7 +15,7 @@ class QTemporaryFile;
     This class also is responsible for temporary files management (removing them) created while
     opening attachement items.
 */
-class TKeyhoteeApplication : public QApplication
+class TKeyhoteeApplication : protected QApplication
 {
   Q_OBJECT
 

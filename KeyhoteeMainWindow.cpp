@@ -1,7 +1,13 @@
 #include "KeyhoteeMainWindow.hpp"
 
 #include "ui_KeyhoteeMainWindow.h"
+
+#include "connectionstatusframe.h"
 #include "diagnosticdialog.h"
+#include "GitSHA1.h"
+#include "KeyhoteeApplication.hpp"
+#include "public_key_address.hpp"
+
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/NewIdentityDialog.hpp"
 #include "AddressBook/ContactView.hpp"
@@ -9,10 +15,6 @@
 #include "Mail/MailboxModel.hpp"
 #include "Mail/MailEditor.hpp"
 #include "Mail/maileditorwindow.hpp"
-
-#include "connectionstatusframe.h"
-#include "GitSHA1.h"
-#include "KeyhoteeApplication.hpp"
 
 #include <bts/bitchat/bitchat_private_message.hpp>
 
@@ -108,7 +110,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ATopLevelWindowsContainer(),
   MailProcessor(*this, bts::application::instance()->get_profile())
 {
-  ui.reset(new Ui::KeyhoteeMainWindow() );
+  ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);
   setWindowIcon(QIcon(":/images/shield1024.png") );
 
@@ -208,6 +210,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _mailboxes_root->setExpanded(true);
   _inbox_root = _mailboxes_root->child(Inbox);
   _drafts_root = _mailboxes_root->child(Drafts);
+  _out_box_root = _mailboxes_root->child(Outbox);
   _sent_root = _mailboxes_root->child(Sent);
 
   _wallets_root->setExpanded(true);
@@ -223,10 +226,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   auto addressbook = profile->get_addressbook();
   _addressbook_model = new AddressBookModel(this, addressbook);
 
-  _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db(), *_addressbook_model);
-  _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model);
-  _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model);
-  _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model);
+  _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db(), *_addressbook_model, false);
+  _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model, true);
+  _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model, false);
+  _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, false);
 
   connect(_addressbook_model, &QAbstractItemModel::dataChanged, this,
     &KeyhoteeMainWindow::addressBookDataChanged);
@@ -235,8 +238,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   ui->contacts_page->setAddressBook(_addressbook_model);
   ui->new_contact->setAddressBook(_addressbook_model);
+
   ui->inbox_page->initial(MailProcessor, _inbox_model, Mailbox::Inbox, this);
   ui->draft_box_page->initial(MailProcessor, _draft_model, Mailbox::Drafts, this);
+  ui->out_box_page->initial(MailProcessor, _pending_model, Mailbox::Outbox, this);
   ui->sent_box_page->initial(MailProcessor, _sent_model, Mailbox::Sent, this);
 
   ui->widget_stack->setCurrentWidget(ui->inbox_page);
@@ -289,7 +294,18 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 }
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
-{}
+  {
+  delete ui;
+  }
+
+void KeyhoteeMainWindow::activateMailboxPage(Mailbox* mailBox)
+  {
+  ui->widget_stack->setCurrentWidget(mailBox);
+  connect(ui->actionDelete, SIGNAL(triggered()), mailBox, SLOT(onDeleteMail()));
+  connect(ui->actionShow_details, SIGNAL(toggled(bool)), mailBox, SLOT(on_actionShow_details_toggled(bool)));
+  bool checked = mailBox->isShowDetailsHidden() == false;
+  ui->actionShow_details->setChecked(checked);
+  }
 
 void KeyhoteeMainWindow::addContact()
 {
@@ -359,13 +375,18 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
+    disconnect(ui->actionDelete, SIGNAL(triggered()), ui->out_box_page, SLOT(onDeleteMail()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->sent_box_page, SLOT(onDeleteMail()));
+
     disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
     disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
     disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->draft_box_page, SLOT(on_actionShow_details_toggled(bool)));
+    disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->out_box_page, SLOT(on_actionShow_details_toggled(bool)));
     disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->sent_box_page, SLOT(on_actionShow_details_toggled(bool)));
 
-    if (selected_items[0]->type() == ContactItem)
+    QTreeWidgetItem* selectedItem = selected_items.first();
+
+    if (selectedItem->type() == ContactItem)
     {
       auto con_id = selected_items[0]->data(0, ContactIdRole).toInt();
       openContactGui(con_id);
@@ -380,11 +401,11 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);
     }
-    else if (selected_items[0]->type() == IdentityItem)
+    else if (selectedItem->type() == IdentityItem)
     {
-      selectIdentityItem(selected_items[0]);
+      selectIdentityItem(selectedItem);
     }
-    else if (selected_items[0] == _contacts_root)
+    else if (selectedItem == _contacts_root)
     {
       showContacts();
       connect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
@@ -394,51 +415,28 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);
     }
-    else if (selected_items[0] == _mailboxes_root)
-    {
-      ui->widget_stack->setCurrentWidget(ui->inbox_page);
-      connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
-      connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
-      if (ui->inbox_page->isShowDetailsHidden())
-        ui->actionShow_details->setChecked(false);
-      else
-        ui->actionShow_details->setChecked(true);
-    }
     /*
        else if( selected_items[0] == _identities_root )
      {
      }
      */
-    else if (selected_items[0] == _inbox_root)
-    {
-      ui->widget_stack->setCurrentWidget(ui->inbox_page);
-      connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
-      connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
-      if (ui->inbox_page->isShowDetailsHidden())
-        ui->actionShow_details->setChecked(false);
-      else
-        ui->actionShow_details->setChecked(true);
-    }
-    else if (selected_items[0] == _drafts_root)
-    {
-      ui->widget_stack->setCurrentWidget(ui->draft_box_page);
-      connect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
-      connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->draft_box_page, SLOT(on_actionShow_details_toggled(bool)));
-      if (ui->draft_box_page->isShowDetailsHidden())
-        ui->actionShow_details->setChecked(false);
-      else
-        ui->actionShow_details->setChecked(true);
-    }
-    else if (selected_items[0] == _sent_root)
-    {
-      ui->widget_stack->setCurrentWidget(ui->sent_box_page);
-      connect(ui->actionDelete, SIGNAL(triggered()), ui->sent_box_page, SLOT(onDeleteMail()));
-      connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->sent_box_page, SLOT(on_actionShow_details_toggled(bool)));
-      if (ui->sent_box_page->isShowDetailsHidden())
-        ui->actionShow_details->setChecked(false);
-      else
-        ui->actionShow_details->setChecked(true);
-    }
+    /// For mailboxes root just select inbox root
+    else if (selectedItem == _mailboxes_root || selectedItem == _inbox_root)
+      {
+      activateMailboxPage(ui->inbox_page);
+      }
+    else if (selectedItem == _drafts_root)
+      {
+      activateMailboxPage(ui->draft_box_page);
+      }
+    else if (selectedItem == _out_box_root)
+      {
+      activateMailboxPage(ui->out_box_page);
+      }
+    else if (selectedItem == _sent_root)
+      {
+      activateMailboxPage(ui->sent_box_page);
+      }
     else if (selected_items[0] == _wallets_root)
     {
       ui->widget_stack->setCurrentWidget(ui->wallets);
@@ -742,9 +740,17 @@ void KeyhoteeMainWindow::OnMessageGroupPending(unsigned int count)
   /// FIXME - add some status bar messaging
 }
 
-void KeyhoteeMainWindow::OnMessagePending(const TStoredMailMessage& msg)
+void KeyhoteeMainWindow::OnMessagePending(const TStoredMailMessage& msg,
+  const TStoredMailMessage* savedDraftMsg)
 {
   /// FIXME - add some status bar messaging
+  if(savedDraftMsg != nullptr)
+    ui->draft_box_page->removeMessage(*savedDraftMsg);
+  else
+    _pending_model->addMailHeader(msg);
+
+  ui->draft_box_page->refreshMessageViewer();
+  ui->out_box_page->refreshMessageViewer();
 }
 
 void KeyhoteeMainWindow::OnMessageGroupPendingEnd()
@@ -761,11 +767,26 @@ void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
   const TStoredMailMessage& sentMsg)
 {
   /// FIXME - add some status bar messaging
+  ui->out_box_page->removeMessage(pendingMsg);
+  ui->out_box_page->refreshMessageViewer();
+  _sent_model->addMailHeader(sentMsg);
+  ui->sent_box_page->refreshMessageViewer();
 }
 
 void KeyhoteeMainWindow::OnMessageSendingEnd()
 {
   /// FIXME - add some status bar messaging
+}
+
+void KeyhoteeMainWindow::OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
+  const TPhysicalMailMessage& msg)
+{
+  public_key_address pkAddress(senderId);
+  std::string pkAddressText(pkAddress);
+
+  QMessageBox::warning(this, tr("Mail send"),
+    tr("Following sender identity specified in a pending mail message doesn't exist anymore:\n") +
+    QString(pkAddressText.c_str()));
 }
 
 void KeyhoteeMainWindow::notSupported()
