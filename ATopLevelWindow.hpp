@@ -3,13 +3,10 @@
 
 #include "qtreusable/selfsizingmainwindow.h"
 
-namespace Ui { class ATopLevelWindow; }
-
 class QAction;
 class ATopLevelWindowsContainer;
 
-class ATopLevelWindow :
-  public SelfSizingMainWindow
+class ATopLevelWindow : public SelfSizingMainWindow
 {
 public:
   ATopLevelWindow(ATopLevelWindowsContainer *parent = 0);
@@ -28,4 +25,4 @@ protected:
   virtual void closeEvent(QCloseEvent *event);
 };
 
-#endif __ATOPLEVELWINDOW_HPP
+#endif /// __ATOPLEVELWINDOW_HPP

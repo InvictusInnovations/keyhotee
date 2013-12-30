@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_CN">
+<TS version="2.1" language="zh_CN">
+<context>
+    <name>ATopLevelWindow</name>
+    <message>
+        <location filename="../ATopLevelWindow.cpp" line="13"/>
+        <source>[*]</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>AddContactDialog</name>
     <message>
@@ -43,12 +51,12 @@
     <message>
         <location filename="../AddContactDialog.ui" line="204"/>
         <source>First Name</source>
-        <translation>姓</translation>
+        <translation>名</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="221"/>
         <source>Last Name</source>
-        <translation>名</translation>
+        <translation>姓</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="250"/>
@@ -59,6 +67,268 @@
         <location filename="../AddContactDialog.ui" line="276"/>
         <source>Notes</source>
         <translation>备注</translation>
+    </message>
+</context>
+<context>
+    <name>AddressBookModel</name>
+    <message>
+        <location filename="../AddressBook/AddressBookModel.cpp" line="120"/>
+        <source>First Name</source>
+        <translation>名</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/AddressBookModel.cpp" line="122"/>
+        <source> </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/AddressBookModel.cpp" line="124"/>
+        <source>Last Name</source>
+        <translation>姓</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/AddressBookModel.cpp" line="126"/>
+        <source>Id</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/AddressBookModel.cpp" line="128"/>
+        <source>Age</source>
+        <translation>年龄</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/AddressBookModel.cpp" line="130"/>
+        <source>Repute</source>
+        <translation>名誉</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/AddressBookModel.cpp" line="253"/>
+        <source>Ownership</source>
+        <translation>所有权</translation>
+    </message>
+</context>
+<context>
+    <name>BitSharesMainWindow</name>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="14"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="255"/>
+        <source>MainWindow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="119"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="283"/>
+        <source>File</source>
+        <translation>文件</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="128"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="284"/>
+        <source>Edit</source>
+        <translation>编辑</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="142"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="285"/>
+        <source>Mail</source>
+        <translation>邮件</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="151"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="286"/>
+        <source>Help</source>
+        <translation>帮助</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="157"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="287"/>
+        <source>Contacts</source>
+        <translation>联系人</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="179"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="256"/>
+        <source>Open Profile...</source>
+        <translation>打开档案...</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="184"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="257"/>
+        <source>Exit</source>
+        <translation>退出</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="189"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="258"/>
+        <source>New Profile...</source>
+        <translation>新建档案...</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="194"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="259"/>
+        <source>Recent Profiles</source>
+        <translation>最近档案</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="199"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="260"/>
+        <source>About</source>
+        <translation>关于</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="208"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="261"/>
+        <source>New Mail Message</source>
+        <translation>新建邮件</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="211"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="262"/>
+        <source>Ctrl+N</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="216"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="263"/>
+        <source>Reply</source>
+        <translation>回复</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="219"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="264"/>
+        <source>Ctrl+R</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="224"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="265"/>
+        <source>Reply to all</source>
+        <translation>回复所有</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="227"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="266"/>
+        <source>Ctrl+Shift+R</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="232"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="267"/>
+        <source>Forward</source>
+        <translation>转发</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="237"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="268"/>
+        <source>Undo</source>
+        <translation>撤销</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="240"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="269"/>
+        <source>Ctrl+Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="245"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="270"/>
+        <source>Redo</source>
+        <translation>重做</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="248"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="271"/>
+        <source>Ctrl+Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="253"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="272"/>
+        <source>Cut</source>
+        <translation>剪切</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="256"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="273"/>
+        <source>Ctrl+X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="261"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="274"/>
+        <source>Copy</source>
+        <translation>拷贝</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="264"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="275"/>
+        <source>Ctrl+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="269"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="276"/>
+        <source>Paste</source>
+        <translation>粘贴</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="272"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="277"/>
+        <source>Ctrl+V</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="277"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="278"/>
+        <source>Delete Message</source>
+        <translation>删除消息</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="280"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="279"/>
+        <source>Del</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="285"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="280"/>
+        <source>Find</source>
+        <translation>查找</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="288"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="281"/>
+        <source>Ctrl+F</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="293"/>
+        <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="282"/>
+        <source>Add Contact</source>
+        <translation>添加联系人</translation>
+    </message>
+</context>
+<context>
+    <name>ChatWidget</name>
+    <message>
+        <location filename="../BitShares/bitsharesgui/chatwidget.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/chatwidget.ui" line="22"/>
+        <source>Chat</source>
+        <translation>对话</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/chatwidget.cpp" line="12"/>
+        <source>Send Chat Message</source>
+        <translation>发送消息</translation>
+    </message>
+    <message>
+        <location filename="../BitShares/bitsharesgui/chatwidget.cpp" line="13"/>
+        <source>Ctrl+Enter</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -89,23 +359,23 @@
     <message>
         <location filename="../AddressBook/ContactView.ui" line="129"/>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation>信息</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="176"/>
         <location filename="../AddressBook/ContactView.ui" line="256"/>
         <source>Keyhotee ID</source>
-        <translation type="unfinished">Keyhotee ID</translation>
+        <translation>Keyhotee ID</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="196"/>
         <source>First Name</source>
-        <translation type="unfinished">姓</translation>
+        <translation>名</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="223"/>
         <source>Last Name</source>
-        <translation type="unfinished">名</translation>
+        <translation>姓</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="299"/>
@@ -115,7 +385,7 @@
     <message>
         <location filename="../AddressBook/ContactView.ui" line="329"/>
         <source>ID Status</source>
-        <translation type="unfinished"></translation>
+        <translation>ID状态</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="336"/>
@@ -125,7 +395,7 @@
     <message>
         <location filename="../AddressBook/ContactView.ui" line="364"/>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>复制到剪切板</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="367"/>
@@ -135,55 +405,172 @@
     <message>
         <location filename="../AddressBook/ContactView.ui" line="384"/>
         <source>Privacy Level</source>
-        <translation type="unfinished"></translation>
+        <translation>隐私级别</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="401"/>
         <source>Blocked</source>
-        <translation type="unfinished"></translation>
+        <translation>屏蔽</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="406"/>
         <source>Hidden Relationship</source>
         <extracomment>No one should know you have ever communicated with this individual.</extracomment>
-        <translation type="unfinished">隐藏关系</translation>
+        <translation>隐藏关系</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="411"/>
         <source>Public Relationship</source>
         <extracomment>The government knows you are in communication with this individual.</extracomment>
-        <translation type="unfinished">公开关系</translation>
+        <translation>公开关系</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="419"/>
         <source>Email</source>
-        <translation type="unfinished">Email</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="432"/>
         <source>Phone</source>
-        <translation type="unfinished">电话号码</translation>
+        <translation>电话号码</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="457"/>
         <source>Notes</source>
-        <translation type="unfinished">提示信息</translation>
+        <translation>提示信息</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="514"/>
+        <location filename="../AddressBook/ContactView.cpp" line="112"/>
         <source>Chat</source>
-        <translation type="unfinished"></translation>
+        <translation>对话</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="532"/>
         <source>Allows to send message
 Enter</source>
-        <translation type="unfinished"></translation>
+        <translation>允许发送消息
+确认</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="536"/>
         <source>Send</source>
+        <translation>发送</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="111"/>
+        <source>Mail</source>
+        <translation>邮件</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="113"/>
+        <source>Edit</source>
+        <translation>编辑</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="114"/>
+        <source>Share (need new icon)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="115"/>
+        <source>Request authorisation</source>
+        <translation>请求验证</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="116"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="117"/>
+        <source>Discard changes</source>
+        <translation>放弃修改</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="129"/>
+        <source>     Create new contact</source>
+        <translation>     创建新联系人</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="263"/>
+        <location filename="../AddressBook/ContactView.cpp" line="268"/>
+        <source>Warning</source>
+        <translation>警告</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="263"/>
+        <location filename="../AddressBook/ContactView.cpp" line="268"/>
+        <source>Not supported</source>
+        <translation>不支持</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="377"/>
+        <source>Looking up id...</source>
+        <translation>查找ID中...</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="405"/>
+        <source>Public Key Only Mode: valid key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="411"/>
+        <source>Public Key Only Mode: not a valid key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="432"/>
+        <source>Registered</source>
+        <translation>已注册</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="444"/>
+        <source>Unable to find ID</source>
+        <translation>无法找到ID</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="546"/>
+        <location filename="../AddressBook/ContactView.cpp" line="566"/>
+        <source>Application</source>
+        <translation>应用</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="547"/>
+        <source>The contact has been modified.
+Do you want to save your changes ?</source>
+        <translation>联系人信息已经被修改
+你是否保存修改？</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="567"/>
+        <source>Please correct the Keyhotee ID.</source>
+        <translation>请准确填写Keyhotee ID。</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="595"/>
+        <source>Select Avatar image for contact</source>
+        <translation>为联系人选择Avatar头像</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="596"/>
+        <source>Image Files (*.png *.jpg *.bmp)</source>
+        <translation>图像文件 (*.png *.jpg *.bmp)</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="621"/>
+        <source>Please provide a valid ID or public key</source>
+        <translation>请提供有效的ID或公钥</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="623"/>
+        <source>Public Key Only Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/ContactView.cpp" line="677"/>
+        <source>This contact is already added to the list</source>
+        <translation>联系人已被加入列表</translation>
     </message>
 </context>
 <context>
@@ -196,7 +583,7 @@ Enter</source>
     <message>
         <location filename="../AddressBook/ContactsTable.ui" line="103"/>
         <source>Please select the contact</source>
-        <translation type="unfinished"></translation>
+        <translation>请选择联系人</translation>
     </message>
 </context>
 <context>
@@ -204,6 +591,26 @@ Enter</source>
     <message>
         <location filename="../diagnosticdialog.ui" line="20"/>
         <source>Dialog</source>
+        <translation>对话框</translation>
+    </message>
+    <message>
+        <location filename="../diagnosticdialog.cpp" line="29"/>
+        <source>&amp;OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../diagnosticdialog.cpp" line="30"/>
+        <source>&amp;Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../diagnosticdialog.cpp" line="62"/>
+        <source>Save Diagnostic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../diagnosticdialog.cpp" line="62"/>
+        <source>All Files (*)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -219,18 +626,19 @@ Enter</source>
     <name>KeyhoteeMainWindow</name>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="14"/>
+        <location filename="../KeyhoteeMainWindow.cpp" line="285"/>
         <source>Keyhotee</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="138"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名字</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="143"/>
         <source>MAILBOXES</source>
-        <translation type="unfinished"></translation>
+        <translation>邮箱</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="164"/>
@@ -301,12 +709,12 @@ Enter</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="398"/>
         <source>Identity</source>
-        <translation type="unfinished"></translation>
+        <translation>身份</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="406"/>
         <source>Window</source>
-        <translation type="unfinished"></translation>
+        <translation>窗口</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="420"/>
@@ -351,7 +759,7 @@ Enter</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="514"/>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation>剪切</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="517"/>
@@ -361,7 +769,7 @@ Enter</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="526"/>
         <source>Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>粘贴</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="529"/>
@@ -371,7 +779,7 @@ Enter</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="534"/>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>选择所有</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="537"/>
@@ -381,12 +789,12 @@ Enter</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="546"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>删除</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="549"/>
         <source>Allows to delete currently selected item(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>允许删除当前所选项</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="552"/>
@@ -396,7 +804,7 @@ Enter</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="561"/>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>转发</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="570"/>
@@ -426,7 +834,7 @@ Enter</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="607"/>
         <source>New identity</source>
-        <translation type="unfinished"></translation>
+        <translation>新建身份</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="612"/>
@@ -437,6 +845,66 @@ Enter</source>
         <location filename="../KeyhoteeMainWindow.ui" line="627"/>
         <source>Show details</source>
         <translation>显示详情</translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="149"/>
+        <source>Search</source>
+        <translation>搜索</translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="564"/>
+        <source>About </source>
+        <translation>关于</translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="567"/>
+        <source>&lt;p align=&apos;center&apos;&gt;&lt;b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="569"/>
+        <source> version </source>
+        <translation>版本</translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="571"/>
+        <source>&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="573"/>
+        <source>Built from revision: &lt;a href=&quot;https://github.com/InvictusInnovations/keyhotee/commit/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="575"/>
+        <source>&quot;&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="577"/>
+        <source>&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="578"/>
+        <source>&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="579"/>
+        <source>Invictus Innovations Inc&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="580"/>
+        <source>&lt;a href=&quot;http://invictus-innovations.com/keyhotee/&quot;&gt;http://invictus-innovations.com/keyhotee/&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="581"/>
+        <source>&lt;br/&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -473,6 +941,194 @@ Enter</source>
     </message>
 </context>
 <context>
+    <name>MailEditor</name>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="222"/>
+        <source>(No Subject)</source>
+        <translation>(无主题)</translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="257"/>
+        <source>&amp;Send</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="267"/>
+        <source>Mail Fields</source>
+        <translation>邮件字段</translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="282"/>
+        <source>&amp;Format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="291"/>
+        <source>&amp;Attach Money</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="299"/>
+        <source>&amp;Attach File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="338"/>
+        <source>New Message</source>
+        <translation>新建消息</translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="634"/>
+        <source>&amp;Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="639"/>
+        <source>&amp;Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="644"/>
+        <source>&amp;Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="651"/>
+        <source>Cu&amp;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="657"/>
+        <source>&amp;Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="663"/>
+        <source>&amp;Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="730"/>
+        <source>F&amp;ormat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="734"/>
+        <source>&amp;Bold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="747"/>
+        <source>&amp;Italic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="760"/>
+        <source>&amp;Underline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="781"/>
+        <location filename="../Mail/MailEditor.cpp" line="799"/>
+        <source>&amp;Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="784"/>
+        <location filename="../Mail/MailEditor.cpp" line="796"/>
+        <source>C&amp;enter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="787"/>
+        <location filename="../Mail/MailEditor.cpp" line="793"/>
+        <source>&amp;Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="803"/>
+        <source>&amp;Justify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="825"/>
+        <source>&amp;Color...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="885"/>
+        <source>Application</source>
+        <translation>应用</translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="886"/>
+        <source>The document has been modified.
+Do you want to save your changes?</source>
+        <translation>内容已被修改
+是否保存变化?</translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="978"/>
+        <source>Save as...</source>
+        <translation>另存为...</translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="979"/>
+        <source>ODF files (*.odt);;HTML-Files (*.htm *.html);;All Files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="998"/>
+        <source>Print Document</source>
+        <translation>打印文档</translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="1195"/>
+        <source>About</source>
+        <translation>关于</translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="1195"/>
+        <source>This example demonstrates Qt&apos;s rich text editing facilities in action, providing an example document for you to experiment with.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MailEditorMainWindow</name>
+    <message>
+        <location filename="../Mail/maileditorwindow.cpp" line="144"/>
+        <source>Keyhotee</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/maileditorwindow.cpp" line="145"/>
+        <source>The document has been modified.
+Do you want to save your changes ?</source>
+        <translation>内容已被修改
+是否保存变化?</translation>
+    </message>
+    <message>
+        <location filename="../Mail/maileditorwindow.cpp" line="236"/>
+        <source>Following files doesn&apos;t exist or are not readable. Do you want to continue ?&lt;br/&gt;</source>
+        <translation>文件不存在或者不可读. 你是否继续?&lt;br/&gt;</translation>
+    </message>
+    <message>
+        <location filename="../Mail/maileditorwindow.cpp" line="240"/>
+        <source>&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/maileditorwindow.cpp" line="243"/>
+        <source>File attachment</source>
+        <translation>附件</translation>
+    </message>
+    <message>
+        <location filename="../Mail/maileditorwindow.cpp" line="417"/>
+        <source>Mail message: %1[*]</source>
+        <translation>邮件消息: %1[*]</translation>
+    </message>
+</context>
+<context>
     <name>MailEditorWindow</name>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="17"/>
@@ -483,27 +1139,27 @@ Enter</source>
         <location filename="../Mail/maileditorwindow.ui" line="49"/>
         <location filename="../Mail/maileditorwindow.ui" line="435"/>
         <source>Mail fields</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">邮件字段</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="78"/>
         <source>Standard</source>
-        <translation type="unfinished"></translation>
+        <translation>标准</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="129"/>
         <source>Text adjust</source>
-        <translation type="unfinished"></translation>
+        <translation>文本调整</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="150"/>
         <source>Text format</source>
-        <translation type="unfinished"></translation>
+        <translation>文本格式</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="166"/>
         <source>File attachment</source>
-        <translation type="unfinished"></translation>
+        <translation>附件</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="183"/>
@@ -513,23 +1169,23 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="194"/>
         <source>Text edit</source>
-        <translation type="unfinished"></translation>
+        <translation>文本编辑</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="218"/>
         <location filename="../Mail/maileditorwindow.ui" line="221"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="224"/>
         <source>Save document</source>
-        <translation type="unfinished"></translation>
+        <translation>保存文档</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="227"/>
         <source>Save currently edited message into Drafts folder</source>
-        <translation type="unfinished"></translation>
+        <translation>保存当前编辑消息到草稿箱</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="230"/>
@@ -539,7 +1195,7 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="235"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="238"/>
@@ -550,12 +1206,12 @@ Enter</source>
         <location filename="../Mail/maileditorwindow.ui" line="250"/>
         <location filename="../Mail/maileditorwindow.ui" line="253"/>
         <source>Copy</source>
-        <translation type="unfinished">拷贝</translation>
+        <translation>拷贝</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="256"/>
         <source>Copy current selection to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>拷贝当前选择到剪切板</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="259"/>
@@ -565,7 +1221,7 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="271"/>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation>剪切</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="274"/>
@@ -575,7 +1231,7 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="286"/>
         <source>Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>粘贴</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="289"/>
@@ -585,7 +1241,7 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="294"/>
         <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <translation>选择所有</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="297"/>
@@ -595,22 +1251,22 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="306"/>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>发送</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="309"/>
         <source>Allows to send given mail document</source>
-        <translation type="unfinished"></translation>
+        <translation>允许发送邮件</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="312"/>
         <source>Allows to send currently edited message</source>
-        <translation type="unfinished"></translation>
+        <translation>允许发送当前编辑消息</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="324"/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation>左边</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="327"/>
@@ -620,7 +1276,7 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="339"/>
         <source>Center</source>
-        <translation type="unfinished"></translation>
+        <translation>中间</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="342"/>
@@ -630,7 +1286,7 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="354"/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation>右边</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="357"/>
@@ -650,7 +1306,7 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="384"/>
         <source>Bold</source>
-        <translation type="unfinished"></translation>
+        <translation>加粗</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="387"/>
@@ -665,12 +1321,12 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="402"/>
         <source>Italic</source>
-        <translation type="unfinished"></translation>
+        <translation>斜体</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="405"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Changes currently selected text to &lt;span style=&quot; font-style:italic;&quot;&gt;italic&lt;/span&gt; font&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;改变当前文本为&lt;span style=&quot; font-style:italic;&quot;&gt;斜体&lt;/span&gt; 字体&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="408"/>
@@ -680,12 +1336,12 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="420"/>
         <source>Underline</source>
-        <translation type="unfinished"></translation>
+        <translation>下划线</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="423"/>
         <source>Draw line below selected text</source>
-        <translation type="unfinished"></translation>
+        <translation>在选择的文本下面画下划线</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="426"/>
@@ -695,7 +1351,7 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="438"/>
         <source>Allows to select additional mail fields (Bcc: Cc: From:)</source>
-        <translation type="unfinished"></translation>
+        <translation>允许选择附加邮件字段</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="446"/>
@@ -715,12 +1371,12 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="477"/>
         <source>Attachement</source>
-        <translation type="unfinished"></translation>
+        <translation>附件</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="480"/>
         <source>Allows to manage mail attachement</source>
-        <translation type="unfinished"></translation>
+        <translation>允许管理邮件附件</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="492"/>
@@ -736,7 +1392,7 @@ Enter</source>
         <location filename="../Mail/maileditorwindow.ui" line="507"/>
         <location filename="../Mail/maileditorwindow.ui" line="510"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>撤销</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="513"/>
@@ -747,7 +1403,7 @@ Enter</source>
         <location filename="../Mail/maileditorwindow.ui" line="525"/>
         <location filename="../Mail/maileditorwindow.ui" line="528"/>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>重做</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="531"/>
@@ -757,12 +1413,12 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="536"/>
         <source>TextColor</source>
-        <translation type="unfinished"></translation>
+        <translation>文本颜色</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="539"/>
         <source>Allows to change text colour</source>
-        <translation type="unfinished"></translation>
+        <translation>允许改变文本颜色</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="551"/>
@@ -772,7 +1428,7 @@ Enter</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="554"/>
         <source>Allows to display all text formatting options...</source>
-        <translation type="unfinished"></translation>
+        <translation>允许显示所有文本格式选项</translation>
     </message>
 </context>
 <context>
@@ -780,22 +1436,22 @@ Enter</source>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="20"/>
         <source>Mail fields</source>
-        <translation type="unfinished"></translation>
+        <translation>邮件字段</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="29"/>
         <source>Allows to send currently edited mail message</source>
-        <translation type="unfinished"></translation>
+        <translation>允许发送当前编辑消息</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="32"/>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>发送</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="71"/>
         <source>Allows to choose sender&apos;s identity</source>
-        <translation type="unfinished"></translation>
+        <translation>允许选择发件人身份</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="74"/>
@@ -807,7 +1463,7 @@ Enter</source>
         <location filename="../Mail/mailfieldswidget.ui" line="155"/>
         <location filename="../Mail/mailfieldswidget.ui" line="197"/>
         <source>Allows to choose mail recipients</source>
-        <translation type="unfinished"></translation>
+        <translation>允许选择邮件收件人</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="122"/>
@@ -827,7 +1483,7 @@ Enter</source>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="233"/>
         <source>Subject:</source>
-        <translation type="unfinished"></translation>
+        <translation>主题:</translation>
     </message>
 </context>
 <context>
@@ -835,7 +1491,7 @@ Enter</source>
     <message>
         <location filename="../Mail/MailViewer.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>来自</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="99"/>
@@ -900,6 +1556,59 @@ Enter</source>
         <source>Multiple selection</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../Mail/Mailbox.cpp" line="159"/>
+        <source>Reply</source>
+        <translation>回复</translation>
+    </message>
+    <message>
+        <location filename="../Mail/Mailbox.cpp" line="160"/>
+        <source>Reply All</source>
+        <translation>回复所有</translation>
+    </message>
+    <message>
+        <location filename="../Mail/Mailbox.cpp" line="161"/>
+        <source>Forward</source>
+        <translation>转发</translation>
+    </message>
+    <message>
+        <location filename="../Mail/Mailbox.cpp" line="162"/>
+        <source>Delete</source>
+        <translation>删除</translation>
+    </message>
+</context>
+<context>
+    <name>MailboxModel</name>
+    <message>
+        <location filename="../Mail/MailboxModel.cpp" line="198"/>
+        <source>From</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailboxModel.cpp" line="200"/>
+        <source>Subject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailboxModel.cpp" line="202"/>
+        <source>Date Received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailboxModel.cpp" line="204"/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailboxModel.cpp" line="206"/>
+        <source>Date Sent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailboxModel.cpp" line="208"/>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MoneyAttachementWidget</name>
@@ -919,42 +1628,52 @@ Enter</source>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="14"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">对话框</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="20"/>
         <source>First Name</source>
-        <translation type="unfinished">姓</translation>
+        <translation>名</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="27"/>
         <source>Last Name</source>
-        <translation type="unfinished">名</translation>
+        <translation>姓</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="34"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>用户名</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="44"/>
         <source>If your desired identity has not been registered by another user, Keyhotee will do the work necessary to register this identity to your public key.</source>
-        <translation type="unfinished"></translation>
+        <translation>如果你想要的ID没有被其他用户注册, 那么Keyhotee将会根据你的公钥来注册这个ID</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="47"/>
         <source>Register</source>
-        <translation type="unfinished"></translation>
+        <translation>注册</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="54"/>
         <source>Public Key</source>
-        <translation type="unfinished"></translation>
+        <translation>公钥</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="74"/>
         <source>Status:  Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>状态:  未知</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/NewIdentityDialog.cpp" line="42"/>
+        <source>Status: You have already created this identity.</source>
+        <translation>状态: 你已经创建这个ID.</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/NewIdentityDialog.cpp" line="46"/>
+        <source>Status: Unknown</source>
+        <translation>状态:  未知</translation>
     </message>
 </context>
 <context>
@@ -962,23 +1681,23 @@ Enter</source>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="14"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation>向导</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="20"/>
         <source>Your Keyhotee ID is your globally unique username that will allow others to contact you.</source>
-        <translation type="unfinished"></translation>
+        <translation>你的Keyhotee ID是你的唯一用户名， 别人可以通过这个用户名来联系你。</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="42"/>
         <source>Keyhotee ID</source>
-        <translation type="unfinished">Keyhotee ID</translation>
+        <translation>Keyhotee ID</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="52"/>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="65"/>
         <source>Avatar</source>
-        <translation type="unfinished">头像</translation>
+        <translation>头像</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="106"/>
@@ -988,12 +1707,42 @@ Enter</source>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="109"/>
         <source>Create Unlisted ID</source>
-        <translation type="unfinished"></translation>
+        <translation>创建未列入ID</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="122"/>
         <source>This name is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>这个名字不可用.</translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="27"/>
+        <source>Create your Keyhotee ID</source>
+        <translation>创建你的Keyhotee ID</translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="48"/>
+        <source>Checking availability of ID...</source>
+        <translation>检查ID是否可用...</translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="65"/>
+        <source>This ID has been taken by another user</source>
+        <translation>这个ID已经被其他用户使用</translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="69"/>
+        <source>This ID is available!</source>
+        <translation>这个ID可用!</translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="83"/>
+        <source>Open Image</source>
+        <translation>打开图片</translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="83"/>
+        <source>Image Files (*.png *.jpg *.bmp)</source>
+        <translation>图像文件 (*.png *.jpg *.bmp)</translation>
     </message>
 </context>
 <context>
@@ -1001,17 +1750,17 @@ Enter</source>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="14"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation>向导</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="20"/>
         <source>Information collected by this form is meant to strengthen your brain wallet with unique yet easily remembered information. This information is never sent to any other party.  </source>
-        <translation type="unfinished"></translation>
+        <translation>此表单收集的信息可以用容易记住的信息来加强你的脑钱包。这些信息绝不会发送至任何其他第三方.  </translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="42"/>
         <source>First Name</source>
-        <translation type="unfinished">姓</translation>
+        <translation type="unfinished">名</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="59"/>
@@ -1021,22 +1770,22 @@ Enter</source>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="76"/>
         <source>Last Name</source>
-        <translation type="unfinished">名</translation>
+        <translation type="unfinished">姓</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="93"/>
         <source>Date of Birth</source>
-        <translation type="unfinished"></translation>
+        <translation>生日</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="103"/>
         <source>Passport #</source>
-        <translation type="unfinished"></translation>
+        <translation>护照</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="116"/>
         <source>Passport or Social Security Number</source>
-        <translation type="unfinished"></translation>
+        <translation>护照或身份证号码</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="123"/>
@@ -1046,42 +1795,84 @@ Enter</source>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="142"/>
         <source>You will need to remember the values you provide here any time you wish to recover your profile from memory alone.  Your profile gives you access to your identies and money within Keyhotee.</source>
-        <translation type="unfinished"></translation>
+        <translation>你需要记住在这里提供的信息，以防止需要用它们来恢复你的档案。 你的档案可以用来获得Keyhotee中身份和钱包的访问权限。</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="167"/>
         <source>Brain Wallet Key</source>
-        <translation type="unfinished"></translation>
+        <translation>脑钱包密钥</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="180"/>
         <source>Your brain key must have at least 32 characters</source>
-        <translation type="unfinished"></translation>
+        <translation>你的脑钱包密钥必须至少包含32个字符</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="199"/>
         <source>Create Random</source>
-        <translation type="unfinished"></translation>
+        <translation>随机创建</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="221"/>
         <source>Repeat Password</source>
-        <translation type="unfinished"></translation>
+        <translation>重复密码</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="235"/>
         <source>Login Password</source>
-        <translation type="unfinished"></translation>
+        <translation>登陆密码</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="244"/>
         <source>Your Login password will be required every time your launch Keyhotee and is used to secure your profile while it is stored on your computer. </source>
-        <translation type="unfinished"></translation>
+        <translation>每次登陆Keyhotee都需要输入你的登陆密码，此密码用来对存储在你电脑上的资料进行加密。</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="254"/>
         <source>Your password must have at least 8 characters.</source>
+        <translation>密码至少包含8个字符.</translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="99"/>
+        <source>Create your Keyhotee Profile</source>
+        <translation>创建你的Keyhotee档案</translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="117"/>
+        <source>Your Brain Key must be at least 32 characters</source>
+        <translation>你的脑钱包密钥必须至少包含32个字符</translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="128"/>
+        <source>Password must be at least 8 characters</source>
+        <translation>密码至少包含8个字符</translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="133"/>
+        <source>Password do not match</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="145"/>
+        <source>Passwords do not match</source>
+        <translation>输入密码不一致</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileEditor</name>
+    <message>
+        <location filename="../BitShares/bitsharesgui/profileeditor.ui" line="16"/>
+        <location filename="../BitShares/bitsharesgui/ui_profileeditor.h" line="47"/>
+        <source>Dialog</source>
+        <translation type="unfinished">对话框</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileWizard</name>
+    <message>
+        <location filename="../profile_wizard/ProfileWizard.cpp" line="173"/>
+        <source>Welcome to Keyhotee</source>
+        <translation>欢迎来到Keyhotee</translation>
     </message>
 </context>
 <context>
@@ -1094,28 +1885,28 @@ Enter</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="32"/>
         <source>Allows to add new file to mail attachment</source>
-        <translation type="unfinished"></translation>
+        <translation>允许添加新文件到邮件附件</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="35"/>
         <source>add</source>
-        <translation type="unfinished"></translation>
+        <translation>添加</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="91"/>
         <source>Total count</source>
         <extracomment>Number of attachement items</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>附件总数</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="96"/>
         <source>Total size</source>
-        <translation type="unfinished"></translation>
+        <translation>附件大小</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="110"/>
         <source>Allows to delete selected attachment items</source>
-        <translation type="unfinished"></translation>
+        <translation>允许删除选择的附件</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="113"/>
@@ -1127,33 +1918,33 @@ Enter</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="135"/>
         <source>Allows to save selected attachment items</source>
-        <translation type="unfinished"></translation>
+        <translation>允许保存删除的附件</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="138"/>
         <location filename="../Mail/fileattachmentwidget.ui" line="188"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="158"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>添加</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="161"/>
         <source>Allows to add new file(s) to the emai&apos;s attachement</source>
-        <translation type="unfinished"></translation>
+        <translation>允许添加新文件到邮件附件</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="173"/>
         <source>Allows to remove selected items from the email&apos;s attachment</source>
-        <translation type="unfinished"></translation>
+        <translation>允许从邮件附件中除去选择的附件</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="191"/>
         <source>Allows to save selected items from email&apos;s attachment</source>
-        <translation type="unfinished"></translation>
+        <translation>允许从选择的邮件附件中保存选择的附件</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="194"/>
@@ -1163,12 +1954,12 @@ Enter</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="202"/>
         <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <translation>选择所有</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="205"/>
         <source>Select all items in attachment</source>
-        <translation type="unfinished"></translation>
+        <translation>选择附件中所有项</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="208"/>
@@ -1178,12 +1969,12 @@ Enter</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="216"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>重命名</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="219"/>
         <source>Allows to rename attached file</source>
-        <translation type="unfinished"></translation>
+        <translation>允许重命名附件文件</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="222"/>
@@ -1193,16 +1984,86 @@ Enter</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="233"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>打开</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="236"/>
         <source>Opens the attachment using its default application</source>
-        <translation type="unfinished"></translation>
+        <translation>用默认程序打开附件</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="239"/>
         <source>Ctrl+Shift+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="50"/>
+        <source>Open attachment...</source>
+        <translation>打开附件...</translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="59"/>
+        <source>Cannot open temporary file to store attachment: </source>
+        <translation>不能打开临时文件目录来存储附件: </translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="72"/>
+        <source>Cannot open attachment using its default application: </source>
+        <translation>不能用默认程序打开附件: </translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="477"/>
+        <source> attachment(s)</source>
+        <translation>附件</translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="483"/>
+        <source>Total attachment size: </source>
+        <translation>附件总大小: </translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="541"/>
+        <source> </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="547"/>
+        <source>Save attachment...</source>
+        <translation>保存附件...</translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="550"/>
+        <source>File: </source>
+        <translation>文件: </translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="551"/>
+        <source> already exists.
+Do you want to overwrite it ?</source>
+        <translation> 已经存在.
+你是否想覆盖它?</translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="563"/>
+        <source>Cannot read file: </source>
+        <translation>无法读取文件: </translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="567"/>
+        <source>Cannot write to file: </source>
+        <translation>无法写入文件: </translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="689"/>
+        <source>Save selected file attachments...</source>
+        <translation>保存选中的附件...</translation>
+    </message>
+</context>
+<context>
+    <name>TreeWidgetCustom</name>
+    <message>
+        <location filename="../TreeWidgetCustom.cpp" line="14"/>
+        <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1216,6 +2077,14 @@ Enter</source>
     <message>
         <location filename="../wallets.ui" line="33"/>
         <source>Wallet functionality not supported yet</source>
+        <translation>钱包功能尚未支持</translation>
+    </message>
+</context>
+<context>
+    <name>bshare_gui</name>
+    <message>
+        <location filename="../BitShares/bitsharesgui/bshare_gui.ui" line="14"/>
+        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

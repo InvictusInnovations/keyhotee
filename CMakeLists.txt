@@ -130,33 +130,11 @@ qt5_wrap_ui( UiFileAttachmentWidget            Mail/fileattachmentwidget.ui )
 
 qt5_wrap_ui( UiWallets                         wallets.ui )
 
-file(GLOB ui_files *.ui profile_wizard/*.ui AddressBook/*.ui Mail/*.ui)
-find_package( Qt5LinguistTools )
-set(FILES_TO_TRANSLATE ${ui_files})
-
-file (GLOB TRANSLATIONS_FILES translations/*.ts)
-
-option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts
-  files (WARNING: make clean will delete the source .ts files! Danger!)")
-if (UPDATE_TRANSLATIONS)
-  qt5_create_translation(QM_FILES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
-else (UPDATE_TRANSLATIONS)
-  qt5_add_translation(QM_FILES ${TRANSLATIONS_FILES})
-endif (UPDATE_TRANSLATIONS) 
-
-add_custom_target (translations_target DEPENDS ${QM_FILES})
-
-QT5_ADD_RESOURCES( KeyhoteeQRC  Keyhotee.qrc )
-
 set( library_sources
         AddressBook/AddressBookModel.hpp
         AddressBook/AddressBookModel.cpp )
 
 set( sources  
-        Keyhotee.qrc
-        images/shield.icns
-        qrc_Keyhotee.cpp
-
         qtreusable/selfsizingmainwindow.cpp
 
         profile_wizard/ProfileEditPage.ui
@@ -233,6 +211,8 @@ set( sources
         diagnosticdialog.h
         diagnosticdialog.cpp
 
+        utils.hpp
+        utils.cpp
 
         connectionstatusframe.ui
         connectionstatusframe.h
@@ -252,6 +232,40 @@ set( sources
         ch/ModificationsChecker.hpp
 
         main.cpp )
+
+find_package( Qt5LinguistTools )
+
+set(FILES_TO_TRANSLATE ${sources})
+file (GLOB TRANSLATIONS_FILES translations/*.ts)
+option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts
+  files (WARNING: make clean will delete the source .ts files! Danger!)")
+if (UPDATE_TRANSLATIONS)
+  qt5_create_translation(QM_FILES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
+else (UPDATE_TRANSLATIONS)
+  qt5_add_translation(QM_FILES ${TRANSLATIONS_FILES})
+endif (UPDATE_TRANSLATIONS) 
+
+add_custom_target (translations_target DEPENDS ${QM_FILES})
+
+# Construct an appropriate resource file
+SET(QM_QRC "<RCC>\n<qresource prefix=\"/\">\n")
+FOREACH(QM_FILE ${QM_FILES})
+FILE(RELATIVE_PATH QM_FILE ${CMAKE_CURRENT_BINARY_DIR} ${QM_FILE})
+SET(QM_QRC "${QM_QRC}<file>${QM_FILE}</file>\n")
+ENDFOREACH(QM_FILE ${QM_FILES})
+SET(QM_QRC "${QM_QRC}</qresource>\n</RCC>\n")
+SET(QM_QRC_PATH ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_trans.qrc)
+FILE(WRITE ${QM_QRC_PATH} ${QM_QRC})
+
+qt5_add_resources( KeyhoteeQRC  Keyhotee.qrc  ${QM_QRC_PATH})
+
+set( resources
+        Keyhotee.qrc
+        keyhotee_trans.qrc
+        images/shield.icns
+        qrc_keyhotee_trans.cpp 
+        qrc_Keyhotee.cpp )
+
 
 # Append files generated from git revision to the sources list
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" @ONLY)
@@ -276,7 +290,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${INVICTUS_ROOT}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
 
 # Configure dependencies of keyhotee main application module
-add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} )
+add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} ${resources} )
 add_dependencies (Keyhotee translations_target)
 
 # Let's configure different target names for release and debug builds.
@@ -294,4 +308,3 @@ if (MSVC)
 # Probably cmake has a bug and vcxproj generated for executable in Debug conf. has disabled debug info
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
 endif(MSVC)
-

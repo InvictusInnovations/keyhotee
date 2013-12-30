@@ -2,9 +2,11 @@
 
 #include "ui_Mailbox.h"
 
+#include "ATopLevelWindowsContainer.hpp"
 #include "MailboxModel.hpp"
 #include "MailEditor.hpp"
 #include "maileditorwindow.hpp"
+#include <KeyhoteeMainWindow.hpp>
 
 #include <bts/profile.hpp>
 #include <fc/reflect/variant.hpp>
@@ -39,7 +41,8 @@ Mailbox::Mailbox(ATopLevelWindowsContainer* parent)
   : ui(new Ui::Mailbox() ),
   _type(Inbox),
   _sourceModel(nullptr),
-  _mainWindow(parent)
+  _mainWindow(parent),
+  _attachmentSelected(false)
   {
   ui->setupUi(this);
   setupActions();
@@ -54,9 +57,9 @@ void Mailbox::onDoubleClickedItem(QModelIndex index)
   IMailProcessor::TPhysicalMailMessage decodedMsg;
   IMailProcessor::TStoredMailMessage encodedMsg;
   sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
-  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_mainWindow, sourceModel->getAddressBookModel(), 
-                                                              *_mailProcessor, _type == Drafts);
-  mailEditor->LoadMessage(encodedMsg, decodedMsg);
+  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_mainWindow,
+    sourceModel->getAddressBookModel(), *_mailProcessor, _type == Drafts);
+  mailEditor->LoadMessage(encodedMsg, decodedMsg, MailEditorMainWindow::TLoadForm::Draft);
   mailEditor->show();
   }
 
@@ -86,6 +89,8 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
     else
       ui->mail_viewer->setCurrentWidget(ui->info_1);
     //TODO: not implemented ui->current_message->displayMailMessages(indexes,selection_model);
+
+    getKeyhoteeWindow()->setEnabledAttachmentSaveOption( _attachmentSelected = false );
     }
   }
 
@@ -189,45 +194,40 @@ QSortFilterProxyModel* Mailbox::sortedModel()
   return static_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
   }
 
-void Mailbox::duplicateMail(ReplyType reply_type)
+void Mailbox::duplicateMail(ReplyType replyType)
   {
-  QModelIndex   index = getSelectedMail();
-  if (index == QModelIndex())
+  QModelIndex index = getSelectedMail();
+  if(index.isValid() == false)
     return;
-  MessageHeader header;
-  QModelIndex   mappedIndex = sortedModel()->mapToSource(index);
-  _sourceModel->getFullMessage(mappedIndex, header);
-  auto          msg_window = new MailEditor(this);
-  //TODO: add "x wrote on such date":
-  QString       new_body = header.body;
-  msg_window->copyToBody(new_body);
 
-  QString       new_subject;
-  auto          addressbook = bts::get_profile()->get_addressbook();
-  if (reply_type == reply || reply_type == reply_all)
+  QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+  QModelIndex sourceModelIndex = model->mapToSource(index);
+
+  IMailProcessor::TPhysicalMailMessage decodedMsg;
+  IMailProcessor::TStoredMailMessage encodedMsg;
+  _sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
+  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_mainWindow,
+    _sourceModel->getAddressBookModel(), *_mailProcessor, true);
+
+  MailEditorMainWindow::TLoadForm loadForm = MailEditorMainWindow::TLoadForm::Draft;
+
+  switch(replyType)
     {
-    new_subject = "Re: " + header.subject;
-//    auto reply_to_contact = addressbook->get_contact_by_public_key(header.header.from_key);
-//    if (reply_to_contact)
-//      msg_window->addToContact(reply_to_contact->wallet_index);
-    msg_window->addToContact(header.header.from_key);
+    case ReplyType::forward:
+      loadForm = MailEditorMainWindow::TLoadForm::Forward;
+      break;
+    case ReplyType::reply_all:
+      loadForm = MailEditorMainWindow::TLoadForm::ReplyAll;
+      break;
+    case ReplyType::reply:
+      loadForm = MailEditorMainWindow::TLoadForm::Reply;
+      break;
+    default:
+      assert(false);
     }
-  else if (reply_type == forward)
-    {
-    new_subject = "Fwd: " + header.subject;
-    //TODO add attachments
-    }
-  if (reply_type == reply_all)
-    {
-    //TODO add check to avoid replying to self as well
-    foreach(auto to_key, header.to_list)
-      msg_window->addToContact(to_key);
-    foreach(auto cc_key, header.cc_list)
-      msg_window->addCcContact(cc_key);
-    }
-  msg_window->SetSubject(new_subject);
-  //TODO set focus to top of window
-  msg_window->setFocusAndShow();
+
+  mailEditor->LoadMessage(encodedMsg, decodedMsg, loadForm);
+  mailEditor->show();
   }
 
 void Mailbox::onDeleteMail()
@@ -268,8 +268,23 @@ void Mailbox::refreshMessageViewer()
     QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
     QModelIndex sourceModelIndex = model->mapToSource(indexes[0]);
     MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
-	ui->mail_viewer->setCurrentWidget(ui->current_message);
+    ui->mail_viewer->setCurrentWidget(ui->current_message);
     ui->current_message->displayMailMessage(sourceModelIndex, sourceModel);
+    _attachmentSelected = sourceModel->hasAttachments(sourceModelIndex);
+    getKeyhoteeWindow()->setEnabledAttachmentSaveOption(_attachmentSelected);
+    }
+  }
+
+void Mailbox::removeMessage(const IMailProcessor::TStoredMailMessage& msg)
+  {
+  QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+
+  QModelIndex foundModelIndex = _sourceModel->findModelIndex(msg);
+  if(foundModelIndex.isValid())
+    {
+    QModelIndex proxyModelIndex = model->mapFromSource(foundModelIndex);
+    assert(proxyModelIndex.isValid());
+    model->removeRow(proxyModelIndex.row());
     }
   }
 
@@ -282,3 +297,12 @@ void Mailbox::on_actionShow_details_toggled(bool checked)
 
   }
 
+bool Mailbox::isAttachmentSelected () const
+  {
+    return _attachmentSelected;
+  }
+
+void Mailbox::saveAttachment ()
+  {
+    
+  }
