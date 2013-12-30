@@ -19,7 +19,7 @@ public:
       \param abModel - access to the main address book model, needed for message editing purposes
   */
   MailboxModel(QObject* parent, const bts::profile_ptr& user_profile,
-    bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel);
+    bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel, bool isDraftFolder);
   virtual ~MailboxModel();
 
   enum Columns
@@ -45,7 +45,7 @@ public:
   void replaceMessage(const TStoredMailMessage& overwrittenMsg, const TStoredMailMessage& msg);
   void getFullMessage(const QModelIndex& index, MessageHeader& header) const;
   void markMessageAsRead(const QModelIndex& index);
-
+  QModelIndex findModelIndex(const TStoredMailMessage& msg) const;
   /** Allows to retrieve given message data in encoded & decoded from.
       Encoded form (the message_header) is needed to retrieve sender for example.
       Decoded message contains all others attributes.

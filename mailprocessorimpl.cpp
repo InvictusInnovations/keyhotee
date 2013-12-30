@@ -2,16 +2,38 @@
 
 #include <bts/application.hpp>
 
+#include <fc/log/logger.hpp>
+#include <fc/thread/thread.hpp>
+
 #include <atomic>
 
 class TMailProcessor::TOutboxQueue
   {
   public:
-    explicit TOutboxQueue(const bts::profile_ptr& profile)
+    TOutboxQueue(TMailProcessor& processor, const bts::profile_ptr& profile) :
+      Processor(processor)
       {
+      Profile = profile;
+      App = bts::application::instance();
+
       Outbox = profile->get_pending_db();
       Sent = profile->get_sent_db();
       }
+
+    void StartTransmission()
+      {
+      TransferLoopComplete = fc::async([=]{ this->transmissionLoop(); });
+      }
+
+    /** Allows to add new pending message to the sending queue.
+        \param senderId      - identity chosen to be specified as mail sender,
+        \param msg           - mail message to be sent,
+        \param savedDraftMsg - optional, can be nullptr. If not null, it means that previously saved
+                               draft message is about to send (it should be removed from Draft
+                               folder).
+    */
+    void AddPendingMessage(const TIdentity& senderId, const TPhysicalMailMessage& msg,
+      const TStoredMailMessage* savedDraftMsg);
 
     bool AnyOperationsPending() const;
 
@@ -27,19 +49,183 @@ class TMailProcessor::TOutboxQueue
   private:
     virtual ~TOutboxQueue() {}
 
+    void transmissionLoop();
+    bool fetchNextMessage(TStoredMailMessage* storedMsg, TPhysicalMailMessage* storage);
+    bool transferMessage(const TRecipientPublicKey& senderId, const TPhysicalMailMessage& msg);
+    /** Allows to get identity associated to given public key. Returns false if there is no
+        associated identity to given public key.
+    */
+    bool findIdentity(const TRecipientPublicKey& senderId, TIdentity* identity) const;
+    /** Allows to get private key associated to given public key (held by one of defined identities).
+        Returns false if there is no associated identity to given public key.
+    */
+    bool findIdentityPrivateKey(const TRecipientPublicKey& senderId,
+      bts::extended_private_key* key) const;
+    /// Allows to move already sent message from Outbox DB into Sent DB.
+    void moveMsgToSentDB(const TStoredMailMessage& storedMsg, const TPhysicalMailMessage& sentMsg);
+
   private:
-    TMessageDB Outbox;
-    TMessageDB Sent;
+    TMailProcessor&        Processor;
+    bts::profile_ptr       Profile;
+    bts::application_ptr   App;
+    TMessageDB             Outbox;
+    TMessageDB             Sent;
+    fc::future<void>       TransferLoopComplete;
+    fc::promise<void>::ptr CancelPromise;
   };
+
+void TMailProcessor::TOutboxQueue::AddPendingMessage(const TIdentity& senderId,
+  const TPhysicalMailMessage& msg, const TStoredMailMessage* savedDraftMsg)
+  {
+  TStorableMessage storableMsg;
+  Processor.PrepareStorableMessage(senderId, msg, &storableMsg);
+  TStoredMailMessage storedMsg = Outbox->store_message(storableMsg, nullptr);
+  Processor.Sink.OnMessagePending(storedMsg, savedDraftMsg);
+  }
 
 bool TMailProcessor::TOutboxQueue::AnyOperationsPending() const
   {
-  return false;
+  bool transferLoopCompleted =TransferLoopComplete.valid() == false || TransferLoopComplete.ready();
+  return transferLoopCompleted ? false : Outbox->fetch_headers(TPhysicalMailMessage::type).empty();
   }
 
 unsigned int TMailProcessor::TOutboxQueue::GetLength() const
   {
-  return 0;
+  bool transferLoopCompleted = TransferLoopComplete.valid() == false || TransferLoopComplete.ready();
+  return transferLoopCompleted ? 0 : Outbox->fetch_headers(TPhysicalMailMessage::type).size();
+  }
+
+void TMailProcessor::TOutboxQueue::transmissionLoop()
+  {
+  bool notificationSent = false;
+
+  while(CancelPromise->ready() == false)
+    {
+    if(notificationSent == false)
+      {
+      Processor.Sink.OnMessageSendingStart();
+      notificationSent = true;
+      }
+
+    TPhysicalMailMessage msg;
+    TStoredMailMessage   storedMsg;
+    if(fetchNextMessage(&storedMsg, &msg) && transferMessage(storedMsg.from_key, msg))
+      moveMsgToSentDB(storedMsg, msg);
+    }
+
+  if(notificationSent)
+    Processor.Sink.OnMessageSendingEnd();
+  }
+
+bool TMailProcessor::TOutboxQueue::fetchNextMessage(TStoredMailMessage* storedMsg,
+  TPhysicalMailMessage* storage)
+  {
+  assert(storedMsg != nullptr);
+  assert(storage != nullptr);
+
+  /// FIXME - message_db interface is terrible - there should be a way to query just for 1 object
+  auto pendingMsgHeaders = Outbox->fetch_headers(TPhysicalMailMessage::type);
+  if(pendingMsgHeaders.empty())
+    return false;
+
+  *storedMsg = pendingMsgHeaders.front();
+  auto rawData = Outbox->fetch_data(storedMsg->digest);
+  *storage = fc::raw::unpack<TPhysicalMailMessage>(rawData);
+
+  return true;
+  }
+
+bool TMailProcessor::TOutboxQueue::transferMessage(const TRecipientPublicKey& senderId,
+  const TPhysicalMailMessage& msg)
+  {
+  bool sendStatus = false;
+
+  try
+    {
+    bts::extended_private_key senderPrivKey;
+    if(findIdentityPrivateKey(senderId, &senderPrivKey))
+      {
+      TPhysicalMailMessage msgToSend(msg);
+      TRecipientPublicKeys bccList(msg.bcc_list);
+      /// \warning Message to be sent must have cleared bcc list.
+      msgToSend.bcc_list.clear();
+
+      size_t totalRecipientCount = msgToSend.to_list.size() + msgToSend.cc_list.size() + bccList.size();
+
+      for(const auto& public_key : msgToSend.to_list)
+        App->send_email(msgToSend, public_key, senderPrivKey);
+
+      for(const auto& public_key : msgToSend.cc_list)
+        App->send_email(msgToSend, public_key, senderPrivKey);
+
+      for(const auto& public_key : bccList)
+        App->send_email(msgToSend, public_key, senderPrivKey);
+
+      sendStatus = true;
+      }
+    else
+      {
+      Processor.Sink.OnMissingSenderIdentity(senderId, msg);
+      sendStatus = false;
+      }
+    }
+  catch(const fc::exception& e)
+    {
+    sendStatus = false;
+    elog("${e}", ("e", e.to_detail_string()));
+    }
+
+  return sendStatus;
+  }
+
+inline
+bool TMailProcessor::TOutboxQueue::findIdentity(const TRecipientPublicKey& senderId,
+  TIdentity* identity) const
+  {
+  *identity = TIdentity();
+
+  for(const TIdentity& id : Profile->identities())
+    {
+    if(id.public_key == senderId)
+      {
+      *identity = id;
+      return true;
+      }
+    }
+
+  return false;
+  }
+
+inline
+bool TMailProcessor::TOutboxQueue::findIdentityPrivateKey(const TRecipientPublicKey& senderId,
+  bts::extended_private_key* key) const
+  {
+  *key = bts::extended_private_key();
+
+  TIdentity id;
+  if(findIdentity(senderId, &id))
+    {
+    *key = Profile->get_keychain().get_identity_key(id.dac_id_string);
+    return true;
+    }
+
+  return false;
+  }
+
+void TMailProcessor::TOutboxQueue::moveMsgToSentDB(const TStoredMailMessage& pendingMsg,
+  const TPhysicalMailMessage& sentMsg)
+  {
+  TIdentity id;
+  bool result = findIdentity(pendingMsg.from_key, &id);
+  assert(result);
+
+  TStorableMessage storableMsg;
+  Processor.PrepareStorableMessage(id, sentMsg, &storableMsg);
+
+  TStoredMailMessage savedMsg = Sent->store_message(storableMsg, nullptr);
+  Processor.Sink.OnMessageSent(pendingMsg, savedMsg);
+
+  Outbox->remove_message(pendingMsg);
   }
 
 TMailProcessor::TMailProcessor(IUpdateSink& updateSink,
@@ -48,7 +234,7 @@ TMailProcessor::TMailProcessor(IUpdateSink& updateSink,
   Profile(loadedProfile)
   {
   Drafts = Profile->get_draft_db();
-  OutboxQueue = new TOutboxQueue(Profile);
+  OutboxQueue = new TOutboxQueue(*this, Profile);
   }
 
 TMailProcessor::~TMailProcessor()
@@ -56,58 +242,72 @@ TMailProcessor::~TMailProcessor()
   OutboxQueue->Release();
   }
 
-void TMailProcessor::Send(const TIdentity& senderId, const TPhysicalMailMessage& msg)
+void TMailProcessor::Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
+  const TStoredMailMessage* savedDraftMsg)
   {
-  TPhysicalMailMessage msgToSend(msg);
-  TRecipientPublicKeys bccList(msg.bcc_list);
-  /// \warning Message to be sent must have cleared bcc list.
-  msgToSend.bcc_list.clear();
+  const bool outboxSupport = false;
+  if(outboxSupport)
+    {
+    OutboxQueue->AddPendingMessage(senderId, msg, savedDraftMsg);
+    }
+  else
+    {
+    TStorableMessage storableMsg;
+    PrepareStorableMessage(senderId, msg, &storableMsg);
+    auto outbox = Profile->get_pending_db();
+    auto sent = Profile->get_sent_db();
+    TStoredMailMessage pendingMsg = outbox->store_message(storableMsg, nullptr);
 
-  size_t totalRecipientCount = msgToSend.to_list.size() + msgToSend.cc_list.size() + bccList.size();
+    Sink.OnMessagePending(pendingMsg, savedDraftMsg);
 
-  //Sink.OnMessageGroupPending(totalRecipientCount);
+    TPhysicalMailMessage msgToSend(msg);
+    TRecipientPublicKeys bccList(msg.bcc_list);
+    /// \warning Message to be sent must have cleared bcc list.
+    msgToSend.bcc_list.clear();
 
-  //Sink.OnMessagePending
+    size_t totalRecipientCount = msgToSend.to_list.size() + msgToSend.cc_list.size() + bccList.size();
 
-  auto my_priv_key = Profile->get_keychain().get_identity_key(senderId.dac_id_string);
-  auto app = bts::application::instance();
+    //Sink.OnMessageGroupPending(totalRecipientCount);
 
-  for(const auto& public_key : msgToSend.to_list)
-    app->send_email(msgToSend, public_key, my_priv_key);
+    //Sink.OnMessagePending
 
-  for(const auto& public_key : msgToSend.cc_list)
-    app->send_email(msgToSend, public_key, my_priv_key);
+    auto my_priv_key = Profile->get_keychain().get_identity_key(senderId.dac_id_string);
+    auto app = bts::application::instance();
 
-  for(const auto& public_key : bccList)
-    app->send_email(msgToSend, public_key, my_priv_key);
+    for(const auto& public_key : msgToSend.to_list)
+      app->send_email(msgToSend, public_key, my_priv_key);
+
+    for(const auto& public_key : msgToSend.cc_list)
+      app->send_email(msgToSend, public_key, my_priv_key);
+
+    for(const auto& public_key : bccList)
+      app->send_email(msgToSend, public_key, my_priv_key);
+    
+    TStoredMailMessage sentMsg = sent->store_message(storableMsg, nullptr);
+    Sink.OnMessageSent(pendingMsg, sentMsg);
+    }
   }
 
-void TMailProcessor::Save(const TIdentity& senderId, const TPhysicalMailMessage& sourceMsg,
-  const TStoredMailMessage* msgToOverwrite, TStoredMailMessage* savedMsg)
+IMailProcessor::TStoredMailMessage 
+TMailProcessor::Save(const TIdentity& senderId, const TPhysicalMailMessage& sourceMsg,
+  const TStoredMailMessage* msgBeingReplaced)
   {
-  assert(savedMsg != nullptr);
-
   Sink.OnMessageSaving();
 
   TStorableMessage storableMsg;
   PrepareStorableMessage(senderId, sourceMsg, &storableMsg);
-
-  *savedMsg = Drafts->store(storableMsg);
-
-  /** FIXME - block for another bug in backend. It is impossible to uniquely identify message_header
-      object.
-      https://github.com/InvictusInnovations/keyhotee/issues/107
-  */
-  msgToOverwrite = nullptr;
-
-  Sink.OnMessageSaved(*savedMsg, msgToOverwrite);
-
-  if(msgToOverwrite != nullptr)
-    Drafts->remove(*msgToOverwrite);
+  //Modify digest by updating signature time for the draft email.
+  //Note that signature time is not true signature time of send, but
+  //time when this version of draft email is being saved.
+  storableMsg.sig_time = fc::time_point::now();
+  TStoredMailMessage savedMsg = Drafts->store_message(storableMsg,msgBeingReplaced);
+  Sink.OnMessageSaved(savedMsg, msgBeingReplaced);
+  return savedMsg;
   }
 
 void TMailProcessor::PrepareStorableMessage(const TIdentity& senderId,
-  const TPhysicalMailMessage& sourceMsg, TStorableMessage* storableMsg)
+                                            const TPhysicalMailMessage& sourceMsg, 
+                                            TStorableMessage* storableMsg)
   {
   /** It looks for me like another bug in backend. Even decrypted message object can be constructed
       directly by using interface of this class it is not sufficient to successfully store it in
@@ -115,6 +315,20 @@ void TMailProcessor::PrepareStorableMessage(const TIdentity& senderId,
       transmission of course). So it must be first encrypted and next decrypted to properly fill
       actual decrypted message.
   */
+  //DLN Since we're saving message in unencrypted format in dbases, I think it would be better to
+  //work with decrypted_message (TStorableMessage) and eliminate most references to TPhysicalMailMesage
+  //at GUI level. The only time TPhysicalMailMessage is necessary is when actually sending. So I think
+  //it would be better to extract fields from GUI forms to TStorableMessage, then have a function to convert
+  //TStorableMessage to TPhysicalMailMessage for sending (opposite of how it is now I think). There's
+  //no need to do a full sign/encrypt to save TStorableMessage in database, it just needs to have a unique
+  //sig_time (so that the mapping to the message contents is unique even when two email messages have
+  //same contents). 
+  // For draft messages, this can be achieved by simply setting sig_time
+  //"draft save time". I added a line to set the sig_time in the Save function,
+  // even though this PrepareStorableMessage currently sets it, 
+  // with the idea that we could then eliminate PrepareStorableMessage.
+  // Also, we should change the "Date Sent" column in draft mailbox view to "Date Saved".
+  // 
   bts::bitchat::decrypted_message msg(sourceMsg);
 
   auto senderPrivKey = Profile->get_keychain().get_identity_key(senderId.dac_id_string);

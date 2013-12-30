@@ -5,6 +5,9 @@
 #include "fileattachmentwidget.hpp"
 #include "mailfieldswidget.hpp"
 #include "moneyattachementwidget.hpp"
+#include "utils.hpp"
+
+#include <bts/profile.hpp>
 
 #include <QApplication>
 #include <QClipboard>
@@ -14,10 +17,177 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QMimeData>
+#include <QTextDocumentFragment>
 #include <QToolBar>
 #include <QToolButton>
 
-MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel,
+namespace
+{
+typedef IMailProcessor::TRecipientPublicKey TRecipientPublicKey;
+
+class TRecipientPublicKeyLess
+  {
+  public:
+    bool operator()(const TRecipientPublicKey& pk1, const TRecipientPublicKey& pk2) const
+      {
+      return pk1.serialize() < pk2.serialize();
+      }
+  };
+
+typedef std::set<TRecipientPublicKey, TRecipientPublicKeyLess> TPublicKeyIndex;
+typedef std::pair<TPublicKeyIndex::iterator, bool>             TInsertInfo;
+typedef IMailProcessor::TStoredMailMessage                     TStoredMailMessage;
+typedef IMailProcessor::TPhysicalMailMessage                   TPhysicalMailMessage;
+typedef MailEditorMainWindow::TLoadForm                        TLoadForm;
+
+/** Helper class able to do replied mail document transformations.
+*/
+class TDocumentTransform
+  {
+  public:
+    QString Do(TLoadForm loadForm, const TStoredMailMessage& msgHeader,
+      const TPhysicalMailMessage& srcMsg, QTextDocument* doc);
+
+  private:
+    QTextCursor replace(const char* textToFind, const QString& replacement,
+      const QTextCursor& startPos = QTextCursor());
+    QTextCursor replace(const char* textToFind, const QTextDocumentFragment& replacement,
+      const QTextCursor& startPos = QTextCursor());
+    /// Allows to remove whole line containing given text.
+    void removeContainingLine(const char* textToFind, const QTextCursor& startPos = QTextCursor());
+    QTextCursor find(const char* textToFind, const QTextCursor& startPos);
+  /// Class attributes:
+  private:
+    QTextDocument* Doc;
+  };
+
+QString
+TDocumentTransform::Do(TLoadForm loadForm, const TStoredMailMessage& msgHeader,
+  const TPhysicalMailMessage& srcMsg, QTextDocument* doc)
+  {
+  Doc = doc;
+
+  QString newSubject;
+
+  switch(loadForm)
+    {
+    case TLoadForm::Reply:
+    case TLoadForm::ReplyAll:
+      newSubject = "Re: ";
+      break;
+    case TLoadForm::Forward:
+      newSubject = "FW: ";
+      break;
+    case TLoadForm::Draft:
+    default:
+      assert(false);
+    }
+
+  newSubject += srcMsg.subject.c_str();
+
+  QFile htmlPattern(":/Mail/RepliedMailPattern.html");
+  if(htmlPattern.open(QFile::ReadOnly) == false)
+    {
+    /// If pattern cannot be loaded for some reason just load original text :-(
+    doc->setHtml(QString(srcMsg.body.c_str()));
+    return newSubject;
+    }
+
+  QByteArray contents = htmlPattern.readAll();
+  QString patternHtml(contents);
+  doc->setHtml(patternHtml);
+
+  QString senderText(Utils::toString(msgHeader.from_key, Utils::FULL_CONTACT_DETAILS));
+  QString sentDate(Utils::toQDateTime(msgHeader.from_sig_time).toString(Qt::DefaultLocaleShortDate));
+  QString toList(Utils::makeContactListString(srcMsg.to_list, ';', Utils::FULL_CONTACT_DETAILS));
+  QString ccList(Utils::makeContactListString(srcMsg.cc_list, ';', Utils::FULL_CONTACT_DETAILS));
+
+  replace("$$SENDER$$", senderText);
+  replace("$$SENT_DATE$$", sentDate);
+  replace("$$TO_RECIPIENTS$$", toList);
+  
+  if(ccList.isEmpty())
+    removeContainingLine("$$CC_RECIPIENTS$$");
+  else
+    replace("$$CC_RECIPIENTS$$", ccList);
+
+  replace("$$SUBJECT$$", newSubject);
+
+  QTextDocumentFragment tf(QTextDocumentFragment::fromHtml(QString(srcMsg.body.c_str())));
+  replace("$$SOURCE_BODY$$", tf);
+  
+  return newSubject;
+  }
+
+inline
+QTextCursor TDocumentTransform::replace(const char* textToFind, const QString& replacement,
+  const QTextCursor& startPos /*= QTextCursor()*/)
+  {
+  /** \warning It is impossible to use here QTextDocumentFragment::fromPlainText and next pass
+      it to another replace version, since formatting gets broken (new instered text uses formatting
+      from begin of block instead of this one which was specified for replaced text).
+      It looks like it is some bug in insertFragment (where fragment was built from plain text).
+  */
+  QTextCursor foundPos = find(textToFind, startPos);
+
+  if(foundPos.isNull() == false && foundPos.hasSelection())
+    {
+    auto cf = foundPos.charFormat();
+    foundPos.beginEditBlock();
+    foundPos.removeSelectedText();
+    foundPos.insertText(replacement, cf);
+    foundPos.endEditBlock();
+    }
+
+  return foundPos;
+  }
+
+inline
+QTextCursor 
+TDocumentTransform::replace(const char* textToFind, const QTextDocumentFragment& replacement,
+  const QTextCursor& startPos /*= QTextCursor()*/)
+  {
+  QTextCursor foundPos = find(textToFind, startPos);
+
+  if(foundPos.isNull() == false && foundPos.hasSelection())
+    {
+    foundPos.beginEditBlock();
+    foundPos.removeSelectedText();
+    foundPos.insertFragment(replacement);
+    foundPos.endEditBlock();
+    }
+
+  return foundPos;
+  }
+
+void TDocumentTransform::removeContainingLine(const char* textToFind,
+  const QTextCursor& startPos /*= QTextCursor()*/)
+  {
+  QTextCursor foundPos = find(textToFind, startPos);
+
+  if(foundPos.isNull() == false && foundPos.hasSelection())
+    {
+    foundPos.beginEditBlock();
+    foundPos.movePosition(QTextCursor::MoveOperation::StartOfLine, QTextCursor::MoveMode::MoveAnchor);
+    foundPos.movePosition(QTextCursor::MoveOperation::EndOfLine, QTextCursor::MoveMode::KeepAnchor);
+    foundPos.removeSelectedText();
+    foundPos.deletePreviousChar();
+    foundPos.endEditBlock();
+    }
+  }
+
+QTextCursor TDocumentTransform::find(const char* textToFind, const QTextCursor& startPos)
+  {
+  /// Use strict matching to avoid mismatch while doing replace.
+  QTextDocument::FindFlags findOptions = QTextDocument::FindFlags(
+    QTextDocument::FindFlag::FindCaseSensitively|QTextDocument::FindFlag::FindWholeWords);
+  QTextCursor foundPos = Doc->find(QString(textToFind), startPos, findOptions);
+  return foundPos;
+  }
+
+} ///namespace
+
+MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, AddressBookModel& abModel,
   IMailProcessor& mailProcessor, bool editMode) :
   ATopLevelWindow(parent),
   ui(new Ui::MailEditorWindow()),
@@ -112,17 +282,42 @@ MailEditorMainWindow::~MailEditorMainWindow()
 void MailEditorMainWindow::SetRecipientList(const TRecipientPublicKeys& toList,
   const TRecipientPublicKeys& ccList, const TRecipientPublicKeys& bccList)
   {
-  MailFields->SetRecipientList(toList, ccList, bccList);
+  TRecipientPublicKey emptyKey;
+  MailFields->SetRecipientList(emptyKey, toList, ccList, bccList);
   }
 
 void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
-  const TPhysicalMailMessage& srcMsg)
+  const TPhysicalMailMessage& srcMsg, TLoadForm loadForm)
   {
-  DraftMessageInfo.first = srcMsgHeader;
-  DraftMessageInfo.second = true;
+  TPublicKeyIndex allRecipients, toRecipients;
+  TRecipientPublicKeys sourceToList, sourceCCList;
+  QString newSubject;
 
-  /// Now load source message contents into editor controls.
-  loadContents(srcMsgHeader.from_key, srcMsg);
+  switch(loadForm)
+    {
+    case TLoadForm::Draft:
+      DraftMessage = srcMsgHeader;
+      /// Now load source message contents into editor controls.
+      loadContents(srcMsgHeader.from_key, srcMsg);
+      break;
+    case TLoadForm::ReplyAll:
+      sourceToList = srcMsg.to_list;
+      sourceCCList = srcMsg.cc_list;
+    case TLoadForm::Reply:
+      transformRecipientList(srcMsgHeader.from_key, sourceToList, sourceCCList);
+      newSubject = transformMailBody(loadForm, srcMsgHeader, srcMsg);
+      MailFields->SetSubject(newSubject);
+      break;
+    case TLoadForm::Forward:
+      FileAttachment->LoadAttachedFiles(srcMsg.attachments);
+      newSubject = transformMailBody(loadForm, srcMsgHeader, srcMsg);
+      MailFields->SetSubject(newSubject);
+      break;
+    default:
+      assert(false);
+    }
+
+  ui->messageEdit->moveCursor(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor);
   }
 
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
@@ -255,6 +450,59 @@ void MailEditorMainWindow::loadContents(const TRecipientPublicKey& senderId,
   ui->messageEdit->setText(QString(srcMsg.body.c_str()));
   }
 
+void MailEditorMainWindow::transformRecipientList(const TRecipientPublicKey& senderId,
+  const TRecipientPublicKeys& sourceToList, const TRecipientPublicKeys& sourceCCList)
+  {
+  TPublicKeyIndex allRecipients, myIdentities;
+
+  TRecipientPublicKeys toRecipients, ccRecipients, empty;
+  toRecipients.reserve(sourceToList.size() + 1);
+  ccRecipients.reserve(sourceCCList.size());
+
+  /** First fill allRecipient index with own identities public keys, to avoid sending replied
+      message to myself
+  */
+  for(const auto& id : bts::get_profile()->identities())
+    {
+    const auto& pk = id.public_key;
+    assert(pk.valid());
+    TInsertInfo ii = allRecipients.insert(pk);
+    assert(ii.second && "Redundant identity public keys");
+    }
+
+  myIdentities = allRecipients;
+
+  TRecipientPublicKey newSenderId;
+
+  toRecipients.push_back(senderId);
+  for(const auto& recipient : sourceToList)
+    {
+    TInsertInfo ii = allRecipients.insert(recipient);
+    if(ii.second)
+      toRecipients.push_back(recipient);
+
+    if(newSenderId.valid() == false && myIdentities.find(recipient) != myIdentities.end())
+      newSenderId = recipient;
+    }
+
+  for(const auto& recipient : sourceCCList)
+    {
+    TInsertInfo ii = allRecipients.insert(recipient);
+    if(ii.second)
+      ccRecipients.push_back(recipient);
+    }
+
+  MailFields->SetRecipientList(newSenderId, toRecipients, ccRecipients, empty);
+  }
+
+QString 
+MailEditorMainWindow::transformMailBody(TLoadForm loadForm, const TStoredMailMessage& msgHeader,
+  const TPhysicalMailMessage& srcMsg)
+  {
+  TDocumentTransform transform;
+  return transform.Do(loadForm, msgHeader, srcMsg, ui->messageEdit->document());
+  }
+
 void MailEditorMainWindow::toggleReadOnlyMode()
   {
   ui->actionCut->setEnabled(EditMode);
@@ -271,10 +519,9 @@ void MailEditorMainWindow::onSave()
   if(prepareMailMessage(&msg))
     {
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Save(senderId, msg, 
-      DraftMessageInfo.second ? &DraftMessageInfo.first : nullptr, &DraftMessageInfo.first);
-
-    DraftMessageInfo.second = true;
+    //DLN we should probably add get_pointer implementation to fc::optional to avoid code like this
+    TStoredMailMessage* oldMessage = DraftMessage.valid() ? &(*DraftMessage) : nullptr;
+    DraftMessage = MailProcessor.Save(senderId, msg, oldMessage);
     }
   }
 
@@ -405,7 +652,7 @@ void MailEditorMainWindow::on_actionSend_triggered()
   if(prepareMailMessage(&msg))
     {
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Send(senderId, msg);
+    MailProcessor.Send(senderId, msg, DraftMessage.valid() ? &(*DraftMessage) : nullptr);
     /// Clear potential modified flag to avoid asking for saving changes.
     ui->messageEdit->document()->setModified(false);
     close();

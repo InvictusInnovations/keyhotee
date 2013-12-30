@@ -1,6 +1,8 @@
 #include "MailboxModel.hpp"
 #include "MessageHeader.hpp"
-#include "public_key_address.hpp"
+
+#include "utils.hpp"
+
 #include <QIcon>
 #include <QPixmap>
 #include <QImage>
@@ -28,45 +30,12 @@ class MailboxModelImpl
     QIcon                        _read_icon;
     QIcon                        _money_icon;
     AddressBookModel*            _abModel;
+    bool                         _isDraftFolder;
   };
 }
 
-QDateTime toQDateTime(const fc::time_point_sec& time_in_seconds)
-  {
-  QDateTime date_time;
-  date_time.setTime_t(time_in_seconds.sec_since_epoch());
-  return date_time;
-  }
-
-QString toString(const fc::ecc::public_key& pk)
-  {
-  auto address_book = bts::get_profile()->get_addressbook();
-  auto contact = address_book->get_contact_by_public_key(pk);
-  if (contact)
-    {
-    return QString(contact->dac_id_string.c_str());
-    }
-  else   //display public_key as base58
-    {
-    std::string public_key_string = public_key_address(pk);
-    return QString(public_key_string.c_str());
-    }
-  }
-
-//DLNFIX move this to utility function file
-QString makeContactListString(std::vector<fc::ecc::public_key> key_list)
-  {
-  QStringList to_list;
-  foreach(auto public_key, key_list)
-    {
-    to_list.append(toString(public_key));
-    }
-
-  return to_list.join(',');
-  }
-
 MailboxModel::MailboxModel(QObject* parent, const bts::profile_ptr& profile,
-  bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel)
+  bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel, bool isDraftFolder)
   : QAbstractTableModel(parent),
   my(new Detail::MailboxModelImpl() )
   {
@@ -77,6 +46,7 @@ MailboxModel::MailboxModel(QObject* parent, const bts::profile_ptr& profile,
   my->_money_icon = QIcon(":/images/bitcoin.png");
   my->_read_icon = QIcon(":/images/read-icon.png");
   my->_abModel = &abModel;
+  my->_isDraftFolder = isDraftFolder;
 
   readMailBoxHeadersDb(mail_db);
   }
@@ -89,11 +59,11 @@ void MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
   {
   mail_header.header = header;
   auto addressbook = my->_profile->get_addressbook();
-  mail_header.date_received = toQDateTime(header.received_time);
+  mail_header.date_received = Utils::toQDateTime(header.received_time);
 
-  mail_header.from = toString(header.from_key);
+  mail_header.from = Utils::toString(header.from_key, Utils::FULL_CONTACT_DETAILS);
 
-  mail_header.date_sent = toQDateTime(header.from_sig_time);
+  mail_header.date_sent = Utils::toQDateTime(header.from_sig_time);
 
   //fill remaining fields from private_email_message
   auto raw_data = my->_mail_db->fetch_data(header.digest);
@@ -157,7 +127,7 @@ bool MailboxModel::removeRows(int row, int count, const QModelIndex&)
   {
   beginRemoveRows(QModelIndex(), row, row + count - 1);
   for (int i = row; i < row + count; ++i)
-    my->_mail_db->remove(my->_headers[i].header);
+    my->_mail_db->remove_message(my->_headers[i].header);
   //delete headers from in-memory my->_headers list
   auto rowI = my->_headers.begin() + row;
   my->_headers.erase(rowI, rowI + count);
@@ -203,7 +173,7 @@ QVariant MailboxModel::headerData(int section, Qt::Orientation orientation, int 
           case To:
             return tr("To");
           case DateSent:
-            return tr("Date Sent");
+            return my->_isDraftFolder ? tr("Date Saved") : tr("Date Sent");
           case Status:
             return tr("Status");
           }
@@ -289,13 +259,13 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
           return header.hasAttachments;
         //             case Chat:
         case From:
-          return toString(header.header.from_key);
+          return Utils::toString(header.header.from_key, Utils::FULL_CONTACT_DETAILS);
         case Subject:
           return header.subject;
         case DateReceived:
           return header.date_received;
         case To:
-          return makeContactListString(header.to_list);
+          return Utils::makeContactListString(header.to_list, ';', Utils::FULL_CONTACT_DETAILS);
         case DateSent:
           return header.date_sent;
         case Status:
@@ -331,6 +301,22 @@ void MailboxModel::markMessageAsRead(const QModelIndex& index)
   MessageHeader& msg = my->_headers[index.row()];
   msg.header.read_mark = true;
   my->_mail_db->store_message_header(msg.header);
+  }
+
+QModelIndex MailboxModel::findModelIndex(const TStoredMailMessage& msg) const
+  {
+  int row = 0;
+  for(const auto& hdr : my->_headers)
+    {
+    if(hdr.header.digest == msg.digest)
+      {
+      /// Replace complete - return.
+      return index(row, 0);
+      }
+    ++row;
+    }
+
+  return QModelIndex();
   }
 
 void MailboxModel::getMessageData(const QModelIndex& index,

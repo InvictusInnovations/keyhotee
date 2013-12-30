@@ -17,10 +17,12 @@ class TMailProcessor : public IMailProcessor
 
   /// IMailProcessor interface implementation:
     /// \see IMailProcessor interface description.
-    virtual void Send(const TIdentity& senderId, const TPhysicalMailMessage& msg) override;
+    virtual void Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
+      const TStoredMailMessage* savedDraftMsg) override;
     /// \see IMailProcessor interface description.
-    virtual void Save(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TStoredMailMessage* msgToOverwrite, TStoredMailMessage* savedMsg) override;
+    virtual TStoredMailMessage Save(const TIdentity& senderId, 
+                                    const TPhysicalMailMessage& sourceMsg,
+                                    const TStoredMailMessage* msgBeingReplaced) override;
 
   /// Other implementation helpers:
 

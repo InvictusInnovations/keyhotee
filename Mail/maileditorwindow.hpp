@@ -5,11 +5,9 @@
 
 #include <bts/bitchat/bitchat_message_db.hpp>
 
-#include "ATopLevelWindow.h"
+#include "ATopLevelWindow.hpp"
 
 #include <QMainWindow>
-
-#include <utility>
 
 namespace Ui { class MailEditorWindow; }
 
@@ -24,6 +22,8 @@ class AddressBookModel;
 class TFileAttachmentWidget;
 class MailFieldsWidget;
 class TMoneyAttachementWidget;
+
+
 
 /** Mail message editor/viewer window.
     Contains rich editor, file attachment browser, money attachment browser.
@@ -42,8 +42,21 @@ class MailEditorMainWindow : public ATopLevelWindow
     typedef IMailProcessor::TRecipientPublicKeys TRecipientPublicKeys;
     typedef IMailProcessor::TStoredMailMessage   TStoredMailMessage;
 
-    MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel, IMailProcessor& mailProcessor,
-      bool editMode);
+    /// Determines way how to source message should be duplicated.
+    enum TLoadForm
+      {
+      /// Message is loaded as a draft - no any changes is needed
+      Draft,
+      /// Allows to create a forwarded message (\see description of LoadMessage)
+      Forward,
+      /// Allows to create an answer message (\see description of LoadMessage)
+      Reply,
+      /// Allows to create an answer message (\see description of LoadMessage)
+      ReplyAll
+      };
+
+    MailEditorMainWindow(ATopLevelWindowsContainer* parent, AddressBookModel& abModel,
+      IMailProcessor& mailProcessor, bool editMode);
     virtual ~MailEditorMainWindow();
 
     /** Allows to explicitly specify initial recipient lists while creating a mail window.
@@ -59,8 +72,22 @@ class MailEditorMainWindow : public ATopLevelWindow
                               replace given one than creating another object in storage.
         \param srcMsg       - decoded (from srcMsgHeader) backend object holding saved/received
                               message data.
+        \param loadForm     - determines how original message contents should be transformed.
+
+        Message have to been modified to match 'forwarded/replied' message specification:
+          - in the message text an additional header should be added containing original sender,
+            date, subject info. 
+          - attachment list should be cleared in case of Reply/ReplyAll forms
+          - new recipient list should be modified regarding to chosen load form:
+            a) Forward  - recipient list should be left empty.
+            b) Reply    - only original sender should be added as 'to' recipient
+            c) ReplyAll - 'to' list should contain original sender and original recipient list
+                          (except our own identity).
+                          'cc' list should contain others contacts originally placed on 'cc' list
+                          if they are not yet on 'to' list.
     */
-    void LoadMessage(const TStoredMailMessage& srcMsgHeader, const TPhysicalMailMessage& srcMsg);
+    void LoadMessage(const TStoredMailMessage& srcMsgHeader, const TPhysicalMailMessage& srcMsg,
+      TLoadForm loadForm);
 
   private:
     /// QWidget reimplementation to support query for save mod. contents.
@@ -78,6 +105,16 @@ class MailEditorMainWindow : public ATopLevelWindow
     bool prepareMailMessage(TPhysicalMailMessage* storage);
     /// Loads given message contents into all editor controls.
     void loadContents(const TRecipientPublicKey& senderId, const TPhysicalMailMessage& srcMsg);
+    /** Allows to transform source recipient list to properly fill new one.
+    */
+    void transformRecipientList(const TRecipientPublicKey& senderId,
+      const TRecipientPublicKeys& sourceToList, const TRecipientPublicKeys& sourceCCList);
+    /** Allows to transform original message body to the 'answered' form (with additional header
+        containing original sender info etc).
+        Next fills editor window with such transformed body.
+    */
+    QString transformMailBody(TLoadForm loadForm, const TStoredMailMessage& msgHeader,
+      const TPhysicalMailMessage& srcMsg);
     void toggleReadOnlyMode();
 
   private slots:
@@ -117,24 +154,19 @@ class MailEditorMainWindow : public ATopLevelWindow
     void onAttachmentListChanged();
 
   private:
-    /** pairs loaded encoded draft message & flag determining it was specified (it is impossible
-        to query TStoredMailMessage for 'valid' property.
-    */
-    typedef std::pair<TStoredMailMessage, bool> TDraftMessageInfo;
-
     Ui::MailEditorWindow*    ui;
     /** Filled when mail editor has been opened with message already stored in Drafts. During save
         this old message should be replaced with new one.
     */
-    TDraftMessageInfo        DraftMessageInfo;
-    AddressBookModel&        ABModel;
-    IMailProcessor&          MailProcessor;
-    MailFieldsWidget*        MailFields;
-    TMoneyAttachementWidget* MoneyAttachement;
-    TFileAttachmentWidget*   FileAttachment;
-    QFontComboBox*           FontCombo;
-    QComboBox*               FontSize;
-    bool                     EditMode;
+    fc::optional<TStoredMailMessage> DraftMessage;
+    AddressBookModel&                ABModel;
+    IMailProcessor&                  MailProcessor;
+    MailFieldsWidget*                MailFields;
+    TMoneyAttachementWidget*         MoneyAttachement;
+    TFileAttachmentWidget*           FileAttachment;
+    QFontComboBox*                   FontCombo;
+    QComboBox*                       FontSize;
+    bool                             EditMode;
   };
 
 #endif ///__MAILEDITORWINDOW_HPP

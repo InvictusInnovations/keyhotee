@@ -31,8 +31,12 @@ class MailFieldsWidget : public QWidget
         For each nonempty optional lists, controls related to them (ie ccList) will be displayed
         automatically.
     */
-    void SetRecipientList(const TRecipientPublicKeys& toList, const TRecipientPublicKeys& ccList,
-      const TRecipientPublicKeys& bccList);
+    void SetRecipientList(const TRecipientPublicKey& senderPK, const TRecipientPublicKeys& toList,
+      const TRecipientPublicKeys& ccList, const TRecipientPublicKeys& bccList);
+
+    /// Allows to explicitly set subject.
+    void SetSubject(const std::string& subject);
+    void SetSubject(const QString& subject);
 
     /** Loads 'to', 'cc' lists into proper controls.
         Also initializes subject with this one stored in the srcMsg.

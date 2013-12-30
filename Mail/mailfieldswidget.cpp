@@ -65,9 +65,16 @@ MailFieldsWidget::~MailFieldsWidget()
   delete ui;
   }
 
-void MailFieldsWidget::SetRecipientList(const TRecipientPublicKeys& toList,
-  const TRecipientPublicKeys& ccList, const TRecipientPublicKeys& bccList)
+void MailFieldsWidget::SetRecipientList(const TRecipientPublicKey& senderPK,
+  const TRecipientPublicKeys& toList, const TRecipientPublicKeys& ccList,
+  const TRecipientPublicKeys& bccList)
   {
+  if(senderPK.valid())
+    {
+    selectSenderIdentity(senderPK);
+    showFromControls(true);
+    }
+
   ui->toEdit->SetCollectedContacts(toList);
   ui->ccEdit->SetCollectedContacts(ccList);
   ui->bccEdit->SetCollectedContacts(bccList);
@@ -79,18 +86,22 @@ void MailFieldsWidget::SetRecipientList(const TRecipientPublicKeys& toList,
     showBccControls(true);
   }
 
+void MailFieldsWidget::SetSubject(const std::string& subject)
+  {
+  SetSubject(QString(subject.c_str()));
+  }
+
+void MailFieldsWidget::SetSubject(const QString& subject)
+  {
+  ui->subjectEdit->setText(subject);
+  }
+
 void MailFieldsWidget::LoadContents(const TRecipientPublicKey& senderPK,
   const TPhysicalMailMessage& srcMsg)
   {
-  if(senderPK.valid())
-    {
-    selectSenderIdentity(senderPK);
-    showFromControls(true);
-    }
+  SetRecipientList(senderPK, srcMsg.to_list, srcMsg.cc_list, srcMsg.bcc_list);
 
-  SetRecipientList(srcMsg.to_list, srcMsg.cc_list, srcMsg.bcc_list);
-
-  ui->subjectEdit->setText(QString(srcMsg.subject.c_str()));
+  SetSubject(srcMsg.subject);
   }
 
 void MailFieldsWidget::showFromControls(bool show)
