@@ -1,23 +1,20 @@
-#include "ATopLevelWindow.h"
-#include "ATopLevelWindowsContainer.h"
+#include "ATopLevelWindow.hpp"
+#include "ATopLevelWindowsContainer.hpp"
 
 #include <QAction>
 #include <QKeyEvent>
 
-ATopLevelWindow::ATopLevelWindow(QWidget *parent) :
+ATopLevelWindow::ATopLevelWindow(ATopLevelWindowsContainer *parent) :
   SelfSizingMainWindow(parent)
 {
   QMainWindow::setParent(parent);
-//  setWindowFlags(Qt::WindowType::Dialog);
+
+  parentWin = parent;
 
   actionMenu = new QAction(tr("[*]"), this);
   actionMenu->setCheckable(true);
 
-  //DLNFIX Q&D workaround as I needed to test saving draft mail messages. Greg, please make a better fix
-  #if 0
-  ((ATopLevelWindowsContainer*)parent)->registration(actionMenu);
-  #endif
-
+  parentWin->registration(actionMenu);
 }
 
 ATopLevelWindow::~ATopLevelWindow(void)
@@ -32,17 +29,10 @@ void ATopLevelWindow::setWindowTitle(const QString& title_string)
 
 void ATopLevelWindow::SetActionText(QString string)
 {
-  std::string _string = string.toStdString();
-
-  printf(_string.c_str());
-
   actionMenu->setText(string);
 }
 
 void ATopLevelWindow::closeEvent(QCloseEvent *event)
 {
-  //DLNFIX Q&D workaround as I need edto test saving draft mail messages. Greg, please make a better fix
-#if 0
-  ((ATopLevelWindowsContainer*)this->parent())->unRegistration(actionMenu);
-#endif
+  parentWin->unRegistration(actionMenu);
 }

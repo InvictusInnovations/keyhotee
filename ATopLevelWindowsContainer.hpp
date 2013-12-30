@@ -13,7 +13,7 @@ class ATopLevelWindowsContainer :
 {
 public:
   ATopLevelWindowsContainer(QWidget *parent = 0);
-  ~ATopLevelWindowsContainer(void);
+  virtual ~ATopLevelWindowsContainer(void);
 
   void registration(QAction *newAction);
   void unRegistration(QAction *newAction);
@@ -28,7 +28,7 @@ private slots:
   void onPrevWindow();
 
 protected:
-  void closeEvent(QCloseEvent *event);
+  virtual void closeEvent(QCloseEvent *event);
   void onActiveWindow(QAction* action);
 
 private:

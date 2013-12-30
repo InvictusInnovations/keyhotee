@@ -35,7 +35,7 @@ void Mailbox::searchEditChanged(QString search_string)
   model->setFilterRegExp(regex);
   }
 
-Mailbox::Mailbox(QWidget* parent)
+Mailbox::Mailbox(ATopLevelWindowsContainer* parent)
   : ui(new Ui::Mailbox() ),
   _type(Inbox),
   _sourceModel(nullptr),
@@ -94,11 +94,12 @@ Mailbox::~Mailbox()
   delete ui;
   }
 
-void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type, KeyhoteeMainWindow* parentKehoteeMainW)
+void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type, ATopLevelWindowsContainer* parentKehoteeMainW)
   {
   _type = type;
   _sourceModel = model;
   _mailProcessor = &mailProcessor;
+  _mainWindow = parentKehoteeMainW;
 
   //enable sorting the mailbox
   QSortFilterProxyModel* proxyModel = new MailSortFilterProxyModel();

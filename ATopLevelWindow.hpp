@@ -2,18 +2,18 @@
 #define __ATOPLEVELWINDOW_HPP
 
 #include "qtreusable/selfsizingmainwindow.h"
-#include "ATopLevelWindowsContainer.h"
 
 namespace Ui { class ATopLevelWindow; }
 
 class QAction;
+class ATopLevelWindowsContainer;
 
 class ATopLevelWindow :
   public SelfSizingMainWindow
 {
 public:
-  ATopLevelWindow(QWidget *parent = 0);
-  ~ATopLevelWindow(void);
+  ATopLevelWindow(ATopLevelWindowsContainer *parent = 0);
+  virtual ~ATopLevelWindow(void);
 
   void setWindowTitle(const QString& title_string);
 
@@ -22,12 +22,10 @@ private:
 
 private:
   QAction* actionMenu;
+  ATopLevelWindowsContainer* parentWin;
 
 protected:
-  void closeEvent(QCloseEvent *event);
-
-//Q_SIGNALS:
-//  void windowOpened(QAction* actionMenu);
+  virtual void closeEvent(QCloseEvent *event);
 };
 
 #endif __ATOPLEVELWINDOW_HPP
