@@ -98,15 +98,15 @@ class IMailProcessor
       const TStoredMailMessage* savedDraftMsg) = 0;
 
     /** Allows to save given message into Drafts folder in the backend storage.
-        \param msgToOverwrite - optional (can be null). If specified given message will be first
+        \param msgBeingReplaced - optional (can be null). If specified given message will be first
                                 removed from mail_db and next replaced with new one.
-        \param savedMsg       - output, will be filled with saved message representation produced
-                                by mail_db.
+        \returns saved message representation produced by mail_db.
 
         \see Send description for other parameter details.
     */
-    virtual void Save(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TStoredMailMessage* msgToOverwrite, TStoredMailMessage* savedMsg) = 0;
+    virtual TStoredMailMessage Save(const TIdentity& senderId, 
+                                    const TPhysicalMailMessage& sourceMsg,
+                                    const TStoredMailMessage* msgBeingReplaced) = 0;
 
   protected:
     virtual ~IMailProcessor() {}

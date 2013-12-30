@@ -9,7 +9,7 @@
 #include "dataaccessimpl.h"
 #include "mailprocessorimpl.hpp"
 #include "ch/ModificationsChecker.hpp"
-#include "ATopLevelWindowsContainer.h"
+#include "ATopLevelWindowsContainer.hpp"
 
 namespace Ui { class KeyhoteeMainWindow; }
 

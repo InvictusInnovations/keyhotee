@@ -1,10 +1,12 @@
-#include <KeyhoteeMainWindow.hpp>
+#pragma once
+
 #include <QWidget>
 
 namespace Ui { class Mailbox; }
 
 #include "ch/mailprocessor.hpp"
 
+class ATopLevelWindowsContainer;
 class MailboxModel;
 
 class QAbstractItemModel;
@@ -23,11 +25,11 @@ public:
     Sent
     };
 
-  Mailbox(QWidget* parent = nullptr);
+  Mailbox(ATopLevelWindowsContainer* parent = nullptr);
   virtual ~Mailbox();
 
   // void setModel(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type = Inbox);
-  void initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type, KeyhoteeMainWindow* parentKehoteeMainW);
+  void initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type, ATopLevelWindowsContainer* parentKehoteeMainW);
   void searchEditChanged(QString search_string);
 
   bool isShowDetailsHidden();
@@ -71,6 +73,7 @@ private:
   InboxType                    _type;
   MailboxModel*                _sourceModel;
   IMailProcessor*              _mailProcessor;
+  ATopLevelWindowsContainer*   _mainWindow;
   QAction*                     reply_mail;
   QAction*                     reply_all_mail;
   QAction*                     forward_mail;

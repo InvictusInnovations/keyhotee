@@ -187,7 +187,7 @@ QTextCursor TDocumentTransform::find(const char* textToFind, const QTextCursor& 
 
 } ///namespace
 
-MailEditorMainWindow::MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel,
+MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, AddressBookModel& abModel,
   IMailProcessor& mailProcessor, bool editMode) :
   ATopLevelWindow(parent),
   ui(new Ui::MailEditorWindow()),
@@ -296,8 +296,7 @@ void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
   switch(loadForm)
     {
     case TLoadForm::Draft:
-      DraftMessageInfo.first = srcMsgHeader;
-      DraftMessageInfo.second = true;
+      DraftMessage = srcMsgHeader;
       /// Now load source message contents into editor controls.
       loadContents(srcMsgHeader.from_key, srcMsg);
       break;
@@ -520,10 +519,9 @@ void MailEditorMainWindow::onSave()
   if(prepareMailMessage(&msg))
     {
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Save(senderId, msg, 
-      DraftMessageInfo.second ? &DraftMessageInfo.first : nullptr, &DraftMessageInfo.first);
-
-    DraftMessageInfo.second = true;
+    //DLN we should probably add get_pointer implementation to fc::optional to avoid code like this
+    TStoredMailMessage* oldMessage = DraftMessage.valid() ? &(*DraftMessage) : nullptr;
+    DraftMessage = MailProcessor.Save(senderId, msg, oldMessage);
     }
   }
 
@@ -654,7 +652,7 @@ void MailEditorMainWindow::on_actionSend_triggered()
   if(prepareMailMessage(&msg))
     {
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Send(senderId, msg, DraftMessageInfo.second ? &DraftMessageInfo.first : nullptr);
+    MailProcessor.Send(senderId, msg, DraftMessage.valid() ? &(*DraftMessage) : nullptr);
     /// Clear potential modified flag to avoid asking for saving changes.
     ui->messageEdit->document()->setModified(false);
     close();

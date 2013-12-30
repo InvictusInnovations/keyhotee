@@ -2,6 +2,7 @@
 
 #include "ui_Mailbox.h"
 
+#include "ATopLevelWindowsContainer.hpp"
 #include "MailboxModel.hpp"
 #include "MailEditor.hpp"
 #include "maileditorwindow.hpp"
@@ -35,10 +36,11 @@ void Mailbox::searchEditChanged(QString search_string)
   model->setFilterRegExp(regex);
   }
 
-Mailbox::Mailbox(QWidget* parent)
+Mailbox::Mailbox(ATopLevelWindowsContainer* parent)
   : ui(new Ui::Mailbox() ),
   _type(Inbox),
-  _sourceModel(nullptr)
+  _sourceModel(nullptr),
+  _mainWindow(parent)
   {
   ui->setupUi(this);
   setupActions();
@@ -53,7 +55,7 @@ void Mailbox::onDoubleClickedItem(QModelIndex index)
   IMailProcessor::TPhysicalMailMessage decodedMsg;
   IMailProcessor::TStoredMailMessage encodedMsg;
   sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
-  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(this,
+  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_mainWindow,
     sourceModel->getAddressBookModel(), *_mailProcessor, _type == Drafts);
   mailEditor->LoadMessage(encodedMsg, decodedMsg, MailEditorMainWindow::TLoadForm::Draft);
   mailEditor->show();
@@ -93,11 +95,12 @@ Mailbox::~Mailbox()
   delete ui;
   }
 
-void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type, KeyhoteeMainWindow* parentKehoteeMainW)
+void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type, ATopLevelWindowsContainer* parentKehoteeMainW)
   {
   _type = type;
   _sourceModel = model;
   _mailProcessor = &mailProcessor;
+  _mainWindow = parentKehoteeMainW;
 
   //enable sorting the mailbox
   QSortFilterProxyModel* proxyModel = new MailSortFilterProxyModel();
@@ -199,7 +202,7 @@ void Mailbox::duplicateMail(ReplyType replyType)
   IMailProcessor::TPhysicalMailMessage decodedMsg;
   IMailProcessor::TStoredMailMessage encodedMsg;
   _sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
-  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(this,
+  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_mainWindow,
     _sourceModel->getAddressBookModel(), *_mailProcessor, true);
 
   MailEditorMainWindow::TLoadForm loadForm = MailEditorMainWindow::TLoadForm::Draft;
@@ -221,45 +224,6 @@ void Mailbox::duplicateMail(ReplyType replyType)
 
   mailEditor->LoadMessage(encodedMsg, decodedMsg, loadForm);
   mailEditor->show();
-
-#if 0
-  if (index == QModelIndex())
-    return;
-  MessageHeader header;
-  QModelIndex   mappedIndex = sortedModel()->mapToSource(index);
-  _sourceModel->getFullMessage(mappedIndex, header);
-  auto          msg_window = new MailEditor(this);
-  //TODO: add "x wrote on such date":
-  QString       new_body = header.body;
-  msg_window->copyToBody(new_body);
-
-  QString       new_subject;
-  auto          addressbook = bts::get_profile()->get_addressbook();
-  if (reply_type == reply || reply_type == reply_all)
-    {
-    new_subject = "Re: " + header.subject;
-//    auto reply_to_contact = addressbook->get_contact_by_public_key(header.header.from_key);
-//    if (reply_to_contact)
-//      msg_window->addToContact(reply_to_contact->wallet_index);
-    msg_window->addToContact(header.header.from_key);
-    }
-  else if (reply_type == forward)
-    {
-    new_subject = "Fwd: " + header.subject;
-    //TODO add attachments
-    }
-  if (reply_type == reply_all)
-    {
-    //TODO add check to avoid replying to self as well
-    foreach(auto to_key, header.to_list)
-      msg_window->addToContact(to_key);
-    foreach(auto cc_key, header.cc_list)
-      msg_window->addCcContact(cc_key);
-    }
-  msg_window->SetSubject(new_subject);
-  //TODO set focus to top of window
-  msg_window->setFocusAndShow();
-#endif
   }
 
 void Mailbox::onDeleteMail()
@@ -307,14 +271,9 @@ void Mailbox::refreshMessageViewer()
 
 void Mailbox::removeMessage(const IMailProcessor::TStoredMailMessage& msg)
   {
-  QItemSelectionModel* selectionModel = ui->inbox_table->selectionModel();
-  QModelIndexList indexes = selectionModel->selectedRows();
-
   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
-  QModelIndex selectedModelIndex = model->mapToSource(indexes[0]);
-  MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
 
-  QModelIndex foundModelIndex = sourceModel->findModelIndex(msg);
+  QModelIndex foundModelIndex = _sourceModel->findModelIndex(msg);
   if(foundModelIndex.isValid())
     {
     QModelIndex proxyModelIndex = model->mapFromSource(foundModelIndex);

@@ -19,7 +19,7 @@ public:
       \param abModel - access to the main address book model, needed for message editing purposes
   */
   MailboxModel(QObject* parent, const bts::profile_ptr& user_profile,
-    bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel);
+    bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel, bool isDraftFolder);
   virtual ~MailboxModel();
 
   enum Columns

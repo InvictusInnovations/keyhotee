@@ -5,11 +5,9 @@
 
 #include <bts/bitchat/bitchat_message_db.hpp>
 
-#include "ATopLevelWindow.h"
+#include "ATopLevelWindow.hpp"
 
 #include <QMainWindow>
-
-#include <utility>
 
 namespace Ui { class MailEditorWindow; }
 
@@ -24,6 +22,8 @@ class AddressBookModel;
 class TFileAttachmentWidget;
 class MailFieldsWidget;
 class TMoneyAttachementWidget;
+
+
 
 /** Mail message editor/viewer window.
     Contains rich editor, file attachment browser, money attachment browser.
@@ -55,8 +55,8 @@ class MailEditorMainWindow : public ATopLevelWindow
       ReplyAll
       };
 
-    MailEditorMainWindow(QWidget* parent, AddressBookModel& abModel, IMailProcessor& mailProcessor,
-      bool editMode);
+    MailEditorMainWindow(ATopLevelWindowsContainer* parent, AddressBookModel& abModel,
+      IMailProcessor& mailProcessor, bool editMode);
     virtual ~MailEditorMainWindow();
 
     /** Allows to explicitly specify initial recipient lists while creating a mail window.
@@ -154,24 +154,19 @@ class MailEditorMainWindow : public ATopLevelWindow
     void onAttachmentListChanged();
 
   private:
-    /** pairs loaded encoded draft message & flag determining it was specified (it is impossible
-        to query TStoredMailMessage for 'valid' property.
-    */
-    typedef std::pair<TStoredMailMessage, bool> TDraftMessageInfo;
-
     Ui::MailEditorWindow*    ui;
     /** Filled when mail editor has been opened with message already stored in Drafts. During save
         this old message should be replaced with new one.
     */
-    TDraftMessageInfo        DraftMessageInfo;
-    AddressBookModel&        ABModel;
-    IMailProcessor&          MailProcessor;
-    MailFieldsWidget*        MailFields;
-    TMoneyAttachementWidget* MoneyAttachement;
-    TFileAttachmentWidget*   FileAttachment;
-    QFontComboBox*           FontCombo;
-    QComboBox*               FontSize;
-    bool                     EditMode;
+    fc::optional<TStoredMailMessage> DraftMessage;
+    AddressBookModel&                ABModel;
+    IMailProcessor&                  MailProcessor;
+    MailFieldsWidget*                MailFields;
+    TMoneyAttachementWidget*         MoneyAttachement;
+    TFileAttachmentWidget*           FileAttachment;
+    QFontComboBox*                   FontCombo;
+    QComboBox*                       FontSize;
+    bool                             EditMode;
   };
 
 #endif ///__MAILEDITORWINDOW_HPP

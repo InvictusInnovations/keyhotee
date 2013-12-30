@@ -224,9 +224,9 @@ set( sources
         KeyhoteeMainWindow.hpp
         KeyhoteeMainWindow.cpp
 
-        ATopLevelWindowsContainer.h
+        ATopLevelWindowsContainer.hpp
         ATopLevelWindowsContainer.cpp
-        ATopLevelWindow.h
+        ATopLevelWindow.hpp
         ATopLevelWindow.cpp
 
         diagnosticdialog.ui

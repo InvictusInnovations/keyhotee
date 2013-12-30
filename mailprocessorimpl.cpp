@@ -79,18 +79,20 @@ void TMailProcessor::TOutboxQueue::AddPendingMessage(const TIdentity& senderId,
   {
   TStorableMessage storableMsg;
   Processor.PrepareStorableMessage(senderId, msg, &storableMsg);
-  TStoredMailMessage storedMsg = Outbox->store(storableMsg);
+  TStoredMailMessage storedMsg = Outbox->store_message(storableMsg, nullptr);
   Processor.Sink.OnMessagePending(storedMsg, savedDraftMsg);
   }
 
 bool TMailProcessor::TOutboxQueue::AnyOperationsPending() const
   {
-  return TransferLoopComplete.ready() ? false : Outbox->fetch_headers(TPhysicalMailMessage::type).empty();
+  bool transferLoopCompleted =TransferLoopComplete.valid() == false || TransferLoopComplete.ready();
+  return transferLoopCompleted ? false : Outbox->fetch_headers(TPhysicalMailMessage::type).empty();
   }
 
 unsigned int TMailProcessor::TOutboxQueue::GetLength() const
   {
-  return TransferLoopComplete.ready() ? 0 : Outbox->fetch_headers(TPhysicalMailMessage::type).size();
+  bool transferLoopCompleted = TransferLoopComplete.valid() == false || TransferLoopComplete.ready();
+  return transferLoopCompleted ? 0 : Outbox->fetch_headers(TPhysicalMailMessage::type).size();
   }
 
 void TMailProcessor::TOutboxQueue::transmissionLoop()
@@ -220,10 +222,10 @@ void TMailProcessor::TOutboxQueue::moveMsgToSentDB(const TStoredMailMessage& pen
   TStorableMessage storableMsg;
   Processor.PrepareStorableMessage(id, sentMsg, &storableMsg);
 
-  TStoredMailMessage savedMsg = Sent->store(storableMsg);
+  TStoredMailMessage savedMsg = Sent->store_message(storableMsg, nullptr);
   Processor.Sink.OnMessageSent(pendingMsg, savedMsg);
 
-  Outbox->remove(pendingMsg);
+  Outbox->remove_message(pendingMsg);
   }
 
 TMailProcessor::TMailProcessor(IUpdateSink& updateSink,
@@ -250,6 +252,14 @@ void TMailProcessor::Send(const TIdentity& senderId, const TPhysicalMailMessage&
     }
   else
     {
+    TStorableMessage storableMsg;
+    PrepareStorableMessage(senderId, msg, &storableMsg);
+    auto outbox = Profile->get_pending_db();
+    auto sent = Profile->get_sent_db();
+    TStoredMailMessage pendingMsg = outbox->store_message(storableMsg, nullptr);
+
+    Sink.OnMessagePending(pendingMsg, savedDraftMsg);
+
     TPhysicalMailMessage msgToSend(msg);
     TRecipientPublicKeys bccList(msg.bcc_list);
     /// \warning Message to be sent must have cleared bcc list.
@@ -272,35 +282,32 @@ void TMailProcessor::Send(const TIdentity& senderId, const TPhysicalMailMessage&
 
     for(const auto& public_key : bccList)
       app->send_email(msgToSend, public_key, my_priv_key);
+    
+    TStoredMailMessage sentMsg = sent->store_message(storableMsg, nullptr);
+    Sink.OnMessageSent(pendingMsg, sentMsg);
     }
   }
 
-void TMailProcessor::Save(const TIdentity& senderId, const TPhysicalMailMessage& sourceMsg,
-  const TStoredMailMessage* msgToOverwrite, TStoredMailMessage* savedMsg)
+IMailProcessor::TStoredMailMessage 
+TMailProcessor::Save(const TIdentity& senderId, const TPhysicalMailMessage& sourceMsg,
+  const TStoredMailMessage* msgBeingReplaced)
   {
-  assert(savedMsg != nullptr);
-
   Sink.OnMessageSaving();
 
   TStorableMessage storableMsg;
   PrepareStorableMessage(senderId, sourceMsg, &storableMsg);
-
-  *savedMsg = Drafts->store(storableMsg);
-
-  /** FIXME - block for another bug in backend. It is impossible to uniquely identify message_header
-      object.
-      https://github.com/InvictusInnovations/keyhotee/issues/107
-  */
-  msgToOverwrite = nullptr;
-
-  Sink.OnMessageSaved(*savedMsg, msgToOverwrite);
-
-  if(msgToOverwrite != nullptr)
-    Drafts->remove(*msgToOverwrite);
+  //Modify digest by updating signature time for the draft email.
+  //Note that signature time is not true signature time of send, but
+  //time when this version of draft email is being saved.
+  storableMsg.sig_time = fc::time_point::now();
+  TStoredMailMessage savedMsg = Drafts->store_message(storableMsg,msgBeingReplaced);
+  Sink.OnMessageSaved(savedMsg, msgBeingReplaced);
+  return savedMsg;
   }
 
 void TMailProcessor::PrepareStorableMessage(const TIdentity& senderId,
-  const TPhysicalMailMessage& sourceMsg, TStorableMessage* storableMsg)
+                                            const TPhysicalMailMessage& sourceMsg, 
+                                            TStorableMessage* storableMsg)
   {
   /** It looks for me like another bug in backend. Even decrypted message object can be constructed
       directly by using interface of this class it is not sufficient to successfully store it in
@@ -308,6 +315,20 @@ void TMailProcessor::PrepareStorableMessage(const TIdentity& senderId,
       transmission of course). So it must be first encrypted and next decrypted to properly fill
       actual decrypted message.
   */
+  //DLN Since we're saving message in unencrypted format in dbases, I think it would be better to
+  //work with decrypted_message (TStorableMessage) and eliminate most references to TPhysicalMailMesage
+  //at GUI level. The only time TPhysicalMailMessage is necessary is when actually sending. So I think
+  //it would be better to extract fields from GUI forms to TStorableMessage, then have a function to convert
+  //TStorableMessage to TPhysicalMailMessage for sending (opposite of how it is now I think). There's
+  //no need to do a full sign/encrypt to save TStorableMessage in database, it just needs to have a unique
+  //sig_time (so that the mapping to the message contents is unique even when two email messages have
+  //same contents). 
+  // For draft messages, this can be achieved by simply setting sig_time
+  //"draft save time". I added a line to set the sig_time in the Save function,
+  // even though this PrepareStorableMessage currently sets it, 
+  // with the idea that we could then eliminate PrepareStorableMessage.
+  // Also, we should change the "Date Sent" column in draft mailbox view to "Date Saved".
+  // 
   bts::bitchat::decrypted_message msg(sourceMsg);
 
   auto senderPrivKey = Profile->get_keychain().get_identity_key(senderId.dac_id_string);

@@ -30,11 +30,12 @@ class MailboxModelImpl
     QIcon                        _read_icon;
     QIcon                        _money_icon;
     AddressBookModel*            _abModel;
+    bool                         _isDraftFolder;
   };
 }
 
 MailboxModel::MailboxModel(QObject* parent, const bts::profile_ptr& profile,
-  bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel)
+  bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel, bool isDraftFolder)
   : QAbstractTableModel(parent),
   my(new Detail::MailboxModelImpl() )
   {
@@ -45,6 +46,7 @@ MailboxModel::MailboxModel(QObject* parent, const bts::profile_ptr& profile,
   my->_money_icon = QIcon(":/images/bitcoin.png");
   my->_read_icon = QIcon(":/images/read-icon.png");
   my->_abModel = &abModel;
+  my->_isDraftFolder = isDraftFolder;
 
   readMailBoxHeadersDb(mail_db);
   }
@@ -125,7 +127,7 @@ bool MailboxModel::removeRows(int row, int count, const QModelIndex&)
   {
   beginRemoveRows(QModelIndex(), row, row + count - 1);
   for (int i = row; i < row + count; ++i)
-    my->_mail_db->remove(my->_headers[i].header);
+    my->_mail_db->remove_message(my->_headers[i].header);
   //delete headers from in-memory my->_headers list
   auto rowI = my->_headers.begin() + row;
   my->_headers.erase(rowI, rowI + count);
@@ -171,7 +173,7 @@ QVariant MailboxModel::headerData(int section, Qt::Orientation orientation, int 
           case To:
             return tr("To");
           case DateSent:
-            return tr("Date Sent");
+            return my->_isDraftFolder ? tr("Date Saved") : tr("Date Sent");
           case Status:
             return tr("Status");
           }

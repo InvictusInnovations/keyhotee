@@ -226,10 +226,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   auto addressbook = profile->get_addressbook();
   _addressbook_model = new AddressBookModel(this, addressbook);
 
-  _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db(), *_addressbook_model);
-  _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model);
-  _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model);
-  _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model);
+  _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db(), *_addressbook_model, false);
+  _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model, true);
+  _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model, false);
+  _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, false);
 
   connect(_addressbook_model, &QAbstractItemModel::dataChanged, this,
     &KeyhoteeMainWindow::addressBookDataChanged);
@@ -707,14 +707,14 @@ void KeyhoteeMainWindow::received_text(const bts::bitchat::decrypted_message& ms
     auto      text = msg.as<bts::bitchat::private_text_message>();
     QDateTime dateTime;
     dateTime.setTime_t(msg.sig_time.sec_since_epoch());
-    bts::get_profile()->get_chat_db()->store(msg);
+    bts::get_profile()->get_chat_db()->store_message(msg,nullptr);
     contact_gui->receiveChatMessage(opt_contact->dac_id_string.c_str(), text.msg.c_str(), dateTime);
   }
 }
 
 void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& msg)
 {
-  auto header = bts::get_profile()->get_inbox_db()->store(msg);
+  auto header = bts::get_profile()->get_inbox_db()->store_message(msg,nullptr);
   _inbox_model->addMailHeader(header);
 }
 
@@ -766,6 +766,10 @@ void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
   const TStoredMailMessage& sentMsg)
 {
   /// FIXME - add some status bar messaging
+  ui->out_box_page->removeMessage(pendingMsg);
+  ui->draft_box_page->refreshMessageViewer();
+  _sent_model->addMailHeader(sentMsg);
+  ui->sent_box_page->refreshMessageViewer();
 }
 
 void KeyhoteeMainWindow::OnMessageSendingEnd()
@@ -775,14 +779,14 @@ void KeyhoteeMainWindow::OnMessageSendingEnd()
 
 void KeyhoteeMainWindow::OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
   const TPhysicalMailMessage& msg)
-  {
+{
   public_key_address pkAddress(senderId);
   std::string pkAddressText(pkAddress);
 
   QMessageBox::warning(this, tr("Mail send"),
     tr("Following sender identity specified in a pending mail message doesn't exist anymore:\n") +
     QString(pkAddressText.c_str()));
-  }
+}
 
 void KeyhoteeMainWindow::notSupported()
 {
