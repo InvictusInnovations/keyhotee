@@ -157,7 +157,7 @@ bool MailboxModel::removeRows(int row, int count, const QModelIndex&)
   {
   beginRemoveRows(QModelIndex(), row, row + count - 1);
   for (int i = row; i < row + count; ++i)
-    my->_mail_db->remove(my->_headers[i].header);
+    my->_mail_db->remove_message(my->_headers[i].header);
   //delete headers from in-memory my->_headers list
   auto rowI = my->_headers.begin() + row;
   my->_headers.erase(rowI, rowI + count);

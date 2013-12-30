@@ -709,14 +709,14 @@ void KeyhoteeMainWindow::received_text(const bts::bitchat::decrypted_message& ms
     auto      text = msg.as<bts::bitchat::private_text_message>();
     QDateTime dateTime;
     dateTime.setTime_t(msg.sig_time.sec_since_epoch());
-    bts::get_profile()->get_chat_db()->store(msg);
+    bts::get_profile()->get_chat_db()->store_message(msg,nullptr);
     contact_gui->receiveChatMessage(opt_contact->dac_id_string.c_str(), text.msg.c_str(), dateTime);
   }
 }
 
 void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& msg)
 {
-  auto header = bts::get_profile()->get_inbox_db()->store(msg);
+  auto header = bts::get_profile()->get_inbox_db()->store_message(msg,nullptr);
   _inbox_model->addMailHeader(header);
 }
 

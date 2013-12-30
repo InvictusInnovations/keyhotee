@@ -117,16 +117,11 @@ class MailEditorMainWindow : public ATopLevelWindow
     void onAttachmentListChanged();
 
   private:
-    /** pairs loaded encoded draft message & flag determining it was specified (it is impossible
-        to query TStoredMailMessage for 'valid' property.
-    */
-    typedef std::pair<TStoredMailMessage, bool> TDraftMessageInfo;
-
     Ui::MailEditorWindow*    ui;
     /** Filled when mail editor has been opened with message already stored in Drafts. During save
         this old message should be replaced with new one.
     */
-    TDraftMessageInfo        DraftMessageInfo;
+    fc::optional<TStoredMailMessage> DraftMessage;
     AddressBookModel&        ABModel;
     IMailProcessor&          MailProcessor;
     MailFieldsWidget*        MailFields;

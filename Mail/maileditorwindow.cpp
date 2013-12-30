@@ -118,8 +118,7 @@ void MailEditorMainWindow::SetRecipientList(const TRecipientPublicKeys& toList,
 void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
   const TPhysicalMailMessage& srcMsg)
   {
-  DraftMessageInfo.first = srcMsgHeader;
-  DraftMessageInfo.second = true;
+  DraftMessage = srcMsgHeader;
 
   /// Now load source message contents into editor controls.
   loadContents(srcMsgHeader.from_key, srcMsg);
@@ -271,10 +270,9 @@ void MailEditorMainWindow::onSave()
   if(prepareMailMessage(&msg))
     {
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Save(senderId, msg, 
-      DraftMessageInfo.second ? &DraftMessageInfo.first : nullptr, &DraftMessageInfo.first);
-
-    DraftMessageInfo.second = true;
+    //DLN we should probably add get_pointer implementation to fc::optional to avoid code like this
+    TStoredMailMessage* oldMessage = DraftMessage.valid() ? &(*DraftMessage) : nullptr;
+    DraftMessage = MailProcessor.Save(senderId, msg, oldMessage);
     }
   }
 

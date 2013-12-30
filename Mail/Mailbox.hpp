@@ -69,6 +69,7 @@ private:
   InboxType                    _type;
   MailboxModel*                _sourceModel;
   IMailProcessor*              _mailProcessor;
+  QWidget*                     _mainWindow;
   QAction*                     reply_mail;
   QAction*                     reply_all_mail;
   QAction*                     forward_mail;

@@ -13,7 +13,10 @@ ATopLevelWindow::ATopLevelWindow(QWidget *parent) :
   actionMenu = new QAction(tr("[*]"), this);
   actionMenu->setCheckable(true);
 
+  //DLNFIX Q&D workaround as I needed to test saving draft mail messages. Greg, please make a better fix
+  #if 0
   ((ATopLevelWindowsContainer*)parent)->registration(actionMenu);
+  #endif
 
 }
 
@@ -38,5 +41,8 @@ void ATopLevelWindow::SetActionText(QString string)
 
 void ATopLevelWindow::closeEvent(QCloseEvent *event)
 {
+  //DLNFIX Q&D workaround as I need edto test saving draft mail messages. Greg, please make a better fix
+#if 0
   ((ATopLevelWindowsContainer*)this->parent())->unRegistration(actionMenu);
+#endif
 }

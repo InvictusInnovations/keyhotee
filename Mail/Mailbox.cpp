@@ -38,7 +38,8 @@ void Mailbox::searchEditChanged(QString search_string)
 Mailbox::Mailbox(QWidget* parent)
   : ui(new Ui::Mailbox() ),
   _type(Inbox),
-  _sourceModel(nullptr)
+  _sourceModel(nullptr),
+  _mainWindow(parent)
   {
   ui->setupUi(this);
   setupActions();
@@ -53,8 +54,8 @@ void Mailbox::onDoubleClickedItem(QModelIndex index)
   IMailProcessor::TPhysicalMailMessage decodedMsg;
   IMailProcessor::TStoredMailMessage encodedMsg;
   sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
-  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(this,
-    sourceModel->getAddressBookModel(), *_mailProcessor, _type == Drafts);
+  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_mainWindow, sourceModel->getAddressBookModel(), 
+                                                              *_mailProcessor, _type == Drafts);
   mailEditor->LoadMessage(encodedMsg, decodedMsg);
   mailEditor->show();
   }
