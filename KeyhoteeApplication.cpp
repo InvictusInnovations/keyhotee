@@ -125,8 +125,6 @@ TKeyhoteeApplication::~TKeyhoteeApplication()
 
 int TKeyhoteeApplication::run()
 {
-  int exitCode = TExitStatus::SUCCESS;
-  
 #ifndef WIN32
   signal(SIGSEGV, linuxSignalHandler);
 #endif ///WIN32
@@ -140,7 +138,7 @@ int TKeyhoteeApplication::run()
     QString locale = QLocale::system().name();
     QTranslator translator;
     translator.load(QString(":/keyhotee_")+locale);
-    qApp->installTranslator(&translator);
+    installTranslator(&translator);
 
     startup();
 
@@ -171,7 +169,7 @@ int TKeyhoteeApplication::run()
 void TKeyhoteeApplication::displayLogin()
 {
   ilog( "." );
-  LoginDialog* loginDialog = new LoginDialog();
+  LoginDialog* loginDialog = new LoginDialog(*this);
   loginDialog->connect(loginDialog, &QDialog::accepted,
     [ = ]()
     {

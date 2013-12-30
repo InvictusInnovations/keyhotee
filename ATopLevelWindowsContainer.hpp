@@ -38,4 +38,4 @@ private:
   int               currentWindowIndex;
 };
 
-#endif __ATOPLEVELWINDOWSCONTAINER_HPP
+#endif /// __ATOPLEVELWINDOWSCONTAINER_HPP

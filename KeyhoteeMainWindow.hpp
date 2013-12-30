@@ -23,6 +23,7 @@ class ContactView;
 class InboxView;
 class Mailbox;
 class MailboxModel;
+class Mailbox;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
 
@@ -79,6 +80,7 @@ public:
   virtual bool canContinue() const;
 
   void displayDiagnosticLog();
+  void setEnabledAttachmentSaveOption(bool enable);
 
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
@@ -190,6 +192,7 @@ private:
   Ui::KeyhoteeMainWindow*                 ui;
   TConnectionStatusDS                     ConnectionStatusDS;
   TMailProcessor                          MailProcessor;
+  Mailbox*                                _currentMailbox;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();

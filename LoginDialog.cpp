@@ -1,16 +1,20 @@
 #include "LoginDialog.hpp"
-#include <ui_LoginDialog.h>
+
+#include "ui_LoginDialog.h"
+
+#include "KeyhoteeApplication.hpp"
+
 #include <bts/application.hpp>
 
 #include <fc/log/logger.hpp>
 #include <fc/thread/thread.hpp>
-#include <QApplication>
-#include "KeyhoteeApplication.hpp"
 
-LoginDialog::LoginDialog(QWidget* parent)
-  : QDialog(parent)
+
+LoginDialog::LoginDialog(TKeyhoteeApplication& mainApp, QWidget* parent)
+  : QDialog(parent),
+  ui(new Ui::LoginDialog),
+  _mainApp(mainApp)
 {
-  ui.reset(new Ui::LoginDialog() );
   ui->setupUi(this);
   ui->password->setFocus();
   connect(ui->login, &QPushButton::clicked, this, &LoginDialog::onLogin);
@@ -26,7 +30,9 @@ LoginDialog::LoginDialog(QWidget* parent)
 }
 
 LoginDialog::~LoginDialog()
-{}
+{
+  delete ui;
+}
 
 
 void LoginDialog::onLogin()
@@ -50,7 +56,7 @@ void LoginDialog::onLogin()
 void LoginDialog::onNew()
 {
    close();
-   static_cast<TKeyhoteeApplication*>(qApp)->displayProfileWizard();
+   _mainApp.displayProfileWizard();
 }
 
 void LoginDialog::shake()
@@ -66,7 +72,7 @@ void LoginDialog::shake()
 
 void LoginDialog::onQuit()
 {
-  qApp->quit();
+  _mainApp.quit();
   reject();
 }
 

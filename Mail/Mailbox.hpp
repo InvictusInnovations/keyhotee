@@ -36,6 +36,8 @@ public:
   /// Allows to explicitly reread currently displayed message in the preview pane.
   void refreshMessageViewer();
   void removeMessage(const IMailProcessor::TStoredMailMessage& msg);
+  bool isAttachmentSelected () const;
+  void saveAttachment ();
 
 private slots:
   void onDoubleClickedItem(QModelIndex);
@@ -78,4 +80,5 @@ private:
   QAction*                     reply_all_mail;
   QAction*                     forward_mail;
   QAction*                     delete_mail;
+  bool                        _attachmentSelected;
 };
