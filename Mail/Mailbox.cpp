@@ -38,7 +38,8 @@ void Mailbox::searchEditChanged(QString search_string)
 Mailbox::Mailbox(QWidget* parent)
   : ui(new Ui::Mailbox() ),
   _type(Inbox),
-  _sourceModel(nullptr)
+  _sourceModel(nullptr),
+  _attachmentSelected(false)
   {
   ui->setupUi(this);
   setupActions();
@@ -85,6 +86,8 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
     else
       ui->mail_viewer->setCurrentWidget(ui->info_1);
     //TODO: not implemented ui->current_message->displayMailMessages(indexes,selection_model);
+
+    getKeyhoteeWindow()->setEnabledAttachmentSaveOption( _attachmentSelected = false );
     }
   }
 
@@ -268,6 +271,8 @@ void Mailbox::refreshMessageViewer()
     MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
 	ui->mail_viewer->setCurrentWidget(ui->current_message);
     ui->current_message->displayMailMessage(sourceModelIndex, sourceModel);
+    _attachmentSelected = sourceModel->hasAttachments(sourceModelIndex);
+    getKeyhoteeWindow()->setEnabledAttachmentSaveOption(_attachmentSelected);
     }
   }
 
@@ -280,3 +285,12 @@ void Mailbox::on_actionShow_details_toggled(bool checked)
 
   }
 
+bool Mailbox::isAttachmentSelected () const
+  {
+    return _attachmentSelected;
+  }
+
+void Mailbox::saveAttachment ()
+  {
+    
+  }

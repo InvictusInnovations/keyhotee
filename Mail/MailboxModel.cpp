@@ -348,3 +348,8 @@ AddressBookModel& MailboxModel::getAddressBookModel() const
   return *my->_abModel;
   }
 
+bool MailboxModel::hasAttachments(const QModelIndex& index) const
+  {
+  MessageHeader& msg = my->_headers[index.row()];
+  return msg.hasAttachments;
+  }
