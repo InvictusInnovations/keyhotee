@@ -431,7 +431,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       }
     else if (selectedItem == _out_box_root)
       {
-      activateMailboxPage(ui->sent_box_page);
+      activateMailboxPage(ui->out_box_page);
       }
     else if (selectedItem == _sent_root)
       {
@@ -750,6 +750,7 @@ void KeyhoteeMainWindow::OnMessagePending(const TStoredMailMessage& msg,
     _pending_model->addMailHeader(msg);
 
   ui->draft_box_page->refreshMessageViewer();
+  ui->out_box_page->refreshMessageViewer();
 }
 
 void KeyhoteeMainWindow::OnMessageGroupPendingEnd()
@@ -767,7 +768,7 @@ void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
 {
   /// FIXME - add some status bar messaging
   ui->out_box_page->removeMessage(pendingMsg);
-  ui->draft_box_page->refreshMessageViewer();
+  ui->out_box_page->refreshMessageViewer();
   _sent_model->addMailHeader(sentMsg);
   ui->sent_box_page->refreshMessageViewer();
 }
