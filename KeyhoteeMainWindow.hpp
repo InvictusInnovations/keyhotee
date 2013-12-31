@@ -81,7 +81,7 @@ public:
 
   void displayDiagnosticLog();
   void setEnabledAttachmentSaveOption(bool enable);
-
+  void setEnabledDeleteOption( bool enable );
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 protected:
@@ -132,7 +132,6 @@ private slots:
   void on_actionCut_triggered();
   void on_actionPaste_triggered();
   void on_actionSelectAll_triggered();
-  void on_actionDelete_triggered();
   // Identity
   void on_actionNew_identity_triggered();
   void enableMining_toggled(bool enabled);

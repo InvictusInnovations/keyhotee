@@ -31,6 +31,7 @@ public:
   void selectChat();
   void contactRemoved ();
   virtual bool canContinue() const;
+  bool isSelection () const;
 
 private:
   ContactView* getCurrentView() const;

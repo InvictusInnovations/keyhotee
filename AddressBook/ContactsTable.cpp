@@ -4,6 +4,7 @@
 #include <bts/application.hpp>
 #include <bts/profile.hpp>
 #include "AddressBook/ContactView.hpp"
+#include "KeyhoteeMainWindow.hpp"
 
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
@@ -87,6 +88,8 @@ void ContactsTable::onSelectionChanged (const QItemSelection &selected, const QI
     {
     ui->contact_details_view->setCurrentWidget(ui->page_message);        
     }
+
+  getKeyhoteeWindow()->setEnabledDeleteOption( indexes.size() > 0 );
   }
 
 void ContactsTable::onDeleteContact()
@@ -219,4 +222,11 @@ void ContactsTable::showContactsTable (bool visible) const
 bool ContactsTable::canContinue() const
   {
   return checkSaving();
+  }
+
+bool ContactsTable::isSelection () const
+  {
+  QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
+  QModelIndexList      indexes = selection_model->selectedRows();
+  return (indexes.size() > 0);
   }
