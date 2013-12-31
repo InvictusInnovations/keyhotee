@@ -43,12 +43,12 @@ ContactsTable::ContactsTable(QWidget* parent)
   ui(new Ui::ContactsTable() )
   {
   ui->setupUi(this);
+  ui->contact_table->setModificationsChecker (this);
   //_delete_contact = new QAction(this); //QIcon( ":/images/delete_icon.png"), tr( "Delete" ), this);
   //_delete_contact->setShortcut(Qt::Key_Delete);
   //addAction(_delete_contact);
 
   //connect( _delete_contact, &QAction::triggered, this, &ContactsTable::onDeleteContact);
-  connect(ui->contact_details_view, &QStackedWidget::currentChanged, this, &ContactsTable::onCurrentViewChanged);
   }
 
 ContactsTable::~ContactsTable(){}
@@ -98,7 +98,7 @@ void ContactsTable::onDeleteContact()
   QModelIndexList        sortFilterIndexes = selection_model->selectedRows();
   if (sortFilterIndexes.count() == 0)
     return;
-  if (QMessageBox::question(this, "Delete Contact", "Are you sure you want to delete this contact?") == QMessageBox::Button::No)
+  if (QMessageBox::question(this, tr("Delete Contact"), tr("Are you sure you want to delete this contact?")) == QMessageBox::Button::No)
     return;
   QModelIndexList        indexes;
   foreach(QModelIndex sortFilterIndex, sortFilterIndexes)
@@ -143,10 +143,10 @@ void ContactsTable::showView(ContactView& view) const
   if (view.isAddingNewContact())
     {
     ui->contact_details_view->show();
-    ui->contact_table->hide ();    
+    showContactsTable (false);
     }
   else
-    ui->contact_table->show ();
+    showContactsTable (true);
 
   ui->contact_details_view->setCurrentWidget(&view);
   }
@@ -169,7 +169,7 @@ void ContactsTable::addNewContact(ContactView& view) const
 
 void ContactsTable::onCanceledNewContact()
   {
-  ui->contact_table->show ();
+  showContactsTable (true);
   }
 
 void ContactsTable::onSavedNewContact(int idxNewContact)
@@ -180,11 +180,8 @@ void ContactsTable::onSavedNewContact(int idxNewContact)
   QModelIndex mapped_index = _sorted_addressbook_model->mapFromSource(idx);
   selectRow(mapped_index.row());
 
-  ui->contact_table->show ();
+  showContactsTable (true);
   }
-
-void ContactsTable::onCurrentViewChanged(int index)
-  {}
 
 void ContactsTable::selectRow(int index)
 {
@@ -207,4 +204,19 @@ void ContactsTable::contactRemoved()
   {
   if (ContactView * currentView = getCurrentView ())
       currentView->onInfo ();
+  }
+
+void ContactsTable::showContactsTable (bool visible) const
+  {
+  //disable table, because hide() function emits signal onSelectionChanged
+  ui->contact_table->setEnabled (visible);
+  if (visible)
+    ui->contact_table->show ();
+  else
+    ui->contact_table->hide ();
+  }
+
+bool ContactsTable::canContinue() const
+  {
+  return checkSaving();
   }

@@ -1,5 +1,6 @@
 #include "AddressBook/LineEditReadOnly.hpp"
 #include <QKeyEvent>
+#include <QMenu>
 
 LineEditReadOnly::LineEditReadOnly(QWidget* parent)
   : QLineEdit(parent)
@@ -28,13 +29,28 @@ void LineEditReadOnly::mousePressEvent(QMouseEvent *mouse_event)
 void LineEditReadOnly::keyPressEvent(QKeyEvent* key_event)
   {
   if (! _readOnly)
-    QLineEdit::keyPressEvent(key_event);
+    return QLineEdit::keyPressEvent(key_event);
 
   bool isCtrlC = ((key_event->modifiers() & Qt::ControlModifier) && key_event->key() == Qt::Key_C); // Ctrl+C
   if (isCtrlC)
     {
-    QLineEdit::keyPressEvent(key_event);
+    return QLineEdit::keyPressEvent(key_event);
     }
   else
     return;
+  }
+
+ void LineEditReadOnly::contextMenuEvent(QContextMenuEvent *event)
+  {
+  if (! _readOnly)
+    return QLineEdit::contextMenuEvent(event);
+
+  #ifndef QT_NO_CLIPBOARD    
+  QMenu *menu = new QMenu();
+  QAction *action = menu->addAction(QLineEdit::tr("&Copy"));
+  action->setEnabled(hasSelectedText());
+  connect(action, SIGNAL(triggered()), SLOT(copy()));
+  menu->exec(event->globalPos());
+  delete menu;
+  #endif
   }

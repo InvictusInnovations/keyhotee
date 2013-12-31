@@ -4,10 +4,12 @@
 #include "NewIdentityDialog.hpp"
 #include <QPushButton>
 #include <bts/addressbook/contact.hpp>
+#include <fc/log/logger.hpp>
 
 #include "KeyhoteeApplication.hpp"
 #include "KeyhoteeMainWindow.hpp"
 #include "AddressBookModel.hpp"
+
 
 NewIdentityDialog::NewIdentityDialog( QWidget* parent_widget )
 :QDialog(parent_widget),ui( new Ui::NewIdentityDialog() )
@@ -68,9 +70,16 @@ void NewIdentityDialog::onSave()
     auto priv_key = profile->get_keychain().get_identity_key(trim_dac_id);
     ident.public_key = priv_key.get_public_key();
     profile->store_identity( ident );
-    app->mine_name(trim_dac_id,
+    try 
+    {
+      app->mine_name(trim_dac_id,
                 profile->get_keychain().get_identity_key(trim_dac_id).get_public_key(),
                 ident.mining_effort);
+    }
+    catch ( const fc::exception& e )
+    {
+      wlog( "${e}", ("e",e.to_detail_string()) );
+    }
 
     //store contact for new identity
     bts::addressbook::wallet_contact myself;

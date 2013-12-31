@@ -12,8 +12,9 @@ public:
   // bool isReadOnly() const; always return false
 
 protected:
-  void mousePressEvent(QMouseEvent*);
-  void keyPressEvent(QKeyEvent*);
+  virtual void mousePressEvent(QMouseEvent*);
+  virtual void keyPressEvent(QKeyEvent*);
+  virtual void contextMenuEvent(QContextMenuEvent *);
    
 private:
   bool _readOnly;

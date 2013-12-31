@@ -154,6 +154,8 @@ set( sources
         AddressBook/Contact.cpp
         AddressBook/LineEditReadOnly.hpp
         AddressBook/LineEditReadOnly.cpp
+        AddressBook/TableViewCustom.hpp
+        AddressBook/TableViewCustom.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp

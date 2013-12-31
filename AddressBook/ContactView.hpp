@@ -90,6 +90,10 @@ private slots:
 
   void currentTabChanged(int index);
   void onSend ();
+  void onSliderChanged(int mining_effort)
+    {
+    _current_contact.setMiningEffort(mining_effort);
+    }
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event);
