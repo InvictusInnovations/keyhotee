@@ -233,8 +233,14 @@ void MailFieldsWidget::fillSenderIdentities()
 
   connect(menu, SIGNAL(triggered(QAction*)), this, SLOT(onFromBtnTriggered(QAction*)));
 
-  onFromBtnTriggered(first);
-  menu->setActiveAction(first);
+  /** \warning nowadays because of broken profile creation process, application can be in inconsistent
+      state and have no identity defined.
+  */
+  if(first != nullptr)
+    {
+    onFromBtnTriggered(first);
+    menu->setActiveAction(first);
+    }
   }
 
 void MailFieldsWidget::selectSenderIdentity(const TRecipientPublicKey& senderPK)

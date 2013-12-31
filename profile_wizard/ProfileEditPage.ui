@@ -95,7 +95,11 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QDateEdit" name="birthdate"/>
+      <widget class="QDateEdit" name="birthdate">
+       <property name="displayFormat">
+        <string>yyyy-MM-dd</string>
+       </property>
+      </widget>
      </item>
      <item row="4" column="0">
       <widget class="QLabel" name="label_5">
