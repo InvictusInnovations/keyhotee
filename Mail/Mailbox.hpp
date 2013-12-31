@@ -38,6 +38,7 @@ public:
   void removeMessage(const IMailProcessor::TStoredMailMessage& msg);
   bool isAttachmentSelected () const;
   void saveAttachment ();
+  bool isSelection () const;
 
 private slots:
   void onDoubleClickedItem(QModelIndex);

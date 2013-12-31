@@ -91,6 +91,8 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
 
     getKeyhoteeWindow()->setEnabledAttachmentSaveOption( _attachmentSelected = false );
     }
+
+  getKeyhoteeWindow()->setEnabledDeleteOption( indexes.size() > 0 );
   }
 
 Mailbox::~Mailbox()
@@ -299,7 +301,14 @@ void Mailbox::on_actionShow_details_toggled(bool checked)
 
 bool Mailbox::isAttachmentSelected () const
   {
-    return _attachmentSelected;
+  return _attachmentSelected;
+  }
+
+bool Mailbox::isSelection () const
+  {
+  QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
+  QModelIndexList      indexes = selection_model->selectedRows();
+  return (indexes.size() > 0);
   }
 
 void Mailbox::saveAttachment ()
