@@ -70,6 +70,9 @@ class TMailProcessor::TOutboxQueue
 
     bool fetchNextMessage(TStoredMailMessage* storedMsg, TPhysicalMailMessage* storage);
     bool transferMessage(const TRecipientPublicKey& senderId, const TPhysicalMailMessage& msg);
+    void sendMail(const TPhysicalMailMessage& email, const TRecipientPublicKey& to,
+      const fc::ecc::private_key& from);
+
     /** Allows to get identity associated to given public key. Returns false if there is no
         associated identity to given public key.
     */
@@ -194,13 +197,13 @@ bool TMailProcessor::TOutboxQueue::transferMessage(const TRecipientPublicKey& se
       size_t totalRecipientCount = msgToSend.to_list.size() + msgToSend.cc_list.size() + bccList.size();
 
       for(const auto& public_key : msgToSend.to_list)
-        App->send_email(msgToSend, public_key, senderPrivKey);
+        sendMail(msgToSend, public_key, senderPrivKey);
 
       for(const auto& public_key : msgToSend.cc_list)
-        App->send_email(msgToSend, public_key, senderPrivKey);
+        sendMail(msgToSend, public_key, senderPrivKey);
 
       for(const auto& public_key : bccList)
-        App->send_email(msgToSend, public_key, senderPrivKey);
+        sendMail(msgToSend, public_key, senderPrivKey);
 
       sendStatus = true;
       }
@@ -219,6 +222,19 @@ bool TMailProcessor::TOutboxQueue::transferMessage(const TRecipientPublicKey& se
     }
 
   return sendStatus;
+  }
+
+inline
+void TMailProcessor::TOutboxQueue::sendMail(const TPhysicalMailMessage& email,
+  const TRecipientPublicKey& to, const fc::ecc::private_key& from)
+  {
+  if(isConnected())
+    {
+    App->send_email(email, to, from);
+    return;
+    }
+
+  FC_THROW("No connection to execute send_email"); 
   }
 
 inline

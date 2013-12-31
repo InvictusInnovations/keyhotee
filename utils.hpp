@@ -3,8 +3,6 @@
 
 /// Set of helper functions used to backend data text conversions.
 
-#include <bts/address.hpp>
-
 #include <fc/time.hpp>
 #include <fc/crypto/elliptic.hpp>
 
@@ -12,6 +10,14 @@
 #include <QString>
 
 #include <vector>
+
+namespace bts
+{
+namespace addressbook
+{
+struct contact;
+} ///namespace addressbook
+} /// namespace bts
 
 namespace Utils
 {
@@ -38,8 +44,15 @@ enum TContactTextFormatting
     If given key matches to one of known contacts (incl. created own identities) returned string
     can be built in a form defined by contactFormatting parameter.
     if given key is unknown, function returns just its textual form (as base58).
+
+    \param pk - input public key. Must be valid
+    \param contactFormatting - settings related to contact textual fomatting.
+                \see TContactTextFormatting definition for details.
+    \param matchingContact - optional, output parameter. Can be null. Will point to found contact
+                info or if contact is unknown will be just filled with input public key.
 */
-QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFormatting);
+QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFormatting,
+  bts::addressbook::contact* matchingContact = nullptr);
 
 /** Allows to convert list of keys into textual form, separated by given character.
     \see above toString description to single key conversion details.

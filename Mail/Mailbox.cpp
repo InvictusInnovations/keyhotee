@@ -3,10 +3,9 @@
 #include "ui_Mailbox.h"
 
 #include "ATopLevelWindowsContainer.hpp"
+#include "KeyhoteeMainWindow.hpp"
 #include "MailboxModel.hpp"
-#include "MailEditor.hpp"
 #include "maileditorwindow.hpp"
-#include <KeyhoteeMainWindow.hpp>
 
 #include <bts/profile.hpp>
 #include <fc/reflect/variant.hpp>

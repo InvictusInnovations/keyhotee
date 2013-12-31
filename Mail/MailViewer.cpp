@@ -26,6 +26,9 @@ MailViewer::~MailViewer()
 
 void MailViewer::displayMailMessage(const QModelIndex& index, MailboxModel* mailbox)
   {
+  assert(index.isValid());
+  assert(mailbox != nullptr);
+
   //TODO: later, possibly set a timer and only mark as read if still displaying
   //      this message when timer expires?
   mailbox->markMessageAsRead(index);

@@ -155,9 +155,6 @@ set( sources
         AddressBook/LineEditReadOnly.hpp
         AddressBook/LineEditReadOnly.cpp
 
-        Mail/MailEditor.hpp
-        Mail/MailEditor.cpp
-
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp
 

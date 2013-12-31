@@ -13,7 +13,6 @@
 #include "AddressBook/ContactView.hpp"
 
 #include "Mail/MailboxModel.hpp"
-#include "Mail/MailEditor.hpp"
 #include "Mail/maileditorwindow.hpp"
 
 #include <bts/bitchat/bitchat_private_message.hpp>
@@ -234,8 +233,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   connect(_addressbook_model, &QAbstractItemModel::dataChanged, this,
     &KeyhoteeMainWindow::addressBookDataChanged);
-
-  MailEditor::setContactCompleter(_addressbook_model->getContactCompleter() );
 
   ui->contacts_page->setAddressBook(_addressbook_model);
   ui->new_contact->setAddressBook(_addressbook_model);
@@ -639,10 +636,6 @@ void KeyhoteeMainWindow::newMailMessage()
   MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
     MailProcessor, true);
   mailWindow->show();
-
-  //auto msg_window = new MailEditor(this);
-  //msg_window->addToContact(-1);
-  //msg_window->setFocusAndShow();
 }
 
 void KeyhoteeMainWindow::newMailMessageTo(const Contact& contact)
@@ -654,10 +647,6 @@ void KeyhoteeMainWindow::newMailMessageTo(const Contact& contact)
   toList.push_back(contact.public_key);
   mailWindow->SetRecipientList(toList, emptyList, emptyList);
   mailWindow->show();
-
-  //auto msg_window = new MailEditor(this);
-  //msg_window->addToContact(contact_id);
-  //msg_window->setFocusAndShow();
 }
 
 ContactGui* KeyhoteeMainWindow::getContactGui(int contact_id)

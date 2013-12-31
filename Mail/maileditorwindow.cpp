@@ -301,9 +301,13 @@ void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
       loadContents(srcMsgHeader.from_key, srcMsg);
       break;
     case TLoadForm::ReplyAll:
-      sourceToList = srcMsg.to_list;
-      sourceCCList = srcMsg.cc_list;
+      transformRecipientList(srcMsgHeader.from_key, srcMsg.to_list, srcMsg.cc_list);
+      newSubject = transformMailBody(loadForm, srcMsgHeader, srcMsg);
+      MailFields->SetSubject(newSubject);
+      break;
     case TLoadForm::Reply:
+      if(srcMsg.to_list.empty() == false)
+        sourceToList.push_back(srcMsg.to_list.front());
       transformRecipientList(srcMsgHeader.from_key, sourceToList, sourceCCList);
       newSubject = transformMailBody(loadForm, srcMsgHeader, srcMsg);
       MailFields->SetSubject(newSubject);

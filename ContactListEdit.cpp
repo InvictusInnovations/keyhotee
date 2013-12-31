@@ -1,6 +1,7 @@
 #include "ContactListEdit.hpp"
 
-#include "public_key_address.hpp"
+#include "utils.hpp"
+
 #include "AddressBook/Contact.hpp"
 
 #include <QCompleter>
@@ -97,24 +98,6 @@ QString ContactListEdit::textUnderCursor() const
   return text_cursor.selectedText();
   }
 
-QStringList ContactListEdit::getListOfImageNames() const
-  {
-  QStringList image_names;
-  QTextBlock  block = document()->begin();
-  while (block.isValid())
-    {
-    for (QTextBlock::iterator i = block.begin(); !i.atEnd(); ++i)
-      {
-      QTextCharFormat format = i.fragment().charFormat();
-      bool            isImage = format.isImageFormat();
-      if (isImage)
-        image_names << format.toImageFormat().name();
-      }
-    block = block.next();
-    }
-  return image_names;
-  }
-
 void ContactListEdit::addContactEntry(const QString& contactText, const bts::addressbook::contact& c)
   {
   QFont        default_font;
@@ -161,63 +144,57 @@ void ContactListEdit::addContactEntry(const QString& contactText, const bts::add
   painter.setPen(QPen());
   painter.drawText(QPoint(10, completion_height - 2), contactText);
 
-  QTextCursor text_cursor = textCursor();
-     // int extra = completion.length() -
-  // tc.movePosition(QTextCursor::Left);
-  // tc.movePosition(QTextCursor::EndOfWord);
-  // tc.insertText(completion.right(extra));
-  text_cursor.insertImage(completion_image, contactText);
-  text_cursor.insertText(" ");
-  setTextCursor(text_cursor);
+  QTextDocument* doc = document();
+  doc->addResource(QTextDocument::ImageResource, QUrl(contactText), completion_image);
+  QTextImageFormat format;
+  format.setName(contactText);
+
+  encodePublicKey(c.public_key, &format);
+
+  QTextCursor txtCursor = textCursor();
+  txtCursor.insertImage(format);
+
+  txtCursor.insertText(" ");
+  setTextCursor(txtCursor);
   }
 
-QString ContactListEdit::toString(const bts::addressbook::wallet_identity& id) const
+void ContactListEdit::encodePublicKey(const IMailProcessor::TRecipientPublicKey& key,
+  QTextImageFormat* storage) const
   {
-  return toStringImpl(id);
+  assert(key.valid());
+
+  auto pkData = key.serialize();
+
+  QByteArray pkArray(pkData.size(), Qt::Initialization::Uninitialized);
+  memcpy(pkArray.data(), pkData.begin(), pkData.size());
+
+  storage->setProperty(QTextImageFormat::UserProperty, QVariant(pkArray));
   }
 
-QString ContactListEdit::toString(const bts::addressbook::wallet_contact& id) const
+void ContactListEdit::decodePublicKey(const QTextImageFormat& storage,
+  IMailProcessor::TRecipientPublicKey* key) const
   {
-  return id.get_display_name().c_str();//toStringImpl(id);
+  assert(storage.hasProperty(QTextImageFormat::UserProperty));
+
+  QVariant v = storage.property(QTextImageFormat::UserProperty);
+  QByteArray pkArray = v.toByteArray();
+
+  fc::ecc::public_key_data s;
+
+  assert(pkArray.size() == s.size());
+
+  memcpy(s.begin(), pkArray.data(), s.size());
+
+  *key = IMailProcessor::TRecipientPublicKey(s);
+  assert(key->valid());
   }
 
-template <class TContactStorage>
-inline
-QString ContactListEdit::toStringImpl(const TContactStorage& id) const
-  {
-  /** Use trivial encoding (as kID only) until some underlying storage for added contact
-      data will be implemented. Right now built text must allow successfull reverse parsing
-      what is completely wrong
-  */
-  bool noAlias = true;//id.first_name.empty() && id.last_name.empty();
-  std::string identity_label;
-  if(noAlias == false)
-    identity_label = id.first_name + " " + id.last_name;
-
-  std::string entry(identity_label);
-
-  if(noAlias == false)
-    entry += '(';
-
-  entry += id.dac_id_string;
-
-  if(noAlias == false)
-    entry += ')';
-
-  return QString(entry.c_str());
-  }
-
-//! [5]
-
-//! [6]
 void ContactListEdit::focusInEvent(QFocusEvent* focus_event)
   {
   if (_completer)
     _completer->setWidget(this);
   QTextEdit::focusInEvent(focus_event);
   }
-
-//! [6]
 
 bool ContactListEdit::focusNextPrevChild(bool next)
   {
@@ -226,7 +203,6 @@ bool ContactListEdit::focusNextPrevChild(bool next)
   return QTextEdit::focusNextPrevChild(next);
   }
 
-//! [7]
 void ContactListEdit::keyPressEvent(QKeyEvent* key_event)
   {
   if (_completer && _completer->popup()->isVisible())
@@ -287,71 +263,35 @@ void ContactListEdit::SetCollectedContacts(const IMailProcessor::TRecipientPubli
   for(const auto& recipient : storage)
     {
     assert(recipient.valid());
-
-    auto contact = aBook->get_contact_by_public_key(recipient);
-
-    if(contact)
-      {
-      /** Use kID as completion here - it is slight violation against source list but we don't know
-          here how it was originally entered (by kID or alias: fName lName)
-      */
-      QString entryText(toString(*contact));
-      addContactEntry(entryText, *contact);
-      }
-    else
-      {
-      bool known = false;
-      /// If no contact found try one of registered identities.
-      std::vector<bts::addressbook::wallet_identity> identities = profile->identities();
-      for(const auto& identity : identities)
-        {
-        assert(identity.public_key.valid());
-
-        if(identity.public_key == recipient)
-          {
-          QString entryText(toString(identity));
-          addContactEntry(entryText, identity);
-          known = true;
-          break;
-          }
-        }
-
-      if(known == false)
-        {
-        /// Some unknown contact. Lets show its public key in the list.
-        public_key_address pkAddress(recipient);
-        std::string textPK(pkAddress);
-        bts::addressbook::wallet_contact wc;
-        wc.public_key = recipient;
-        addContactEntry(QString(textPK.c_str()), wc);
-        }
-      }
+    bts::addressbook::contact matchingContact;
+    QString entryText(Utils::toString(recipient, Utils::TContactTextFormatting::FULL_CONTACT_DETAILS,
+      &matchingContact));
+    addContactEntry(entryText, matchingContact);
     }
   }
 
 void ContactListEdit::GetCollectedContacts(IMailProcessor::TRecipientPublicKeys* storage) const
   {
-  /** FIXME - this code generally looks bad. It will don't work when in AB will be conflict between
-      kID and fName lName alias.
-      Whole completer <-> contact edit communication is wrong, since it should operate on Contact
-      objects not just strings (where noone knows it is a kID or alias).
-      Another problem is synchronization against AB changes. It is also did wrong. To do it correclty
-      instantiated completer should use dedicated model operating DIRECTLY on AB not copied string
-      list.
-  */
-  auto addressbook = bts::get_profile()->get_addressbook();
-  QStringList recipient_image_names = getListOfImageNames();
-  storage->reserve(recipient_image_names.size());
+  assert(storage != nullptr);
+  storage->reserve(10);
 
-  for(const auto& recipient : recipient_image_names)
+  QTextBlock block = document()->begin();
+  while(block.isValid())
     {
-    std::string to_string = recipient.toStdString();
-    //check first to see if we have a dac_id
-    auto to_contact = addressbook->get_contact_by_dac_id(to_string);
-    if (!to_contact.valid()) // if not dac_id, check if we have a full name
-      to_contact = addressbook->get_contact_by_display_name(to_string);
-    assert(to_contact.valid());
-    storage->push_back(to_contact->public_key);
+    for(QTextBlock::iterator i = block.begin(); i != block.end(); ++i)
+      {
+      QTextCharFormat format = i.fragment().charFormat();
+      if(format.isImageFormat())
+        {
+        QTextImageFormat imgF = format.toImageFormat();
+        IMailProcessor::TRecipientPublicKey pk;
+        decodePublicKey(imgF, &pk);
+        assert(pk.valid());
+        storage->push_back(pk);
+        }
+      }
+
+    block = block.next();
     }
   }
 //! [8]
@@ -378,7 +318,6 @@ void ContactListEdit::resizeEvent(QResizeEvent* resize_event)
   fitHeightToDocument();
   QTextEdit::resizeEvent(resize_event);
   }
-
 
 QMimeData *ContactListEdit::createMimeDataFromSelection() const
   {
@@ -418,3 +357,4 @@ QMimeData *ContactListEdit::createMimeDataFromSelection() const
   mimeData->setText(textMime);
   return mimeData;
   }
+

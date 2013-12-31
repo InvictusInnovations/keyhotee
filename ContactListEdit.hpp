@@ -8,8 +8,6 @@ namespace bts
 namespace addressbook
 {
 struct contact;
-struct wallet_contact;
-struct wallet_identity;
 } ///namespace addressbook
 } /// namespace bts
 
@@ -48,25 +46,28 @@ protected:
   void keyPressEvent(QKeyEvent* key_event);
   void focusInEvent(QFocusEvent* focus_event);
   void resizeEvent(QResizeEvent* resize_event);
+  /// Reimplemented to correctly support clipboard operations.
   virtual QMimeData *createMimeDataFromSelection() const;
 
 public Q_SLOTS:
-  void insertCompletion( const QString& completion, const bts::addressbook::contact& c);
-  void insertCompletion( const QModelIndex& completion );
   /// Slot to explicitly request to show a completer.
   void onCompleterRequest();
 
 private Q_SLOTS:
+  void insertCompletion(const QString& completion, const bts::addressbook::contact& c);
+  void insertCompletion(const QModelIndex& completion);
+
   void fitHeightToDocument();
 
 private:
-  QString     textUnderCursor() const;
-  QStringList getListOfImageNames() const;
-  void        addContactEntry(const QString& contactText, const bts::addressbook::contact& c);
-  QString     toString(const bts::addressbook::wallet_identity& id) const;
-  QString     toString(const bts::addressbook::wallet_contact& id) const;
-  template <class TContactStorage>
-  QString     toStringImpl(const TContactStorage& id) const;
+  QString textUnderCursor() const;
+  void    addContactEntry(const QString& contactText, const bts::addressbook::contact& c);
+  /// Stores public key as user def. property on the image to be created in document.
+  void    encodePublicKey(const IMailProcessor::TRecipientPublicKey& key,
+    QTextImageFormat* storage) const;
+  /// Reads public key stored as user def. property from the image previously created in document.
+  void    decodePublicKey(const QTextImageFormat& storage,
+    IMailProcessor::TRecipientPublicKey* key) const;
 
 private:
   int         _fitted_height;

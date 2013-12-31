@@ -12,10 +12,14 @@ class MailViewer : public QWidget
   Q_OBJECT
 public:
   MailViewer(QWidget* parent = nullptr);
-  ~MailViewer();
-  //displays mail and marks as having been read
+  virtual ~MailViewer();
+  
+  /** Displays mail and marks as having been read
+      \param index - model index referencing mail message to be displayed. Must be valid.
+      \param mailbox - mailbox model, cannot be null.
+  */
   void displayMailMessage(const QModelIndex& index, MailboxModel* mailbox);
-  void      displayMailMessages(QModelIndexList, QItemSelectionModel * mailbox);
+  void displayMailMessages(QModelIndexList, QItemSelectionModel * mailbox);
 
   QToolBar* message_tools;
 private:
