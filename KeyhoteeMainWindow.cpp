@@ -802,6 +802,7 @@ void KeyhoteeMainWindow::OnMessageGroupPendingEnd()
 void KeyhoteeMainWindow::OnMessageSendingStart()
 {
   /// FIXME - add some status bar messaging
+  statusBar()->showMessage(tr("Starting mail trasmission..."), 1000);
 }
 
 void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
@@ -817,6 +818,7 @@ void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
 void KeyhoteeMainWindow::OnMessageSendingEnd()
 {
   /// FIXME - add some status bar messaging
+  statusBar()->showMessage(tr("All mail messages sent."), 1000);
 }
 
 void KeyhoteeMainWindow::OnMissingSenderIdentity(const TRecipientPublicKey& senderId,

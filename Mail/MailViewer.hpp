@@ -19,11 +19,8 @@ public:
       \param mailbox - mailbox model, cannot be null.
   */
   void displayMailMessage(const QModelIndex& index, MailboxModel* mailbox);
-  void displayMailMessages(QModelIndexList, QItemSelectionModel * mailbox);
 
   QToolBar* message_tools;
 private:
-  void displayAttachments(const MessageHeader& msg);
-
-  std::unique_ptr<Ui::MailViewer> ui;
+  Ui::MailViewer* ui;
 };

@@ -70,8 +70,7 @@ public:
   bool hasAttachments(const QModelIndex& index) const;
 
 private:
-  void fillMailHeader(const bts::bitchat::message_header& header,
-                      MessageHeader& mail_header);
+  bool fillMailHeader(const bts::bitchat::message_header& header, MessageHeader& mail_header);
 
   void readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db);
 

@@ -54,34 +54,46 @@ MailboxModel::MailboxModel(QObject* parent, const bts::profile_ptr& profile,
 MailboxModel::~MailboxModel()
   {}
 
-void MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
-                                  MessageHeader& mail_header)
+bool MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
+  MessageHeader& mail_header)
   {
-  mail_header.header = header;
-  auto addressbook = my->_profile->get_addressbook();
-  mail_header.date_received = Utils::toQDateTime(header.received_time);
+  try
+    {
+    mail_header.header = header;
+    auto addressbook = my->_profile->get_addressbook();
+    mail_header.date_received = Utils::toQDateTime(header.received_time);
 
-  mail_header.from = Utils::toString(header.from_key, Utils::FULL_CONTACT_DETAILS);
+    mail_header.from = Utils::toString(header.from_key, Utils::FULL_CONTACT_DETAILS);
 
-  mail_header.date_sent = Utils::toQDateTime(header.from_sig_time);
+    mail_header.date_sent = Utils::toQDateTime(header.from_sig_time);
 
-  //fill remaining fields from private_email_message
-  auto raw_data = my->_mail_db->fetch_data(header.digest);
-  auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
-  mail_header.to_list = email_msg.to_list;
-  mail_header.cc_list = email_msg.cc_list;
-  mail_header.subject = email_msg.subject.c_str();
-  mail_header.hasAttachments = email_msg.attachments.size();
+    //fill remaining fields from private_email_message
+    auto raw_data = my->_mail_db->fetch_data(header.digest);
+    auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
+    mail_header.to_list = email_msg.to_list;
+    mail_header.cc_list = email_msg.cc_list;
+    mail_header.subject = email_msg.subject.c_str();
+    mail_header.hasAttachments = email_msg.attachments.size();
+    return true;
+    }
+  catch(const fc::exception& e)
+    {
+    mail_header = MessageHeader();
+    elog("${e}", ("e", e.to_detail_string()));
+    return false;
+    }
   }
 
 void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
   {
   MessageHeader mail_header;
-  fillMailHeader(header, mail_header);
-  int           newRow = my->_headers.size();
-  beginInsertRows(QModelIndex(), newRow, newRow);
-  my->_headers.push_back(mail_header);
-  endInsertRows();
+  if(fillMailHeader(header, mail_header))
+    {
+    int           newRow = my->_headers.size();
+    beginInsertRows(QModelIndex(), newRow, newRow);
+    my->_headers.push_back(mail_header);
+    endInsertRows();
+    }
   }
 
 void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
@@ -91,8 +103,9 @@ void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
     {
     if(hdr.header.digest == overwrittenMsg.digest)
       {
-      hdr = MessageHeader();
-      fillMailHeader(msg, hdr);
+      MessageHeader helper;
+      if(fillMailHeader(msg, helper))
+        hdr = helper;
 
       /// Replace complete - return.
       return;
@@ -108,9 +121,13 @@ void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
 void MailboxModel::readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db)
   {
   auto headers = mail_db->fetch_headers(bts::bitchat::private_email_message::type);
-  my->_headers.resize(headers.size());
+  my->_headers.reserve(headers.size());
   for (uint32_t i = 0; i < headers.size(); ++i)
-    fillMailHeader(headers[i], my->_headers[i]);
+    {
+    MessageHeader helper;
+    if(fillMailHeader(headers[i], helper))
+      my->_headers.push_back(helper);
+    }
   }
 
 int MailboxModel::rowCount(const QModelIndex& parent) const
@@ -286,16 +303,24 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
 
 void MailboxModel::getFullMessage(const QModelIndex& index, MessageHeader& header) const
   {
-  header = my->_headers[index.row()];
-  /// Update sender info each time to match data defined in contact/identity list.
-  header.from = Utils::toString(header.header.from_key, Utils::TContactTextFormatting::FULL_CONTACT_DETAILS);
-  auto raw_data = my->_mail_db->fetch_data(header.header.digest);
-  auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
-  header.to_list = email_msg.to_list;
-  header.cc_list = email_msg.cc_list;
-  header.subject = email_msg.subject.c_str();
-  header.body = email_msg.body.c_str();
-  header.attachments = email_msg.attachments;
+  try
+    {
+    header = my->_headers[index.row()];
+    /// Update sender info each time to match data defined in contact/identity list.
+    header.from = Utils::toString(header.header.from_key, Utils::TContactTextFormatting::FULL_CONTACT_DETAILS);
+    auto raw_data = my->_mail_db->fetch_data(header.header.digest);
+    auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
+    header.to_list = email_msg.to_list;
+    header.cc_list = email_msg.cc_list;
+    header.subject = email_msg.subject.c_str();
+    header.body = email_msg.body.c_str();
+    header.attachments = email_msg.attachments;
+    }
+  catch(const fc::exception& e)
+    {
+    elog("${e}", ("e", e.to_detail_string()));
+    header = MessageHeader();
+    }
   }
 
 void MailboxModel::markMessageAsRead(const QModelIndex& index)

@@ -22,7 +22,9 @@ MailViewer::MailViewer(QWidget* parent)
   }
 
 MailViewer::~MailViewer()
-  {}
+  {
+  delete ui;
+  }
 
 void MailViewer::displayMailMessage(const QModelIndex& index, MailboxModel* mailbox)
   {
@@ -62,45 +64,5 @@ void MailViewer::displayMailMessage(const QModelIndex& index, MailboxModel* mail
   //TODO: add to and cc lists
   ui->subject_label->setText(msg.subject);
   ui->message_content->setHtml(msg.body);
-  displayAttachments(msg);
   }
-
-void MailViewer::displayAttachments(const MessageHeader& msg)
-  {
-#if 0 //code doesn't yet work
-  QTextDocument* textDocument = ui->message_content->document();
-  QImage         image;
-  int            i = 1;
-  foreach(const bts::bitchat::attachment & attachment, msg.attachments)
-    {
-    image.fromData(attachment.body.data());
-    QUrl             url(QString("attachment_image_%1").arg(i++));
-    textDocument->addResource(QTextDocument::ImageResource, url, QVariant(image) );
-    QTextCursor      cursor = ui->message_content->textCursor();
-    QTextImageFormat imageFormat;
-    imageFormat.setWidth(image.width() );
-    imageFormat.setHeight(image.height() );
-    imageFormat.setName(url.toString() );
-    cursor.insertImage(imageFormat);
-    }
-#endif
-  }
-
-#if 0
-void MailViewer::displayMailMessages(QModelIndexList indexes, QItemSelectionModel* selection_model)
-  {
-  QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
-  foreach(QModelIndex index, items)
-    {
-    auto sourceModelIndex = model->mapToSource(index);
-    _sourceModel->getFullMessage(sourceModelIndex, message_header);
-    msgs.push_back(message_header);
-    }
-
-    {
-    //TODO: show summary display when multiple messages selected
-    }
-  }
-
-#endif
 
