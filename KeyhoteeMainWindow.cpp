@@ -406,6 +406,8 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
         ui->actionShow_details->setChecked(false);
       else
         ui->actionShow_details->setChecked(true);
+
+      setEnabledDeleteOption (ui->contacts_page->isSelection());
     }
     else if (selectedItem->type() == IdentityItem)
     {
