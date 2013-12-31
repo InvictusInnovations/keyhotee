@@ -652,24 +652,33 @@ bool ContactView::doDataExchange (bool valid)
        std::string public_key_string = public_key_address( _current_contact.public_key );
        ui->public_key->setText( public_key_string.c_str() );
        ui->keyhotee_founder->setVisible(!_editing && _current_contact.isKeyhoteeFounder());
+       //DLNFIX TODO: add check to see if we are synced on blockchain. If not synched,
+       //             display "Keyhotee ledger not accessible"
        bool is_owner = _current_contact.isOwn();
        if(is_owner)
          {
          ui->mining_effort_slider->setValue( static_cast<int>(_current_contact.getMiningEffort()));
-         switch (_current_contact.getKeyhoteeStatus())
+         //if registered keyhoteeId
+         auto name_record = bts::application::instance()->lookup_name(_current_contact.dac_id_string);
+         if (name_record)
            {
-           case 0:  // Registered
+           //  if keyhoteeId's public key matches ours.
+           //DLNFIX this isn't working properly, maybe a problem with isOwn, look into more soon
+           if (name_record->active_key == _current_contact.public_key)
+             { //Registered to us
              ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : green; color : black; }");
              ui->keyhoteeID_status->setText(tr("Registered"));
-             break;
-           case 1:  // Conflict
+             }
+           else //Not Available (someone else owns it)
+             {
              ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : red; color : black; }");
-             ui->keyhoteeID_status->setText(tr("Conflict"));
-             break;
-           default:  // Pending
-             ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : yellow; color : black; }");
-             ui->keyhoteeID_status->setText(tr("Pending"));
-             break;
+             ui->keyhoteeID_status->setText(tr("Not Available"));
+             }
+           }
+         else //Unregistered (no one has it yet)
+           {
+           ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : yellow; color : black; }");
+           ui->keyhoteeID_status->setText(tr("Unregistered"));
            }
          }
        ui->keyhoteeID_status->setVisible(!_editing && is_owner);

@@ -42,11 +42,6 @@ public:
   QString getNotes() const;
   void setNotes(const QString& phone);
 
-  int getKeyhoteeStatus()
-    {
-    return 0;
-    }
-
   float getMiningEffort() const
     {
     return 50;  // expected range 0 - 100 
