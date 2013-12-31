@@ -43,6 +43,7 @@ ContactsTable::ContactsTable(QWidget* parent)
   ui(new Ui::ContactsTable() )
   {
   ui->setupUi(this);
+  ui->contact_table->setModificationsChecker (this);
   //_delete_contact = new QAction(this); //QIcon( ":/images/delete_icon.png"), tr( "Delete" ), this);
   //_delete_contact->setShortcut(Qt::Key_Delete);
   //addAction(_delete_contact);
@@ -213,4 +214,9 @@ void ContactsTable::showContactsTable (bool visible) const
     ui->contact_table->show ();
   else
     ui->contact_table->hide ();
+  }
+
+bool ContactsTable::canContinue() const
+  {
+  return checkSaving();
   }

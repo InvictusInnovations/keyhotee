@@ -2,6 +2,8 @@
 #include <QWidget>
 #include <memory>
 
+#include "ch/ModificationsChecker.hpp"
+
 namespace Ui { class ContactsTable; }
 
 class AddressBookModel;
@@ -9,7 +11,8 @@ class QSortFilterProxyModel;
 class QItemSelection;
 class ContactView;
 
-class ContactsTable  : public QWidget
+class ContactsTable  : public QWidget,
+                       public IModificationsChecker
 {
   Q_OBJECT
 public:
@@ -27,6 +30,7 @@ public:
   void selectRow(int index);
   void selectChat();
   void contactRemoved ();
+  virtual bool canContinue() const;
 
 private:
   ContactView* getCurrentView() const;
