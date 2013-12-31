@@ -287,6 +287,8 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
 void MailboxModel::getFullMessage(const QModelIndex& index, MessageHeader& header) const
   {
   header = my->_headers[index.row()];
+  /// Update sender info each time to match data defined in contact/identity list.
+  header.from = Utils::toString(header.header.from_key, Utils::TContactTextFormatting::FULL_CONTACT_DETAILS);
   auto raw_data = my->_mail_db->fetch_data(header.header.digest);
   auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
   header.to_list = email_msg.to_list;

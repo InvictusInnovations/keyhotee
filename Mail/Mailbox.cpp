@@ -98,7 +98,8 @@ Mailbox::~Mailbox()
   delete ui;
   }
 
-void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type, ATopLevelWindowsContainer* parentKehoteeMainW)
+void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxType type,
+  ATopLevelWindowsContainer* parentKehoteeMainW)
   {
   _type = type;
   _sourceModel = model;
@@ -139,7 +140,7 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
     }
 
   ui->inbox_table->horizontalHeader()->setSectionsMovable(true);
-  ui->inbox_table->horizontalHeader()->setSortIndicatorShown(false);
+  ui->inbox_table->horizontalHeader()->setSortIndicatorShown(true);
   ui->inbox_table->horizontalHeader()->setSectionsClickable(true);
   ui->inbox_table->horizontalHeader()->setHighlightSections(true);
 
