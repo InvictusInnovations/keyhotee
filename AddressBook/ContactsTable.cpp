@@ -183,18 +183,17 @@ void ContactsTable::onCanceledNewContact()
 
 void ContactsTable::onSavedNewContact(int idxNewContact)
   {
-  QModelIndex idx;
-
-  idx = _addressbook_model->index (idxNewContact, 0);
-  QModelIndex mapped_index = _sorted_addressbook_model->mapFromSource(idx);
-  selectRow(mapped_index.row());
-
+  selectRow(idxNewContact);
   showContactsTable (true);
   }
 
 void ContactsTable::selectRow(int index)
 {
-  ui->contact_table->selectRow(index);
+  QModelIndex idx;
+  idx = _addressbook_model->index (index, 0);
+  QModelIndex mapped_index = _sorted_addressbook_model->mapFromSource(idx);
+
+  ui->contact_table->selectRow(mapped_index.row());
 }
 
 ContactView* ContactsTable::getCurrentView() const

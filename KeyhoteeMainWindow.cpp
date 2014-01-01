@@ -418,10 +418,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     {
       auto con_id = selected_items[0]->data(0, ContactIdRole).toInt();
       openContactGui(con_id);
-      //this makes overstack when contact_page table is sorted, 
-      //selectRow generate signal onSidebarSelectionChanged and openContactGui is call two or more
-      //issue #51: Selecting contact on recent list should synchronize it in main list
-      //ui->contacts_page->selectRow(con_id);
+      ui->contacts_page->selectRow(con_id);
       connect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
       connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
       if(ui->contacts_page->isShowDetailsHidden())
