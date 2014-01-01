@@ -663,7 +663,6 @@ bool ContactView::doDataExchange (bool valid)
          if (name_record)
            {
            //  if keyhoteeId's public key matches ours.
-           //DLNFIX this isn't working properly, maybe a problem with isOwn, look into more soon
            if (name_record->active_key == _current_contact.public_key)
              { //Registered to us
              ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : green; color : black; }");
