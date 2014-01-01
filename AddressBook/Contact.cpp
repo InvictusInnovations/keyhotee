@@ -18,8 +18,11 @@ Contact::Contact(const bts::addressbook::wallet_contact& contact)
   {
   if (contact.icon_png.size() )
     {
+      QString image_string = QString::fromLatin1(&contact.icon_png[0], contact.icon_png.size());
+      QByteArray image_byte_array = image_string.toLatin1();
+
     QImage image;
-    if (image.loadFromData( (unsigned char*)icon_png.data(), icon_png.size() ) )
+    if (image.loadFromData( image_byte_array ) )
       icon = QIcon(QPixmap::fromImage(image) );
     else
       wlog("unable to load icon for contact ${c}", ("c", contact) );
@@ -35,7 +38,7 @@ void Contact::setIcon(const QIcon& icon)
   this->icon = icon;
   if (!icon.isNull() )
     {
-    QImage     image;
+      QImage     image(icon.pixmap(QSize(32, 32)).toImage());
     QByteArray byte_array;
     QBuffer    buffer(&byte_array);
     buffer.open(QIODevice::WriteOnly);
