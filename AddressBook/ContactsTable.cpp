@@ -41,7 +41,8 @@ void ContactsTable::searchEditChanged(QString search_string)
 
 ContactsTable::ContactsTable(QWidget* parent)
   : QWidget(parent),
-  ui(new Ui::ContactsTable() )
+  ui(new Ui::ContactsTable() ),
+  _currentWidgetView (nullptr)
   {
   ui->setupUi(this);
   ui->contact_table->setModificationsChecker (this);
@@ -86,7 +87,8 @@ void ContactsTable::onSelectionChanged (const QItemSelection &selected, const QI
     }
   else
     {
-    ui->contact_details_view->setCurrentWidget(ui->page_message);        
+    _currentWidgetView = ui->page_message;
+    ui->contact_details_view->setCurrentWidget(ui->page_message);
     }
 
   getKeyhoteeWindow()->setEnabledDeleteOption( indexes.size() > 0 );
@@ -147,6 +149,8 @@ void ContactsTable::showView(ContactView& view) const
     {
     ui->contact_details_view->show();
     showContactsTable (false);
+    //save current view and restore it after canceled
+    _currentWidgetView = ui->contact_details_view->currentWidget();    
     }
   else
     showContactsTable (true);
@@ -173,6 +177,8 @@ void ContactsTable::addNewContact(ContactView& view) const
 void ContactsTable::onCanceledNewContact()
   {
   showContactsTable (true);
+  assert (_currentWidgetView);
+  ui->contact_details_view->setCurrentWidget(_currentWidgetView);
   }
 
 void ContactsTable::onSavedNewContact(int idxNewContact)

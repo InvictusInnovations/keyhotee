@@ -231,7 +231,6 @@ void ContactView::onCancel()
   keyEdit(false);
   if (isAddingNewContact())
   {
-    this->setVisible(false);    
     emit canceledNewContact();
   }
   else  //editing contact
