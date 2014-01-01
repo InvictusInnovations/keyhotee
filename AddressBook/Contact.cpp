@@ -18,8 +18,11 @@ Contact::Contact(const bts::addressbook::wallet_contact& contact)
   {
   if (contact.icon_png.size() )
     {
+      QString image_string = QString::fromLatin1(&contact.icon_png[0], contact.icon_png.size());
+      QByteArray image_byte_array = image_string.toLatin1();
+
     QImage image;
-    if (image.loadFromData( (unsigned char*)icon_png.data(), icon_png.size() ) )
+    if (image.loadFromData( image_byte_array ) )
       icon = QIcon(QPixmap::fromImage(image) );
     else
       wlog("unable to load icon for contact ${c}", ("c", contact) );
@@ -35,7 +38,7 @@ void Contact::setIcon(const QIcon& icon)
   this->icon = icon;
   if (!icon.isNull() )
     {
-    QImage     image;
+      QImage     image(icon.pixmap(QSize(32, 32)).toImage());
     QByteArray byte_array;
     QBuffer    buffer(&byte_array);
     buffer.open(QIODevice::WriteOnly);
@@ -90,27 +93,21 @@ bool Contact::isOwn() const
   {
   bts::application_ptr app = bts::application::instance();
   bts::profile_ptr     currentProfile = app->get_profile();
-
   bts::keychain        keyChain = currentProfile->get_keychain();
 
   typedef std::set<fc::ecc::public_key_data> TPublicKeyIndex;
-
   try
     {
+    //put all public keys owned by profile into a set
     TPublicKeyIndex myPublicKeys;
-
     for (const auto& id : currentProfile->identities())
       {
-      auto                     myPublicKey = keyChain.get_identity_key(id.dac_id_string).get_public_key();
+      auto myPublicKey = keyChain.get_identity_key(id.dac_id_string).get_public_key();
       fc::ecc::public_key_data keyData = myPublicKey;
-
       myPublicKeys.insert(keyData);
       }
-
-    /// If query for a private key associated to given contact fails, fc::exception is thrown
-    auto contactPublicKey = keyChain.get_identity_key(dac_id_string).get_public_key();
-
-    return myPublicKeys.find(contactPublicKey) != myPublicKeys.end();
+    //check if we have a public key in our set matching the contact's public key
+    return myPublicKeys.find(public_key) != myPublicKeys.end();
     }
   catch (const fc::exception&)
     {

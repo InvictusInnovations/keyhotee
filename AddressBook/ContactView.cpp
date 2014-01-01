@@ -231,7 +231,6 @@ void ContactView::onCancel()
   keyEdit(false);
   if (isAddingNewContact())
   {
-    this->setVisible(false);    
     emit canceledNewContact();
   }
   else  //editing contact
@@ -600,8 +599,12 @@ void ContactView::onIconSearch()
   auto writableLocation = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
   auto fileName = QFileDialog::getOpenFileName(this, tr("Select Avatar image for contact"), writableLocation,
                                                tr("Image Files (*.png *.jpg *.bmp)"));
+
   if (!fileName.isEmpty())
+  {
+    save_contact->setEnabled(_validForm);
     ui->icon_view->setIcon(QIcon(fileName));
+  }
 }
 
 
@@ -660,7 +663,6 @@ bool ContactView::doDataExchange (bool valid)
          if (name_record)
            {
            //  if keyhoteeId's public key matches ours.
-           //DLNFIX this isn't working properly, maybe a problem with isOwn, look into more soon
            if (name_record->active_key == _current_contact.public_key)
              { //Registered to us
              ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : green; color : black; }");

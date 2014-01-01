@@ -9,8 +9,8 @@ include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
 #  set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake;C:/gh/qt5.1.1/qtwebkit/WebKitBuild/Release/lib/cmake/Qt5WebKitWidgets;"  )
-set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
-message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+#set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
+#message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
 IF( WIN32 )
   #You need to set OPENSSL_ROOT environment variable for your system on WIN32

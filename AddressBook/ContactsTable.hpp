@@ -46,6 +46,7 @@ private:
   AddressBookModel*                  _addressbook_model;
   QSortFilterProxyModel*             _sorted_addressbook_model;
   QAction*                           _delete_contact;
+  mutable QWidget*                   _currentWidgetView;
 
 public slots:
   void onDeleteContact();
