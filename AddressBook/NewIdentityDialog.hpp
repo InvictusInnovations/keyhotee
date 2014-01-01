@@ -12,6 +12,7 @@ class NewIdentityDialog : public QDialog
       ~NewIdentityDialog();
 
       void onUserNameChanged( const QString& name );
+      void onKey( const QString& name );
       void onSave();
 
    private:
