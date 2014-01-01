@@ -526,10 +526,7 @@ void ContactView::keyEdit(bool enable)
   ui->keyhotee_founder->setVisible(!enable && _current_contact.isKeyhoteeFounder());
   bool is_owner = _current_contact.isOwn();
   ui->keyhoteeID_status->setVisible(!enable && is_owner);
-  ui->mining_effort->setVisible(!enable && is_owner);
-  ui->mining_effort_slider->setVisible(!enable && is_owner);
-  ui->mining_effort_label->setVisible(!enable && is_owner);
-  ui->mining_effort_label_2->setVisible(!enable && is_owner);
+  ui->mining_effort_slider->setDisabled(!enable && is_owner);
   
   cancel_edit_contact->setEnabled(enable);
   send_mail->setEnabled(!enable);
@@ -682,10 +679,11 @@ bool ContactView::doDataExchange (bool valid)
            }
          }
        ui->keyhoteeID_status->setVisible(!_editing && is_owner);
-       ui->mining_effort->setVisible(!_editing && is_owner);
-       ui->mining_effort_slider->setVisible(!_editing && is_owner);
-       ui->mining_effort_label->setVisible(!_editing && is_owner);
-       ui->mining_effort_label_2->setVisible(!_editing && is_owner);
+       ui->mining_effort->setVisible(is_owner);
+       ui->mining_effort_slider->setVisible(is_owner);
+       ui->mining_effort_slider->setDisabled(!_editing);
+       ui->mining_effort_label->setVisible(is_owner);
+       ui->mining_effort_label_2->setVisible(is_owner);
 
        ui->id_status->setText(QString());
      }

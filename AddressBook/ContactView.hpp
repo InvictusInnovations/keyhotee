@@ -93,6 +93,7 @@ private slots:
   void onSliderChanged(int mining_effort)
     {
     _current_contact.setMiningEffort(mining_effort);
+    setModyfied();
     }
 
 protected:
