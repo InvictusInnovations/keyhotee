@@ -80,6 +80,7 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
   if (oneEmailSelected)
     {
     refreshMessageViewer();
+    getKeyhoteeWindow()->setEnabledMailActions(true);
     }
   else
     {
@@ -89,6 +90,7 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
       ui->mail_viewer->setCurrentWidget(ui->info_1);
     //TODO: not implemented ui->current_message->displayMailMessages(indexes,selection_model);
 
+    getKeyhoteeWindow()->setEnabledMailActions(false);
     getKeyhoteeWindow()->setEnabledAttachmentSaveOption( _attachmentSelected = false );
     }
 
@@ -309,6 +311,13 @@ bool Mailbox::isSelection () const
   QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
   QModelIndexList      indexes = selection_model->selectedRows();
   return (indexes.size() > 0);
+  }
+
+bool Mailbox::isOneEmailSelected() const
+  {
+  QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
+  QModelIndexList      indexes = selection_model->selectedRows();
+  return (indexes.size() == 1);
   }
 
 void Mailbox::saveAttachment ()

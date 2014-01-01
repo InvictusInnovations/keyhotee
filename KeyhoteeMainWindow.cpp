@@ -117,6 +117,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   setWindowTitle(title);
   setEnabledAttachmentSaveOption(false);
   setEnabledDeleteOption(false);
+  setEnabledMailActions(false);
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
   connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
@@ -173,9 +174,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   connect(ui->actionEnable_Mining, &QAction::toggled, this, &KeyhoteeMainWindow::enableMining_toggled);
   // Mail
   connect(ui->actionNew_Message, &QAction::triggered, this, &KeyhoteeMainWindow::newMailMessage);
-  connect(ui->actionReply, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionReply_triggered);
-  connect(ui->actionReply_all, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionReply_all_triggered);
-  connect(ui->actionForward, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionForward_triggered);
   connect(ui->actionSave_attachement, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionSave_attachement_triggered);
   // Contact
   connect(ui->actionNew_Contact, &QAction::triggered, this, &KeyhoteeMainWindow::addContact);
@@ -245,6 +243,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->widget_stack->setCurrentWidget(ui->inbox_page);
   connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
   connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
+  connect(ui->actionReply, SIGNAL(triggered()), ui->inbox_page, SLOT(onReplyMail()));
+  connect(ui->actionReply_all, SIGNAL(triggered()), ui->inbox_page, SLOT(onReplyAllMail()));
+  connect(ui->actionForward, SIGNAL(triggered()), ui->inbox_page, SLOT(onForwardMail()));
 
   wlog("idents: ${idents}", ("idents", idents) );
   for (size_t i = 0; i < idents.size(); ++i)
@@ -301,12 +302,16 @@ void KeyhoteeMainWindow::activateMailboxPage(Mailbox* mailBox)
   ui->widget_stack->setCurrentWidget(mailBox);
   connect(ui->actionDelete, SIGNAL(triggered()), mailBox, SLOT(onDeleteMail()));
   connect(ui->actionShow_details, SIGNAL(toggled(bool)), mailBox, SLOT(on_actionShow_details_toggled(bool)));
+  connect(ui->actionReply, SIGNAL(triggered()), mailBox, SLOT(onReplyMail()));
+  connect(ui->actionReply_all, SIGNAL(triggered()), mailBox, SLOT(onReplyAllMail()));
+  connect(ui->actionForward, SIGNAL(triggered()), mailBox, SLOT(onForwardMail()));
   bool checked = mailBox->isShowDetailsHidden() == false;
   ui->actionShow_details->setChecked(checked);
 
   _currentMailbox = mailBox;
   setEnabledAttachmentSaveOption(_currentMailbox->isAttachmentSelected());
   setEnabledDeleteOption (_currentMailbox->isSelection());
+  setEnabledMailActions(_currentMailbox->isOneEmailSelected());
   }
 
 void KeyhoteeMainWindow::addContact()
@@ -380,6 +385,22 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->out_box_page, SLOT(onDeleteMail()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->sent_box_page, SLOT(onDeleteMail()));
 
+    disconnect(ui->actionReply, SIGNAL(triggered()), ui->inbox_page, SLOT(onReplyMail()));
+    disconnect(ui->actionReply_all, SIGNAL(triggered()), ui->inbox_page, SLOT(onReplyAllMail()));
+    disconnect(ui->actionForward, SIGNAL(triggered()), ui->inbox_page, SLOT(onForwardMail()));
+
+    disconnect(ui->actionReply, SIGNAL(triggered()), ui->draft_box_page, SLOT(onReplyMail()));
+    disconnect(ui->actionReply_all, SIGNAL(triggered()), ui->draft_box_page, SLOT(onReplyAllMail()));
+    disconnect(ui->actionForward, SIGNAL(triggered()), ui->draft_box_page, SLOT(onForwardMail()));
+
+    disconnect(ui->actionReply, SIGNAL(triggered()), ui->out_box_page, SLOT(onReplyMail()));
+    disconnect(ui->actionReply_all, SIGNAL(triggered()), ui->out_box_page, SLOT(onReplyAllMail()));
+    disconnect(ui->actionForward, SIGNAL(triggered()), ui->out_box_page, SLOT(onForwardMail()));
+
+    disconnect(ui->actionReply, SIGNAL(triggered()), ui->sent_box_page, SLOT(onReplyMail()));
+    disconnect(ui->actionReply_all, SIGNAL(triggered()), ui->sent_box_page, SLOT(onReplyAllMail()));
+    disconnect(ui->actionForward, SIGNAL(triggered()), ui->sent_box_page, SLOT(onForwardMail()));
+
     disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
     disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
     disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->draft_box_page, SLOT(on_actionShow_details_toggled(bool)));
@@ -388,6 +409,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
 
     setEnabledDeleteOption (false);
     setEnabledAttachmentSaveOption(false);
+    setEnabledMailActions(false);
     _currentMailbox = nullptr;
 
     QTreeWidgetItem* selectedItem = selected_items.first();
@@ -524,21 +546,6 @@ void KeyhoteeMainWindow::enableMining_toggled(bool enabled)
 }
 
 // Menu Mail
-void KeyhoteeMainWindow::on_actionReply_triggered()
-{
-  notSupported();
-}
-
-void KeyhoteeMainWindow::on_actionReply_all_triggered()
-{
-  notSupported();
-}
-
-void KeyhoteeMainWindow::on_actionForward_triggered()
-{
-  notSupported();
-}
-
 void KeyhoteeMainWindow::on_actionSave_attachement_triggered()
 {
   assert (_currentMailbox != nullptr);
@@ -814,6 +821,7 @@ void KeyhoteeMainWindow::enableMenu(bool enable)
 {
   ui->actionShow_details->setEnabled (enable);
   setEnabledDeleteOption (enable);
+  setEnabledMailActions(enable);
   ui->actionNew_Contact->setEnabled (enable);
   ui->actionShow_Contacts->setEnabled (enable);
   _search_edit->setEnabled (enable);  
@@ -857,4 +865,11 @@ void KeyhoteeMainWindow::setEnabledAttachmentSaveOption( bool enable )
 void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable )
   {
   ui->actionDelete->setEnabled (enable);
+  }
+
+void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
+  {
+    ui->actionReply->setEnabled(enable);
+    ui->actionReply_all->setEnabled(enable);
+    ui->actionForward->setEnabled(enable);
   }

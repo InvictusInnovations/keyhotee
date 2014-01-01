@@ -39,6 +39,7 @@ public:
   bool isAttachmentSelected () const;
   void saveAttachment ();
   bool isSelection () const;
+  bool isOneEmailSelected() const;
 
 private slots:
   void onDoubleClickedItem(QModelIndex);
@@ -51,6 +52,8 @@ private:
   void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
   void duplicateMail(ReplyType);
+
+public slots:
   void onReplyMail()
     {
     duplicateMail(ReplyType::reply);
