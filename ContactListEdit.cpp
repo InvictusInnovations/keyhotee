@@ -4,14 +4,15 @@
 
 #include "AddressBook/Contact.hpp"
 
-#include <QCompleter>
 #include <QAbstractItemView>
-#include <QKeyEvent>
-#include <QScrollBar>
-#include <QPainter>
-#include <QTextBlock>
-#include <QMimeData>
+#include <QCompleter>
 #include <QDebug>
+#include <QKeyEvent>
+#include <QMimeData>
+#include <QPainter>
+#include <QScrollBar>
+#include <QTextBlock>
+#include <QToolTip>
 
 #include <fc/log/logger.hpp>
 #include <bts/profile.hpp>
@@ -88,6 +89,11 @@ void ContactListEdit::onCompleterRequest()
   {
   setFocus();
   showCompleter(QString());
+  if(_completer->model()->rowCount() == 0)
+    {
+    QRect pos = cursorRect();
+    QToolTip::showText(mapToGlobal(pos.topLeft()), tr("There is no contact defined"));
+    }
   }
 
 //! [5]

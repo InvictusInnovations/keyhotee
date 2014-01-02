@@ -216,7 +216,6 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
   MailFields = new MailFieldsWidget(*this, *ui->actionSend, abModel, editMode);
 
   /// Initially only basic mail fields (To: and Subject:) should be visible
-  MailFields->showFromControls(false);
   MailFields->showCcControls(false);
   MailFields->showBccControls(false);
 

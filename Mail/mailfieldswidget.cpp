@@ -43,9 +43,11 @@ MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, Address
 
   /// This edit must be always read only - it is automatically filled by 'from' tool button selection.
   ui->fromEdit->setReadOnly(true);
-  ui->fromEdit->setCompleter(completer);
   if(editMode)
     fillSenderIdentities();
+
+  ui->sendButton->setEnabled(editMode);
+  ui->sendButton->setVisible(editMode);
 
   validateSendButtonState();
 
@@ -55,9 +57,6 @@ MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, Address
   ui->bccButton->setEnabled(editMode);
 
   ui->subjectEdit->setReadOnly(readOnly);
-  
-  ui->sendButton->setEnabled(editMode);
-  ui->sendButton->setVisible(editMode);
   }
 
 MailFieldsWidget::~MailFieldsWidget()
@@ -199,12 +198,15 @@ void MailFieldsWidget::showLayoutWidgets(QLayout* layout, bool show)
 
 void MailFieldsWidget::validateSendButtonState()
   {
-  bool anyRecipient = ui->toEdit->document()->isEmpty() == false;
-  anyRecipient = anyRecipient || ui->ccEdit->document()->isEmpty() == false;
-  anyRecipient = anyRecipient || ui->bccEdit->document()->isEmpty() == false;
+  bool anySender = Action2Identity.empty() == false;
+  IMailProcessor::TRecipientPublicKeys recipients;
+  ui->toEdit->GetCollectedContacts(&recipients);
+  ui->ccEdit->GetCollectedContacts(&recipients);
+  ui->bccEdit->GetCollectedContacts(&recipients);
 
+  bool anyRecipient = recipients.empty() == false;
   /// Make the send button enabled only if there is any recipient
-  ui->sendButton->setEnabled(anyRecipient);
+  ui->sendButton->setEnabled(anyRecipient && anySender);
   }
 
 void MailFieldsWidget::fillSenderIdentities()
@@ -226,7 +228,7 @@ void MailFieldsWidget::fillSenderIdentities()
     QAction* action = menu->addAction(tr(entry.c_str()));
     action->setCheckable(true);
     Action2Identity.insert(TAction2IdentityIndex::value_type(action, identity));
-    
+
     if(first == nullptr)
       first = action;
     }
@@ -241,6 +243,15 @@ void MailFieldsWidget::fillSenderIdentities()
     onFromBtnTriggered(first);
     menu->setActiveAction(first);
     }
+  else
+    {
+    QAction* action = menu->addAction(tr("No identity defined"));
+    action->setDisabled(true);
+    }
+
+  /// Show from controls when multiple identities are defined.
+  if(Action2Identity.size() > 1)
+    showFromControls(true);
   }
 
 void MailFieldsWidget::selectSenderIdentity(const TRecipientPublicKey& senderPK)
@@ -304,9 +315,10 @@ void MailFieldsWidget::onFromBtnTriggered(QAction* action)
   action->setChecked(true);
 
   TAction2IdentityIndex::const_iterator foundPos = Action2Identity.find(action);
-  assert(foundPos != Action2Identity.end());
-
-  SenderIdentity = foundPos->second;
-  setChosenSender(SenderIdentity.public_key);
+  if(foundPos != Action2Identity.end())
+    {
+    SenderIdentity = foundPos->second;
+    setChosenSender(SenderIdentity.public_key);
+    }
   }
 
