@@ -422,7 +422,7 @@
                 <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="text">
-                <string>Pending</string>
+                <string>Unregistered</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -659,15 +659,11 @@
           <zorder>notes_groupbox</zorder>
           <zorder>privacy_level_label</zorder>
           <zorder>public_key_label_2</zorder>
-          <zorder>lastname</zorder>
-          <zorder>firstname</zorder>
           <zorder>first_name_label</zorder>
           <zorder>last_name_label</zorder>
           <zorder>public_key_to_clipboard</zorder>
           <zorder>icon_view</zorder>
           <zorder>id_status</zorder>
-          <zorder>mining_effort_label</zorder>
-          <zorder>mining_effort_slider</zorder>
          </widget>
         </widget>
        </item>
