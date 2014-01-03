@@ -262,10 +262,11 @@ void ProfileWizard::createProfile()
     */
     TKeyhoteeApplication* mainApp = &_mainApp;
 
+    auto app = bts::application::instance();
+
     progress->doTask(
       [=]() 
       {
-      auto app = bts::application::instance();
       auto profile = app->create_profile(profile_name, conf, password, 
         [=]( double p )
         {
