@@ -99,6 +99,7 @@ public:
     setTitle(tr("Create your Keyhotee Profile") );
     ui.setupUi(this);
     connect(ui.generaterandom, &QPushButton::clicked, this, &ProfileEditPage::generateSeed);
+    connect(ui.first_name, &QLineEdit::textChanged, this, &ProfileEditPage::firstNameEdited);
     connect(ui.brainkey, &QLineEdit::textChanged, this, &ProfileEditPage::brainKeyEdited);
     connect(ui.local_password1, &QLineEdit::textEdited, this, &ProfileEditPage::loginPasswordEdited);
     connect(ui.local_password2, &QLineEdit::textEdited, this, &ProfileEditPage::loginPasswordCheckEdited);
@@ -108,6 +109,11 @@ public:
   {
     auto private_key = fc::ecc::private_key::generate();
     ui.brainkey->setText(std::string(private_key.get_secret()).c_str() );
+    completeChanged();
+  }
+
+  void firstNameEdited(const QString& first_name)
+  {
     completeChanged();
   }
 
@@ -148,14 +154,31 @@ public:
 
   virtual bool isComplete() const
   {
-    if (ui.brainkey->text().size() < 32)
-      return false;
+    ui.first_name->setStyleSheet("");
+    ui.brainkey->setStyleSheet("");
+    ui.local_password1->setStyleSheet("");
+    ui.local_password2->setStyleSheet("");
+
     if (ui.first_name->text().size() == 0 )
+    {
+      ui.first_name->setStyleSheet("border: 1px solid red");
       return false;
+    }
+    if (ui.brainkey->text().size() < 32)
+    {
+      ui.brainkey->setStyleSheet("border: 1px solid red");
+      return false;
+    }
     if (ui.local_password1->text().size() < 8)
+    {
+      ui.local_password1->setStyleSheet("border: 1px solid red");
       return false;
+    }
     if (ui.local_password1->text() != ui.local_password2->text() )
+    {
+      ui.local_password2->setStyleSheet("border: 1px solid red");
       return false;
+    }
     return true;
   }
 
@@ -178,7 +201,7 @@ ProfileWizard::ProfileWizard(TKeyhoteeApplication& mainApp) :
   _profile_edit = new ProfileEditPage(this);
 
   connect(this, &ProfileWizard::helpRequested, this, &ProfileWizard::showHelp);
-  connect(this, &ProfileWizard::finished, this, &ProfileWizard::createProfile);
+  connect(this, &ProfileWizard::accepted, this, &ProfileWizard::createProfile);
 
   setPage(Page_Intro, intro_page);
   setPage(Page_Profile, _profile_edit);
@@ -204,7 +227,7 @@ void ProfileWizard::showHelp()
   // TODO: open up the help browser and direct it to this page.
 }
 
-void ProfileWizard::createProfile(int result)
+void ProfileWizard::createProfile()
 {
   if (_profile_edit->isComplete() )
   {
