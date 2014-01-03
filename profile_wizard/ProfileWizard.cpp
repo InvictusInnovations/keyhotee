@@ -1,19 +1,19 @@
-#include <fc/string.hpp>
 #include "ProfileWizard.hpp"
-#include <ui_ProfileEditPage.h>
-#include <ui_ProfileIntroPage.h>
-#include <QProgressBar>
-#include <QDesktopWidget>
-//#include <ui_ProfileNymPage.h>
-
-#include <QStandardPaths>
-#include <QFileDialog>
 
 #include "KeyhoteeApplication.hpp"
 
-#include <fc/thread/thread.hpp>
+#include "qtreusable/AutoUpdateProgressBar.hpp"
 
+#include "ui_ProfileEditPage.h"
+#include "ui_ProfileIntroPage.h"
+
+#include <QDesktopWidget>
+//#include <ui_ProfileNymPage.h>
+
+#include <fc/string.hpp>
+#include <fc/thread/thread.hpp>
 #include <fc/log/logger.hpp>
+
 #include <bts/addressbook/addressbook.hpp>
 
 #if 0
@@ -99,6 +99,7 @@ public:
     setTitle(tr("Create your Keyhotee Profile") );
     ui.setupUi(this);
     connect(ui.generaterandom, &QPushButton::clicked, this, &ProfileEditPage::generateSeed);
+    connect(ui.first_name, &QLineEdit::textChanged, this, &ProfileEditPage::firstNameEdited);
     connect(ui.brainkey, &QLineEdit::textChanged, this, &ProfileEditPage::brainKeyEdited);
     connect(ui.local_password1, &QLineEdit::textEdited, this, &ProfileEditPage::loginPasswordEdited);
     connect(ui.local_password2, &QLineEdit::textEdited, this, &ProfileEditPage::loginPasswordCheckEdited);
@@ -108,6 +109,11 @@ public:
   {
     auto private_key = fc::ecc::private_key::generate();
     ui.brainkey->setText(std::string(private_key.get_secret()).c_str() );
+    completeChanged();
+  }
+
+  void firstNameEdited(const QString& first_name)
+  {
     completeChanged();
   }
 
@@ -148,14 +154,31 @@ public:
 
   virtual bool isComplete() const
   {
-    if (ui.brainkey->text().size() < 32)
-      return false;
+    ui.first_name->setStyleSheet("");
+    ui.brainkey->setStyleSheet("");
+    ui.local_password1->setStyleSheet("");
+    ui.local_password2->setStyleSheet("");
+
     if (ui.first_name->text().size() == 0 )
+    {
+      ui.first_name->setStyleSheet("border: 1px solid red");
       return false;
+    }
+    if (ui.brainkey->text().size() < 32)
+    {
+      ui.brainkey->setStyleSheet("border: 1px solid red");
+      return false;
+    }
     if (ui.local_password1->text().size() < 8)
+    {
+      ui.local_password1->setStyleSheet("border: 1px solid red");
       return false;
+    }
     if (ui.local_password1->text() != ui.local_password2->text() )
+    {
+      ui.local_password2->setStyleSheet("border: 1px solid red");
       return false;
+    }
     return true;
   }
 
@@ -178,7 +201,7 @@ ProfileWizard::ProfileWizard(TKeyhoteeApplication& mainApp) :
   _profile_edit = new ProfileEditPage(this);
 
   connect(this, &ProfileWizard::helpRequested, this, &ProfileWizard::showHelp);
-  connect(this, &ProfileWizard::finished, this, &ProfileWizard::createProfile);
+  connect(this, &ProfileWizard::accepted, this, &ProfileWizard::createProfile);
 
   setPage(Page_Intro, intro_page);
   setPage(Page_Profile, _profile_edit);
@@ -204,7 +227,7 @@ void ProfileWizard::showHelp()
   // TODO: open up the help browser and direct it to this page.
 }
 
-void ProfileWizard::createProfile(int result)
+void ProfileWizard::createProfile()
 {
   if (_profile_edit->isComplete() )
   {
@@ -225,30 +248,39 @@ void ProfileWizard::createProfile(int result)
     if (!conf.lastname.empty())
       profile_name += " " + conf.lastname;
 
-    auto                             app = bts::application::instance();
-    fc::thread* main_thread = &fc::thread::current();
-    QProgressBar* progress = new QProgressBar();
-    progress->setWindowTitle( "Creating Profile" );
-    progress->setMaximum(1000);
-    progress->resize( 640, 20 );
-    progress->show();
-    int x=(qApp->desktop()->width() - progress->width())/2;
-    int y=(qApp->desktop()->height() - progress->height())/2;
-    progress->move(x,y);
-    auto                             profile = app->create_profile(profile_name, conf, password, 
-                                               [=]( double p )
-                                               {
-                                                  main_thread->async( [=](){ 
-                                                                      progress->setValue( 1000*p );
-                                                                      qApp->sendPostedEvents();
-                                                                      qApp->processEvents();
-                                                                      if( p >= 1.0 ) progress->deleteLater();
-                                                                      } ).wait();
-                                               }
-                                               );
-    assert(profile != nullptr);
+    const unsigned int progressWidth = 640;
+    const unsigned int progressHeight = 20;
+    const unsigned int progressMax = 1000;
+    int x=(qApp->desktop()->width() - progressWidth)/2;
+    int y=(qApp->desktop()->height() - progressHeight)/2;
 
-    _mainApp.displayMainWindow();
+    TAutoUpdateProgressBar* progress = TAutoUpdateProgressBar::create(QRect(x, y, progressWidth,
+      progressHeight), tr("Creating Profile"), progressMax);
+
+    /** \warning Copy mainApp pointer to local variable, since lambda needs its copy
+        this object is destroyed while executing create_profile action.
+    */
+    TKeyhoteeApplication* mainApp = &_mainApp;
+
+    auto app = bts::application::instance();
+
+    progress->doTask(
+      [=]() 
+      {
+      auto profile = app->create_profile(profile_name, conf, password, 
+        [=]( double p )
+        {
+          progress->updateValue(progressMax*p);
+        });
+
+        assert(profile != nullptr);
+      },
+      [=]() 
+      {
+        mainApp->displayMainWindow();
+      }
+    );
   }
+
 }
 

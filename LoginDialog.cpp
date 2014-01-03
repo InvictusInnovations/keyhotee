@@ -3,6 +3,7 @@
 #include "ui_LoginDialog.h"
 
 #include "KeyhoteeApplication.hpp"
+#include <QMessageBox>
 
 #include <bts/application.hpp>
 
@@ -45,9 +46,21 @@ void LoginDialog::onLogin()
     if (profile)
       accept();
   }
+  catch (const fc::db_in_use_exception& e)
+  {
+    elog("error ${w}", ("w", e.to_detail_string()) );
+    QMessageBox::warning(this,tr("Keyhotee login"), tr("Unable to load profile: ") +
+      ui->profileSelection->currentText());
+  }
   catch (const fc::exception& e)
   {
     elog("error ${w}", ("w", e.to_detail_string()) );
+   //TODO: We need to display a message to user when profile load fails because
+   //      it can't be opened (versus just a bad password specified). One reason
+   //      a profile load can fail is because it's already locked (opened by another
+   //      Keyhotee process, for example). Unfortunately displaying such a message
+   //      requires untangling the exception thrown, so leaving this as-is for now.
+   // QMessageBox::warning(this,tr("Unable to load profile"),e.to_detail_string().c_str());
   }
   ui->password->setText(QString());
   shake();

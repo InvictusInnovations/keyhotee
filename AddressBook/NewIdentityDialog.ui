@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Create New Identity</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="2">
@@ -137,6 +137,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>firstname</tabstop>
+  <tabstop>lastname</tabstop>
+  <tabstop>username</tabstop>
+  <tabstop>register_checkbox</tabstop>
+  <tabstop>publickey</tabstop>
+  <tabstop>founder_code</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

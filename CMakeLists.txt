@@ -139,7 +139,10 @@ set( library_sources
         AddressBook/AddressBookModel.cpp )
 
 set( sources  
+        qtreusable/selfsizingmainwindow.h
         qtreusable/selfsizingmainwindow.cpp
+        qtreusable/AutoUpdateProgressBar.hpp
+        qtreusable/AutoUpdateProgressBar.cpp
 
         profile_wizard/ProfileEditPage.ui
         profile_wizard/ProfileIntroPage.ui
