@@ -41,7 +41,9 @@ TAutoUpdateProgressBar::create(const QRect& rect, const QString& title, unsigned
 
   connect(bar->_notifier, SIGNAL(finished()), bar, SLOT(onFinish()));
 
-  //bar->move(rect.topLeft()); //doesn't take into account the width/height of the taskbar
+#ifndef WIN32
+  bar->move(rect.topLeft()); //doesn't take into account the width/height of the taskbar
+#endif /// !WIN32
   bar->resize(rect.size());
   bar->show();
 
