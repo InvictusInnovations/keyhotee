@@ -23,7 +23,7 @@ public:
 
 public slots:
   void showHelp();
-  void createProfile(int result);
+  void createProfile();
 
 private:
   /// Only main app is allowed to create this object.

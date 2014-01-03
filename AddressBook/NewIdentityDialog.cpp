@@ -54,12 +54,24 @@ void NewIdentityDialog::onUserNameChanged( const QString& name )
       try {
           bts::addressbook::wallet_identity cur_ident = pro->get_identity( trim_name );
           ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
+          ui->status_label->setStyleSheet("QLabel { color : red; }");
           ui->status_label->setText( tr( "Status: You have already created this identity." ) );
       } 
       catch ( fc::key_not_found_exception& e )
       {
-          ui->status_label->setText( tr( "Status: Unknown" ) );
-          ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(true);
+          fc::optional<bts::bitname::name_record> current_record = bts::application::instance()->lookup_name(trim_name);
+          if(current_record)
+          {
+             ui->status_label->setStyleSheet("QLabel { color : red; }");
+             ui->status_label->setText(tr("Status: This Keyhotee ID was already registered by someone else."));
+             ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
+          }
+          else
+          {
+             ui->status_label->setStyleSheet("QLabel { color : black; }");
+             ui->status_label->setText( tr( "Status: Unknown" ) );
+             ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(true);
+          }
       }
    }
    else
