@@ -110,7 +110,7 @@ void NewIdentityDialog::onKey( const QString& key )
    }
    catch ( fc::exception& e )
    {
-      ui->status_label->setText( ("Status: Error Registering Founder ID: " + e.to_detail_string()).c_str() );
+      ui->status_label->setText( ("Status: Error Registering Founder ID: " + e.to_string()).c_str() );
    }
    catch ( ... )
    {
