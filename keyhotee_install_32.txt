@@ -13,5 +13,7 @@ c:\lib\boost\stage\lib\BOOST_FILESYSTEM-VC110-MT-1_53.DLL
 c:\lib\boost\stage\lib\BOOST_SYSTEM-VC110-MT-1_53.DLL
 c:\lib\boost\stage\lib\BOOST_THREAD-VC110-MT-1_53.DLL
 c:\openssl\bin\LIBEAY32.DLL
-c:\windows\system32\msvcp110.dll
-c:\windows\system32\msvcr110.dll
+c:\gh\msvc32\msvcp110.dll
+c:\gh\msvc32\msvcr110.dll
+c:\gh\msvc32\msvcp100.dll
+c:\gh\msvc32\msvcr100.dll

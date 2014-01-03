@@ -15,15 +15,22 @@ if __name__ == '__main__':
     binDir = 'keyhotee_' + version
     if os.path.exists(binDir):
         shutil.rmtree(binDir)
+    #TODO: remove dependency on msvcr100 dll (from ICU dlls)		
     os.mkdir(binDir)
     for line in open("keyhotee_install_32.txt",'r'):
         line=line.strip()
         if line:
             print(line)
             shutil.copy(line,binDir)
+    platformDir = binDir + '/platforms'
+    os.mkdir(platformDir)
+    print('platformDir=',platformDir)
+    shutil.copy('c:/gh/bin/platforms/qminimal.dll',platformDir)
+    shutil.copy('c:/gh/bin/platforms/qoffscreen.dll',platformDir)
+    shutil.copy('c:/gh/bin/platforms/qwindows.dll',platformDir)
     
     #zip up files in bin dir to miner.zip
-	zipfileName = binDir + '.zip'
+    zipfileName = binDir + '.zip'
     zip = zipfile.ZipFile(zipfileName,'w')
     zipdir(binDir, zip)
     zip.close()
