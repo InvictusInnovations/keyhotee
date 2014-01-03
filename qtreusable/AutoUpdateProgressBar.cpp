@@ -1,7 +1,7 @@
 #include "qtreusable/AutoUpdateProgressBar.hpp"
 
-#include <QtConcurrent/QtConcurrentRun>
-#include <QFutureWatcher>
+
+#include <fc/thread/thread.hpp>
 
 /// Helper notifier function, needed to transmit progress update signals between threads.
 class TUpdateNotifier : public QObject
@@ -16,8 +16,15 @@ class TUpdateNotifier : public QObject
       emit onUpdateProgress(value);
       }
 
+    void notifyFinished()
+      {
+      emit finished();
+      }
+
   /// The client code should connect to this signal to make progress update safely.
-    Q_SIGNALS: void onUpdateProgress(int value);
+  Q_SIGNALS:
+    void onUpdateProgress(int value);
+    void finished();
   };
 
 TAutoUpdateProgressBar* 
@@ -32,9 +39,9 @@ TAutoUpdateProgressBar::create(const QRect& rect, const QString& title, unsigned
 
   connect(bar->_notifier, SIGNAL(onUpdateProgress(int)), bar, SLOT(setValue(int)), Qt::BlockingQueuedConnection);
 
-  connect(&bar->_futureWatcher, SIGNAL(finished()), bar, SLOT(onFinish()));
+  connect(bar->_notifier, SIGNAL(finished()), bar, SLOT(onFinish()));
 
-  bar->move(rect.topLeft());
+  //bar->move(rect.topLeft()); //doesn't take into account the width/height of the taskbar
   bar->resize(rect.size());
   bar->show();
 
@@ -44,8 +51,11 @@ TAutoUpdateProgressBar::create(const QRect& rect, const QString& title, unsigned
 void TAutoUpdateProgressBar::doTask(std::function<void()> mainTask, std::function<void()> onFinish)
   {
   _onFinishAction = onFinish;
-  QFuture<void> f = QtConcurrent::run(mainTask);
-  _futureWatcher.setFuture(f);
+
+  fc::async([=]() {
+    mainTask();
+    _notifier->notifyFinished();
+    });
   }
 
 void TAutoUpdateProgressBar::release()
