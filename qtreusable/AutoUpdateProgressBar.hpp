@@ -1,7 +1,6 @@
 #ifndef __AUTOUPDATEPROGRESSBAR_HPP
 #define __AUTOUPDATEPROGRESSBAR_HPP
 
-#include <QFutureWatcher>
 #include <QProgressBar>
 
 #include <functional>
@@ -47,7 +46,6 @@ class TAutoUpdateProgressBar : protected QProgressBar
   /// Class attributes:
   private:
     TUpdateNotifier*      _notifier;
-    QFutureWatcher<void>  _futureWatcher;
     std::function<void()> _onFinishAction;
     int                   _maxValue;
   };
