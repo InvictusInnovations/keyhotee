@@ -65,6 +65,10 @@ class TMailProcessor::TOutboxQueue
       auto network = App->get_network();
       return static_cast<unsigned int>(network->get_connections().size()) > 0;
       }
+    bool isMailConnected() const
+      {
+      return App->is_mail_connected();
+      }
 
     void connectionCheckingLoop();
     void startTransmission()
@@ -171,7 +175,7 @@ void TMailProcessor::TOutboxQueue::connectionCheckingLoop()
   {
   do
     {
-    if(isConnected())
+    if(isMailConnected())
       {
       startTransmission();
       break;
@@ -262,7 +266,7 @@ inline
 void TMailProcessor::TOutboxQueue::sendMail(const TPhysicalMailMessage& email,
   const TRecipientPublicKey& to, const fc::ecc::private_key& from)
   {
-  if(isConnected())
+  if(isMailConnected())
     {
     App->send_email(email, to, from);
     return;
