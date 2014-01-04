@@ -263,18 +263,18 @@ void ContactListEdit::showCompleter(const QString& completionPrefix)
   }
 
 void ContactListEdit::SetCollectedContacts(const IMailProcessor::TRecipientPublicKeys& storage)
-  {
+{
   auto profile = bts::get_profile();
   auto aBook = profile->get_addressbook();
   for(const auto& recipient : storage)
-    {
+  {
     assert(recipient.valid());
     bts::addressbook::contact matchingContact;
     QString entryText(Utils::toString(recipient, Utils::TContactTextFormatting::FULL_CONTACT_DETAILS,
       &matchingContact));
     addContactEntry(entryText, matchingContact);
-    }
   }
+}
 
 void ContactListEdit::GetCollectedContacts(IMailProcessor::TRecipientPublicKeys* storage) const
   {
