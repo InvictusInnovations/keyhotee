@@ -2,7 +2,9 @@
 
 #include "utils.hpp"
 
-#include "AddressBook/Contact.hpp"
+//#include "AddressBook/Contact.hpp"
+#include "KeyhoteeMainWindow.hpp"
+#include "AddressBook/AddressBookModel.hpp"
 
 #include <QAbstractItemView>
 #include <QCompleter>
@@ -15,7 +17,6 @@
 #include <QToolTip>
 
 #include <fc/log/logger.hpp>
-#include <bts/profile.hpp>
 
 ContactListEdit::ContactListEdit(QWidget* parent)
   : QTextEdit(parent)
@@ -61,10 +62,9 @@ void ContactListEdit::insertCompletion( const QModelIndex& completionIndex )
   QString completion = completionIndex.data().toString();
   int row = completionIndex.data(Qt::UserRole).toInt();
   row = row / 2;
-  auto addressbook = bts::get_profile()->get_addressbook();
-  auto contacts = addressbook->get_contacts();
-  auto contact = contacts[row];
-  
+  //DLNFIX consider telling ContactListEdit about addressbookmodel some other way eventually
+  QModelIndex index = getKeyhoteeWindow()->getAddressBookModel()->index(row,0);
+  auto contact = getKeyhoteeWindow()->getAddressBookModel()->getContact(index);
   insertCompletion(completion, contact);
   }
 
@@ -264,8 +264,6 @@ void ContactListEdit::showCompleter(const QString& completionPrefix)
 
 void ContactListEdit::SetCollectedContacts(const IMailProcessor::TRecipientPublicKeys& storage)
 {
-  auto profile = bts::get_profile();
-  auto aBook = profile->get_addressbook();
   for(const auto& recipient : storage)
   {
     assert(recipient.valid());

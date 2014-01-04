@@ -49,6 +49,7 @@ public:
 
   void setMiningEffort(float miningEffort){} // range from 0 to 100 %
 
+  bool operator<(const Contact& rhs) const { return wallet_index < rhs.wallet_index; }
 private:
   /// cache the icon we want to use.
   QIcon icon;

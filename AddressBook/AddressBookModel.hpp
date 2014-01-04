@@ -60,5 +60,7 @@ public:
   void reloadContacts();
 
 private:
+  int getContactRow(const Contact& contact) const;
+
   std::unique_ptr<Detail::AddressBookModelImpl> my;
 };

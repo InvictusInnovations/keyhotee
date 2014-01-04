@@ -24,6 +24,7 @@ class AddressBookModelImpl
     bts::addressbook::addressbook_ptr _address_book;
     ContactCompletionModel            _contact_completion_model;
     QCompleter*                       _contact_completer;
+//    std::vector<int>                  _completion_row_to_wallet_index;
 };
 }
 
@@ -264,10 +265,13 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
   QModelIndex completionIndex;
   if (contact_to_store.wallet_index == WALLET_INVALID_INDEX)
   {
+    //Start at 0 if no contacts, otherwise use next higher wallet index than currently exists.
+    //Contacts are sorted by wallet index, so highest index is at back of list
+    auto next_wallet_index = my->_contacts.empty() ? 0 : my->_contacts.back().wallet_index + 1;
     auto num_contacts = my->_contacts.size();
     beginInsertRows(QModelIndex(), num_contacts, num_contacts);
     my->_contacts.push_back(contact_to_store);
-    my->_contacts.back().wallet_index = my->_contacts.size() - 1;
+    my->_contacts.back().wallet_index = next_wallet_index;
     endInsertRows();
     //update completion model with new contact dac_id and fullname
     int row_count = my->_contact_completion_model.rowCount();
@@ -276,13 +280,15 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
     my->_contact_completion_model.setData(completionIndex, contact_to_store.dac_id_string.c_str());
     completionIndex = my->_contact_completion_model.index(row_count + 1);
     my->_contact_completion_model.setData(completionIndex, contact_to_store.get_display_name().c_str());
+    //my->_completion_row_to_wallet_index.push_back(contact_to_store.wallet_index);
 
     //add fullname to completion list
     my->_address_book->store_contact(my->_contacts.back() );
-    return my->_contacts.back().wallet_index;
+    return next_wallet_index;
   }
 
-  FC_ASSERT(contact_to_store.wallet_index < int(my->_contacts.size()) );
+  //FC_ASSERT(contact_to_store.wallet_index < int(my->_contacts.size()) );
+  /*
   auto row = -1;
   for (uint32_t i = 0; i < my->_contacts.size(); ++i)
     if (my->_contacts[i].wallet_index == contact_to_store.wallet_index)
@@ -292,6 +298,9 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
     }
   if(row == -1)
     FC_ASSERT(!"invalid contact id");
+    */
+  //find contact using binary search as they are stored sorted by wallet_index
+  auto row = getContactRow(contact_to_store);
   my->_contacts[row] = contact_to_store;
   my->_address_book->store_contact(my->_contacts[row]);
 
@@ -306,13 +315,26 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
   return contact_to_store.wallet_index;
 }
 
+int AddressBookModel::getContactRow(const Contact& contact) const
+{
+  auto contact_iterator = std::lower_bound( my->_contacts.begin(), my->_contacts.end(), contact );
+  if (contact_iterator == my->_contacts.end())
+    FC_ASSERT(!"invalid contact id");
+  return contact_iterator - my->_contacts.begin();
+}
+
 const Contact& AddressBookModel::getContactById(int contact_id)
 {
+  Contact temp_contact;
+  temp_contact.wallet_index = contact_id;
+  int row  = getContactRow(temp_contact);
+  return my->_contacts[row];
+  /*
   for (uint32_t i = 0; i < my->_contacts.size(); ++i)
     if (my->_contacts[i].wallet_index == contact_id)
       return my->_contacts[i];
-
   FC_ASSERT(!"invalid contact id");
+  */
   //FC_ASSERT( !"invalid contact id ${id}", ("id",contact_id) );
 }
 
@@ -334,6 +356,11 @@ void AddressBookModel::reloadContacts()
     ilog("loading contacts...");
     my->_contacts.push_back(Contact(contact) );
 
+  }
+  //contacts must be sorted by wallet index
+  std::sort(my->_contacts.begin(), my->_contacts.end());
+  for(auto& contact : my->_contacts)
+  {
     //add dac_id to completion list
     completion_list.push_back(contact.dac_id_string.c_str() );
     //add fullname to completion list
