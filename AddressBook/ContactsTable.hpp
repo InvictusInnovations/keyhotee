@@ -37,6 +37,7 @@ public:
 private:
   ContactView* getCurrentView() const;
   void showContactsTable (bool visible) const;
+  void selectNextRow(int idx, int deletedRowCount) const;
 
 Q_SIGNALS:
   void contactOpened(int contact_id);

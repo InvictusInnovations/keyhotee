@@ -117,8 +117,10 @@ void ContactsTable::onDeleteContact()
     Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted
     }
   //model->setUpdatesEnabled(true);
-
   //TODO Remove fullname/bitname for deleted contacts from QCompleter
+
+  qSort(sortFilterIndexes);
+  selectNextRow(sortFilterIndexes.takeLast().row(), indexes.count());
   }
 
 bool ContactsTable::isShowDetailsHidden()
@@ -239,4 +241,16 @@ bool ContactsTable::isSelection () const
 bool ContactsTable::hasFocusContacts() const
 {
   return ui->contact_table->hasFocus();
+}
+
+void ContactsTable::selectNextRow(int idx, int deletedRowCount) const
+{
+  int count = _addressbook_model->rowCount();
+  if (count == 0)
+    return;
+  int nextIdx = idx + 1 - deletedRowCount;
+  if (nextIdx < count)
+    ui->contact_table->selectRow(nextIdx);
+  else
+    ui->contact_table->selectRow(count - 1);
 }
