@@ -32,6 +32,7 @@ public:
   void contactRemoved ();
   virtual bool canContinue() const;
   bool isSelection () const;
+  bool hasFocusContacts() const;
 
 private:
   ContactView* getCurrentView() const;

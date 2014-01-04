@@ -235,3 +235,8 @@ bool ContactsTable::isSelection () const
   QModelIndexList      indexes = selection_model->selectedRows();
   return (indexes.size() > 0);
   }
+
+bool ContactsTable::hasFocusContacts() const
+{
+  return ui->contact_table->hasFocus();
+}

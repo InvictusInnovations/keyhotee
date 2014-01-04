@@ -57,6 +57,7 @@ class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
                             protected IMailProcessor::IUpdateSink,
                             public IModificationsChecker
 {
+  Q_OBJECT
 public:
 
   void newMailMessage();
@@ -147,6 +148,7 @@ private slots:
   void onCanceledNewContact();
   void onSavedNewContact(int idxNewContact);
   void onItemContactRemoved (QTreeWidgetItem&);
+  void onRemoveContact ();
 
 private:
   void addressBookDataChanged(const QModelIndex& top_left, const QModelIndex& bottom_right,

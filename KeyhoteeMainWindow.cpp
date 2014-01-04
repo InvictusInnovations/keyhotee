@@ -380,6 +380,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
   if (selected_items.size() )
   {
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
+    disconnect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onRemoveContact()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->out_box_page, SLOT(onDeleteMail()));
@@ -420,7 +421,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       openContactGui(con_id);
 //    issue #51: Selecting contact on recent list should synchronize it in main list
 //    ui->contacts_page->selectRow(con_id);
-      connect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
+      connect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onRemoveContact()));
       connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
       if(ui->contacts_page->isShowDetailsHidden())
         ui->actionShow_details->setChecked(false);
@@ -871,3 +872,27 @@ void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
     ui->actionReply_all->setEnabled(enable);
     ui->actionForward->setEnabled(enable);
   }
+
+
+void KeyhoteeMainWindow::onRemoveContact()
+{  
+  QList<QTreeWidgetItem*> selected_items = ui->side_bar->selectedItems();
+
+  if (! ui->contacts_page->hasFocusContacts() && selected_items.size())
+  {
+    QTreeWidgetItem* selectedItem = selected_items.first();
+    if (selectedItem->type() == ContactItem)
+    { 
+      //Find next contact item
+      //QTreeWidgetItem* itemNext = ui->side_bar->itemBelow (selectedItem);
+      //if (itemNext == nullptr)
+      //  itemNext = ui->side_bar->itemAbove (selectedItem);
+
+      onItemContactRemoved (*selectedItem);
+      //select next contact item
+      //ui->side_bar->setItemSelected (itemNext, true);
+    }
+  }
+  else
+    ui->contacts_page->onDeleteContact();
+}
