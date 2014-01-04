@@ -2,6 +2,7 @@ c:\gh\bin\KEYHOTEE.EXE
 c:\gh\icu\bin\ICUDT52.DLL
 c:\gh\icu\bin\ICUIN52.DLL
 c:\gh\icu\bin\ICUUC52.DLL
+C:\gh\qt\bin\LIBEGL.DLL
 c:\gh\qt\bin\LIBGLESV2.DLL
 c:\gh\qt\bin\QT5CORE.DLL
 c:\gh\qt\bin\QT5GUI.DLL
