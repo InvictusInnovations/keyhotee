@@ -4,6 +4,7 @@ cmake_minimum_required( VERSION 2.8.11 )
 set( CMAKE_INCLUDE_CURRENT_DIR ON)
 set( CMAKE_AUTOMOC ON  )
 
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/GitVersionGen/")
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
@@ -13,6 +14,8 @@ get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 #message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
 IF( WIN32 )
+  #Set to allow xp compatibility
+  set(CMAKE_GENERATOR_TOOLSET "v110_xp" CACHE INTERNAL "XP-compatible VS 11")
   #You need to set OPENSSL_ROOT environment variable for your system on WIN32
   message("Setting up OpenSSL root and include vars on Win32 platform")
   set( OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT} )
