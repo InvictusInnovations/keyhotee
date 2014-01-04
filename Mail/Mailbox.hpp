@@ -50,7 +50,7 @@ private:
   QModelIndex getSelectedMail();
   void showCurrentMail(const QModelIndex &selected, const QModelIndex &deselected);
   void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-
+  void selectNextRow(int idx, int deletedRowCount) const;
   void duplicateMail(ReplyType);
 
 public slots:

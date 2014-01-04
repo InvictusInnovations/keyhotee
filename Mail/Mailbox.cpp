@@ -253,6 +253,8 @@ void Mailbox::onDeleteMail()
   for (int i = indexes.count() - 1; i > -1; --i)
     sourceModel->removeRows(indexes.at(i).row(), 1);
   //model->setUpdatesEnabled(true);
+  qSort(sortFilterIndexes);
+  selectNextRow(sortFilterIndexes.takeLast().row(), indexes.count());
   }
 
 bool Mailbox::isShowDetailsHidden()
@@ -324,3 +326,14 @@ void Mailbox::saveAttachment ()
   {
     
   }
+
+void Mailbox::selectNextRow(int idx, int deletedRowCount) const
+{
+  if (_sourceModel->rowCount() == 0)
+    return;
+  int nextIdx = idx + 1 - deletedRowCount;
+  if (nextIdx < _sourceModel->rowCount())
+    ui->inbox_table->selectRow(nextIdx);
+  else
+    ui->inbox_table->selectRow(_sourceModel->rowCount() - 1);
+}
