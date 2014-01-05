@@ -128,22 +128,22 @@ private:
 private slots:
   // ---------- MenuBar
   // File
-  void on_actionExit_triggered();
+  void onExit();
   // Edit
-  void on_actionCopy_triggered();
-  void on_actionCut_triggered();
-  void on_actionPaste_triggered();
-  void on_actionSelectAll_triggered();
+  void onCopy();
+  void onCut();
+  void onPaste();
+  void onSelectAll();
   // Identity
-  void on_actionNew_identity_triggered();
-  void enableMining_toggled(bool enabled);
+  void onNewIdentity();
+  void onEnableMining(bool enabled);
   // Mail
-  void on_actionSave_attachement_triggered();
+  void onSaveAttachement();
   // Contact
-  void on_actionset_Icon_triggered();
+  void onSetIcon();
   // Help
-  void on_actionDiagnostic_triggered();
-  void on_actionAbout_triggered();
+  void onDiagnostic();
+  void onAbout();
 
   void onCanceledNewContact();
   void onSavedNewContact(int idxNewContact);
