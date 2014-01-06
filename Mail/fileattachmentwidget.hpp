@@ -41,7 +41,7 @@ class TFileAttachmentWidget : public QWidget
     bool GetAttachedFiles(TAttachmentContainer* storage, TFileInfoList* failedFilesStorage) const;
     void selectAllFiles();
     bool saveAttachments();
-    bool hasAttachments();
+    bool hasAttachment();
     
     /// Signal emitted when attachment list changes.
     Q_SIGNAL void attachmentListChanged();

@@ -750,7 +750,7 @@ bool TFileAttachmentWidget::saveAttachments()
   }
 }
 
-bool TFileAttachmentWidget::hasAttachments()
+bool TFileAttachmentWidget::hasAttachment()
 {
   return AttachmentList.size() > 0;
 }
