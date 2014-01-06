@@ -684,5 +684,5 @@ void MailEditorMainWindow::onAttachmentListChanged()
 void MailEditorMainWindow::show()
 {
   onFileAttachementTriggered( FileAttachment->hasAttachments() );
-  __super::show();
+  ATopLevelWindow::show();
 }
