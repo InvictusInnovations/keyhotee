@@ -681,3 +681,8 @@ void MailEditorMainWindow::onAttachmentListChanged()
   ui->messageEdit->document()->setModified(true);
   }
 
+void MailEditorMainWindow::show()
+{
+  onFileAttachementTriggered( FileAttachment->hasAttachments() );
+  __super::show();
+}
