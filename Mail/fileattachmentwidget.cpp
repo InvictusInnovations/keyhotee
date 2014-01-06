@@ -749,3 +749,8 @@ bool TFileAttachmentWidget::saveAttachments()
     return SaveAttachmentItem(attachmentItem, fi, false);
   }
 }
+
+bool TFileAttachmentWidget::hasAttachments()
+{
+  return AttachmentList.size() > 0;
+}
