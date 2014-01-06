@@ -52,6 +52,8 @@ private:
   void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
   void selectNextRow(int idx, int deletedRowCount) const;
   void duplicateMail(ReplyType);
+  bool Mailbox::getSelectedMessageData (IMailProcessor::TStoredMailMessage* encodedMsg, 
+                             IMailProcessor::TPhysicalMailMessage* decodedMsg);
 
 public slots:
   void onReplyMail()

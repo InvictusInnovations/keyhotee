@@ -593,7 +593,7 @@ void KeyhoteeMainWindow::onAbout()
   QMessageBox::about(this, title, text);
 }
 
-void KeyhoteeMainWindow::showContacts()
+void KeyhoteeMainWindow::showContacts() const
 {
   ui->side_bar->setCurrentItem(_contacts_root);
   ui->widget_stack->setCurrentWidget(ui->contacts_page);

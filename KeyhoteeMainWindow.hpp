@@ -62,8 +62,7 @@ public:
 
   void newMailMessage();
   void newMailMessageTo(const Contact& contact);
-  void addContact();
-  void showContacts();
+  void addContact();  
   void onSidebarSelectionChanged();
   void onSidebarDoubleClicked();
   void selectContactItem(QTreeWidgetItem* item);
@@ -162,6 +161,7 @@ private:
   void notSupported();
   void enableMenu(bool enable);
   bool checkSaving() const;
+  void showContacts() const;
 
   /// Class attributes:
 
