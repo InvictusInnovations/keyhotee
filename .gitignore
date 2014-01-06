@@ -5,6 +5,7 @@
 #out-of-source build
 build/
 bitshares/
+BitShares/
 # Compiled Object files
 *.slo
 *.lo
