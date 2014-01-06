@@ -86,13 +86,15 @@ void ContactView::appendChatMessage(const QString& from, const QString& msg, con
 
 ContactView::ContactView(QWidget* parent)
   : QWidget(parent),
-  ui(new Ui::ContactView() )
+  ui(new Ui::ContactView() ),
+  _validForm(false)
 {
   _address_book = nullptr;  
   ui->setupUi(this);
   _addingNewContact = false;
   _editing = false;
   _modyfied = false;
+
    message_tools = new QToolBar( ui->toolbar_container );
   QGridLayout* grid_layout = new QGridLayout(ui->toolbar_container);
   grid_layout->setContentsMargins(0, 0, 0, 0);
