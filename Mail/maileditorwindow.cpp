@@ -319,8 +319,9 @@ void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
     default:
       assert(false);
     }
-
+  
   ui->messageEdit->moveCursor(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor);
+  onFileAttachementTriggered( FileAttachment->hasAttachment() );
   }
 
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
@@ -680,9 +681,3 @@ void MailEditorMainWindow::onAttachmentListChanged()
   /// Let's treat attachment list change also as document modification.
   ui->messageEdit->document()->setModified(true);
   }
-
-void MailEditorMainWindow::show()
-{
-  onFileAttachementTriggered( FileAttachment->hasAttachments() );
-  ATopLevelWindow::show();
-}

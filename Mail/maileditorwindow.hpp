@@ -88,8 +88,6 @@ class MailEditorMainWindow : public ATopLevelWindow
     */
     void LoadMessage(const TStoredMailMessage& srcMsgHeader, const TPhysicalMailMessage& srcMsg,
       TLoadForm loadForm);
-    /// QWidget reimplementation
-    void show();
 
   private:
     /// QWidget reimplementation to support query for save mod. contents.
