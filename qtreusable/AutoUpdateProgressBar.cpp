@@ -1,6 +1,6 @@
 #include "qtreusable/AutoUpdateProgressBar.hpp"
 
-
+#include <fc/log/logger.hpp>
 #include <fc/thread/thread.hpp>
 
 /// Helper notifier function, needed to transmit progress update signals between threads.
@@ -47,15 +47,21 @@ TAutoUpdateProgressBar::create(const QRect& rect, const QString& title, unsigned
   bar->resize(rect.size());
   bar->show();
 
+  ilog("Creating TAutoUpdateProgressBar");
+
   return bar;
   }
 
 void TAutoUpdateProgressBar::doTask(std::function<void()> mainTask, std::function<void()> onFinish)
   {
   _onFinishAction = onFinish;
+  
+  ilog("Entering");
 
   fc::async([=]() {
+    ilog("before mainTask()");
     mainTask();
+    ilog("after mainTask()");
     _notifier->notifyFinished();
     });
   }
@@ -68,6 +74,7 @@ void TAutoUpdateProgressBar::release()
 
 void TAutoUpdateProgressBar::updateValue(int value)
   {
+  ilog("Updating progress value...");
   _notifier->updateProgress(value);
   }
 
@@ -85,8 +92,10 @@ TAutoUpdateProgressBar::~TAutoUpdateProgressBar()
 
 void TAutoUpdateProgressBar::onFinish()
   {
+  ilog("Entering...");
   setValue(_maxValue);
   release();
+  ilog("executing _onFinishAction");
   _onFinishAction();
   }
 

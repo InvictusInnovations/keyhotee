@@ -231,6 +231,7 @@ void ProfileWizard::createProfile()
 {
   if (_profile_edit->isComplete() )
   {
+    ilog( "." );
     bts::profile_config conf;
     conf.firstname  = _profile_edit->ui.first_name->text().toUtf8().constData();
     conf.firstname  = fc::trim( conf.firstname );
@@ -281,6 +282,9 @@ void ProfileWizard::createProfile()
       }
     );
   }
-
+  else
+    {
+    ilog( "createProfile: Incomplete profile" );
+    }
 }
 
