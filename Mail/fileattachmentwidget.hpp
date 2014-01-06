@@ -24,7 +24,7 @@ class TFileAttachmentWidget : public QWidget
     typedef std::vector<bts::bitchat::attachment> TAttachmentContainer;
     typedef std::list<QFileInfo>                  TFileInfoList;
 
-    TFileAttachmentWidget(QWidget* parent, bool editMode);
+    TFileAttachmentWidget(QWidget* parent, bool editMode = false);
     virtual ~TFileAttachmentWidget();
 
     /** Allows to load set of files attached to already existing email message (ie in Draft).
@@ -39,6 +39,8 @@ class TFileAttachmentWidget : public QWidget
                          (because they don't exist anymore or are not readable).
     */
     bool GetAttachedFiles(TAttachmentContainer* storage, TFileInfoList* failedFilesStorage) const;
+    void selectAllFiles();
+    bool saveAttachments();
     
     /// Signal emitted when attachment list changes.
     Q_SIGNAL void attachmentListChanged();

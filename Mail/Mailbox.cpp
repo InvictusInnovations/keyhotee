@@ -3,6 +3,7 @@
 #include "ui_Mailbox.h"
 
 #include "ATopLevelWindowsContainer.hpp"
+#include "FileAttachmentDialog.hpp"
 #include "KeyhoteeMainWindow.hpp"
 #include "MailboxModel.hpp"
 #include "maileditorwindow.hpp"
@@ -200,16 +201,11 @@ QSortFilterProxyModel* Mailbox::sortedModel()
 
 void Mailbox::duplicateMail(ReplyType replyType)
   {
-  QModelIndex index = getSelectedMail();
-  if(index.isValid() == false)
-    return;
-
-  QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
-  QModelIndex sourceModelIndex = model->mapToSource(index);
-
   IMailProcessor::TPhysicalMailMessage decodedMsg;
   IMailProcessor::TStoredMailMessage encodedMsg;
-  _sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
+  if (getSelectedMessageData (&encodedMsg, &decodedMsg) == false)
+    return;
+
   MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_mainWindow,
     _sourceModel->getAddressBookModel(), *_mailProcessor, true);
 
@@ -323,9 +319,25 @@ bool Mailbox::isOneEmailSelected() const
   }
 
 void Mailbox::saveAttachment ()
+{
+  IMailProcessor::TPhysicalMailMessage decodedMsg;
+  IMailProcessor::TStoredMailMessage encodedMsg;
+  if (getSelectedMessageData (&encodedMsg, &decodedMsg) == false)
+    return;
+
+  FileAttachmentDialog* attachmentsDlg = new FileAttachmentDialog(this);
+  attachmentsDlg->setModal(true);
+  attachmentsDlg->loadAttachments(decodedMsg);
+  if (decodedMsg.attachments.size () == 1)
   {
-    
+    attachmentsDlg->saveAttachments ();
   }
+  else
+  {
+    attachmentsDlg->exec ();
+  }
+  delete attachmentsDlg;
+}
 
 void Mailbox::selectNextRow(int idx, int deletedRowCount) const
 {
@@ -337,3 +349,19 @@ void Mailbox::selectNextRow(int idx, int deletedRowCount) const
   else
     ui->inbox_table->selectRow(_sourceModel->rowCount() - 1);
 }
+
+bool Mailbox::getSelectedMessageData (IMailProcessor::TStoredMailMessage* encodedMsg, 
+                             IMailProcessor::TPhysicalMailMessage* decodedMsg)
+{
+  QModelIndex index = getSelectedMail();
+  if(index.isValid() == false)
+    return false;
+
+  QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+  QModelIndex sourceModelIndex = model->mapToSource(index);
+  _sourceModel->getMessageData(sourceModelIndex, encodedMsg, decodedMsg);
+
+  return true;
+}
+
+    

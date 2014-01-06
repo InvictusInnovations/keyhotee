@@ -163,25 +163,25 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   // ---------------------- MenuBar
   // File
-  connect(ui->actionExit, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionExit_triggered);
+  connect(ui->actionExit, &QAction::triggered, this, &KeyhoteeMainWindow::onExit);
   // Edit
-  connect(ui->actionCopy, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionCopy_triggered);
-  connect(ui->actionCut, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionCut_triggered);
-  connect(ui->actionPaste, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionPaste_triggered);
-  connect(ui->actionSelect_All, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionSelectAll_triggered);
+  connect(ui->actionCopy, &QAction::triggered, this, &KeyhoteeMainWindow::onCopy);
+  connect(ui->actionCut, &QAction::triggered, this, &KeyhoteeMainWindow::onCut);
+  connect(ui->actionPaste, &QAction::triggered, this, &KeyhoteeMainWindow::onPaste);
+  connect(ui->actionSelect_All, &QAction::triggered, this, &KeyhoteeMainWindow::onSelectAll);
   // Identity
-  connect(ui->actionNew_identity, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionNew_identity_triggered);
-  connect(ui->actionEnable_Mining, &QAction::toggled, this, &KeyhoteeMainWindow::enableMining_toggled);
+  connect(ui->actionNew_identity, &QAction::triggered, this, &KeyhoteeMainWindow::onNewIdentity);
+  connect(ui->actionEnable_Mining, &QAction::toggled, this, &KeyhoteeMainWindow::onEnableMining);
   // Mail
   connect(ui->actionNew_Message, &QAction::triggered, this, &KeyhoteeMainWindow::newMailMessage);
-  connect(ui->actionSave_attachement, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionSave_attachement_triggered);
+  connect(ui->actionSave_attachement, &QAction::triggered, this, &KeyhoteeMainWindow::onSaveAttachement);
   // Contact
   connect(ui->actionNew_Contact, &QAction::triggered, this, &KeyhoteeMainWindow::addContact);
-  connect(ui->actionSet_Icon, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionset_Icon_triggered);
+  connect(ui->actionSet_Icon, &QAction::triggered, this, &KeyhoteeMainWindow::onSetIcon);
   connect(ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts);
   // Help
-  connect(ui->actionDiagnostic, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionDiagnostic_triggered);
-  connect(ui->actionAbout, &QAction::triggered, this, &KeyhoteeMainWindow::on_actionAbout_triggered);
+  connect(ui->actionDiagnostic, &QAction::triggered, this, &KeyhoteeMainWindow::onDiagnostic);
+  connect(ui->actionAbout, &QAction::triggered, this, &KeyhoteeMainWindow::onAbout);
 
   connect(ui->splitter, &QSplitter::splitterMoved, this, &KeyhoteeMainWindow::sideBarSplitterMoved);
   connect(ui->side_bar, &TreeWidgetCustom::itemSelectionChanged, this, &KeyhoteeMainWindow::onSidebarSelectionChanged);
@@ -505,54 +505,54 @@ void KeyhoteeMainWindow::selectIdentityItem(QTreeWidgetItem* item)
 {}
 
 // Menu File
-void KeyhoteeMainWindow::on_actionExit_triggered()
+void KeyhoteeMainWindow::onExit()
 {
   qApp->closeAllWindows();
 }
 
 // Menu Edit
-void KeyhoteeMainWindow::on_actionCopy_triggered()
+void KeyhoteeMainWindow::onCopy()
 {
   notSupported();
 }
 
-void KeyhoteeMainWindow::on_actionCut_triggered()
+void KeyhoteeMainWindow::onCut()
 {
   notSupported();
 }
 
-void KeyhoteeMainWindow::on_actionPaste_triggered()
+void KeyhoteeMainWindow::onPaste()
 {
   notSupported();
 }
 
-void KeyhoteeMainWindow::on_actionSelectAll_triggered()
+void KeyhoteeMainWindow::onSelectAll()
 {
   notSupported();
 }
 
 // Menu Identity
-void KeyhoteeMainWindow::on_actionNew_identity_triggered()
+void KeyhoteeMainWindow::onNewIdentity()
 {
    NewIdentityDialog* ident_dialog = new NewIdentityDialog(this);
    ident_dialog->show();
 }
 
-void KeyhoteeMainWindow::enableMining_toggled(bool enabled)
+void KeyhoteeMainWindow::onEnableMining(bool enabled)
 {
   auto app = bts::application::instance();
   app->set_mining_intensity(enabled ? 100 : 0);
 }
 
 // Menu Mail
-void KeyhoteeMainWindow::on_actionSave_attachement_triggered()
+void KeyhoteeMainWindow::onSaveAttachement()
 {
   assert (_currentMailbox != nullptr);
   _currentMailbox->saveAttachment();
 }
 
 // Menu Contact
-void KeyhoteeMainWindow::on_actionset_Icon_triggered()
+void KeyhoteeMainWindow::onSetIcon()
 {
   notSupported();
 }
@@ -564,12 +564,12 @@ void KeyhoteeMainWindow::displayDiagnosticLog()
   diagnoslic_dialog.exec();
 }
 // Menu Help
-void KeyhoteeMainWindow::on_actionDiagnostic_triggered()
+void KeyhoteeMainWindow::onDiagnostic()
 {
   displayDiagnosticLog();
 }
 
-void KeyhoteeMainWindow::on_actionAbout_triggered()
+void KeyhoteeMainWindow::onAbout()
 {
   QString title(tr("About "));
   title += windowTitle();
@@ -593,7 +593,7 @@ void KeyhoteeMainWindow::on_actionAbout_triggered()
   QMessageBox::about(this, title, text);
 }
 
-void KeyhoteeMainWindow::showContacts()
+void KeyhoteeMainWindow::showContacts() const
 {
   ui->side_bar->setCurrentItem(_contacts_root);
   ui->widget_stack->setCurrentWidget(ui->contacts_page);
