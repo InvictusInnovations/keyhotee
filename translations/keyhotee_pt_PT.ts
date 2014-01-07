@@ -1361,7 +1361,7 @@ Pretende gravar as alterações?</translation>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="457"/>
         <source>CC:</source>
-        <translation type="unfinished">/translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="465"/>
