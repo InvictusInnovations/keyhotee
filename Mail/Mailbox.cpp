@@ -120,11 +120,13 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
 
   ui->inbox_table->setShowGrid(false);
 
+  ui->inbox_table->verticalHeader()->setDefaultSectionSize(20);
+
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::To, 120);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::Subject, 300);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateReceived, 140);
   ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::From, 120);
-  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateSent, 120);
+  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateSent, 140);
   if (_type == Inbox)
     {
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::Status);
