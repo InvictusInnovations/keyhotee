@@ -268,13 +268,23 @@ void ProfileWizard::createProfile()
     progress->doTask(
       [=]() 
       {
-      auto profile = app->create_profile(profile_name, conf, password, 
-        [=]( double p )
-        {
-          progress->updateValue(progressMax*p);
-        });
-
-        assert(profile != nullptr);
+      try {
+        auto profile = app->create_profile(profile_name, conf, password, 
+          [=]( double p )
+          {
+            progress->updateValue(progressMax*p);
+          });
+       }
+       catch (fc::exception& e)
+       {
+       elog("${e}", ("e", e.to_detail_string()));
+       throw e;
+       }
+       catch (...)
+       {
+       elog("unrecognized exception while creating profile");
+       throw;
+       }
       },
       [=]() 
       {
