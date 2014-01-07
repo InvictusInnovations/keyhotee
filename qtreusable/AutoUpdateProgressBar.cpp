@@ -37,8 +37,12 @@ TAutoUpdateProgressBar::create(const QRect& rect, const QString& title, unsigned
 
   bar->_notifier = new TUpdateNotifier();
 
-  connect(bar->_notifier, SIGNAL(onUpdateProgress(int)), bar, SLOT(setValue(int)), Qt::BlockingQueuedConnection);
-
+  /** \warning Use here always Auto-Connection feature since even this bar is designed to execute
+      main task in separate thread, using fc::async doesn't guarantee that new separate thread
+      can be created. Then Qt::BlockingQueuedConnection can lead to lock (same thread).
+      Reproduced on linux and also reported by some customer(s).
+  */
+  connect(bar->_notifier, SIGNAL(onUpdateProgress(int)), bar, SLOT(setValue(int)));
   connect(bar->_notifier, SIGNAL(finished()), bar, SLOT(onFinish()));
 
 #ifndef WIN32
