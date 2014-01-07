@@ -655,6 +655,14 @@ void MailEditorMainWindow::on_actionSend_triggered()
   TPhysicalMailMessage msg;
   if(prepareMailMessage(&msg))
     {
+    int msg_size = msg.subject.size() + msg.body.size();
+    for(int i=0; i<msg.attachments.size(); i++)
+      msg_size += msg.attachments[i].body.size();
+    if(msg_size > 1024*1024)
+    {
+      QMessageBox::warning(this, tr("Warning"), tr("Message too big. Limit size 1MB"));
+      return;
+    }
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
     MailProcessor.Send(senderId, msg, DraftMessage.valid() ? &(*DraftMessage) : nullptr);
     /// Clear potential modified flag to avoid asking for saving changes.
