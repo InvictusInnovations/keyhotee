@@ -166,7 +166,7 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="199"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="260"/>
         <source>About</source>
-        <translation>Acerca</translation>
+        <translation>Acerca de</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="208"/>
@@ -208,7 +208,7 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="232"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="267"/>
         <source>Forward</source>
-        <translation>Adelante</translation>
+        <translation>Reenviar</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="237"/>
@@ -306,7 +306,7 @@
     <message>
         <location filename="../BitShares/bitsharesgui/chatwidget.ui" line="14"/>
         <source>Form</source>
-        <translation>Form</translation>
+        <translation>Formulario</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/chatwidget.ui" line="22"/>
@@ -347,7 +347,7 @@
     <message>
         <location filename="../AddressBook/ContactView.ui" line="27"/>
         <source>Form</source>
-        <translation>Form</translation>
+        <translation>Formulario</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="129"/>
@@ -647,7 +647,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="197"/>
         <source>WALLETS</source>
-        <translation>CARTERAS</translation>
+        <translation>MONEDEROS</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="218"/>
@@ -793,7 +793,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="561"/>
         <source>Forward</source>
-        <translation>Adelante</translation>
+        <translation>Reenviar</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="570"/>
@@ -863,7 +863,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="573"/>
         <source>Built from revision: &lt;a href=&quot;https://github.com/InvictusInnovations/keyhotee/commit/</source>
-        <translation>Construido a partir de la revisión: &lt;a href=&quot;https://github.com/InvictusInnovations/keyhotee/commit/</translation>
+        <translation>Creado de la revisión: &lt;a href=&quot;https://github.com/InvictusInnovations/keyhotee/commit/</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="575"/>
@@ -1348,7 +1348,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="480"/>
         <source>Allows to manage mail attachement</source>
-        <translation>Permite gestionar adjuntos al correo</translation>
+        <translation>Permite gestionar adjuntos del correo</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="492"/>
@@ -1463,7 +1463,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/MailViewer.ui" line="14"/>
         <source>Form</source>
-        <translation>De</translation>
+        <translation>Formulario</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="99"/>
@@ -1516,7 +1516,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/Mailbox.ui" line="14"/>
         <source>Form</source>
-        <translation>De</translation>
+        <translation>Formulario</translation>
     </message>
     <message>
         <location filename="../Mail/Mailbox.ui" line="91"/>
@@ -1541,7 +1541,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/Mailbox.cpp" line="161"/>
         <source>Forward</source>
-        <translation>Adelante</translation>
+        <translation>Reenviar</translation>
     </message>
     <message>
         <location filename="../Mail/Mailbox.cpp" line="162"/>
@@ -1592,7 +1592,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/moneyattachementwidget.ui" line="58"/>
         <source>Wallet balance</source>
-        <translation>Saldo de la cartera</translation>
+        <translation>Saldo del monedero</translation>
     </message>
 </context>
 <context>
@@ -1727,7 +1727,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="20"/>
         <source>Information collected by this form is meant to strengthen your brain wallet with unique yet easily remembered information. This information is never sent to any other party.  </source>
-        <translation>La información recogida por este formulario tiene la intención de reforzar la recuperación de su cartera con información única que sea fácil de recordar. Esta información no se envía nunca a ninguna otra parte.</translation>
+        <translation>La información recogida por este formulario tiene la intención de reforzar la recuperación de su monedero con información única que sea fácil de recordar. Esta información no se envía nunca a ninguna otra parte.</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="42"/>
@@ -1772,7 +1772,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="167"/>
         <source>Brain Wallet Key</source>
-        <translation>Clave Memorística de Recuperación de Cartera</translation>
+        <translation>Clave Memorística de Recuperación del Monedero</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="180"/>
@@ -1852,7 +1852,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="14"/>
         <source>Form</source>
-        <translation>De</translation>
+        <translation>Formulario</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="32"/>
@@ -2042,7 +2042,7 @@ Do you want to overwrite it ?</source>
     <message>
         <location filename="../wallets.ui" line="33"/>
         <source>Wallet functionality not supported yet</source>
-        <translation>Funcionalidad Monedero no soportado todavía</translation>
+        <translation>Sistema de Monedero aún no disponible</translation>
     </message>
 </context>
 <context>
