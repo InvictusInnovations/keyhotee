@@ -156,6 +156,7 @@ ContactView::ContactView(QWidget* parent)
   connect(ui->notes, &QPlainTextEdit::textChanged, this, &ContactView::notesChanged);
   connect(ui->public_key_to_clipboard, &QToolButton::clicked, this, &ContactView::onPublicKeyToClipboard);
   connect(ui->sendButton, &QPushButton::clicked, this, &ContactView::onSend);
+  connect(ui->chat_input, &QPlainTextEdit::textChanged, this, &ContactView::onTextChanged);
 
   connect(ui->contact_pages, &QTabWidget::currentChanged, this, &ContactView::currentTabChanged);
 
@@ -748,6 +749,20 @@ void ContactView::currentTabChanged(int index)
   if (index == chat)
     onChat ();
   }
+
+void ContactView::onTextChanged()
+{
+    if (ui->chat_input->toPlainText().length() > _max_chat_char)
+    {
+        QString text = ui->chat_input->toPlainText();
+        text.chop(text.length() - _max_chat_char);
+        ui->chat_input->setPlainText(text);
+
+        QTextCursor cursor = ui->chat_input->textCursor();
+        cursor.setPosition(ui->chat_input->document()->characterCount() - 1);
+        ui->chat_input->setTextCursor(cursor);
+    }
+}
 
 void ContactView::onSend ()
   {
