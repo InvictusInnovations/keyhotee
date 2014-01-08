@@ -767,4 +767,5 @@ void ContactView::onTextChanged()
 void ContactView::onSend ()
   {
   sendChatMessage();
+  ui->chat_input->setFocus ();
   }
