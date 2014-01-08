@@ -83,6 +83,7 @@ public:
   void setEnabledAttachmentSaveOption(bool enable);
   void setEnabledDeleteOption( bool enable );
   void setEnabledMailActions(bool enable);
+  void setMailSettings (MailSettings& mailSettings);
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 protected:

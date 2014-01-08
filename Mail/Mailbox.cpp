@@ -131,6 +131,9 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
     {
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::Status);
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::DateSent);
+    
+    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnInbox,
+        static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderInbox) );
     }
   if (_type == Sent)
     {
@@ -365,5 +368,13 @@ bool Mailbox::getSelectedMessageData (IMailProcessor::TStoredMailMessage* encode
 
   return true;
 }
-
     
+Qt::SortOrder Mailbox::getSortOrder() const
+{
+  return ui->inbox_table->horizontalHeader()->sortIndicatorOrder();
+}
+
+int Mailbox::getSortedColumn() const 
+{
+  return ui->inbox_table->horizontalHeader()->sortIndicatorSection();
+}

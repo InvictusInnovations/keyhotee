@@ -119,6 +119,11 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   setEnabledDeleteOption(false);
   setEnabledMailActions(false);
 
+  QString settings_file = "keyhotee_";
+  settings_file.append(mainApp.getLoadedProfileName().c_str());
+  setSettingsFile(settings_file);
+  readSettings();
+
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
   connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
 
@@ -282,10 +287,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
     }
    }
    */
-  QString settings_file = "keyhotee_";
-  settings_file.append(mainApp.getLoadedProfileName().c_str());
-  setSettingsFile(settings_file);
-  readSettings();
+
   QAction* actionMenu = new QAction(tr("Keyhotee"), this);
   actionMenu->setCheckable(true);
   this->setMenuWindow(ui->menuWindow);
@@ -895,4 +897,10 @@ void KeyhoteeMainWindow::onRemoveContact()
   }
   else
     ui->contacts_page->onDeleteContact();
+}
+
+void KeyhoteeMainWindow::setMailSettings (MailSettings& mailSettings)
+{
+  mailSettings.sortColumnInbox = ui->inbox_page->getSortedColumn ();
+  mailSettings.sortOrderInbox = ui->inbox_page->getSortOrder ();
 }
