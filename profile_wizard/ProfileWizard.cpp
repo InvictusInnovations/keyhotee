@@ -119,7 +119,7 @@ public:
 
   void brainKeyEdited(const QString& brain_key)
   {
-    if (brain_key.size() < 32)
+    if(trimmedBrainkey().size() < 32)
       ui.brainkey_warning->setText(tr("Your Brain Key must be at least 32 characters") );
     else
       ui.brainkey_warning->setText(QString() );
@@ -152,6 +152,26 @@ public:
     completeChanged();
   }
 
+  std::string trimmedFirstName() const
+  {
+    return fc::trim(ui.first_name->text().toStdString());
+  }
+
+  std::string trimmedMiddleName() const
+  {
+    return fc::trim(ui.middle_name->text().toStdString());
+  }
+
+  std::string trimmedLastName() const
+  {
+    return fc::trim(ui.last_name->text().toStdString());
+  }
+  
+  std::string trimmedBrainkey() const
+  {
+    return fc::trim(ui.brainkey->text().toStdString());
+  }
+
   virtual bool isComplete() const
   {
     ui.first_name->setStyleSheet("");
@@ -159,22 +179,22 @@ public:
     ui.local_password1->setStyleSheet("");
     ui.local_password2->setStyleSheet("");
 
-    if (ui.first_name->text().size() == 0 )
+    if(trimmedFirstName().size() == 0)
     {
       ui.first_name->setStyleSheet("border: 1px solid red");
       return false;
     }
-    if (ui.brainkey->text().size() < 32)
+    if(trimmedBrainkey().size() < 32)
     {
       ui.brainkey->setStyleSheet("border: 1px solid red");
       return false;
     }
-    if (ui.local_password1->text().size() < 8)
+    if(ui.local_password1->text().size() < 8)
     {
       ui.local_password1->setStyleSheet("border: 1px solid red");
       return false;
     }
-    if (ui.local_password1->text() != ui.local_password2->text() )
+    if(ui.local_password1->text() != ui.local_password2->text())
     {
       ui.local_password2->setStyleSheet("border: 1px solid red");
       return false;
@@ -233,14 +253,10 @@ void ProfileWizard::createProfile()
   {
     ilog( "." );
     bts::profile_config conf;
-    conf.firstname  = _profile_edit->ui.first_name->text().toUtf8().constData();
-    conf.firstname  = fc::trim( conf.firstname );
-    conf.middlename = _profile_edit->ui.middle_name->text().toUtf8().constData();
-    conf.middlename = fc::trim( conf.middlename );
-    conf.lastname   = _profile_edit->ui.last_name->text().toUtf8().constData();
-    conf.lastname   = fc::trim( conf.lastname );
-    conf.brainkey   = _profile_edit->ui.brainkey->text().toUtf8().constData();
-    conf.brainkey   = fc::trim( conf.brainkey );
+    conf.firstname  = _profile_edit->trimmedFirstName();
+    conf.middlename = _profile_edit->trimmedMiddleName();
+    conf.lastname   = _profile_edit->trimmedLastName();
+    conf.brainkey   = _profile_edit->trimmedBrainkey();
 
     std::string password = _profile_edit->ui.local_password1->text().toUtf8().constData();
 
@@ -268,13 +284,23 @@ void ProfileWizard::createProfile()
     progress->doTask(
       [=]() 
       {
-      auto profile = app->create_profile(profile_name, conf, password, 
-        [=]( double p )
-        {
-          progress->updateValue(progressMax*p);
-        });
-
-        assert(profile != nullptr);
+      try {
+        auto profile = app->create_profile(profile_name, conf, password, 
+          [=]( double p )
+          {
+            progress->updateValue(progressMax*p);
+          });
+       }
+       catch (fc::exception& e)
+       {
+       elog("${e}", ("e", e.to_detail_string()));
+       throw e;
+       }
+       catch (...)
+       {
+       elog("unrecognized exception while creating profile");
+       throw;
+       }
       },
       [=]() 
       {

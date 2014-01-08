@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es_CL">
+<TS version="2.1" language="pl_PL">
 <context>
     <name>ATopLevelWindow</name>
     <message>
         <location filename="../ATopLevelWindow.cpp" line="13"/>
         <source>[*]</source>
-        <translation>[*]</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -14,7 +14,7 @@
     <message>
         <location filename="../AddContactDialog.ui" line="14"/>
         <source>Edit Contact</source>
-        <translation>Modificar Contacto</translation>
+        <translation>Edytuj Kontakt</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="25"/>
@@ -24,47 +24,49 @@
     <message>
         <location filename="../AddContactDialog.ui" line="35"/>
         <source>Security Level</source>
-        <translation>Nível de Seguridad</translation>
+        <translation>Poziom Bezpieczeństwa</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="43"/>
         <source>Hidden Relationship</source>
-        <translation>Relación Privada</translation>
+        <extracomment>No one should know you have ever communicated with this individual.</extracomment>
+        <translation>Ukryta Relacja</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="48"/>
         <source>Public Relationship</source>
-        <translation>Relación Publica</translation>
+        <extracomment>The government knows you are in communication with this individual.</extracomment>
+        <translation>Publiczna Relacja</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="56"/>
         <source>Email</source>
-        <translation>Correo Electrónico</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="66"/>
         <source>Phone</source>
-        <translation>Teléfono</translation>
+        <translation>Telefon</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="204"/>
         <source>First Name</source>
-        <translation>Nombre</translation>
+        <translation>Imię</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="221"/>
         <source>Last Name</source>
-        <translation>Apellidos</translation>
+        <translation>Nazwisko</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="250"/>
         <source>Avatar</source>
-        <translation>Apodo</translation>
+        <translation>Awatar</translation>
     </message>
     <message>
         <location filename="../AddContactDialog.ui" line="276"/>
         <source>Notes</source>
-        <translation>Notas</translation>
+        <translation>Notatki</translation>
     </message>
 </context>
 <context>
@@ -72,12 +74,17 @@
     <message>
         <location filename="../AddressBook/AddressBookModel.cpp" line="120"/>
         <source>First Name</source>
-        <translation>Nombre</translation>
+        <translation>Imię</translation>
+    </message>
+    <message>
+        <location filename="../AddressBook/AddressBookModel.cpp" line="122"/>
+        <source> </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../AddressBook/AddressBookModel.cpp" line="124"/>
         <source>Last Name</source>
-        <translation>Apellidos</translation>
+        <translation>Nazwisko</translation>
     </message>
     <message>
         <location filename="../AddressBook/AddressBookModel.cpp" line="126"/>
@@ -87,17 +94,17 @@
     <message>
         <location filename="../AddressBook/AddressBookModel.cpp" line="128"/>
         <source>Age</source>
-        <translation>Edad</translation>
+        <translation>Wiek</translation>
     </message>
     <message>
         <location filename="../AddressBook/AddressBookModel.cpp" line="130"/>
         <source>Repute</source>
-        <translation>Reputación</translation>
+        <translation>Reputacja</translation>
     </message>
     <message>
         <location filename="../AddressBook/AddressBookModel.cpp" line="253"/>
         <source>Ownership</source>
-        <translation>Identidad</translation>
+        <translation>Własność</translation>
     </message>
 </context>
 <context>
@@ -106,139 +113,139 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="14"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="255"/>
         <source>MainWindow</source>
-        <translation>Ventana Principal</translation>
+        <translation>OknoGłówne</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="119"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="283"/>
         <source>File</source>
-        <translation>Archivo</translation>
+        <translation>Plik</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="128"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="284"/>
         <source>Edit</source>
-        <translation>Editar</translation>
+        <translation>Edycja</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="142"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="285"/>
         <source>Mail</source>
-        <translation>Correo</translation>
+        <translation>Poczta</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="151"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="286"/>
         <source>Help</source>
-        <translation>Ayuda</translation>
+        <translation>Pomoc</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="157"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="287"/>
         <source>Contacts</source>
-        <translation>Contactos</translation>
+        <translation>Kontakty</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="179"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="256"/>
         <source>Open Profile...</source>
-        <translation>Abrir Perfil...</translation>
+        <translation>Otwórz Profil...</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="184"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="257"/>
         <source>Exit</source>
-        <translation>Salir</translation>
+        <translation>Wyjście</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="189"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="258"/>
         <source>New Profile...</source>
-        <translation>Nuevo Perfil...</translation>
+        <translation>Nowy Profil...</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="194"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="259"/>
         <source>Recent Profiles</source>
-        <translation>Perfiles recientes</translation>
+        <translation>Ostatnie Profile</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="199"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="260"/>
         <source>About</source>
-        <translation>Acerca de</translation>
+        <translation>Informacje</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="208"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="261"/>
         <source>New Mail Message</source>
-        <translation>Nuevo Mensaje de Correo</translation>
+        <translation>Nowa Wiadomość Pocztowa</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="211"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="262"/>
         <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="216"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="263"/>
         <source>Reply</source>
-        <translation>Responder</translation>
+        <translation>Odpowiedz</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="219"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="264"/>
         <source>Ctrl+R</source>
-        <translation>Ctrl+R</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="224"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="265"/>
         <source>Reply to all</source>
-        <translation>Responder a todos</translation>
+        <translation>Odpowiedz wszystkim</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="227"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="266"/>
         <source>Ctrl+Shift+R</source>
-        <translation>Ctrl+Shift+R</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="232"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="267"/>
         <source>Forward</source>
-        <translation>Reenviar</translation>
+        <translation>Przekaż dalej</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="237"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="268"/>
         <source>Undo</source>
-        <translation>Deshacer</translation>
+        <translation>Cofnij</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="240"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="269"/>
         <source>Ctrl+Z</source>
-        <translation>Ctrl+Z</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="245"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="270"/>
         <source>Redo</source>
-        <translation>Rehacer</translation>
+        <translation>Powtórz</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="248"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="271"/>
         <source>Ctrl+Y</source>
-        <translation>Ctrl+Y</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="253"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="272"/>
         <source>Cut</source>
-        <translation>Cortar</translation>
+        <translation>Wytnij</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="256"/>
@@ -250,7 +257,7 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="261"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="274"/>
         <source>Copy</source>
-        <translation>Copiar</translation>
+        <translation>Kopiuj</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="264"/>
@@ -262,7 +269,7 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="269"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="276"/>
         <source>Paste</source>
-        <translation>Pegar</translation>
+        <translation>Wklej</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="272"/>
@@ -274,19 +281,19 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="277"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="278"/>
         <source>Delete Message</source>
-        <translation>Eliminar Mensaje</translation>
+        <translation>Usuń Wiadomość</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="280"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="279"/>
         <source>Del</source>
-        <translation>Del</translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="285"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="280"/>
         <source>Find</source>
-        <translation>Búsqueda</translation>
+        <translation>Znajdź</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="288"/>
@@ -298,7 +305,7 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="293"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="282"/>
         <source>Add Contact</source>
-        <translation>Añadir Contacto</translation>
+        <translation>Dodaj Kontakt</translation>
     </message>
 </context>
 <context>
@@ -306,17 +313,17 @@
     <message>
         <location filename="../BitShares/bitsharesgui/chatwidget.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Formularz</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/chatwidget.ui" line="22"/>
         <source>Chat</source>
-        <translation>Chat</translation>
+        <translation>Czat</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/chatwidget.cpp" line="12"/>
         <source>Send Chat Message</source>
-        <translation>Enviar Mensaje de Chat</translation>
+        <translation>Wyślij Wiadomość Czat</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/chatwidget.cpp" line="13"/>
@@ -329,12 +336,12 @@
     <message>
         <location filename="../connectionstatusframe.ui" line="20"/>
         <source>Frame</source>
-        <translation>Marco</translation>
+        <translation>Ramka</translation>
     </message>
     <message>
         <location filename="../connectionstatusframe.ui" line="23"/>
         <source>Number of active connections to bitshares network</source>
-        <translation>Número de conexiones activas a la red de bitshares</translation>
+        <translation>Liczba aktywnych połączeń do siebie Bitshares</translation>
     </message>
     <message>
         <location filename="../connectionstatusframe.ui" line="50"/>
@@ -347,12 +354,12 @@
     <message>
         <location filename="../AddressBook/ContactView.ui" line="27"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Formularz</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="129"/>
         <source>Info</source>
-        <translation>Información</translation>
+        <translation>Info</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="176"/>
@@ -363,32 +370,32 @@
     <message>
         <location filename="../AddressBook/ContactView.ui" line="196"/>
         <source>First Name</source>
-        <translation>Nombre</translation>
+        <translation>Imię</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="223"/>
         <source>Last Name</source>
-        <translation>Apellidos</translation>
+        <translation>Nawisko</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="299"/>
         <source>Keyhotee Founder</source>
-        <translation>Fundador Keyhotee</translation>
+        <translation>Założyciel Keyhotee</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="329"/>
         <source>ID Status</source>
-        <translation>Estado del ID</translation>
+        <translation>Status ID</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="336"/>
         <source>Public Key</source>
-        <translation>Public Key</translation>
+        <translation>Klucz Publiczny</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="364"/>
         <source>Copy to clipboard</source>
-        <translation>Copiar al portapapeles</translation>
+        <translation>Kopiuj do schowka</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="367"/>
@@ -398,168 +405,172 @@
     <message>
         <location filename="../AddressBook/ContactView.ui" line="384"/>
         <source>Privacy Level</source>
-        <translation>Nível de Privacidad</translation>
+        <translation>Poziom Prywatności</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="401"/>
         <source>Blocked</source>
-        <translation>Bloqueado</translation>
+        <translation>Zablokowane</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="406"/>
         <source>Hidden Relationship</source>
-        <translation>Relación Privada</translation>
+        <extracomment>No one should know you have ever communicated with this individual.</extracomment>
+        <translation>Ukryta Relacja</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="411"/>
         <source>Public Relationship</source>
-        <translation>Relación Pública</translation>
+        <extracomment>The government knows you are in communication with this individual.</extracomment>
+        <translation>Publiczna Relacja</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="419"/>
         <source>Email</source>
-        <translation>Correo Electrónico</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="432"/>
         <source>Phone</source>
-        <translation>Teléfono</translation>
+        <translation>Telefon</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="457"/>
         <source>Notes</source>
-        <translation>Notas</translation>
+        <translation>Notatki</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="514"/>
         <location filename="../AddressBook/ContactView.cpp" line="112"/>
         <source>Chat</source>
-        <translation>Chat</translation>
+        <translation>Czat</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="532"/>
         <source>Allows to send message
 Enter</source>
-        <translation>Permite enviar mensajes, Pulse Enter</translation>
+        <translation>Umożliwia wysłanie wiadomości
+Enter</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="536"/>
         <source>Send</source>
-        <translation>Enviar</translation>
+        <translation>Wyślij</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="111"/>
         <source>Mail</source>
-        <translation>Correo Electrónico</translation>
+        <translation>Poczta</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="113"/>
         <source>Edit</source>
-        <translation>Editar</translation>
+        <translation>Edycja</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="114"/>
         <source>Share (need new icon)</source>
-        <translation>Compartir (necesita un nuevo icono)</translation>
+        <translation>Podziel się</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="115"/>
         <source>Request authorisation</source>
-        <translation>Pedir autorización</translation>
+        <translation>Zażądaj autoryzacji</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="116"/>
         <source>Save</source>
-        <translation>Guardar</translation>
+        <translation>Zapisz</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="117"/>
         <source>Discard changes</source>
-        <translation>Descartar cambios</translation>
+        <translation>Odrzuć zmiany</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="129"/>
         <source>     Create new contact</source>
-        <translation>Crear nuevo contacto</translation>
+        <translation>     Stwórz nowy kontakt</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="263"/>
         <location filename="../AddressBook/ContactView.cpp" line="268"/>
         <source>Warning</source>
-        <translation>Aviso</translation>
+        <translation>Ostrzeżenie</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="263"/>
         <location filename="../AddressBook/ContactView.cpp" line="268"/>
         <source>Not supported</source>
-        <translation>No es compatible</translation>
+        <translation>Nie wspierane</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="377"/>
         <source>Looking up id...</source>
-        <translation>Buscando id...</translation>
+        <translation>Wyszukiwanie ID...</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="405"/>
         <source>Public Key Only Mode: valid key</source>
-        <translation>Sólo modo de Clave Pública: clave válida</translation>
+        <translation>Tryb Wyłącznie Klucza Publicznego: klucz ważny</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="411"/>
         <source>Public Key Only Mode: not a valid key</source>
-        <translation>Sólo Modo de Clave Pública: no es una clave válida</translation>
+        <translation>Tryb Wyłącznie Klucza Publicznego: klucz nie jest ważny</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="432"/>
         <source>Registered</source>
-        <translation>Registrado</translation>
+        <translation>Zarejestrowany</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="444"/>
         <source>Unable to find ID</source>
-        <translation>No encontrado ID</translation>
+        <translation>Nie można znaleźć ID</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="546"/>
         <location filename="../AddressBook/ContactView.cpp" line="566"/>
         <source>Application</source>
-        <translation>Aplicación</translation>
+        <translation>Aplikacja</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="547"/>
         <source>The contact has been modified.
 Do you want to save your changes ?</source>
-        <translation>El contacto fue modificado. ¿Quieres guardar los cambios?</translation>
+        <translation>Kontakt został zmodyfikowany.
+Czy chceszzapisać zmiany?</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="567"/>
         <source>Please correct the Keyhotee ID.</source>
-        <translation>Por favor corrija el Keyhotee ID.</translation>
+        <translation>Proszę, popraw Keyhotee ID.</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="595"/>
         <source>Select Avatar image for contact</source>
-        <translation>Seleccionar imagen Avatar de contacto</translation>
+        <translation>Wybierz obrazek Awatara dla kontaktu</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="596"/>
         <source>Image Files (*.png *.jpg *.bmp)</source>
-        <translation>Archivos de Imagen (*.png *.jpg *.bmp)</translation>
+        <translation>Pliki Obrazów (*.png *.jpg *.bmp)</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="621"/>
         <source>Please provide a valid ID or public key</source>
-        <translation>Proporcione una ID valida o una clave pública</translation>
+        <translation>Proszę, podaj ważny ID lub klucz publiczny</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="623"/>
         <source>Public Key Only Mode</source>
-        <translation>Sólo Modo de Clave Pública</translation>
+        <translation>Tryb Wyłącznie Klucza Publicznego</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="677"/>
         <source>This contact is already added to the list</source>
-        <translation>Este contacto ya se encuentra en la lista</translation>
+        <translation>Ten kontakt jest już dodany do listy</translation>
     </message>
 </context>
 <context>
@@ -567,12 +578,12 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../AddressBook/ContactsTable.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Formularz</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactsTable.ui" line="103"/>
         <source>Please select the contact</source>
-        <translation>Por favor, seleccione el contacto</translation>
+        <translation>Proszę, wybierz kontakt</translation>
     </message>
 </context>
 <context>
@@ -580,7 +591,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../diagnosticdialog.ui" line="20"/>
         <source>Dialog</source>
-        <translation>Histórico</translation>
+        <translation>Dialog</translation>
     </message>
     <message>
         <location filename="../diagnosticdialog.cpp" line="29"/>
@@ -590,17 +601,17 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../diagnosticdialog.cpp" line="30"/>
         <source>&amp;Save</source>
-        <translation>&amp;Guardar</translation>
+        <translation>&amp;Zapisz</translation>
     </message>
     <message>
         <location filename="../diagnosticdialog.cpp" line="62"/>
         <source>Save Diagnostic</source>
-        <translation>Guardar Diagnóstico</translation>
+        <translation>Zapisz Diagnostykę</translation>
     </message>
     <message>
         <location filename="../diagnosticdialog.cpp" line="62"/>
         <source>All Files (*)</source>
-        <translation>Todos los Archivos (*)</translation>
+        <translation>Wszystkie Pliki (*)</translation>
     </message>
 </context>
 <context>
@@ -608,7 +619,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../profile_wizard/ProfileIntroPage.ui" line="14"/>
         <source>WizardPage</source>
-        <translation>Página del Asistente</translation>
+        <translation>StronaKreatora</translation>
     </message>
 </context>
 <context>
@@ -622,32 +633,32 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="138"/>
         <source>Name</source>
-        <translation>Nombre</translation>
+        <translation>Nazwa</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="143"/>
         <source>MAILBOXES</source>
-        <translation>BUZONES DE CORREO</translation>
+        <translation>POCZTA</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="164"/>
         <source>Inbox</source>
-        <translation>Recibidos</translation>
+        <translation>Skrzynka odbiorcza</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="173"/>
         <source>Drafts</source>
-        <translation>Borradores</translation>
+        <translation>Kopie robocze</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="182"/>
         <source>Sent</source>
-        <translation>Enviado</translation>
+        <translation>Wysłane</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="197"/>
         <source>WALLETS</source>
-        <translation>MONEDEROS</translation>
+        <translation>PORTFELE</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="218"/>
@@ -667,78 +678,78 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="251"/>
         <source>CONTACTS</source>
-        <translation>CONTACTOS</translation>
+        <translation>KONTAKTY</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="352"/>
         <source>File</source>
-        <translation>Archivo</translation>
+        <translation>Plik</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="358"/>
         <source>Edit</source>
-        <translation>Editar</translation>
+        <translation>Edycja</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="370"/>
         <location filename="../KeyhoteeMainWindow.ui" line="450"/>
         <source>Mail</source>
-        <translation>Correo</translation>
+        <translation>Poczta</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="381"/>
         <source>Contact</source>
-        <translation>Contacto</translation>
+        <translation>Kontakt</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="390"/>
         <source>Help</source>
-        <translation>Ayuda</translation>
+        <translation>Pomoc</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="398"/>
         <source>Identity</source>
-        <translation>Identidad</translation>
+        <translation>Tożsamość</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="406"/>
         <source>Window</source>
-        <translation>Ventana</translation>
+        <translation>Okno</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="420"/>
         <source>toolBar</source>
-        <translation>Barra de herramientas</translation>
+        <translation>Narzędzia</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="459"/>
         <source>New Contact</source>
-        <translation>Nuevo Contacto</translation>
+        <translation>Nowy kontakt</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="468"/>
         <source>Compose</source>
-        <translation>Escribir</translation>
+        <translation>Utwórz</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="477"/>
         <source>Show Contacts</source>
-        <translation>Mostrar Contactos</translation>
+        <translation>Pokaż kontakty</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="488"/>
         <source>Enable Mining</source>
-        <translation>Minar</translation>
+        <translation>Włącz Kopanie</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="493"/>
         <source>Exit</source>
-        <translation>Salir</translation>
+        <translation>Wyjście</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="502"/>
         <source>Copy</source>
-        <translation>Copiar</translation>
+        <translation>Kopiuj</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="505"/>
@@ -748,7 +759,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="514"/>
         <source>Cut</source>
-        <translation>Cortar</translation>
+        <translation>Wytnij</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="517"/>
@@ -758,7 +769,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="526"/>
         <source>Paste</source>
-        <translation>Pegar</translation>
+        <translation>Wklej</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="529"/>
@@ -768,7 +779,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="534"/>
         <source>Select All</source>
-        <translation>Seleccionar Todo</translation>
+        <translation>Zaznacz wszystko</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="537"/>
@@ -778,92 +789,92 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="546"/>
         <source>Delete</source>
-        <translation>Borrar</translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="549"/>
         <source>Allows to delete currently selected item(s)</source>
-        <translation>Permite eliminar elementos seleccionados en ese momento</translation>
+        <translation>Umożliwia usunięcie zaznaczonych elementów</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="552"/>
         <source>Del</source>
-        <translation>Del</translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="561"/>
         <source>Forward</source>
-        <translation>Reenviar</translation>
+        <translation>Przekaż dalej</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="570"/>
         <source>Reply</source>
-        <translation>Responder</translation>
+        <translation>Odpowiedz</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="579"/>
         <source>Reply all</source>
-        <translation>Responder a todos</translation>
+        <translation>Odpowiedz wszystkim</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="588"/>
         <source>Save attachement</source>
-        <translation>Guardar datos adjuntos</translation>
+        <translation>Zapisz załącznik</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="593"/>
         <source>Diagnostic </source>
-        <translation>Diagnóstico</translation>
+        <translation>Diagnostyka</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="598"/>
         <source>About</source>
-        <translation>Acerca de</translation>
+        <translation>Informacje</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="607"/>
         <source>New identity</source>
-        <translation>Nueva identidad</translation>
+        <translation>Nowa tożsamość</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="612"/>
         <source>Set Icon</source>
-        <translation>Poner Icono</translation>
+        <translation>Ustaw ikonę</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="627"/>
         <source>Show details</source>
-        <translation>Mostrar detalles</translation>
+        <translation>Pokaż szczegóły</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="149"/>
         <source>Search</source>
-        <translation>Búsqueda</translation>
+        <translation>Wyszukaj</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="564"/>
         <source>About </source>
-        <translation>Acerca de </translation>
+        <translation>Informacje</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="567"/>
-        <source>&lt;p align=&quot;center&quot;&gt;&lt;b /&gt;&lt;/p&gt;</source>
-        <translation>&lt;p align=&quot;center&quot;&gt;&lt;b /&gt;&lt;/p&gt;</translation>
+        <source>&lt;p align=&apos;center&apos;&gt;&lt;b&gt;</source>
+        <translation>&lt;p align=&apos;center&apos;&gt;&lt;b&gt;</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="569"/>
         <source> version </source>
-        <translation> versión </translation>
+        <translation> wersja </translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="571"/>
-        <source>&lt;br /&gt;&lt;br /&gt;</source>
-        <translation>&lt;br /&gt;&lt;br /&gt;</translation>
+        <source>&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;</source>
+        <translation>&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="573"/>
         <source>Built from revision: &lt;a href=&quot;https://github.com/InvictusInnovations/keyhotee/commit/</source>
-        <translation>Creado de la revisión: &lt;a href=&quot;https://github.com/InvictusInnovations/keyhotee/commit/</translation>
+        <translation>Zbudowany z rewizji: &lt;a href=&quot;https://github.com/InvictusInnovations/keyhotee/commit/</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="575"/>
@@ -871,9 +882,19 @@ Do you want to save your changes ?</source>
         <translation>&quot;&gt;</translation>
     </message>
     <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="577"/>
+        <source>&lt;/a&gt;</source>
+        <translation>&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <location filename="../KeyhoteeMainWindow.cpp" line="578"/>
+        <source>&lt;br/&gt;</source>
+        <translation>&lt;br/&gt;</translation>
+    </message>
+    <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="579"/>
-        <source>Invictus Innovations Inc&lt;br /&gt;</source>
-        <translation>Invictus Innovations Inc&lt;br /&gt;</translation>
+        <source>Invictus Innovations Inc&lt;br/&gt;</source>
+        <translation>Invictus Innovations Inc&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="580"/>
@@ -882,8 +903,8 @@ Do you want to save your changes ?</source>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="581"/>
-        <source>&lt;br /&gt;</source>
-        <translation>&lt;br /&gt;</translation>
+        <source>&lt;br/&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -891,32 +912,32 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../LoginDialog.ui" line="14"/>
         <source>Keyhotee Login</source>
-        <translation>Iniciar Sesión Keyhotee</translation>
+        <translation>Keyhotee Login</translation>
     </message>
     <message>
         <location filename="../LoginDialog.ui" line="30"/>
         <source>Profile</source>
-        <translation>Perfil</translation>
+        <translation>Profil</translation>
     </message>
     <message>
         <location filename="../LoginDialog.ui" line="40"/>
         <source>New</source>
-        <translation>Nuevo</translation>
+        <translation>Nowy</translation>
     </message>
     <message>
         <location filename="../LoginDialog.ui" line="47"/>
         <source>Password</source>
-        <translation>Contraseña</translation>
+        <translation>Hasło</translation>
     </message>
     <message>
         <location filename="../LoginDialog.ui" line="61"/>
         <source>Quit</source>
-        <translation>Salir</translation>
+        <translation>Wyjście</translation>
     </message>
     <message>
         <location filename="../LoginDialog.ui" line="87"/>
         <source>Login</source>
-        <translation>Iniciar Sesión</translation>
+        <translation>Login</translation>
     </message>
 </context>
 <context>
@@ -924,146 +945,152 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="222"/>
         <source>(No Subject)</source>
-        <translation>(No Encontrado)</translation>
+        <translation>(Bez Tematu)</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="257"/>
         <source>&amp;Send</source>
-        <translation>&amp;Enviar</translation>
+        <translation>&amp;Wyślij</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="267"/>
         <source>Mail Fields</source>
-        <translation>Contenido de Correo</translation>
+        <translation>Pola Wiadomości</translation>
+    </message>
+    <message>
+        <location filename="../Mail/MailEditor.cpp" line="282"/>
+        <source>&amp;Format</source>
+        <translation>&amp;Formatuj</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="291"/>
         <source>&amp;Attach Money</source>
-        <translation>&amp;Adjuntar Dinero</translation>
+        <translation>&amp;Załącz Pieniądze</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="299"/>
         <source>&amp;Attach File</source>
-        <translation>&amp;Adjuntar Archivos</translation>
+        <translation>&amp;Załącz Plik</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="338"/>
         <source>New Message</source>
-        <translation>Nuevo Mensaje</translation>
+        <translation>Nowa Wiadomość</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="634"/>
         <source>&amp;Edit</source>
-        <translation>&amp;Editar</translation>
+        <translation>&amp;Edycja</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="639"/>
         <source>&amp;Undo</source>
-        <translation>&amp;Deshacer</translation>
+        <translation>&amp;Cofnij</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="644"/>
         <source>&amp;Redo</source>
-        <translation>&amp;Rehacer</translation>
+        <translation>&amp;Powtórz</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="651"/>
-        <source>&amp;Cut</source>
-        <translation>Cortar</translation>
+        <source>Cu&amp;t</source>
+        <translation>Wy&amp;tnij</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="657"/>
         <source>&amp;Copy</source>
-        <translation>&amp;Copiar</translation>
+        <translation>&amp;Kopiuj</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="663"/>
         <source>&amp;Paste</source>
-        <translation>&amp;Pegar</translation>
+        <translation>&amp;Wklej</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="730"/>
-        <source>&amp;Format</source>
-        <translation>&amp;Formato</translation>
+        <source>F&amp;ormat</source>
+        <translation>F&amp;ormatuj</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="734"/>
         <source>&amp;Bold</source>
-        <translation>&amp;Negrita</translation>
+        <translation>Pogru&amp;bienie</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="747"/>
         <source>&amp;Italic</source>
-        <translation>&amp;Italic</translation>
+        <translation>&amp;Kursywa</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="760"/>
         <source>&amp;Underline</source>
-        <translation>Subrayado</translation>
+        <translation>&amp;Podkreślenie</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="781"/>
         <location filename="../Mail/MailEditor.cpp" line="799"/>
         <source>&amp;Left</source>
-        <translation>&amp;Alinear a la Izquierda</translation>
+        <translation>Do l&amp;ewej</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="784"/>
         <location filename="../Mail/MailEditor.cpp" line="796"/>
-        <source>&amp;Center</source>
-        <translation>&amp;Centrar</translation>
+        <source>C&amp;enter</source>
+        <translation>Do śro&amp;dka</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="787"/>
         <location filename="../Mail/MailEditor.cpp" line="793"/>
         <source>&amp;Right</source>
-        <translation>&amp;Alinear a la Derecha</translation>
+        <translation>Do pr&amp;awej</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="803"/>
         <source>&amp;Justify</source>
-        <translation>&amp;Justificar</translation>
+        <translation>&amp;Wyjustuj</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="825"/>
         <source>&amp;Color...</source>
-        <translation>&amp;Color...</translation>
+        <translation>&amp;Kolor...</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="885"/>
         <source>Application</source>
-        <translation>Aplicación</translation>
+        <translation>Aplikacja</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="886"/>
         <source>The document has been modified.
 Do you want to save your changes?</source>
-        <translation>El documento ha sido modificado. ¿Quieres guardar los cambios?</translation>
+        <translation>Dokument został zmodyfikowany.
+Czy chcesz zapisać zmiany?</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="978"/>
         <source>Save as...</source>
-        <translation>Guardar como...</translation>
+        <translation>Zapisz jako...</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="979"/>
         <source>ODF files (*.odt);;HTML-Files (*.htm *.html);;All Files (*)</source>
-        <translation>Archivos ODF (*.odt);;Archivos-HTML (*.htm *.html);;Todos los Archivos (*)</translation>
+        <translation>Pliki ODF (*.odt);;Pliki HTML (*.htm *.html);;Wszystkie Pliki (*) </translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="998"/>
         <source>Print Document</source>
-        <translation>Imprimir Documento</translation>
+        <translation>Wydrukuj Dokument</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="1195"/>
         <source>About</source>
-        <translation>Acerca de</translation>
+        <translation>Informacje</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="1195"/>
-        <source>This example demonstrates Qt&#x27;s rich text editing facilities in action, providing an example document for you to experiment with.</source>
-        <translation>Este ejemplo demuestra las funciones de edición del texto de Qt en acción, proporcionando un documento de ejemplo para que usted pueda experimentar.</translation>
+        <source>This example demonstrates Qt&apos;s rich text editing facilities in action, providing an example document for you to experiment with.</source>
+        <translation>Ten przykład pokazuje bogactwo możliwości edycji tekstu zawartych w Qt, prezentując przykładowy dokument z którym możesz eksperymentować.</translation>
     </message>
 </context>
 <context>
@@ -1077,27 +1104,28 @@ Do you want to save your changes?</source>
         <location filename="../Mail/maileditorwindow.cpp" line="145"/>
         <source>The document has been modified.
 Do you want to save your changes ?</source>
-        <translation>El documento ha sido modificado. ¿Quieres guardar los cambios?</translation>
+        <translation>Dokument został zmodyfikowany.
+Czy chcesz zapisać zmiany ?</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.cpp" line="236"/>
-        <source>Following files doesn&#x27;t exist or are not readable. Do you want to continue ?&lt;br /&gt;</source>
-        <translation>No existen los archivos siguientes o no son legibles. ¿Quieres continuar?&lt;br /&gt;</translation>
+        <source>Following files doesn&apos;t exist or are not readable. Do you want to continue ?&lt;br/&gt;</source>
+        <translation>Następujące pliki nie istnieją lub nie można ich odczytać. Czy chcesz kontynuować ?&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.cpp" line="240"/>
-        <source>&lt;br /&gt;</source>
-        <translation>&lt;br /&gt;</translation>
+        <source>&lt;br/&gt;</source>
+        <translation>&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.cpp" line="243"/>
         <source>File attachment</source>
-        <translation>Archivo adjunto</translation>
+        <translation>Załącz plik</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.cpp" line="417"/>
         <source>Mail message: %1[*]</source>
-        <translation>Mensaje de correo: %1[*]</translation>
+        <translation>Wiadomość pocztowa: %1[*]</translation>
     </message>
 </context>
 <context>
@@ -1105,59 +1133,59 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="17"/>
         <source>MainWindow</source>
-        <translation>Ventana Principal</translation>
+        <translation>OknoGłówne</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="49"/>
         <location filename="../Mail/maileditorwindow.ui" line="435"/>
         <source>Mail fields</source>
-        <translation>Contenido del Correo</translation>
+        <translation>Pola wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="78"/>
         <source>Standard</source>
-        <translation>Estándar</translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="129"/>
         <source>Text adjust</source>
-        <translation>Ajustar texto</translation>
+        <translation>Wyjustowanie tekstu</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="150"/>
         <source>Text format</source>
-        <translation>Formato de texto</translation>
+        <translation>Formatowanie tekstu</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="166"/>
         <source>File attachment</source>
-        <translation>Archivo adjunto</translation>
+        <translation>Załącz plik</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="183"/>
         <source>Money attachment</source>
-        <translation>Dinero adjunto</translation>
+        <translation>Załącznik pieniężny</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="194"/>
         <source>Text edit</source>
-        <translation>Editar texto</translation>
+        <translation>Edycja tekstu</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="218"/>
         <location filename="../Mail/maileditorwindow.ui" line="221"/>
         <source>Save</source>
-        <translation>Guardar</translation>
+        <translation>Zapisz</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="224"/>
         <source>Save document</source>
-        <translation>Guardar documento</translation>
+        <translation>Zapisz dokument</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="227"/>
         <source>Save currently edited message into Drafts folder</source>
-        <translation>Guardar el mensaje editado en la carpeta Borradores</translation>
+        <translation>Zapisz obecnie edytowaną wiadomość do Kopii robowych</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="230"/>
@@ -1167,7 +1195,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="235"/>
         <source>Close</source>
-        <translation>Cerrar</translation>
+        <translation>Zamknij</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="238"/>
@@ -1178,12 +1206,12 @@ Do you want to save your changes ?</source>
         <location filename="../Mail/maileditorwindow.ui" line="250"/>
         <location filename="../Mail/maileditorwindow.ui" line="253"/>
         <source>Copy</source>
-        <translation>Copiar</translation>
+        <translation>Kopiuj</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="256"/>
         <source>Copy current selection to clipboard</source>
-        <translation>Copiar la selección actual en el portapapeles</translation>
+        <translation>Skopiuj zaznaczenie do schowka</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="259"/>
@@ -1193,7 +1221,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="271"/>
         <source>Cut</source>
-        <translation>Cortar</translation>
+        <translation>Wytnij</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="274"/>
@@ -1203,7 +1231,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="286"/>
         <source>Paste</source>
-        <translation>Pegar</translation>
+        <translation>Wklej</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="289"/>
@@ -1213,7 +1241,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="294"/>
         <source>Select all</source>
-        <translation>Seleccionar todo</translation>
+        <translation>Zaznacz wszystko</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="297"/>
@@ -1223,22 +1251,22 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="306"/>
         <source>Send</source>
-        <translation>Enviar</translation>
+        <translation>Wyślij</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="309"/>
         <source>Allows to send given mail document</source>
-        <translation>Permite enviar documentos por correo</translation>
+        <translation>Umożliwia wysłanie danego dokumentu pocztowego</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="312"/>
         <source>Allows to send currently edited message</source>
-        <translation>Permite enviar el mensaje que se está editando</translation>
+        <translation>Umożliwia wysłanie obecnie edytowanej wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="324"/>
         <source>Left</source>
-        <translation>Alinear a la izquierda</translation>
+        <translation>Do lewej</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="327"/>
@@ -1248,7 +1276,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="339"/>
         <source>Center</source>
-        <translation>Centrar</translation>
+        <translation>Do środka</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="342"/>
@@ -1258,7 +1286,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="354"/>
         <source>Right</source>
-        <translation>Alinear a la derecha</translation>
+        <translation>Do prawej</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="357"/>
@@ -1268,7 +1296,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="369"/>
         <source>Justify</source>
-        <translation>Justificar</translation>
+        <translation>Wyjustuj</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="372"/>
@@ -1278,12 +1306,12 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="384"/>
         <source>Bold</source>
-        <translation>Negrita</translation>
+        <translation>Pogrubienie</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="387"/>
         <source>Changes selected text to heavier font</source>
-        <translation>Cambia el texto seleccionado a otra fuente más pesada</translation>
+        <translation>Zmienia zaznaczony tekst na pogrubioną czcionkę</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="390"/>
@@ -1293,12 +1321,12 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="402"/>
         <source>Italic</source>
-        <translation>Italic</translation>
+        <translation>Kursywa</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="405"/>
-        <source>&lt;html&gt;&lt;head /&gt;&lt;body&gt;&lt;p&gt;Changes currently selected text to &lt;span style=&quot; font-style:italic;&quot;&gt;italic&lt;/span&gt; font&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head /&gt;&lt;body&gt;&lt;p&gt;Cambia el texto seleccionado a&lt;span style=&quot; font-style:italic;&quot;&gt; Italic&lt;/span&gt; Fuente&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Changes currently selected text to &lt;span style=&quot; font-style:italic;&quot;&gt;italic&lt;/span&gt; font&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zmienia zaznaczony tekst na &lt;span style=&quot; font-style:italic;&quot;&gt;kursywę&lt;/span&gt; 字体&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="408"/>
@@ -1308,12 +1336,12 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="420"/>
         <source>Underline</source>
-        <translation>Subrayar</translation>
+        <translation>Podkreślenie</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="423"/>
         <source>Draw line below selected text</source>
-        <translation>Dibuja una línea debajo del texto seleccionado</translation>
+        <translation>Rysuje linię poniżej zaznaczonego tekstu</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="426"/>
@@ -1323,48 +1351,48 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="438"/>
         <source>Allows to select additional mail fields (Bcc: Cc: From:)</source>
-        <translation>Permite seleccionar campos adicionales de correo (Bcc: Cc: De:)</translation>
+        <translation>Umożliwia wybranie dodatkowych pól wiadomości (Udw: Dw: Od:)</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="446"/>
         <source>From:</source>
-        <translation>De:</translation>
+        <translation>Od:</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="457"/>
         <source>CC:</source>
-        <translation>CC:</translation>
+        <translation>DW:</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="465"/>
         <source>BCC:</source>
-        <translation>BCC:</translation>
+        <translation>UDW:</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="477"/>
         <source>Attachement</source>
-        <translation>Adjunto</translation>
+        <translation>Załącznik</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="480"/>
         <source>Allows to manage mail attachement</source>
-        <translation>Permite gestionar adjuntos del correo</translation>
+        <translation>Umożliwia zarządzanie załącznikiem wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="492"/>
         <source>Money</source>
-        <translation>Dinero</translation>
+        <translation>Pieniądze</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="495"/>
         <source>Allows to attach money to this mail</source>
-        <translation>Permite adjuntar dinero a este correo</translation>
+        <translation>Umożliwia załączenie pieniędzy do tej wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="507"/>
         <location filename="../Mail/maileditorwindow.ui" line="510"/>
         <source>Undo</source>
-        <translation>Deshacer</translation>
+        <translation>Cofnij</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="513"/>
@@ -1375,7 +1403,7 @@ Do you want to save your changes ?</source>
         <location filename="../Mail/maileditorwindow.ui" line="525"/>
         <location filename="../Mail/maileditorwindow.ui" line="528"/>
         <source>Redo</source>
-        <translation>Rehacer</translation>
+        <translation>Potwórz</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="531"/>
@@ -1385,22 +1413,22 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="536"/>
         <source>TextColor</source>
-        <translation>Color del Texto</translation>
+        <translation>KolorTesktu</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="539"/>
         <source>Allows to change text colour</source>
-        <translation>Permite cambiar el color del texto</translation>
+        <translation>Umożliwia zmianę koloru tekstu</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="551"/>
         <source>ShowFormatOptions</source>
-        <translation>Mostrar Opciones de formato</translation>
+        <translation>PokażOpcjeFormatowania</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="554"/>
         <source>Allows to display all text formatting options...</source>
-        <translation>Permite visualizar todas las opciones de formato de texto ...</translation>
+        <translation>Umożliwia wyświetlenie wszystkich opcji formatowania...</translation>
     </message>
 </context>
 <context>
@@ -1408,39 +1436,39 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="20"/>
         <source>Mail fields</source>
-        <translation>Contenido de Correo</translation>
+        <translation>Pola wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="29"/>
         <source>Allows to send currently edited mail message</source>
-        <translation>Permite enviar el mensaje de correo que se está editando</translation>
+        <translation>Umożliwia wysłanie obecnie edytowanej wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="32"/>
         <source>Send</source>
-        <translation>Enviar</translation>
+        <translation>Wyślij</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="71"/>
-        <source>Allows to choose sender&#x27;s identity</source>
-        <translation>Permite elegir la identidad del remitente</translation>
+        <source>Allows to choose sender&apos;s identity</source>
+        <translation>Umożliwia wybranie tożsamości wysyłającego</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="74"/>
         <source>From:</source>
-        <translation>De:</translation>
+        <translation>Od:</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="119"/>
         <location filename="../Mail/mailfieldswidget.ui" line="155"/>
         <location filename="../Mail/mailfieldswidget.ui" line="197"/>
         <source>Allows to choose mail recipients</source>
-        <translation>Permite elegir los destinatarios de correo</translation>
+        <translation>Umożliwia wybranie odbiorców wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="122"/>
         <source>To: ...</source>
-        <translation>Para: ...</translation>
+        <translation>Do: ...</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="158"/>
@@ -1450,12 +1478,12 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="200"/>
         <source>Bcc: ...</source>
-        <translation>Bcc: ...</translation>
+        <translation>Udw: ...</translation>
     </message>
     <message>
         <location filename="../Mail/mailfieldswidget.ui" line="233"/>
         <source>Subject:</source>
-        <translation>Asunto:</translation>
+        <translation>Temat:</translation>
     </message>
 </context>
 <context>
@@ -1463,52 +1491,52 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/MailViewer.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Formularz</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="99"/>
-        <source>&lt;font color=&quot;Grey&quot;&gt;From&lt;/font&gt;</source>
-        <translation>&lt;font color=&quot;Grey&quot;&gt;Responder a&lt;/font&gt;</translation>
+        <source>&lt;font color=&quot;Grey&quot;&gt;From</source>
+        <translation>&lt;font color=&quot;Grey&quot;&gt;Od</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="124"/>
-        <source>&lt;font color=&quot;Grey&quot;&gt;To&lt;/font&gt;</source>
-        <translation>&lt;font color=&quot;Grey&quot;&gt;Para&lt;/font&gt;</translation>
+        <source>&lt;font color=&quot;Grey&quot;&gt;To</source>
+        <translation>&lt;font color=&quot;Grey&quot;&gt;Do</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="146"/>
-        <source>&lt;font color=&quot;Grey&quot;&gt;CC&lt;/font&gt;</source>
-        <translation>&lt;font color=&quot;Grey&quot;&gt;CC&lt;/font&gt;</translation>
+        <source>&lt;font color=&quot;Grey&quot;&gt;CC</source>
+        <translation>&lt;font color=&quot;Grey&quot;&gt;DW</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="168"/>
-        <source>&lt;font color=&quot;Grey&quot;&gt;Subject&lt;/font&gt;</source>
-        <translation>&lt;font color=&quot;Grey&quot;&gt;Asunto&lt;/font&gt;</translation>
+        <source>&lt;font color=&quot;Grey&quot;&gt;Subject</source>
+        <translation>&lt;font color=&quot;Grey&quot;&gt;Temat</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="190"/>
-        <source>First Name &lt;dac-id /&gt;</source>
-        <translation>Nombre &lt;dac-id /&gt;</translation>
+        <source>First Name &lt;dac-id&gt;</source>
+        <translation>Imię &lt;dac-id&gt;</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="197"/>
         <source>September 13, 2013  9:08 PM</source>
-        <translation>13 Septiembre 2013 9:08 PM</translation>
+        <translation>Wrzesień 13, 2013  9:08 PM</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="213"/>
-        <source>To&#x27;s</source>
-        <translation>Para</translation>
+        <source>To&apos;s</source>
+        <translation>Do</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="226"/>
-        <source>CC&#x27;s</source>
-        <translation>CC&apos;s</translation>
+        <source>CC&apos;s</source>
+        <translation>DW</translation>
     </message>
     <message>
         <location filename="../Mail/MailViewer.ui" line="239"/>
         <source> Subject Line</source>
-        <translation>Línea del asunto</translation>
+        <translation> Linia Tematu</translation>
     </message>
 </context>
 <context>
@@ -1516,37 +1544,37 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/Mailbox.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Od</translation>
     </message>
     <message>
         <location filename="../Mail/Mailbox.ui" line="91"/>
         <source>No selection</source>
-        <translation>Nada seleccionado</translation>
+        <translation>Brak zaznaczenia</translation>
     </message>
     <message>
         <location filename="../Mail/Mailbox.ui" line="112"/>
         <source>Multiple selection</source>
-        <translation>Selección múltiple</translation>
+        <translation>Wielokrotne zaznaczenie</translation>
     </message>
     <message>
         <location filename="../Mail/Mailbox.cpp" line="159"/>
         <source>Reply</source>
-        <translation>Responder</translation>
+        <translation>Odpowiedz</translation>
     </message>
     <message>
         <location filename="../Mail/Mailbox.cpp" line="160"/>
         <source>Reply All</source>
-        <translation>Responder a todos</translation>
+        <translation>Odpowiedz Wszystkim</translation>
     </message>
     <message>
         <location filename="../Mail/Mailbox.cpp" line="161"/>
         <source>Forward</source>
-        <translation>Reenviar</translation>
+        <translation>Przekaż dalej</translation>
     </message>
     <message>
         <location filename="../Mail/Mailbox.cpp" line="162"/>
         <source>Delete</source>
-        <translation>Borrar</translation>
+        <translation>Usuń</translation>
     </message>
 </context>
 <context>
@@ -1554,32 +1582,32 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/MailboxModel.cpp" line="198"/>
         <source>From</source>
-        <translation>De</translation>
+        <translation>Od</translation>
     </message>
     <message>
         <location filename="../Mail/MailboxModel.cpp" line="200"/>
         <source>Subject</source>
-        <translation>Asunto</translation>
+        <translation>Temat</translation>
     </message>
     <message>
         <location filename="../Mail/MailboxModel.cpp" line="202"/>
         <source>Date Received</source>
-        <translation>Fecha de recepción</translation>
+        <translation>Data Odebrania</translation>
     </message>
     <message>
         <location filename="../Mail/MailboxModel.cpp" line="204"/>
         <source>To</source>
-        <translation>Para</translation>
+        <translation>Do</translation>
     </message>
     <message>
         <location filename="../Mail/MailboxModel.cpp" line="206"/>
         <source>Date Sent</source>
-        <translation>Fecha de envío</translation>
+        <translation>Data Wysłania</translation>
     </message>
     <message>
         <location filename="../Mail/MailboxModel.cpp" line="208"/>
         <source>Status</source>
-        <translation>Estado</translation>
+        <translation>Status</translation>
     </message>
 </context>
 <context>
@@ -1587,12 +1615,12 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/moneyattachementwidget.ui" line="20"/>
         <source>Money attachement</source>
-        <translation>Dinero adjunto</translation>
+        <translation>Załącznik pieniężny</translation>
     </message>
     <message>
         <location filename="../Mail/moneyattachementwidget.ui" line="58"/>
         <source>Wallet balance</source>
-        <translation>Saldo del monedero</translation>
+        <translation>Saldo portfela</translation>
     </message>
 </context>
 <context>
@@ -1600,52 +1628,52 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="14"/>
         <source>Dialog</source>
-        <translation>Histórico</translation>
+        <translation>Dialog</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="20"/>
         <source>First Name</source>
-        <translation>Nombre</translation>
+        <translation>Imię</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="27"/>
         <source>Last Name</source>
-        <translation>Apellidos</translation>
+        <translation>Nazwisko</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="34"/>
         <source>Username</source>
-        <translation>Nombre de usuario</translation>
+        <translation>Nazwa użytkownika</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="44"/>
         <source>If your desired identity has not been registered by another user, Keyhotee will do the work necessary to register this identity to your public key.</source>
-        <translation>Si la identidad que desea no ha sido registrada por otro usuario, Keyhotee hará todo lo posible para registrar esta identidad como su clave pública.</translation>
+        <translation>Jeżeli twoje docelowe ID nie zostało zarejestrowane przez innego użytkownika, Keyhotee wykona konieczną pracę aby zarejestrować to ID do Twojego klucza publicznego.</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="47"/>
         <source>Register</source>
-        <translation>Registrar</translation>
+        <translation>Zarejestruj</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="54"/>
         <source>Public Key</source>
-        <translation>Clave Pública</translation>
+        <translation>Klucz Publiczny</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.ui" line="74"/>
         <source>Status:  Unknown</source>
-        <translation>Estado: Desconocido</translation>
+        <translation>Status:  Nieznany</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.cpp" line="42"/>
         <source>Status: You have already created this identity.</source>
-        <translation>Estado: Usted ya ha creado esta identidad.</translation>
+        <translation>Status: Już stworzyłeś to ID.</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.cpp" line="46"/>
         <source>Status: Unknown</source>
-        <translation>Estado: Desconocido</translation>
+        <translation>Status:  Nieznany</translation>
     </message>
 </context>
 <context>
@@ -1653,12 +1681,12 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="14"/>
         <source>WizardPage</source>
-        <translation>Página del asistente</translation>
+        <translation>StronaKreatora</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="20"/>
         <source>Your Keyhotee ID is your globally unique username that will allow others to contact you.</source>
-        <translation>Su Keyhotee ID es su nombre de usuario único a nivel mundial que permitirá a otras personas estar en contacto con usted.</translation>
+        <translation>Twoje Keyhotee ID jest globalnie unikalną nazwą użytkownika, umożliwiającą innym użytkownikom skontaktowanie się z Tobą.</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="42"/>
@@ -1669,52 +1697,52 @@ Do you want to save your changes ?</source>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="52"/>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="65"/>
         <source>Avatar</source>
-        <translation>Avatar</translation>
+        <translation>Awatar</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="106"/>
         <source>Unlisted IDs are not registered with the global ID system and cannot earn a reputation.</source>
-        <translation>Las IDs que no están en la lista no están registradas en el sistema de identificación global y no pueden ganar reputación.</translation>
+        <translation>Nielistowane IDki są niezarejestrowane w globalnym systemie ID i nie mogą zdobyć reputacji.</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="109"/>
         <source>Create Unlisted ID</source>
-        <translation>Crear ID que no esté en la lista</translation>
+        <translation>Strórz Nielistowane ID</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="122"/>
         <source>This name is unavailable.</source>
-        <translation>Este nombre no esta disponible</translation>
+        <translation>Ta nazwa jest niedostępna.</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="27"/>
         <source>Create your Keyhotee ID</source>
-        <translation>Crear tu Keyhotee ID</translation>
+        <translation>Stwórz swoje Keyhotee ID</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="48"/>
         <source>Checking availability of ID...</source>
-        <translation>Verificando la disponibilidad de la ID...</translation>
+        <translation>Sprawdzanie dostępności ID...</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="65"/>
         <source>This ID has been taken by another user</source>
-        <translation>Esta ID ha sido cogida por otro usuario</translation>
+        <translation>To ID jest już zajęte przez innego użytkownika</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="69"/>
         <source>This ID is available!</source>
-        <translation>Esta ID está disponible!</translation>
+        <translation>To ID jest dostępne!</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="83"/>
         <source>Open Image</source>
-        <translation>Abrir Imagen</translation>
+        <translation>Otwórz Obraz</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="83"/>
         <source>Image Files (*.png *.jpg *.bmp)</source>
-        <translation>Archivos de Imagen (*.png *.jpg *.bmp)</translation>
+        <translation>Pliki Obrazów (*.png *.jpg *.bmp)</translation>
     </message>
 </context>
 <context>
@@ -1722,112 +1750,112 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="14"/>
         <source>WizardPage</source>
-        <translation>Página del Asistente</translation>
+        <translation>StronaKreatora</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="20"/>
         <source>Information collected by this form is meant to strengthen your brain wallet with unique yet easily remembered information. This information is never sent to any other party.  </source>
-        <translation>La información recogida por este formulario tiene la intención de reforzar la recuperación de su monedero con información única que sea fácil de recordar. Esta información no se envía nunca a ninguna otra parte.</translation>
+        <translation>Informacje zebrane w tym formularzu mają na celu wzmocnienie Twojego porftela pamięciowego (brain wallet) przy użyciu unikalnych, ale łatwych do zapamiętania danych. Wprowadzone tutaj wartości nie zostaną nigdzie wysłane ani zapisane!  </translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="42"/>
         <source>First Name</source>
-        <translation>Nombre</translation>
+        <translation>Imię</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="59"/>
-        <source>Middle Name</source>
-        <translation>Primer Apellido</translation>
+        <source>Second Name</source>
+        <translation>Drugie imię</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="76"/>
         <source>Last Name</source>
-        <translation>Segundo Apellido</translation>
+        <translation>Nazwisko</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="93"/>
         <source>Date of Birth</source>
-        <translation>Fecha de Nacimiento</translation>
+        <translation>Data Urodzin</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="103"/>
         <source>Passport #</source>
-        <translation>Pasaporte #</translation>
+        <translation>Paszport #</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="116"/>
         <source>Passport or Social Security Number</source>
-        <translation>Pasaporte o Número de Seguridad Social</translation>
+        <translation>Numer paszportu lub PESEL</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="123"/>
         <source>License #</source>
-        <translation>Licencia #</translation>
+        <translation>Licencja (prawo jazdy?) #</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="142"/>
         <source>You will need to remember the values you provide here any time you wish to recover your profile from memory alone.  Your profile gives you access to your identies and money within Keyhotee.</source>
-        <translation>Usted tendrá que recordar los valores facilitados en cualquier momento que desee recuperar su perfil. Su perfil le da acceso a sus IDs y al dinero dentro Keyhotee.</translation>
+        <translation>Będziesz musiał zapamiętać podane tutaj wartości aby móc odtworzyć cały profil tylko z Twojej pamięci. Twój profil daje Ci dostęp do twoich tożsamości i pieniędzy w Keyhotee.</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="167"/>
         <source>Brain Wallet Key</source>
-        <translation>Clave Memorística de Recuperación del Monedero</translation>
+        <translation>Klucz Do Zapamiętania</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="180"/>
         <source>Your brain key must have at least 32 characters</source>
-        <translation>Su clave memorística debe tener al menos 32 caracteres</translation>
+        <translation>Twój Klucz Do Zapamiętania musi mieć co najmniej 32 znaki długości</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="199"/>
         <source>Create Random</source>
-        <translation>Crear de Forma Aleatoria</translation>
+        <translation>Stwórz Losowy</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="221"/>
         <source>Repeat Password</source>
-        <translation>Repetir Contraseña</translation>
+        <translation>Powtórz Hasło</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="235"/>
         <source>Login Password</source>
-        <translation>Contraseña de Inicio de Sesión</translation>
+        <translation>Hasło Logowania</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="244"/>
         <source>Your Login password will be required every time your launch Keyhotee and is used to secure your profile while it is stored on your computer. </source>
-        <translation>Su contraseña de inicio de sesión será requerida cada vez que inicie Keyhotee y se utiliza para asegurar su perfil almacenado en el equipo.</translation>
+        <translation>Twoje hasło logowania będzie wymagane za każdym razem, kiedy uruchomisz Keyhotee i zostanie użyte do zabezpieczenia twojego profilu w czasie gdy jest on przechowywany na twoim komputerze.</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="254"/>
         <source>Your password must have at least 8 characters.</source>
-        <translation>Su contraseña debe tener al menos 8 caracteres.</translation>
+        <translation>Twoje hasło musi mieć co najmniej 8 znaków.</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="99"/>
         <source>Create your Keyhotee Profile</source>
-        <translation>Crea tu Perfil Keyhotee</translation>
+        <translation>Stwórz swój Profil Keyhotee</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="117"/>
         <source>Your Brain Key must be at least 32 characters</source>
-        <translation>Su clave memorística debe ser de al menos 32 caracteres</translation>
+        <translation>Twój Klucz Do Zapamiętania musi mieć co najmniej 32 znaki długości</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="128"/>
         <source>Password must be at least 8 characters</source>
-        <translation>La contraseña debe tener al menos 8 caracteres</translation>
+        <translation>Hasło musi zawierać co najmniej 8 znaków</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="133"/>
         <source>Password do not match</source>
-        <translation>La contraseña no coincide</translation>
+        <translation>Hasła się nie zgadzają</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="145"/>
         <source>Passwords do not match</source>
-        <translation>Las contraseñas no coinciden</translation>
+        <translation>Hasła się nie zgadzają</translation>
     </message>
 </context>
 <context>
@@ -1836,7 +1864,7 @@ Do you want to save your changes ?</source>
         <location filename="../BitShares/bitsharesgui/profileeditor.ui" line="16"/>
         <location filename="../BitShares/bitsharesgui/ui_profileeditor.h" line="47"/>
         <source>Dialog</source>
-        <translation>Histórico</translation>
+        <translation>Dialog</translation>
     </message>
 </context>
 <context>
@@ -1844,7 +1872,7 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="173"/>
         <source>Welcome to Keyhotee</source>
-        <translation>Bienvenido a Keyhotee</translation>
+        <translation>Witaj w Keyhotee</translation>
     </message>
 </context>
 <context>
@@ -1852,70 +1880,71 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Od</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="32"/>
         <source>Allows to add new file to mail attachment</source>
-        <translation>Permite añadir un nuevo archivo adjunto al correo</translation>
+        <translation>Umożliwia dodanie nowego pliku do załącznika wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="35"/>
         <source>add</source>
-        <translation>Añadir</translation>
+        <translation>dodaj</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="91"/>
         <source>Total count</source>
-        <translation>Recuento total</translation>
+        <extracomment>Number of attachement items</extracomment>
+        <translation>Suma</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="96"/>
         <source>Total size</source>
-        <translation>Tamaño Total</translation>
+        <translation>Całkowity rozmiar</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="110"/>
         <source>Allows to delete selected attachment items</source>
-        <translation>Permite eliminar adjuntos seleccionados</translation>
+        <translation>Umożliwia usunięcie zaznaczonych elementów załącznika</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="113"/>
         <location filename="../Mail/fileattachmentwidget.ui" line="170"/>
         <location filename="../Mail/fileattachmentwidget.ui" line="176"/>
         <source>Del</source>
-        <translation>Del</translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="135"/>
         <source>Allows to save selected attachment items</source>
-        <translation>Permite guardar los adjuntos seleccionados</translation>
+        <translation>Umożliwia zapisanie zaznaczonych elementów załącznika</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="138"/>
         <location filename="../Mail/fileattachmentwidget.ui" line="188"/>
         <source>Save</source>
-        <translation>Guardar</translation>
+        <translation>Zapisz</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="158"/>
         <source>Add</source>
-        <translation>Añadir</translation>
+        <translation>Dodaj</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="161"/>
-        <source>Allows to add new file(s) to the emai&#x27;s attachement</source>
-        <translation>Permite añadir nuevos archivo(s) al adjunto del correo</translation>
+        <source>Allows to add new file(s) to the emai&apos;s attachement</source>
+        <translation>Umożliwia dodanie nowych plików do załącznika wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="173"/>
-        <source>Allows to remove selected items from the email&#x27;s attachment</source>
-        <translation>Permite borrar elementos seleccionados del adjunto del correo</translation>
+        <source>Allows to remove selected items from the email&apos;s attachment</source>
+        <translation>Umożliwia usunięcie zaznaczonych elementów z załącznika wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="191"/>
-        <source>Allows to save selected items from email&#x27;s attachment</source>
-        <translation>Permite guardar los elementos seleccionados del adjunto del correo</translation>
+        <source>Allows to save selected items from email&apos;s attachment</source>
+        <translation>Umożliwia zapisanie zaznaczonych elementów z załącznika wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="194"/>
@@ -1925,12 +1954,12 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="202"/>
         <source>Select all</source>
-        <translation>Seleccionar todos</translation>
+        <translation>Zaznacz wszystkie</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="205"/>
         <source>Select all items in attachment</source>
-        <translation>Seleccionar todos los elementos del adjunto</translation>
+        <translation>Zaznacz wszystkie elementy w załączniku</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="208"/>
@@ -1940,12 +1969,12 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="216"/>
         <source>Rename</source>
-        <translation>Renombrar</translation>
+        <translation>Zmień nazwę</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="219"/>
         <source>Allows to rename attached file</source>
-        <translation>Permite cambiar el nombre de archivo adjunto</translation>
+        <translation>Umożliwia zmianę nazwy załączonego pliku</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="222"/>
@@ -1955,12 +1984,12 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="233"/>
         <source>Open</source>
-        <translation>Abrir</translation>
+        <translation>Otwórz</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="236"/>
         <source>Opens the attachment using its default application</source>
-        <translation>Abre el archivo adjunto a través de su aplicación por defecto</translation>
+        <translation>Otwiera załącznik przy użyciu domyślnej aplikacji</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="239"/>
@@ -1970,58 +1999,64 @@ Do you want to save your changes ?</source>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="50"/>
         <source>Open attachment...</source>
-        <translation>Abrir adjunto...</translation>
+        <translation>Otwórz załącznik...</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="59"/>
         <source>Cannot open temporary file to store attachment: </source>
-        <translation>No se puede abrir el archivo temporal para almacenar datos adjuntos:</translation>
+        <translation>Nie można otworzyć pliku tymczasowego do przechowania załącznika: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="72"/>
         <source>Cannot open attachment using its default application: </source>
-        <translation>No se puede abrir archivo adjunto a través de su aplicación por defecto:</translation>
+        <translation>Nie można otworzyć załącznika używając domyślnej aplikacji: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="477"/>
         <source> attachment(s)</source>
-        <translation>adjunto(s) </translation>
+        <translation> załącznik(i)</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="483"/>
         <source>Total attachment size: </source>
-        <translation>Tamaño total de archivo adjunto:</translation>
+        <translation>Całkowity rozmiar załącznika: </translation>
+    </message>
+    <message>
+        <location filename="../Mail/fileattachmentwidget.cpp" line="541"/>
+        <source> </source>
+        <translation> </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="547"/>
         <source>Save attachment...</source>
-        <translation>Guardar adjunto...</translation>
+        <translation>Zapisz załącznik...</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="550"/>
         <source>File: </source>
-        <translation>Archivo: </translation>
+        <translation>Plik: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="551"/>
         <source> already exists.
 Do you want to overwrite it ?</source>
-        <translation>ya existe. ¿Quiere sobreescribirlo?</translation>
+        <translation> już istnieje.
+Czy chcesz go nadpisać?</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="563"/>
         <source>Cannot read file: </source>
-        <translation>No se puede leer el archivo:</translation>
+        <translation>Nie można odczytać pliku: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="567"/>
         <source>Cannot write to file: </source>
-        <translation>No se puede escribir en el archivo:</translation>
+        <translation>Nie można zapisać do pliku: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="689"/>
         <source>Save selected file attachments...</source>
-        <translation>Guardar los archivos adjuntos seleccionados ...</translation>
+        <translation>Zapisz zaznaczone załączniki...</translation>
     </message>
 </context>
 <context>
@@ -2029,7 +2064,7 @@ Do you want to overwrite it ?</source>
     <message>
         <location filename="../TreeWidgetCustom.cpp" line="14"/>
         <source>Remove</source>
-        <translation>Eliminar</translation>
+        <translation>Usuń</translation>
     </message>
 </context>
 <context>
@@ -2037,12 +2072,12 @@ Do you want to overwrite it ?</source>
     <message>
         <location filename="../wallets.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Od</translation>
     </message>
     <message>
         <location filename="../wallets.ui" line="33"/>
         <source>Wallet functionality not supported yet</source>
-        <translation>Sistema de Monedero aún no disponible</translation>
+        <translation>Funkcjonalność portfela nie jest jeszcze wspierana</translation>
     </message>
 </context>
 <context>
@@ -2050,6 +2085,7 @@ Do you want to overwrite it ?</source>
     <message>
         <location filename="../BitShares/bitsharesgui/bshare_gui.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Od</translation>
     </message>
-</context></TS>
+</context>
+</TS>
