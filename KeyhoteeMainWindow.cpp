@@ -903,4 +903,10 @@ void KeyhoteeMainWindow::setMailSettings (MailSettings& mailSettings)
 {
   mailSettings.sortColumnInbox = ui->inbox_page->getSortedColumn ();
   mailSettings.sortOrderInbox = ui->inbox_page->getSortOrder ();
+  mailSettings.sortColumnSent = ui->sent_box_page->getSortedColumn ();
+  mailSettings.sortOrderSent = ui->sent_box_page->getSortOrder ();
+  mailSettings.sortColumnDraft = ui->draft_box_page->getSortedColumn ();
+  mailSettings.sortOrderDraft = ui->draft_box_page->getSortOrder ();
+  mailSettings.sortColumnOutbox = ui->out_box_page->getSortedColumn ();
+  mailSettings.sortOrderOutbox = ui->out_box_page->getSortOrder ();
 }

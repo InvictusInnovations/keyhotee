@@ -7,6 +7,12 @@ struct MailSettings
 {
   int sortColumnInbox;
   int sortOrderInbox;
+  int sortColumnSent;
+  int sortOrderSent;
+  int sortColumnDraft;
+  int sortOrderDraft;
+  int sortColumnOutbox;
+  int sortOrderOutbox;
 };
 
 class SelfSizingMainWindow : public QMainWindow
