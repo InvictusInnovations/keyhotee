@@ -131,19 +131,33 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
     {
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::Status);
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::DateSent);
+    
+    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnInbox,
+       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderInbox) );
     }
-  if (_type == Sent)
+  else if (_type == Sent)
     {
     ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::To, MailboxModel::From);
     ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::DateReceived);
+
+    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnSent,
+       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderSent) );
     }
-  if (_type == Drafts)
+  else if (_type == Drafts)
     {
     ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::To, MailboxModel::From);
     ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::DateReceived);
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::Status);
+
+    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnDraft,
+       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderDraft) );
+    }
+  else if (_type == Outbox)
+    {
+    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnOutbox,
+       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderOutbox) );
     }
 
   ui->inbox_table->horizontalHeader()->setSectionsMovable(true);
@@ -241,7 +255,7 @@ void Mailbox::onDeleteMail()
   QModelIndexList        sortFilterIndexes = selection_model->selectedRows();
   if (sortFilterIndexes.count() == 0)
     return;
-  if (QMessageBox::question(this, tr("Delete Mail"), tr("Are you sure you want to delete this email?")) == QMessageBox::Button::No)
+  if (QMessageBox::question(this, tr("Delete Mail"), tr("Are you sure you want to delete selected email(s)?")) == QMessageBox::Button::No)
     return;
   QModelIndexList indexes;
   foreach(QModelIndex sortFilterIndex, sortFilterIndexes)
@@ -365,5 +379,13 @@ bool Mailbox::getSelectedMessageData (IMailProcessor::TStoredMailMessage* encode
 
   return true;
 }
-
     
+Qt::SortOrder Mailbox::getSortOrder() const
+{
+  return ui->inbox_table->horizontalHeader()->sortIndicatorOrder();
+}
+
+int Mailbox::getSortedColumn() const 
+{
+  return ui->inbox_table->horizontalHeader()->sortIndicatorSection();
+}
