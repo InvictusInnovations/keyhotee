@@ -18,6 +18,16 @@
 
 extern bool gMiningIsPossible;
 
+//#ifndef _DEBUG
+#define ALPHA_RELEASE
+//#endif
+
+#ifdef ALPHA_RELEASE
+void display_founder_key_status(const QString& keyhotee_id, const QString& key, QLabel* status_label);
+#endif
+
+
+
 bool ContactView::eventFilter(QObject* object, QEvent* event)
 {
   if (event->type() == QEvent::KeyPress)
@@ -156,6 +166,7 @@ ContactView::ContactView(QWidget* parent)
   connect(ui->notes, &QPlainTextEdit::textChanged, this, &ContactView::notesChanged);
   connect(ui->public_key_to_clipboard, &QToolButton::clicked, this, &ContactView::onPublicKeyToClipboard);
   connect(ui->sendButton, &QPushButton::clicked, this, &ContactView::onSend);
+  connect(ui->chat_input, &QPlainTextEdit::textChanged, this, &ContactView::onTextChanged);
 
   connect(ui->contact_pages, &QTabWidget::currentChanged, this, &ContactView::currentTabChanged);
 
@@ -366,25 +377,18 @@ void ContactView::lastNameChanged(const QString& /*name*/)
    KeyhoteeId is not editable
 
  */
+
 void ContactView::keyhoteeIdEdited(const QString& id)
 {
-  /** TODO
-     if( is_address( id ) )
-   {
-     _complete = true;
-   }
-     else
-   */
-  {
-    _last_validate = fc::time_point::now();
-    ui->id_status->setText(tr("Looking up id...") );
-    fc::async( [ = ](){
-       fc::usleep(fc::microseconds(500 * 1000) );
-       if (fc::time_point::now() > (_last_validate + fc::microseconds(500 * 1000)))
-          lookupId();
-      }
-      );
-  }
+  _last_validate = fc::time_point::now();
+  ui->id_status->setText(tr("Looking up id...") );
+
+  fc::async( [ = ](){
+      fc::usleep(fc::microseconds(500 * 1000) );
+      if (fc::time_point::now() > (_last_validate + fc::microseconds(500 * 1000)))
+        lookupId();
+    }
+    );
 }
 
 //implement real version and put in bitshares or fc (probably should be in fc)
@@ -659,6 +663,12 @@ bool ContactView::doDataExchange (bool valid)
        bool is_owner = _current_contact.isOwn();
        if(is_owner)
          {
+    #ifdef ALPHA_RELEASE
+        QString keyhotee_id = ui->id_edit->text();
+        QString founder_code = _current_contact.notes.c_str();
+        display_founder_key_status(keyhotee_id,founder_code,ui->keyhoteeID_status);
+        //display_founder_key_status(keyhotee_id,founder_code,ui->keyhoteeID_status);
+    #else
          ui->mining_effort_slider->setValue( static_cast<int>(_current_contact.getMiningEffort()));
          //if registered keyhoteeId
          auto name_record = bts::application::instance()->lookup_name(_current_contact.dac_id_string);
@@ -681,6 +691,7 @@ bool ContactView::doDataExchange (bool valid)
            ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : yellow; color : black; }");
            ui->keyhoteeID_status->setText(tr("Unregistered"));
            }
+    #endif
          }
        ui->keyhoteeID_status->setVisible(!_editing && is_owner);
        ui->mining_effort->setVisible(is_owner);
@@ -749,7 +760,22 @@ void ContactView::currentTabChanged(int index)
     onChat ();
   }
 
+void ContactView::onTextChanged()
+{
+    if (ui->chat_input->toPlainText().length() > _max_chat_char)
+    {
+        QString text = ui->chat_input->toPlainText();
+        text.chop(text.length() - _max_chat_char);
+        ui->chat_input->setPlainText(text);
+
+        QTextCursor cursor = ui->chat_input->textCursor();
+        cursor.setPosition(ui->chat_input->document()->characterCount() - 1);
+        ui->chat_input->setTextCursor(cursor);
+    }
+}
+
 void ContactView::onSend ()
   {
   sendChatMessage();
+  ui->chat_input->setFocus ();
   }

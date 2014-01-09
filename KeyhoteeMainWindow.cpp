@@ -121,6 +121,11 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   setEnabledDeleteOption(false);
   setEnabledMailActions(false);
 
+  QString settings_file = "keyhotee_";
+  settings_file.append(profileName);
+  setSettingsFile(settings_file);
+  readSettings();
+
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
   connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
 
@@ -284,10 +289,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
     }
    }
    */
-  QString settings_file = "keyhotee_";
-  settings_file.append(profileName);
-  setSettingsFile(settings_file);
-  readSettings();
+
   QAction* actionMenu = new QAction(tr("Keyhotee"), this);
   actionMenu->setCheckable(true);
   this->setMenuWindow(ui->menuWindow);
@@ -897,4 +899,16 @@ void KeyhoteeMainWindow::onRemoveContact()
   }
   else
     ui->contacts_page->onDeleteContact();
+}
+
+void KeyhoteeMainWindow::setMailSettings (MailSettings& mailSettings)
+{
+  mailSettings.sortColumnInbox = ui->inbox_page->getSortedColumn ();
+  mailSettings.sortOrderInbox = ui->inbox_page->getSortOrder ();
+  mailSettings.sortColumnSent = ui->sent_box_page->getSortedColumn ();
+  mailSettings.sortOrderSent = ui->sent_box_page->getSortOrder ();
+  mailSettings.sortColumnDraft = ui->draft_box_page->getSortedColumn ();
+  mailSettings.sortOrderDraft = ui->draft_box_page->getSortOrder ();
+  mailSettings.sortColumnOutbox = ui->out_box_page->getSortedColumn ();
+  mailSettings.sortOrderOutbox = ui->out_box_page->getSortOrder ();
 }

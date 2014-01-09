@@ -64,6 +64,7 @@ void LoginDialog::onLogin()
    // QMessageBox::warning(this,tr("Unable to load profile"),e.to_detail_string().c_str());
   }
   ui->password->setText(QString());
+  ui->password->setFocus();
   shake();
 }
 
