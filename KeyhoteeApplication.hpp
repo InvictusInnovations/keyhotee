@@ -34,9 +34,9 @@ class TKeyhoteeApplication : protected QApplication
     void        quit();
 
     /// Gives access to the application name.
-    std::string getAppName() const;
+    std::string  getAppName() const;
     /// Returns selected (from command line) current profile to load.
-    std::string getLoadedProfileName() const;
+    std::wstring getLoadedProfileName() const;
 
     KeyhoteeMainWindow* getMainWindow() const { return _main_window; }
     void displayLogin();
@@ -46,8 +46,6 @@ class TKeyhoteeApplication : protected QApplication
     enum TExitStatus
       {
       SUCCESS,
-      LOAD_CONFIG_FAILURE,
-      BACKEND_CONFIGURATION_FAILURE,
       INTERNAL_ERROR,
       LAST_EXIT_STATUS
       };
@@ -61,7 +59,6 @@ class TKeyhoteeApplication : protected QApplication
     void onUnknownExceptionCaught();
     void displayFailureInfo(const std::string& detail);
 
-    bts::application_config loadConfig();
     void startup();
 
     static void linuxSignalHandler(int);

@@ -23,10 +23,12 @@ LoginDialog::LoginDialog(TKeyhoteeApplication& mainApp, QWidget* parent)
   connect(ui->quit, &QPushButton::clicked, this, &LoginDialog::onQuit);
 
   auto profiles = bts::application::instance()->get_profiles();
-  for( uint32_t i = 0; i < profiles.size(); ++i )
+  for(const auto& profileName : profiles)
   {
-      wlog( "profiles ${p}", ("p",profiles[i]) );
-      ui->profileSelection->insertItem( i, profiles[i].c_str() );
+    QString profileItem = QString::fromStdWString(profileName);
+    /// FIXME - fc::log cannot get std::wstring
+    wlog( "profiles ${p}", ("p", profileItem.toStdString()) );
+    ui->profileSelection->addItem(profileItem);
   }
 }
 
@@ -35,14 +37,13 @@ LoginDialog::~LoginDialog()
   delete ui;
 }
 
-
 void LoginDialog::onLogin()
 {
   try
   {
     password = ui->password->text().toStdString();
-    auto profile_name = ui->profileSelection->currentText().toStdString();
-    auto profile = bts::application::instance()->load_profile(profile_name,password);
+    auto profileName = ui->profileSelection->currentText().toStdWString();
+    auto profile = bts::application::instance()->load_profile(profileName,password);
     if (profile)
       accept();
   }

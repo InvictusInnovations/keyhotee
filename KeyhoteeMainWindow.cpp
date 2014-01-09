@@ -113,7 +113,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->setupUi(this);
   setWindowIcon(QIcon(":/images/shield1024.png") );
 
-  QString title = QString("%1 (%2)").arg(mainApp.getAppName().c_str()).arg(mainApp.getLoadedProfileName().c_str());
+  QString profileName = QString::fromStdWString(mainApp.getLoadedProfileName());
+
+  QString title = QString("%1 (%2)").arg(mainApp.getAppName().c_str()).arg(profileName);
   setWindowTitle(title);
   setEnabledAttachmentSaveOption(false);
   setEnabledDeleteOption(false);
@@ -283,7 +285,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
    }
    */
   QString settings_file = "keyhotee_";
-  settings_file.append(mainApp.getLoadedProfileName().c_str());
+  settings_file.append(profileName);
   setSettingsFile(settings_file);
   readSettings();
   QAction* actionMenu = new QAction(tr("Keyhotee"), this);
