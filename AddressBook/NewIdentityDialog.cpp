@@ -57,7 +57,7 @@ void NewIdentityDialog::onUserNameChanged( const QString& name )
           ui->status_label->setStyleSheet("QLabel { color : red; }");
           ui->status_label->setText( tr( "Status: You have already created this identity." ) );
       } 
-      catch ( fc::key_not_found_exception& e )
+      catch ( fc::key_not_found_exception& )
       {
           fc::optional<bts::bitname::name_record> current_record = bts::application::instance()->lookup_name(trim_name);
           if(current_record)
@@ -80,63 +80,82 @@ void NewIdentityDialog::onUserNameChanged( const QString& name )
    }
 }
 
-void NewIdentityDialog::onKey( const QString& key )
+fc::string register_key_on_server(const QString& keyhotee_id, const QString& key)
+{
+  fc::string trimmed_keyhotee_id = keyhotee_id.trimmed().toStdString();
+  fc::string trimmed_key = key.trimmed().toStdString();
+  auto pro = bts::application::instance()->get_profile();
+  auto keys = pro->get_keychain();
+  auto ident_key       = keys.get_identity_key( trimmed_keyhotee_id );
+  std::string key_addr = public_key_address( ident_key.get_public_key() );
+
+  fc::tcp_socket_ptr sock = std::make_shared<fc::tcp_socket>();
+  sock->connect_to( fc::ip::endpoint( fc::ip::address("162.243.67.4"), 3879 ) );
+  fc::buffered_istream_ptr isock = std::make_shared<fc::buffered_istream>(sock);
+  fc::buffered_ostream_ptr osock = std::make_shared<fc::buffered_ostream>(sock);
+  fc::rpc::json_connection_ptr con = std::make_shared<fc::rpc::json_connection>( isock, osock );
+  con->exec();
+
+  auto result = con->async_call( "register_key", trimmed_keyhotee_id, trimmed_key, key_addr ).wait();
+  auto points = result.get_object()["points"].as_string();
+  auto pub    = result.get_object()["pub_key"].as_string();
+  return points;
+}
+
+void display_founder_key_status(const QString& keyhotee_id, const QString& key, QLabel* status_label)
 {
    try {
-      auto pro = bts::application::instance()->get_profile();
-      auto keys = pro->get_keychain();
-      auto trim_name       = fc::trim(ui->username->text().toStdString());
-      auto ident_key       = keys.get_identity_key( trim_name );
-      std::string key_addr = public_key_address( ident_key.get_public_key() );
-
-      fc::tcp_socket_ptr sock = std::make_shared<fc::tcp_socket>();
-      sock->connect_to( fc::ip::endpoint( fc::ip::address("162.243.67.4"), 3879 ) );
-      fc::buffered_istream_ptr isock = std::make_shared<fc::buffered_istream>(sock);
-      fc::buffered_ostream_ptr osock = std::make_shared<fc::buffered_ostream>(sock);
-      fc::rpc::json_connection_ptr con = std::make_shared<fc::rpc::json_connection>( isock, osock );
-      con->exec();
-
-      auto trim_key = key.trimmed();
-
-      auto result = con->async_call( "register_key", trim_name, trim_key.toStdString(), key_addr ).wait();
-      auto points = result.get_object()["points"].as_string();
-      auto pub    = result.get_object()["pub_key"].as_string();
+      auto points = register_key_on_server(keyhotee_id, key);
       fc::usleep(fc::seconds(1));
-
-      ui->status_label->setText( ("Status: Registered with " + points + " points").c_str() );
+      status_label->setText( ("Registered with " + points + " points").c_str() );
    } 
    catch ( fc::eof_exception&  )
    {
+   ilog("eof exception");
    }
    catch ( fc::exception& e )
    {
-      ui->status_label->setText( ("Status: Error Registering Founder ID: " + e.to_string()).c_str() );
+      fc::string msg = "Invalid KehoteeID/FounderKey Pair: " + e.to_string();
+      elog("${msg}",("msg",msg));
+      status_label->setText( "Invalid ID/FounderKey Pair" );
    }
    catch ( ... )
    {
-      ui->status_label->setText( "Status: Error Registering Founder ID" );
+      elog("unknown error while displaying founder key status");
+      status_label->setText( "Error Registering Founder ID" );
    }
 }
+
+void NewIdentityDialog::onKey( const QString& key )
+{
+  display_founder_key_status(ui->username->text(), key, ui->status_label);
+}
+
+//#ifndef _DEBUG
+#define ALPHA_RELEASE
+ //Q&D hack: remove all references to this for real release
+//#endif
 
 void NewIdentityDialog::onSave()
 {
     //store new identity in profile
     auto app = bts::application::instance();
     auto profile = app->get_profile();
-    auto trim_dac_id = fc::trim(ui->username->text().toUtf8().constData());
+    auto trimmed_dac_id = ui->username->text().trimmed();
+    fc::string dac_id = trimmed_dac_id.toStdString();
     bts::addressbook::wallet_identity ident;
     ident.first_name = fc::trim( ui->firstname->text().toUtf8().constData() );
     ident.last_name = fc::trim( ui->lastname->text().toUtf8().constData() );
     ident.mining_effort = ui->register_checkbox->isChecked();
-    ident.wallet_ident = trim_dac_id;
-    ident.set_dac_id( trim_dac_id );
-    auto priv_key = profile->get_keychain().get_identity_key(trim_dac_id);
+    ident.wallet_ident = dac_id;
+    ident.set_dac_id( dac_id );
+    auto priv_key = profile->get_keychain().get_identity_key(dac_id);
     ident.public_key = priv_key.get_public_key();
     profile->store_identity( ident );
     try 
     {
-      app->mine_name(trim_dac_id,
-                profile->get_keychain().get_identity_key(trim_dac_id).get_public_key(),
+      app->mine_name(dac_id,
+                profile->get_keychain().get_identity_key(dac_id).get_public_key(),
                 ident.mining_effort);
     }
     catch ( const fc::exception& e )
@@ -151,8 +170,12 @@ void NewIdentityDialog::onSave()
     //fill in remaining fields for contact
     myself.first_name = ident.first_name;
     myself.last_name = ident.last_name;
-//    profile->get_addressbook()->store_contact(Contact(myself));
+#ifdef ALPHA_RELEASE
+   //just store the founder code here so we can access it over in ContactView temporarily for alpha release
+    myself.notes = ui->founder_code->text().toStdString();
+#endif
     TKeyhoteeApplication::getInstance()->getMainWindow()->getAddressBookModel()->storeContact( Contact(myself) );
 
     app->add_receive_key(priv_key);
+
 }
