@@ -4,8 +4,12 @@
 #include <QProgressBar>
 
 #include <functional>
+#include <memory>
 
-class TUpdateNotifier;
+namespace fc
+{
+class exception;
+} ///namespace fc
 
 /** Autoupdating progress bar (timer based). Allows to safely update displayed value from another
     thread.
@@ -26,13 +30,15 @@ class TAutoUpdateProgressBar : protected QProgressBar
     static TAutoUpdateProgressBar* create(const QRect& rect, const QString& title, unsigned int max,
       QWidget* parent = nullptr);
 
-    void doTask(std::function<void()> mainTask, std::function<void()> onFinish);
+    void doTask(std::function<void()> mainTask, std::function<void()> onFinish,
+      std::function<void(QString)> onError);
 
     /** Allows to update value displayed for current progress bar.
     */
     void updateValue(int value);
 
   private:
+    class TUpdateNotifier;
     TAutoUpdateProgressBar(unsigned int maxValue = 0, QWidget* parent = nullptr);
     virtual ~TAutoUpdateProgressBar();
     /** Allows to hide & destroy current object. Private since widget can be hidden automatically when
@@ -42,12 +48,14 @@ class TAutoUpdateProgressBar : protected QProgressBar
 
   private slots:
     void onFinish();
+    void onFinishWithError(QString errorInfo);
 
   /// Class attributes:
   private:
-    TUpdateNotifier*      _notifier;
-    std::function<void()> _onFinishAction;
-    int                   _maxValue;
+    TUpdateNotifier*             _notifier;
+    std::function<void()>        _onFinishAction;
+    std::function<void(QString)> _onErrorAction;
+    int                          _maxValue;
   };
 
 #endif ///__AUTOUPDATEPROGRESSBAR_HPP

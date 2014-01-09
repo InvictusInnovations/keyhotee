@@ -114,8 +114,8 @@ TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv)
 
   /// \warning use std::wstring to avoid problems related to paths containing native chars.
   auto str_data_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdWString();
-  
-  boost::filesystem::path data_dir(str_data_dir);
+
+  fc::path data_dir(str_data_dir);
   fc::path profile_dir( data_dir / "profiles" );
   _backend_app->set_profile_directory( profile_dir );
 }

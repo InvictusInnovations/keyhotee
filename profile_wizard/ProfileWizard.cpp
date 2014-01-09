@@ -8,6 +8,7 @@
 #include "ui_ProfileIntroPage.h"
 
 #include <QDesktopWidget>
+#include <QMessageBox>
 //#include <ui_ProfileNymPage.h>
 
 #include <fc/string.hpp>
@@ -299,27 +300,27 @@ void ProfileWizard::createProfile()
     progress->doTask(
       [=]() 
       {
-      try {
         auto profile = app->create_profile(profileName, conf, password, 
           [=]( double p )
           {
             progress->updateValue(progressMax*p);
           });
-       }
-       catch (fc::exception& e)
-       {
-       elog("${e}", ("e", e.to_detail_string()));
-       throw e;
-       }
-       catch (...)
-       {
-       elog("unrecognized exception while creating profile");
-       throw;
-       }
       },
       [=]() 
       {
         mainApp->displayMainWindow();
+      },
+        [=](QString e)
+      {
+      if(e.isEmpty())
+        {
+        QMessageBox::warning(nullptr, tr("Profile wizard"),
+          tr("Cannot create profile - some unknown error occurred"));
+        }
+      else
+        {
+        QMessageBox::warning(nullptr, tr("Profile wizard"), tr("Cannot create profile: ") + e);
+        }
       }
     );
   }
