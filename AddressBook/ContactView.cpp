@@ -425,7 +425,7 @@ void ContactView::lookupId()
 {
   try
   {
-    std::string current_id = ui->id_edit->text().toUtf8().constData();
+    std::string current_id = fc::trim(ui->id_edit->text().toUtf8().constData());
     setValid (false);
     if (current_id.empty() )
     {
