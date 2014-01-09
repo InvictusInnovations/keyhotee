@@ -40,7 +40,7 @@ NewIdentityDialog::~NewIdentityDialog()
 
 void NewIdentityDialog::onUserNameChanged( const QString& name )
 {
-   if( name != QString() )
+   if( name.trimmed() != QString() )
    {
       auto pro = bts::application::instance()->get_profile();
       auto keys = pro->get_keychain();
