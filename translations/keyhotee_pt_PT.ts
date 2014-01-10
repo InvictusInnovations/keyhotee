@@ -1825,37 +1825,37 @@ Pretende gravar as alterações?</translation>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="244"/>
         <source>Your Login password will be required every time your launch Keyhotee and is used to secure your profile while it is stored on your computer. </source>
-        <translation>Your Login password will be required every time your launch Keyhotee and is used to secure your profile while it is stored on your computer. </translation>
+        <translation>A senha é utilizada para encriptar o perfil no seu computadir. Assim terá que introduzir a senha sempre que correr o Keyhotee. </translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="254"/>
         <source>Your password must have at least 8 characters.</source>
-        <translation>Your password must have at least 8 characters.</translation>
+        <translation>A senha deve ter pelo menos 8 caracteres.</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="99"/>
         <source>Create your Keyhotee Profile</source>
-        <translation>Create your Keyhotee Profile</translation>
+        <translation>Criar Perfil Keyhotee</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="117"/>
         <source>Your Brain Key must be at least 32 characters</source>
-        <translation>Your Brain Key must be at least 32 characters</translation>
+        <translation>A 'Brain Key' deve ter pelo menos 32 caracteres</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="128"/>
         <source>Password must be at least 8 characters</source>
-        <translation>Password must be at least 8 characters</translation>
+        <translation>A senha deve ter pelo menos 8 caracteres</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="133"/>
         <source>Password do not match</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">As senhas são diferentes</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="145"/>
         <source>Passwords do not match</source>
-        <translation>As palavras passe não coincidem</translation>
+        <translation>As senhas são diferentes</translation>
     </message>
 </context>
 <context>
@@ -1864,7 +1864,7 @@ Pretende gravar as alterações?</translation>
         <location filename="../BitShares/bitsharesgui/profileeditor.ui" line="16"/>
         <location filename="../BitShares/bitsharesgui/ui_profileeditor.h" line="47"/>
         <source>Dialog</source>
-        <translation type="unfinished">Histórico</translation>
+        <translation type="unfinished">Diálogo</translation>
     </message>
 </context>
 <context>
@@ -1880,12 +1880,12 @@ Pretende gravar as alterações?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished">De</translation>
+        <translation type="unfinished">Formulário</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="32"/>
         <source>Allows to add new file to mail attachment</source>
-        <translation>Allows to add new file to mail attachment</translation>
+        <translation>Permite adicionar um novo anexo</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="35"/>
@@ -1896,35 +1896,35 @@ Pretende gravar as alterações?</translation>
         <location filename="../Mail/fileattachmentwidget.ui" line="91"/>
         <source>Total count</source>
         <extracomment>Number of attachement items</extracomment>
-        <translation>Contagem Total</translation>
+        <translation>Total de anexos</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="96"/>
         <source>Total size</source>
-        <translation>Tamanho Total</translation>
+        <translation>Tamanho total</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="110"/>
         <source>Allows to delete selected attachment items</source>
-        <translation>Allows to delete selected attachment items</translation>
+        <translation>Permite apagar os items selecionados</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="113"/>
         <location filename="../Mail/fileattachmentwidget.ui" line="170"/>
         <location filename="../Mail/fileattachmentwidget.ui" line="176"/>
         <source>Del</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Del</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="135"/>
         <source>Allows to save selected attachment items</source>
-        <translation>Allows to save selected attachment items</translation>
+        <translation>Permite guardar os items selecionados</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="138"/>
         <location filename="../Mail/fileattachmentwidget.ui" line="188"/>
         <source>Save</source>
-        <translation>Gravar</translation>
+        <translation>Guardar</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="158"/>
@@ -1934,22 +1934,22 @@ Pretende gravar as alterações?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="161"/>
         <source>Allows to add new file(s) to the emai&apos;s attachement</source>
-        <translation>Allows to add new file(s) to the emai&apos;s attachement</translation>
+        <translation>Permite adicionar um anexo ao email</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="173"/>
         <source>Allows to remove selected items from the email&apos;s attachment</source>
-        <translation>Allows to remove selected items from the email&apos;s attachment</translation>
+        <translation>Permite remover um anexo do email</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="191"/>
         <source>Allows to save selected items from email&apos;s attachment</source>
-        <translation>Allows to save selected items from email&apos;s attachment</translation>
+        <translation>Permite selecionar itens</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="194"/>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+Shift+S</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="202"/>
@@ -1959,12 +1959,12 @@ Pretende gravar as alterações?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="205"/>
         <source>Select all items in attachment</source>
-        <translation>Select all items in attachment</translation>
+        <translation>Selecionar todos os itens do anexo</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="208"/>
         <source>Ctrl+A</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+A</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="216"/>
@@ -1974,12 +1974,12 @@ Pretende gravar as alterações?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="219"/>
         <source>Allows to rename attached file</source>
-        <translation>Allows to rename attached file</translation>
+        <translation>Permite mudar o nome do anexo</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="222"/>
         <source>F2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">F2</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="233"/>
@@ -1989,12 +1989,12 @@ Pretende gravar as alterações?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="236"/>
         <source>Opens the attachment using its default application</source>
-        <translation>Opens the attachment using its default application</translation>
+        <translation>Abre o anexo com a aplicação pré-definida</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="239"/>
         <source>Ctrl+Shift+O</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+Shift+O</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="50"/>
@@ -2004,12 +2004,12 @@ Pretende gravar as alterações?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="59"/>
         <source>Cannot open temporary file to store attachment: </source>
-        <translation>Cannot open temporary file to store attachment: </translation>
+        <translation>Não é possível abrir o ficheiro temporário para guardar como anexo: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="72"/>
         <source>Cannot open attachment using its default application: </source>
-        <translation>Cannot open attachment using its default application: </translation>
+        <translation>Não é possível abrir o anexo com a aplicação pré-definida: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="477"/>
@@ -2019,17 +2019,17 @@ Pretende gravar as alterações?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="483"/>
         <source>Total attachment size: </source>
-        <translation>Total attachment size: </translation>
+        <translation>Tamanho total do anexo: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="541"/>
         <source> </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"> </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="547"/>
         <source>Save attachment...</source>
-        <translation>Gravar anexo...</translation>
+        <translation>Guardar anexo...</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="550"/>
@@ -2041,22 +2041,22 @@ Pretende gravar as alterações?</translation>
         <source> already exists.
 Do you want to overwrite it ?</source>
         <translation> já existe.
-Quer sobrepor?</translation>
+Pretende substituir?</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="563"/>
         <source>Cannot read file: </source>
-        <translation>Não foi possivel ler o seguinte fhicheiro: </translation>
+        <translation>Não é possivel ler o ficheiro: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="567"/>
         <source>Cannot write to file: </source>
-        <translation>Cannot write to file: </translation>
+        <translation>Não é possível escrever para o ficheiro: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="689"/>
         <source>Save selected file attachments...</source>
-        <translation>Save selected file attachments...</translation>
+        <translation>Guardar os anexos selecionados...</translation>
     </message>
 </context>
 <context>
@@ -2064,7 +2064,7 @@ Quer sobrepor?</translation>
     <message>
         <location filename="../TreeWidgetCustom.cpp" line="14"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Remover</translation>
     </message>
 </context>
 <context>
@@ -2072,12 +2072,12 @@ Quer sobrepor?</translation>
     <message>
         <location filename="../wallets.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Formulário</translation>
     </message>
     <message>
         <location filename="../wallets.ui" line="33"/>
         <source>Wallet functionality not supported yet</source>
-        <translation>Wallet functionality not supported yet</translation>
+        <translation>Esta funcionalidade ainda não está desenvolvida</translation>
     </message>
 </context>
 <context>
@@ -2085,7 +2085,7 @@ Quer sobrepor?</translation>
     <message>
         <location filename="../BitShares/bitsharesgui/bshare_gui.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Formulário</translation>
     </message>
 </context>
 </TS>
