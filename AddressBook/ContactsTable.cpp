@@ -66,7 +66,7 @@ void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
     ui->contact_table->setModel(_sorted_addressbook_model);
     }
   ui->contact_table->setShowGrid(false);
-  ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
   QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
