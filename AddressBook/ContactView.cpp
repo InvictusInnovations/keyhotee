@@ -666,7 +666,13 @@ bool ContactView::doDataExchange (bool valid)
     #ifdef ALPHA_RELEASE
         QString keyhotee_id = ui->id_edit->text();
         QString founder_code = _current_contact.notes.c_str();
-        display_founder_key_status(keyhotee_id,founder_code,ui->keyhoteeID_status);
+        if (founder_code.size() != 0)
+          display_founder_key_status(keyhotee_id,founder_code,ui->keyhoteeID_status);
+        else
+          {
+          ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : yellow; color : black; }");
+          ui->keyhoteeID_status->setText(tr("Unregistered"));
+          }
         //display_founder_key_status(keyhotee_id,founder_code,ui->keyhoteeID_status);
     #else
          ui->mining_effort_slider->setValue( static_cast<int>(_current_contact.getMiningEffort()));
