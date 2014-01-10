@@ -132,7 +132,8 @@ void NewIdentityDialog::onKey( const QString& key )
 }
 
 //#ifndef _DEBUG
-#define ALPHA_RELEASE
+/// defined in CmakeLists.txt
+//#define ALPHA_RELEASE
  //Q&D hack: remove all references to this for real release
 //#endif
 
