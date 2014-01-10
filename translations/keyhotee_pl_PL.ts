@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pl_PL">
+<TS version="2.0" language="pl_PL">
 <context>
     <name>ATopLevelWindow</name>
     <message>
@@ -185,7 +185,7 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="211"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="262"/>
         <source>Ctrl+N</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="216"/>
@@ -197,7 +197,7 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="219"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="264"/>
         <source>Ctrl+R</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="224"/>
@@ -209,7 +209,7 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="227"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="266"/>
         <source>Ctrl+Shift+R</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="232"/>
@@ -227,7 +227,7 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="240"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="269"/>
         <source>Ctrl+Z</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="245"/>
@@ -239,7 +239,7 @@
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="248"/>
         <location filename="../BitShares/bitsharesgui/ui_bitsharesmainwindow.h" line="271"/>
         <source>Ctrl+Y</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/bitsharesmainwindow.ui" line="253"/>
@@ -323,7 +323,7 @@
     <message>
         <location filename="../BitShares/bitsharesgui/chatwidget.cpp" line="12"/>
         <source>Send Chat Message</source>
-        <translation>Wyślij Wiadomość Czat</translation>
+        <translation>Wyślij Wiadomość Czatu</translation>
     </message>
     <message>
         <location filename="../BitShares/bitsharesgui/chatwidget.cpp" line="13"/>
@@ -341,7 +341,7 @@
     <message>
         <location filename="../connectionstatusframe.ui" line="23"/>
         <source>Number of active connections to bitshares network</source>
-        <translation>Liczba aktywnych połączeń do siebie Bitshares</translation>
+        <translation>Liczba aktywnych połączeń do sieci Bitshares</translation>
     </message>
     <message>
         <location filename="../connectionstatusframe.ui" line="50"/>
@@ -375,12 +375,12 @@
     <message>
         <location filename="../AddressBook/ContactView.ui" line="223"/>
         <source>Last Name</source>
-        <translation>Nawisko</translation>
+        <translation>Nazwisko</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="299"/>
         <source>Keyhotee Founder</source>
-        <translation>Założyciel Keyhotee</translation>
+        <translation>Fundator Keyhotee</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.ui" line="329"/>
@@ -470,7 +470,7 @@ Enter</translation>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="114"/>
         <source>Share (need new icon)</source>
-        <translation>Podziel się</translation>
+        <translation>Udostępnij</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="115"/>
@@ -517,7 +517,7 @@ Enter</translation>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="411"/>
         <source>Public Key Only Mode: not a valid key</source>
-        <translation>Tryb Wyłącznie Klucza Publicznego: klucz nie jest ważny</translation>
+        <translation>Tryb Wyłącznie Klucza Publicznego: klucz nie ważny</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="432"/>
@@ -540,7 +540,7 @@ Enter</translation>
         <source>The contact has been modified.
 Do you want to save your changes ?</source>
         <translation>Kontakt został zmodyfikowany.
-Czy chceszzapisać zmiany?</translation>
+Czy chcesz zapisać zmiany?</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="567"/>
@@ -904,7 +904,7 @@ Czy chceszzapisać zmiany?</translation>
     <message>
         <location filename="../KeyhoteeMainWindow.cpp" line="581"/>
         <source>&lt;br/&gt;&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -912,7 +912,7 @@ Czy chceszzapisać zmiany?</translation>
     <message>
         <location filename="../LoginDialog.ui" line="14"/>
         <source>Keyhotee Login</source>
-        <translation>Keyhotee Login</translation>
+        <translation>Keyhotee: Logowanie</translation>
     </message>
     <message>
         <location filename="../LoginDialog.ui" line="30"/>
@@ -1075,7 +1075,7 @@ Czy chcesz zapisać zmiany?</translation>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="979"/>
         <source>ODF files (*.odt);;HTML-Files (*.htm *.html);;All Files (*)</source>
-        <translation>Pliki ODF (*.odt);;Pliki HTML (*.htm *.html);;Wszystkie Pliki (*) </translation>
+        <translation>Pliki ODF (*.odt);;Pliki HTML (*.htm *.html);;Wszystkie Pliki (*)</translation>
     </message>
     <message>
         <location filename="../Mail/MailEditor.cpp" line="998"/>
@@ -1149,7 +1149,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="129"/>
         <source>Text adjust</source>
-        <translation>Wyjustowanie tekstu</translation>
+        <translation>Wyrównanie tekstu</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="150"/>
@@ -1159,7 +1159,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="166"/>
         <source>File attachment</source>
-        <translation>Załącz plik</translation>
+        <translation>Załącznik plikowy</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="183"/>
@@ -1185,7 +1185,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="227"/>
         <source>Save currently edited message into Drafts folder</source>
-        <translation>Zapisz obecnie edytowaną wiadomość do Kopii robowych</translation>
+        <translation>Zapisz obecnie edytowaną wiadomość do Kopii roboczych</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="230"/>
@@ -1311,7 +1311,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="387"/>
         <source>Changes selected text to heavier font</source>
-        <translation>Zmienia zaznaczony tekst na pogrubioną czcionkę</translation>
+        <translation>Pogrubia zaznaczony teskt</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="390"/>
@@ -1326,7 +1326,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="405"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Changes currently selected text to &lt;span style=&quot; font-style:italic;&quot;&gt;italic&lt;/span&gt; font&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zmienia zaznaczony tekst na &lt;span style=&quot; font-style:italic;&quot;&gt;kursywę&lt;/span&gt; 字体&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zmienia zaznaczony tekst na &lt;span style=&quot; font-style:italic;&quot;&gt;kursywę&lt;/span&gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="408"/>
@@ -1341,7 +1341,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="423"/>
         <source>Draw line below selected text</source>
-        <translation>Rysuje linię poniżej zaznaczonego tekstu</translation>
+        <translation>Podkreśla zaznaczony tekst</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="426"/>
@@ -1376,7 +1376,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="480"/>
         <source>Allows to manage mail attachement</source>
-        <translation>Umożliwia zarządzanie załącznikiem wiadomości</translation>
+        <translation>Umożliwia zarządzanie załącznikami wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/maileditorwindow.ui" line="492"/>
@@ -1668,7 +1668,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.cpp" line="42"/>
         <source>Status: You have already created this identity.</source>
-        <translation>Status: Już stworzyłeś to ID.</translation>
+        <translation>Status: Już stworzyłeś tę tożsamość.</translation>
     </message>
     <message>
         <location filename="../AddressBook/NewIdentityDialog.cpp" line="46"/>
@@ -1702,12 +1702,12 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="106"/>
         <source>Unlisted IDs are not registered with the global ID system and cannot earn a reputation.</source>
-        <translation>Nielistowane IDki są niezarejestrowane w globalnym systemie ID i nie mogą zdobyć reputacji.</translation>
+        <translation>Nielistowane ID są niezarejestrowane w globalnym systemie ID i nie mogą zdobyć reputacji.</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="109"/>
         <source>Create Unlisted ID</source>
-        <translation>Strórz Nielistowane ID</translation>
+        <translation>Utwórz Nielistowane ID</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileNymPage.ui" line="122"/>
@@ -1755,7 +1755,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="20"/>
         <source>Information collected by this form is meant to strengthen your brain wallet with unique yet easily remembered information. This information is never sent to any other party.  </source>
-        <translation>Informacje zebrane w tym formularzu mają na celu wzmocnienie Twojego porftela pamięciowego (brain wallet) przy użyciu unikalnych, ale łatwych do zapamiętania danych. Wprowadzone tutaj wartości nie zostaną nigdzie wysłane ani zapisane!  </translation>
+        <translation>Informacje zebrane w tym formularzu mają na celu wzmocnienie Twojego porftela pamięciowego (brain wallet) przy użyciu unikalnych, ale łatwych do zapamiętania danych. Wprowadzone tutaj wartości nie zostaną nigdzie wysłane ani zapisane.</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="42"/>
@@ -1790,7 +1790,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="123"/>
         <source>License #</source>
-        <translation>Licencja (prawo jazdy?) #</translation>
+        <translation>Prawo jazdy #</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="142"/>
@@ -1840,7 +1840,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="117"/>
         <source>Your Brain Key must be at least 32 characters</source>
-        <translation>Twój Klucz Do Zapamiętania musi mieć co najmniej 32 znaki długości</translation>
+        <translation>Twój Klucz Do Zapamiętania musi zawierać co najmniej 32 znaki</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="128"/>
@@ -1885,7 +1885,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="32"/>
         <source>Allows to add new file to mail attachment</source>
-        <translation>Umożliwia dodanie nowego pliku do załącznika wiadomości</translation>
+        <translation>Umożliwia dodanie nowego pliku jako załącznika wiadomości</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="35"/>
@@ -1896,7 +1896,8 @@ Czy chcesz zapisać zmiany ?</translation>
         <location filename="../Mail/fileattachmentwidget.ui" line="91"/>
         <source>Total count</source>
         <extracomment>Number of attachement items</extracomment>
-        <translation>Suma</translation>
+        <translatorcomment>Ilość załączników</translatorcomment>
+        <translation>Ilość</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="96"/>
@@ -1906,7 +1907,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="110"/>
         <source>Allows to delete selected attachment items</source>
-        <translation>Umożliwia usunięcie zaznaczonych elementów załącznika</translation>
+        <translation>Umożliwia usunięcie zaznaczonych załączników</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="113"/>
@@ -1918,7 +1919,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="135"/>
         <source>Allows to save selected attachment items</source>
-        <translation>Umożliwia zapisanie zaznaczonych elementów załącznika</translation>
+        <translation>Umożliwia zapisanie zaznaczonych załączników</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="138"/>
@@ -1934,17 +1935,17 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="161"/>
         <source>Allows to add new file(s) to the emai&apos;s attachement</source>
-        <translation>Umożliwia dodanie nowych plików do załącznika wiadomości</translation>
+        <translation>Umożliwia dodanie nowych plików jako załączniki</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="173"/>
         <source>Allows to remove selected items from the email&apos;s attachment</source>
-        <translation>Umożliwia usunięcie zaznaczonych elementów z załącznika wiadomości</translation>
+        <translation>Umożliwia usunięcie zaznaczonych załączników</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="191"/>
         <source>Allows to save selected items from email&apos;s attachment</source>
-        <translation>Umożliwia zapisanie zaznaczonych elementów z załącznika wiadomości</translation>
+        <translation>Umożliwia zapisanie zaznaczonych załączników</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="194"/>
@@ -1959,7 +1960,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="205"/>
         <source>Select all items in attachment</source>
-        <translation>Zaznacz wszystkie elementy w załączniku</translation>
+        <translation>Zaznacz wszystkie załączniki</translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.ui" line="208"/>
@@ -2019,7 +2020,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="483"/>
         <source>Total attachment size: </source>
-        <translation>Całkowity rozmiar załącznika: </translation>
+        <translation>Całkowity rozmiar załączników: </translation>
     </message>
     <message>
         <location filename="../Mail/fileattachmentwidget.cpp" line="541"/>

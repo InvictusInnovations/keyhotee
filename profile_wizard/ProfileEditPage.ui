@@ -168,7 +168,7 @@
       </size>
      </property>
      <property name="title">
-      <string>Brain Wallet Key</string>
+      <string>Brain Wallet Key Phrase</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0" colspan="2">
