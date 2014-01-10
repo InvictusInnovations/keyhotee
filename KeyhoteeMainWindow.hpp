@@ -81,9 +81,10 @@ public:
 
   void displayDiagnosticLog();
   void setEnabledAttachmentSaveOption(bool enable);
-  void setEnabledDeleteOption( bool enable );
+  void setEnabledDeleteOption( bool enable ) const;
+  void refreshDeleteContactOption() const;
   void setEnabledMailActions(bool enable);
-  void setMailSettings (MailSettings& mailSettings);
+  void setMailSettings (MailSettings& mailSettings);  
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 protected:

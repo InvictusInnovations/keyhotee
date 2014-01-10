@@ -91,7 +91,7 @@ void ContactsTable::onSelectionChanged (const QItemSelection &selected, const QI
     ui->contact_details_view->setCurrentWidget(ui->page_message);
     }
 
-  getKeyhoteeWindow()->setEnabledDeleteOption( indexes.size() > 0 );
+  getKeyhoteeWindow()->refreshDeleteContactOption();
   }
 
 void ContactsTable::onDeleteContact()

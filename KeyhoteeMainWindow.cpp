@@ -432,7 +432,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);
 
-      setEnabledDeleteOption (ui->contacts_page->isSelection());
+      refreshDeleteContactOption ();
     }
     else if (selectedItem->type() == IdentityItem)
     {
@@ -448,7 +448,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);      
 
-      setEnabledDeleteOption (ui->contacts_page->isSelection());
+      refreshDeleteContactOption ();
     }
     /*
        else if( selected_items[0] == _identities_root )
@@ -865,9 +865,23 @@ void KeyhoteeMainWindow::setEnabledAttachmentSaveOption( bool enable )
   ui->actionSave_attachement->setEnabled (enable);
   }
 
-void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable )
+void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable ) const
   {
   ui->actionDelete->setEnabled (enable);
+  }
+
+void KeyhoteeMainWindow::refreshDeleteContactOption() const
+  {
+  bool isContactTableSelected = ui->contacts_page->isSelection();
+  bool isContactTreeItemSelected = false;
+
+  if (ui->side_bar->selectedItems().size())
+  {
+    QTreeWidgetItem* selectedItem = ui->side_bar->selectedItems().first();
+    isContactTreeItemSelected =  (selectedItem->type() == ContactItem);
+  }
+
+  setEnabledDeleteOption( isContactTableSelected || isContactTreeItemSelected );
   }
 
 void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
@@ -882,7 +896,8 @@ void KeyhoteeMainWindow::onRemoveContact()
 {  
   QList<QTreeWidgetItem*> selected_items = ui->side_bar->selectedItems();
 
-  if (! ui->contacts_page->hasFocusContacts() && selected_items.size())
+  if (selected_items.size() && 
+      ( ! ui->contacts_page->hasFocusContacts() || ! ui->contacts_page->isSelection() ) )
   {
     QTreeWidgetItem* selectedItem = selected_items.first();
     if (selectedItem->type() == ContactItem)
@@ -899,6 +914,8 @@ void KeyhoteeMainWindow::onRemoveContact()
   }
   else
     ui->contacts_page->onDeleteContact();
+
+  refreshDeleteContactOption ();
 }
 
 void KeyhoteeMainWindow::setMailSettings (MailSettings& mailSettings)
