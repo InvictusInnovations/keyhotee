@@ -248,6 +248,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->sent_box_page->initial(MailProcessor, _sent_model, Mailbox::Sent, this);
 
   ui->widget_stack->setCurrentWidget(ui->inbox_page);
+  ui->actionDelete->setShortcut(QKeySequence::Delete);
   connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
   connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
   connect(ui->actionReply, SIGNAL(triggered()), ui->inbox_page, SLOT(onReplyMail()));
@@ -383,7 +384,6 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
   QList<QTreeWidgetItem*> selected_items = ui->side_bar->selectedItems();
   if (selected_items.size() )
   {
-    disconnect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onRemoveContact()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
@@ -441,7 +441,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     else if (selectedItem == _contacts_root)
     {
       showContacts();
-      connect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
+      connect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onRemoveContact()));
       connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
       if (ui->contacts_page->isShowDetailsHidden())
         ui->actionShow_details->setChecked(false);
