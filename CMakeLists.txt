@@ -14,6 +14,8 @@ set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
 #message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
 IF( WIN32 )
+  MESSAGE(platform= "Compiling on WIN32")
+
   #Set to allow xp compatibility
   set(CMAKE_GENERATOR_TOOLSET "v110_xp" CACHE INTERNAL "XP-compatible VS 11")
   #You need to set OPENSSL_ROOT environment variable for your system on WIN32
@@ -25,12 +27,8 @@ ENDIF(WIN32)
 
 find_package( OpenSSL )
 find_package( Qt5Core )
-find_package( Qt5WebKitWidgets )
+find_package( Qt5LinguistTools )
 find_package( Qt5PrintSupport )
-
-if (WIN32)
-  MESSAGE(platform= "Compiling on WIN32")
-endif(WIN32)
 
 #Note: bitshares repo should be checked out under keyhotee dir or path here should be changed
 set(BITSHARES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BitShares)
@@ -42,7 +40,7 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
 
 IF("${INVICTUS_ROOT}" STREQUAL "")
-    SET(INVICTUS_ROOT "./")
+  SET(INVICTUS_ROOT "./")
 ENDIF("${INVICTUS_ROOT}" STREQUAL "")
 
 message("Using invictus root: " ${INVICTUS_ROOT})
@@ -71,7 +69,7 @@ IF( WIN32 )
   FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context)
   # For Boost 1.53 on windows, coroutine was not in BOOST_LIBRARYDIR and do not need it to build,  but if boost versin >= 1.54, find coroutine otherwise will cause link errors
   IF(NOT "${Boost_VERSION}" MATCHES "1.53(.*)")
-	FIND_PACKAGE(Boost 1.54 REQUIRED COMPONENTS coroutine)
+    FIND_PACKAGE(Boost 1.54 REQUIRED COMPONENTS coroutine)
   ENDIF()
 
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
@@ -87,9 +85,9 @@ ELSE(WIN32)
   SET(Boost_USE_STATIC_LIBS ON)
   FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context coroutine) 
 
- IF( NOT APPLE )
-      SET( pthread pthread )
- ENDIF( NOT APPLE )
+  IF( NOT APPLE )
+    SET( pthread pthread )
+  ENDIF( NOT APPLE )
 ENDIF(WIN32)
 
 include_directories( ${OPENSSL_INCLUDE_DIR} )
@@ -247,8 +245,6 @@ set( sources
 
         main.cpp )
 
-find_package( Qt5LinguistTools )
-
 set(FILES_TO_TRANSLATE ${sources})
 file (GLOB TRANSLATIONS_FILES translations/*.ts)
 option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts
@@ -288,13 +284,14 @@ list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.h)
 # Some unknown diff between windows and unix, this is quick fix, leave for DanL to clean-up
 IF(WIN32)
 ELSE(WIN32)
-    #apparently this is needed for Ubuntu (see commit from jefferylee), but it causes problems for windows (lib is brought in via upnpc-static on windows at least)
+  #apparently this is needed for Ubuntu (see commit from jefferylee), but it causes problems for windows (lib is brought in via upnpc-static on windows at least)
   set(MINIUPNP_LIB  miniupnpc)
 ENDIF(WIN32)
 
 # Configure dependencies of keyhotee_library module
 add_library( keyhotee_library ${library_sources} )
-qt5_use_modules(keyhotee_library Widgets WebKit)
+qt5_use_modules(keyhotee_library Widgets)
+
 message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
 target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY} )
 
@@ -312,7 +309,7 @@ set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_DEBUG KeyhoteeD )
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
 
 # Use the Widgets module from Qt 5.
-qt5_use_modules(Keyhotee Widgets PrintSupport WebKit)
+qt5_use_modules(Keyhotee Widgets PrintSupport)
 
 #fc  miniupnpc
 target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc  leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY} upnpc-static )
