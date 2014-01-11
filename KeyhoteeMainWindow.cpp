@@ -256,6 +256,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   connect(ui->actionForward, SIGNAL(triggered()), ui->inbox_page, SLOT(onForwardMail()));
 
   wlog("idents: ${idents}", ("idents", idents) );
+
+  if(isIdentityPresent() == false )
+      ui->actionNew_Message->setEnabled(false);
+
   for (size_t i = 0; i < idents.size(); ++i)
   {
      try {
@@ -539,7 +543,28 @@ void KeyhoteeMainWindow::onSelectAll()
 void KeyhoteeMainWindow::onNewIdentity()
 {
    NewIdentityDialog* ident_dialog = new NewIdentityDialog(this);
+
+   QObject::connect(ident_dialog, SIGNAL(identityadded()),
+                    this, SLOT(enableNewMessageIcon()));
+
    ident_dialog->show();
+}
+
+bool KeyhoteeMainWindow::isIdentityPresent()
+{
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+
+    auto idents = profile->identities();
+    return (idents.size() != 0);
+}
+
+void KeyhoteeMainWindow::enableNewMessageIcon()
+{
+    if(isIdentityPresent() == true ) {
+         ui->actionNew_Message->setEnabled(true);
+         emit enableSendMailSignal(true);
+    }
 }
 
 void KeyhoteeMainWindow::onEnableMining(bool enabled)
@@ -665,6 +690,8 @@ void KeyhoteeMainWindow::createContactGui(int contact_id)
 
   auto       view = new ContactView(ui->widget_stack);
 
+  QObject::connect(this, SIGNAL(enableSendMailSignal(bool)),
+                   view, SLOT(enableSendMail(bool)));
   //add new contactGui to map
   _contact_guis[contact_id] = ContactGui(new_contact_item, view);
 
@@ -916,6 +943,10 @@ void KeyhoteeMainWindow::onRemoveContact()
     ui->contacts_page->onDeleteContact();
 
   refreshDeleteContactOption ();
+  if(isIdentityPresent() == false ){
+       ui->actionNew_Message->setEnabled(false);
+       emit enableSendMailSignal(false);
+  }
 }
 
 void KeyhoteeMainWindow::setMailSettings (MailSettings& mailSettings)

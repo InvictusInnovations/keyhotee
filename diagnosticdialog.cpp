@@ -15,7 +15,7 @@ DiagnosticDialog::DiagnosticDialog(QWidget *parent) :
     this->setWindowTitle("Diagnostic");
 
     QFile* log_file = new QFile(gLogFile.fileName());
-    log_file->open(QIODevice::ReadWrite);
+    log_file->open(QIODevice::ReadOnly);
     QString log(log_file->readAll());
     log_file->close();
 
@@ -39,10 +39,9 @@ DiagnosticDialog::DiagnosticDialog(QWidget *parent) :
     _vboxlayout->addWidget(_log_textedit);
     _vboxlayout->addWidget(_buttonbox);
 
-    connect(_ok_button, SIGNAL(clicked()),  this, SLOT(onOkButtonClicked));
-    connect(_save_button, SIGNAL(clicked()),  this, SLOT(onSaveButtonClicked));
-
     setLayout(_vboxlayout);
+    delete log_file;
+    log_file = nullptr;
 }
 
 DiagnosticDialog::~DiagnosticDialog()

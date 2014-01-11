@@ -178,5 +178,6 @@ void NewIdentityDialog::onSave()
     TKeyhoteeApplication::getInstance()->getMainWindow()->getAddressBookModel()->storeContact( Contact(myself) );
 
     app->add_receive_key(priv_key);
+    emit identityadded();
 
 }

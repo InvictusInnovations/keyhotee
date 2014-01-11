@@ -174,7 +174,12 @@ ContactView::ContactView(QWidget* parent)
 
   keyEdit(false);
   ui->chat_input->installEventFilter(this);
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
 
+  auto idents = profile->identities();
+  if(idents.size() == 0)
+       send_mail->setEnabled(false);
   setContact(Contact() );
 }
 
@@ -309,6 +314,17 @@ void ContactView::keyhoteeIdChanged(const QString& /*name*/)
 void ContactView::lastNameChanged(const QString& /*name*/)
 {
   setModyfied();
+}
+
+void ContactView::enableSendMail(bool enable)
+{
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+
+    auto idents = profile->identities();
+    if(idents.size() > 0)
+         send_mail->setEnabled(enable);
+
 }
 
 /*****************  Algorithm for handling keyhoteeId, keyhoteeeId status, and public key fields

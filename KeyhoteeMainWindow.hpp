@@ -87,6 +87,9 @@ public:
   void setMailSettings (MailSettings& mailSettings);  
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
+
+signals:
+  void enableSendMailSignal(bool enable);
 protected:
   virtual void closeEvent(QCloseEvent *);
 
@@ -137,6 +140,7 @@ private slots:
   void onSelectAll();
   // Identity
   void onNewIdentity();
+  void enableNewMessageIcon();
   void onEnableMining(bool enabled);
   // Mail
   void onSaveAttachement();
@@ -152,6 +156,7 @@ private slots:
   void onRemoveContact ();
 
 private:
+  bool isIdentityPresent();
   void addressBookDataChanged(const QModelIndex& top_left, const QModelIndex& bottom_right,
                               const QVector<int>& roles);
   void searchEditChanged(QString search_string);
