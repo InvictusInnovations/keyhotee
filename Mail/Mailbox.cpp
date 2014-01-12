@@ -191,6 +191,15 @@ void Mailbox::setupActions()
   //delete_mail->setShortcut(Qt::Key_Delete);
   //add actions to MailViewer toolbar
   QToolBar* message_tools = ui->current_message->message_tools;
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+
+  auto idents = profile->identities();
+  if(idents.size() == 0) {
+    reply_mail->setEnabled(false);
+    reply_all_mail->setEnabled(false);
+    forward_mail->setEnabled(false);
+  }
   message_tools->addAction(reply_mail);
   message_tools->addAction(reply_all_mail);
   message_tools->addAction(forward_mail);
