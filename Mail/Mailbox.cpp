@@ -398,3 +398,9 @@ int Mailbox::getSortedColumn() const
 {
   return ui->inbox_table->horizontalHeader()->sortIndicatorSection();
 }
+
+void Mailbox::selectAll ()
+{
+  ui->inbox_table->selectAll();
+  ui->inbox_table->setFocus();
+}

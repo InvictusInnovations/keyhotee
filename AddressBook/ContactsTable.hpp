@@ -33,6 +33,7 @@ public:
   virtual bool canContinue() const;
   bool isSelection () const;
   bool hasFocusContacts() const;
+  void selectAll ();
 
 private:
   ContactView* getCurrentView() const;

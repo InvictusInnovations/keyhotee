@@ -254,3 +254,9 @@ void ContactsTable::selectNextRow(int idx, int deletedRowCount) const
   else
     ui->contact_table->selectRow(count - 1);
 }
+
+void ContactsTable::selectAll()
+{
+  ui->contact_table->selectAll();
+  ui->contact_table->setFocus();
+}

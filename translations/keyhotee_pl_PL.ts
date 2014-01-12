@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="pl_PL">
 <context>
@@ -490,7 +490,7 @@ Enter</translation>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="129"/>
         <source>     Create new contact</source>
-        <translation>     Stwórz nowy kontakt</translation>
+        <translation>     Dodaj nowy kontakt</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="263"/>
@@ -1717,7 +1717,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="27"/>
         <source>Create your Keyhotee ID</source>
-        <translation>Stwórz swoje Keyhotee ID</translation>
+        <translation>Utwórz swoje Keyhotee ID</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="48"/>
@@ -1810,7 +1810,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="199"/>
         <source>Create Random</source>
-        <translation>Stwórz Losowy</translation>
+        <translation>Utwórz Losowy</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileEditPage.ui" line="221"/>
@@ -1835,7 +1835,7 @@ Czy chcesz zapisać zmiany ?</translation>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="99"/>
         <source>Create your Keyhotee Profile</source>
-        <translation>Stwórz swój Profil Keyhotee</translation>
+        <translation>Utwórz swój Profil Keyhotee</translation>
     </message>
     <message>
         <location filename="../profile_wizard/ProfileWizard.cpp" line="117"/>
