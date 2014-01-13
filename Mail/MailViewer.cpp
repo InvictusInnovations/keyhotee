@@ -39,12 +39,18 @@ void MailViewer::displayMailMessage(const QModelIndex& index, MailboxModel* mail
   mailbox->getFullMessage(index, msg);
   QString       formatted_date = msg.date_sent.toString(Qt::DefaultLocaleShortDate);
   ui->date_label->setText(formatted_date);
-  ui->from_label->setText(msg.from);
+  ui->from_label->clear();
+  std::vector<fc::ecc::public_key> sender;
+  sender.push_back(msg.header.from_key);
+  ui->from_label->SetCollectedContacts(sender);
+  ui->from_label->setStyleSheet("QTextEdit { background-color: rgb(255, 255, 255, 0) }");
   if (msg.to_list.size())
     {
     ui->to_prefix->show();
     ui->to_label->show();
-    ui->to_label->setText(Utils::makeContactListString(msg.to_list, ';', Utils::FULL_CONTACT_DETAILS));
+    ui->to_label->clear();
+    ui->to_label->SetCollectedContacts(msg.to_list);
+    ui->to_label->setStyleSheet("QTextEdit { background-color: rgb(255, 255, 255, 0) }");
     }
   else
     {
@@ -55,7 +61,9 @@ void MailViewer::displayMailMessage(const QModelIndex& index, MailboxModel* mail
     {
     ui->cc_prefix->show();
     ui->cc_label->show();
-    ui->cc_label->setText(Utils::makeContactListString(msg.cc_list, ';', Utils::FULL_CONTACT_DETAILS));
+    ui->cc_label->clear();
+    ui->cc_label->SetCollectedContacts(msg.cc_list);
+    ui->cc_label->setStyleSheet("QTextEdit { background-color: rgb(255, 255, 255, 0) }");
     }
   else
     {

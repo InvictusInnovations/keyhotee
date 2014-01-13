@@ -15,7 +15,7 @@
 #include <QScrollBar>
 #include <QTextBlock>
 #include <QToolTip>
-#include <Qmenu>
+#include <QMenu>
 
 #include <fc/log/logger.hpp>
 
@@ -134,8 +134,22 @@ void ContactListEdit::addContactEntry(const QString& contactText, const bts::add
     {
     QLinearGradient grad(QPointF(0, 0), QPointF(0, 1));
     grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-    grad.setColorAt(0.3, QColor(231, 190, 66));
-    grad.setColorAt(1.0, QColor(103, 51, 1));
+    grad.setColorAt(0, QColor(35, 40, 3));
+    grad.setColorAt(0.102273, QColor(136, 106, 22));
+    grad.setColorAt(0.225, QColor(166, 140, 41));
+    grad.setColorAt(0.285, QColor(204, 181, 74));
+    grad.setColorAt(0.345, QColor(235, 219, 102));
+    grad.setColorAt(0.415, QColor(245, 236, 112));
+    grad.setColorAt(0.52, QColor(209, 190, 76));
+    grad.setColorAt(0.57, QColor(187, 156, 51));
+    grad.setColorAt(0.635, QColor(168, 142, 42));
+    grad.setColorAt(0.695, QColor(202, 174, 68));
+    grad.setColorAt(0.75, QColor(218, 202, 86));
+    grad.setColorAt(0.815, QColor(208, 187, 73));
+    grad.setColorAt(0.88, QColor(187, 156, 51));
+    grad.setColorAt(0.935, QColor(137, 108, 26));
+    grad.setColorAt(1, QColor(35, 40, 3));
+
     brush = QBrush(grad);
     pen.setColor( QColor( 103, 51, 1 ) );
     }
@@ -379,10 +393,6 @@ void ContactListEdit::contextMenuEvent ( QContextMenuEvent * event )
   connect(action_add_contact, &QAction::triggered, this, &ContactListEdit::onActiveAddContact);
   action_add_contact->setDisabled(true);
 
-  sep = new QAction(this);
-  sep->setSeparator(true);
-  menu->addAction(sep);
-  
   QAction*  action_find_contact = new QAction(tr("Find Contact"), this);
   menu->addAction(action_find_contact);
   connect(action_find_contact, &QAction::triggered, this, &ContactListEdit::onActiveFindContact);
