@@ -8,6 +8,7 @@ namespace bts
 namespace addressbook
 {
 struct contact;
+struct wallet_contact;
 } ///namespace addressbook
 } /// namespace bts
 
@@ -48,6 +49,7 @@ protected:
   void resizeEvent(QResizeEvent* resize_event);
   /// Reimplemented to correctly support clipboard operations.
   virtual QMimeData *createMimeDataFromSelection() const;
+  virtual void contextMenuEvent ( QContextMenuEvent * event );
 
 public Q_SLOTS:
   /// Slot to explicitly request to show a completer.
@@ -58,6 +60,8 @@ private Q_SLOTS:
   void insertCompletion(const QModelIndex& completion);
 
   void fitHeightToDocument();
+  void onActiveAddContact();
+  void onActiveFindContact();
 
 private:
   QString textUnderCursor() const;
@@ -68,8 +72,13 @@ private:
   /// Reads public key stored as user def. property from the image previously created in document.
   void    decodePublicKey(const QTextImageFormat& storage,
     IMailProcessor::TRecipientPublicKey* key) const;
+  bool    isClickOnContact();
+  bool    isStoredContact();
 
 private:
-  int         _fitted_height;
-  QCompleter* _completer;
+  int                               _fitted_height;
+  QCompleter*                       _completer;
+  QPoint                            _right_click;
+  QTextImageFormat                  _image_format;
+  bts::addressbook::wallet_contact* _clicked_contact;
 };

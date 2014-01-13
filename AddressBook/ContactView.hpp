@@ -52,6 +52,7 @@ public:
     }
   bool CheckSaving();
   void addNewContact ();
+  void setPublicKey(const QString& public_key_string);
 
 Q_SIGNALS:
   void canceledNewContact();

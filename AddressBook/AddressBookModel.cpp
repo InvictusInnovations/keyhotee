@@ -362,10 +362,13 @@ void AddressBookModel::reloadContacts()
   for(auto& contact : my->_contacts)
   {
     //add dac_id to completion list
-    completion_list.push_back(contact.dac_id_string.c_str() );
+    QString id = contact.dac_id_string.c_str();    
     //add fullname to completion list
     QString fullName = contact.get_display_name().c_str();
-    completion_list.push_back(fullName);
+    completion_list.push_back( id );
+    //don't duplicate
+    if ( fullName.compare (id) != 0)
+      completion_list.push_back( fullName );
   }
   my->_contact_completion_model.setStringList(completion_list);
 }

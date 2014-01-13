@@ -62,7 +62,8 @@ public:
 
   void newMailMessage();
   void newMailMessageTo(const Contact& contact);
-  void addContact();  
+  void addContact();
+  void addToContacts(const bts::addressbook::wallet_contact* wallet_contact);
   void onSidebarSelectionChanged();
   void onSidebarDoubleClicked();
   void selectContactItem(QTreeWidgetItem* item);

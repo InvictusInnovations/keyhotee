@@ -5,6 +5,8 @@
 #include "connectionstatusframe.h"
 #include "diagnosticdialog.h"
 #include "GitSHA1.h"
+#include "BitShares/GitSHA2.h"
+#include "BitShares/fc/GitSHA3.h"
 #include "KeyhoteeApplication.hpp"
 #include "public_key_address.hpp"
 
@@ -16,6 +18,9 @@
 #include "Mail/maileditorwindow.hpp"
 
 #include <bts/bitchat/bitchat_private_message.hpp>
+
+#include <QTableView>
+#include <QTextBrowser>
 
 #ifdef Q_OS_MAC
 //#include <qmacnativetoolbar.h>
@@ -341,6 +346,13 @@ void KeyhoteeMainWindow::addContact()
   }
 }
 
+void KeyhoteeMainWindow::addToContacts(const bts::addressbook::wallet_contact* wallet_contact)
+{
+  addContact();
+  std::string public_key_string = public_key_address(wallet_contact->public_key);
+  ui->new_contact->setPublicKey(public_key_string.c_str());
+}
+
 void KeyhoteeMainWindow::sideBarSplitterMoved(int pos, int index)
 {
   if (pos <= 5)
@@ -536,7 +548,32 @@ void KeyhoteeMainWindow::onPaste()
 
 void KeyhoteeMainWindow::onSelectAll()
 {
-  notSupported();
+  QWidget *widget = focusWidget ();
+
+  if(ui->side_bar == widget) //TreeView focused
+  {
+    if (ui->widget_stack->currentWidget () == ui->contacts_page)
+      ui->contacts_page->selectAll ();
+    else if (ui->widget_stack->currentWidget () == _currentMailbox)
+      _currentMailbox->selectAll ();
+    else if (ui->widget_stack->currentWidget () == ui->wallets)
+      ; //ui->wallets->selectAll ();
+    else
+      assert (0);
+  }
+  else if(QTableView *tableView = qobject_cast<QTableView*>(widget) ) 
+  {
+    tableView->selectAll();
+  }
+  else if(QTextBrowser *textBrowser = qobject_cast<QTextBrowser*>(widget) ) 
+  {
+    textBrowser->selectAll();
+  }
+  else
+  {
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_A, Qt::ControlModifier, 0);
+    QApplication::postEvent(widget, event);
+  }
 }
 
 // Menu Identity
@@ -609,10 +646,22 @@ void KeyhoteeMainWindow::onAbout()
   text += tr(APPLICATION_VERSION);
   text += tr("</b><br/><br/>");
   /// Build tag: <a href="https://github.com/InvictusInnovations/keyhotee/commit/xxxx">xxxx</a>
-  text += tr("Built from revision: <a href=\"https://github.com/InvictusInnovations/keyhotee/commit/");
+  text += tr("keyhotee Built from revision: <a href=\"https://github.com/InvictusInnovations/keyhotee/commit/");
   text += tr(g_GIT_SHA1);
   text += tr("\">");
   text += tr(g_GIT_SHA1);
+  text += tr("</a>");
+  text += tr("<br/>");
+  text += tr("BitShares Built from revision: <a href=\"https://github.com/InvictusInnovations/BitShares/commit/");
+  text += tr(g_GIT_SHA2);
+  text += tr("\">");
+  text += tr(g_GIT_SHA2);
+  text += tr("</a>");
+  text += tr("<br/>");
+  text += tr("fc Built from revision: <a href=\"https://github.com/InvictusInnovations/fc/commit/");
+  text += tr(g_GIT_SHA3);
+  text += tr("\">");
+  text += tr(g_GIT_SHA3);
   text += tr("</a>");
   text += tr("<br/>");
   text += tr("Invictus Innovations Inc<br/>");

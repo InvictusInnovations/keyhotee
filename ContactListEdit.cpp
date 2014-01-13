@@ -15,6 +15,7 @@
 #include <QScrollBar>
 #include <QTextBlock>
 #include <QToolTip>
+#include <Qmenu>
 
 #include <fc/log/logger.hpp>
 
@@ -22,6 +23,7 @@ ContactListEdit::ContactListEdit(QWidget* parent)
   : QTextEdit(parent)
   {
   _completer = nullptr;
+  _clicked_contact = new bts::addressbook::wallet_contact();
 
   connect(this, &QTextEdit::textChanged, this, &ContactListEdit::fitHeightToDocument);
 
@@ -362,3 +364,99 @@ QMimeData *ContactListEdit::createMimeDataFromSelection() const
   return mimeData;
   }
 
+void ContactListEdit::contextMenuEvent ( QContextMenuEvent * event )
+{
+  _right_click = event->pos();
+  
+  QMenu *menu = createStandardContextMenu();
+
+  QAction* sep = new QAction(this);
+  sep->setSeparator(true);
+  menu->addAction(sep);
+
+  QAction*  action_add_contact = new QAction(tr("Add Contact"), this);
+  menu->addAction(action_add_contact);
+  connect(action_add_contact, &QAction::triggered, this, &ContactListEdit::onActiveAddContact);
+  action_add_contact->setDisabled(true);
+
+  sep = new QAction(this);
+  sep->setSeparator(true);
+  menu->addAction(sep);
+  
+  QAction*  action_find_contact = new QAction(tr("Find Contact"), this);
+  menu->addAction(action_find_contact);
+  connect(action_find_contact, &QAction::triggered, this, &ContactListEdit::onActiveFindContact);
+  action_find_contact->setDisabled(true);
+
+  if(textCursor().selection().isEmpty())
+  {
+    if(isClickOnContact())
+    {
+      if(isStoredContact())
+      {
+        action_find_contact->setEnabled(true);
+      }
+      else
+      {
+        action_add_contact->setEnabled(true);
+      }
+    }
+  }
+  
+  menu->exec(event->globalPos());
+  delete menu;
+}
+
+bool ContactListEdit::isClickOnContact()
+{
+  _right_click += QPoint(2, 0);
+  int current_position = this->document()->documentLayout()->hitTest( _right_click, Qt::ExactHit );
+
+  if(current_position > -1)
+  {
+    QTextBlock current_block = document()->begin();
+    while(current_block.isValid())
+    {
+      for(QTextBlock::iterator it = current_block.begin(); !(it.atEnd()); ++it)
+      {
+        QTextFragment current_fragment = it.fragment();
+        if(current_fragment.isValid())
+          if(current_fragment.contains(current_position))
+          {
+            QTextFormat current_format = current_fragment.charFormat();
+            if(current_format.isImageFormat())
+            {
+              _image_format = current_format.toImageFormat();
+              return true;
+            }
+          }
+      }
+      current_block = current_block.next();
+    }
+  }
+
+  return false;
+}
+
+bool ContactListEdit::isStoredContact()
+{
+  if(_image_format.isValid())
+  {
+    IMailProcessor::TRecipientPublicKey pk;
+    decodePublicKey(_image_format, &pk);
+    if(Utils::matchContact(pk, _clicked_contact))
+      return true;
+  }
+  return false;
+}
+
+
+void ContactListEdit::onActiveAddContact()
+{
+  getKeyhoteeWindow()->addToContacts(_clicked_contact);
+}
+
+void ContactListEdit::onActiveFindContact()
+{
+  getKeyhoteeWindow()->openContactGui(_clicked_contact->wallet_index);
+}
