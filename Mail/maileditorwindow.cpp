@@ -283,6 +283,9 @@ void MailEditorMainWindow::SetRecipientList(const TRecipientPublicKeys& toList,
   {
   TRecipientPublicKey emptyKey;
   MailFields->SetRecipientList(emptyKey, toList, ccList, bccList);
+  /// Ignore MailFields::recipientListChanged signal here
+  ui->messageEdit->document()->setModified(false);
+  setWindowModified(false);
   }
 
 void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,

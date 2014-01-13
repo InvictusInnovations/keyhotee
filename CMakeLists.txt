@@ -4,8 +4,9 @@ cmake_minimum_required( VERSION 2.8.11 )
 set( CMAKE_INCLUDE_CURRENT_DIR ON)
 set( CMAKE_AUTOMOC ON  )
 
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/GitVersionGen/")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CmakeModules/")
+
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
@@ -25,6 +26,7 @@ IF( WIN32 )
 
 ENDIF(WIN32)
 
+find_package( ICU )
 find_package( OpenSSL )
 find_package( Qt5Core )
 find_package( Qt5LinguistTools )
@@ -312,7 +314,7 @@ set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
 qt5_use_modules(Keyhotee Widgets PrintSupport)
 
 #fc  miniupnpc
-target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc  leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY} upnpc-static )
+target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc  leveldb ${CMAKE_DL_LIBS} ${ICU_LIBRARIES} ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY} upnpc-static )
 
 if (MSVC)
   message("Setting up debug options for MSVC build")

@@ -10,7 +10,6 @@
 #include <fc/thread/thread.hpp>
 #include <fc/log/logger.hpp>
 
-#include <QtWebKitWidgets/QWebFrame>
 #include <QToolBar>
 #include <QToolButton>
 #include <QMessageBox>
