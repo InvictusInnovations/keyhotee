@@ -66,7 +66,7 @@ void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
     ui->contact_table->setModel(_sorted_addressbook_model);
     }
   ui->contact_table->setShowGrid(false);
-  ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
   QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
@@ -91,7 +91,7 @@ void ContactsTable::onSelectionChanged (const QItemSelection &selected, const QI
     ui->contact_details_view->setCurrentWidget(ui->page_message);
     }
 
-  getKeyhoteeWindow()->setEnabledDeleteOption( indexes.size() > 0 );
+  getKeyhoteeWindow()->refreshDeleteContactOption();
   }
 
 void ContactsTable::onDeleteContact()
@@ -253,4 +253,10 @@ void ContactsTable::selectNextRow(int idx, int deletedRowCount) const
     ui->contact_table->selectRow(nextIdx);
   else
     ui->contact_table->selectRow(count - 1);
+}
+
+void ContactsTable::selectAll()
+{
+  ui->contact_table->selectAll();
+  ui->contact_table->setFocus();
 }

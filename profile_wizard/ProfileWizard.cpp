@@ -8,6 +8,7 @@
 #include "ui_ProfileIntroPage.h"
 
 #include <QDesktopWidget>
+#include <QMessageBox>
 //#include <ui_ProfileNymPage.h>
 
 #include <fc/string.hpp>
@@ -152,24 +153,24 @@ public:
     completeChanged();
   }
 
-  std::string trimmedFirstName() const
+  QString trimmedFirstName() const
   {
-    return fc::trim(ui.first_name->text().toStdString());
+    return ui.first_name->text().trimmed();
   }
 
-  std::string trimmedMiddleName() const
+  QString trimmedMiddleName() const
   {
-    return fc::trim(ui.middle_name->text().toStdString());
+    return ui.middle_name->text().trimmed();
   }
 
-  std::string trimmedLastName() const
+  QString trimmedLastName() const
   {
-    return fc::trim(ui.last_name->text().toStdString());
+    return ui.last_name->text().trimmed();
   }
   
-  std::string trimmedBrainkey() const
+  QString trimmedBrainkey() const
   {
-    return fc::trim(ui.brainkey->text().toStdString());
+    return ui.brainkey->text().trimmed();
   }
 
   virtual bool isComplete() const
@@ -179,7 +180,7 @@ public:
     ui.local_password1->setStyleSheet("");
     ui.local_password2->setStyleSheet("");
 
-    if(trimmedFirstName().size() == 0)
+    if(trimmedFirstName().isEmpty())
     {
       ui.first_name->setStyleSheet("border: 1px solid red");
       return false;
@@ -253,17 +254,32 @@ void ProfileWizard::createProfile()
   {
     ilog( "." );
     bts::profile_config conf;
-    conf.firstname  = _profile_edit->trimmedFirstName();
-    conf.middlename = _profile_edit->trimmedMiddleName();
-    conf.lastname   = _profile_edit->trimmedLastName();
-    conf.brainkey   = _profile_edit->trimmedBrainkey();
+    QString fName = _profile_edit->trimmedFirstName();
+    QString mName = _profile_edit->trimmedMiddleName();
+    QString lName = _profile_edit->trimmedLastName();
+    conf.firstname  = fName.toStdString();
+    conf.middlename = mName.toStdString();
+    conf.lastname   = lName.toStdString();
 
-    std::string password = _profile_edit->ui.local_password1->text().toUtf8().constData();
+    conf.brainkey   = _profile_edit->trimmedBrainkey().toStdString();
+
+    std::string password = _profile_edit->ui.local_password1->text().toStdString();
+
+    assert(conf.firstname.empty() == false && "Broken update command ui code");
 
     //set profile name from first and last name
-    std::string profile_name = conf.firstname;
-    if (!conf.lastname.empty())
-      profile_name += " " + conf.lastname;
+    std::wstring profileName = fName.toStdWString();
+    if(mName.isEmpty() == false)
+      {
+      profileName += L" ";
+      profileName += mName.toStdWString();
+      }
+
+    if(lName.isEmpty() == false)
+      {
+      profileName += L" ";
+      profileName += lName.toStdWString();
+      }
 
     const unsigned int progressWidth = 640;
     const unsigned int progressHeight = 20;
@@ -284,27 +300,27 @@ void ProfileWizard::createProfile()
     progress->doTask(
       [=]() 
       {
-      try {
-        auto profile = app->create_profile(profile_name, conf, password, 
+        auto profile = app->create_profile(profileName, conf, password, 
           [=]( double p )
           {
             progress->updateValue(progressMax*p);
           });
-       }
-       catch (fc::exception& e)
-       {
-       elog("${e}", ("e", e.to_detail_string()));
-       throw e;
-       }
-       catch (...)
-       {
-       elog("unrecognized exception while creating profile");
-       throw;
-       }
       },
       [=]() 
       {
         mainApp->displayMainWindow();
+      },
+        [=](QString e)
+      {
+      if(e.isEmpty())
+        {
+        QMessageBox::warning(nullptr, tr("Profile wizard"),
+          tr("Cannot create profile - some unknown error occurred"));
+        }
+      else
+        {
+        QMessageBox::warning(nullptr, tr("Profile wizard"), tr("Cannot create profile: ") + e);
+        }
       }
     );
   }

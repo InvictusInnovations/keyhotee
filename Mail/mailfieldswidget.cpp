@@ -46,7 +46,17 @@ MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, Address
   if(editMode)
     fillSenderIdentities();
 
-  ui->sendButton->setEnabled(editMode);
+
+
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+
+  auto idents = profile->identities();
+  if(idents.size() == 0) {
+    ui->sendButton->setEnabled(false);
+  } else {
+    ui->sendButton->setEnabled(editMode);
+  }
   ui->sendButton->setVisible(editMode);
 
   validateSendButtonState();

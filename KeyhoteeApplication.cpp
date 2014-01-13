@@ -47,7 +47,10 @@ void ConfigureLoggingToTemporaryFile()
 
   //configure logger to also write to log file
   fc::file_appender::config ac;
-  ac.filename = gLogFile.fileName().toStdString().c_str();
+  /** \warning Use wstring to construct log file name since %TEMP% can point to path containing
+      native chars.
+  */
+  ac.filename = gLogFile.fileName().toStdWString();
   ac.truncate = false;
   ac.flush    = true;
   fc::logger::get().add_appender( fc::shared_ptr<fc::file_appender>( new fc::file_appender( fc::variant(ac) ) ) );
@@ -92,7 +95,7 @@ std::string TKeyhoteeApplication::getAppName() const
   return APP_NAME;
 }
 
-std::string TKeyhoteeApplication::getLoadedProfileName() const
+std::wstring TKeyhoteeApplication::getLoadedProfileName() const
 {
   return bts::application::instance()->get_profile()->get_name(); //_loaded_profile_name;
 }
@@ -111,8 +114,8 @@ TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv)
 
   /// \warning use std::wstring to avoid problems related to paths containing native chars.
   auto str_data_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdWString();
-  
-  boost::filesystem::path data_dir(str_data_dir);
+
+  fc::path data_dir(str_data_dir);
   fc::path profile_dir( data_dir / "profiles" );
   _backend_app->set_profile_directory( profile_dir );
 }
@@ -151,7 +154,11 @@ int TKeyhoteeApplication::run()
     fc_exec.start(30);
 
     /// increment any QT specific status by last our one to avoid conflicts.
-    _exit_status = LAST_EXIT_STATUS + (unsigned int)exec();
+    int rawStatus = (unsigned int)exec();
+    if(rawStatus != 0)
+      _exit_status = TExitStatus::LAST_EXIT_STATUS + rawStatus;
+    else
+      _exit_status = TExitStatus::SUCCESS;
   }
   catch(const fc::exception& e)
   {
@@ -227,74 +234,14 @@ bool TKeyhoteeApplication::notify(QObject* receiver, QEvent* e)
   return true;
 }
 
-bts::application_config TKeyhoteeApplication::loadConfig()
-{
-  try 
-  {
-     /*
-    fc::create_directories(profile_dir);
-    auto config_file = profile_dir / "config.json";
-
-    ilog("config_file: ${file}", ("file", config_file) );
-    if (fc::exists(config_file) == false)
-    {
-      bts::application_config default_cfg;
-      default_cfg.data_dir = profile_dir / "data";
-      default_cfg.network_port = 0;
-      default_cfg.rpc_config.port = 0;
-      default_cfg.default_nodes.push_back( fc::ip::endpoint( std::string("162.243.67.4"), 9876 ) );
-      
-      fc::ofstream out(config_file);
-      out << fc::json::to_pretty_string(default_cfg);
-    }
-
-    auto app_config = fc::json::from_file(config_file).as<bts::application_config>();
-    fc::ofstream out(config_file);
-    out << fc::json::to_pretty_string(app_config);
-    */
-     bts::application_config app_config;
-    return app_config;
-  }
-  FC_RETHROW_EXCEPTIONS(warn, "") 
-}
-
 void TKeyhoteeApplication::startup()
 {
   ilog( "." );
-  _exit_status = TExitStatus::LOAD_CONFIG_FAILURE;
 
   if(_backend_app->has_profile() )
     displayLogin();
   else
     displayProfileWizard();
-
-  /*
-  try 
-  {
-    auto app_config = loadConfig();
-    _exit_status = TExitStatus::BACKEND_CONFIGURATION_FAILURE;
-    _backend_app->configure(app_config);
-    _exit_status = TExitStatus::SUCCESS;
-  }
-  catch (fc::exception& e)
-  {
-    switch(_exit_status)
-    {
-      case TExitStatus::LOAD_CONFIG_FAILURE:
-        elog("Failed to load Keyhotee configuration: ${e}", ("e",e.to_detail_string()));
-        break;
-      case TExitStatus::BACKEND_CONFIGURATION_FAILURE:
-        elog("Failed to configure Keyhotee: ${e}", ("e",e.to_detail_string()));
-        break;
-      default:
-        elog("Failed to startup Keyhotee: ${e}", ("e",e.to_detail_string()));
-        break;
-    }
-
-    return;
-  }
-  */
-
 }
 
 void TKeyhoteeApplication::linuxSignalHandler(int)

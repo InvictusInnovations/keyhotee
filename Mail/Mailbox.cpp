@@ -131,19 +131,33 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
     {
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::Status);
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::DateSent);
+    
+    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnInbox,
+       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderInbox) );
     }
-  if (_type == Sent)
+  else if (_type == Sent)
     {
     ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::To, MailboxModel::From);
     ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::DateReceived);
+
+    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnSent,
+       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderSent) );
     }
-  if (_type == Drafts)
+  else if (_type == Drafts)
     {
     ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::To, MailboxModel::From);
     ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::DateReceived);
     ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::Status);
+
+    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnDraft,
+       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderDraft) );
+    }
+  else if (_type == Outbox)
+    {
+    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnOutbox,
+       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderOutbox) );
     }
 
   ui->inbox_table->horizontalHeader()->setSectionsMovable(true);
@@ -177,6 +191,15 @@ void Mailbox::setupActions()
   //delete_mail->setShortcut(Qt::Key_Delete);
   //add actions to MailViewer toolbar
   QToolBar* message_tools = ui->current_message->message_tools;
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+
+  auto idents = profile->identities();
+  if(idents.size() == 0) {
+    reply_mail->setEnabled(false);
+    reply_all_mail->setEnabled(false);
+    forward_mail->setEnabled(false);
+  }
   message_tools->addAction(reply_mail);
   message_tools->addAction(reply_all_mail);
   message_tools->addAction(forward_mail);
@@ -365,5 +388,19 @@ bool Mailbox::getSelectedMessageData (IMailProcessor::TStoredMailMessage* encode
 
   return true;
 }
-
     
+Qt::SortOrder Mailbox::getSortOrder() const
+{
+  return ui->inbox_table->horizontalHeader()->sortIndicatorOrder();
+}
+
+int Mailbox::getSortedColumn() const 
+{
+  return ui->inbox_table->horizontalHeader()->sortIndicatorSection();
+}
+
+void Mailbox::selectAll ()
+{
+  ui->inbox_table->selectAll();
+  ui->inbox_table->setFocus();
+}

@@ -5,6 +5,8 @@
 #include "connectionstatusframe.h"
 #include "diagnosticdialog.h"
 #include "GitSHA1.h"
+#include "BitShares/GitSHA2.h"
+#include "BitShares/fc/GitSHA3.h"
 #include "KeyhoteeApplication.hpp"
 #include "public_key_address.hpp"
 
@@ -16,6 +18,9 @@
 #include "Mail/maileditorwindow.hpp"
 
 #include <bts/bitchat/bitchat_private_message.hpp>
+
+#include <QTableView>
+#include <QTextBrowser>
 
 #ifdef Q_OS_MAC
 //#include <qmacnativetoolbar.h>
@@ -113,11 +118,18 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->setupUi(this);
   setWindowIcon(QIcon(":/images/shield1024.png") );
 
-  QString title = QString("%1 (%2)").arg(mainApp.getAppName().c_str()).arg(mainApp.getLoadedProfileName().c_str());
+  QString profileName = QString::fromStdWString(mainApp.getLoadedProfileName());
+
+  QString title = QString("%1 (%2)").arg(mainApp.getAppName().c_str()).arg(profileName);
   setWindowTitle(title);
   setEnabledAttachmentSaveOption(false);
   setEnabledDeleteOption(false);
   setEnabledMailActions(false);
+
+  QString settings_file = "keyhotee_";
+  settings_file.append(profileName);
+  setSettingsFile(settings_file);
+  readSettings();
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
   connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
@@ -241,6 +253,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->sent_box_page->initial(MailProcessor, _sent_model, Mailbox::Sent, this);
 
   ui->widget_stack->setCurrentWidget(ui->inbox_page);
+  ui->actionDelete->setShortcut(QKeySequence::Delete);
   connect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
   connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
   connect(ui->actionReply, SIGNAL(triggered()), ui->inbox_page, SLOT(onReplyMail()));
@@ -248,6 +261,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   connect(ui->actionForward, SIGNAL(triggered()), ui->inbox_page, SLOT(onForwardMail()));
 
   wlog("idents: ${idents}", ("idents", idents) );
+
+  if(isIdentityPresent() == false )
+      ui->actionNew_Message->setEnabled(false);
+
   for (size_t i = 0; i < idents.size(); ++i)
   {
      try {
@@ -282,10 +299,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
     }
    }
    */
-  QString settings_file = "keyhotee_";
-  settings_file.append(mainApp.getLoadedProfileName().c_str());
-  setSettingsFile(settings_file);
-  readSettings();
+
   QAction* actionMenu = new QAction(tr("Keyhotee"), this);
   actionMenu->setCheckable(true);
   this->setMenuWindow(ui->menuWindow);
@@ -386,7 +400,6 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
   QList<QTreeWidgetItem*> selected_items = ui->side_bar->selectedItems();
   if (selected_items.size() )
   {
-    disconnect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onRemoveContact()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
@@ -435,7 +448,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);
 
-      setEnabledDeleteOption (ui->contacts_page->isSelection());
+      refreshDeleteContactOption ();
     }
     else if (selectedItem->type() == IdentityItem)
     {
@@ -444,14 +457,14 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     else if (selectedItem == _contacts_root)
     {
       showContacts();
-      connect(ui->actionDelete, SIGNAL(triggered()), ui->contacts_page, SLOT(onDeleteContact()));
+      connect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onRemoveContact()));
       connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
       if (ui->contacts_page->isShowDetailsHidden())
         ui->actionShow_details->setChecked(false);
       else
         ui->actionShow_details->setChecked(true);      
 
-      setEnabledDeleteOption (ui->contacts_page->isSelection());
+      refreshDeleteContactOption ();
     }
     /*
        else if( selected_items[0] == _identities_root )
@@ -535,14 +548,60 @@ void KeyhoteeMainWindow::onPaste()
 
 void KeyhoteeMainWindow::onSelectAll()
 {
-  notSupported();
+  QWidget *widget = focusWidget ();
+
+  if(ui->side_bar == widget) //TreeView focused
+  {
+    if (ui->widget_stack->currentWidget () == ui->contacts_page)
+      ui->contacts_page->selectAll ();
+    else if (ui->widget_stack->currentWidget () == _currentMailbox)
+      _currentMailbox->selectAll ();
+    else if (ui->widget_stack->currentWidget () == ui->wallets)
+      ; //ui->wallets->selectAll ();
+    else
+      assert (0);
+  }
+  else if(QTableView *tableView = qobject_cast<QTableView*>(widget) ) 
+  {
+    tableView->selectAll();
+  }
+  else if(QTextBrowser *textBrowser = qobject_cast<QTextBrowser*>(widget) ) 
+  {
+    textBrowser->selectAll();
+  }
+  else
+  {
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_A, Qt::ControlModifier, 0);
+    QApplication::postEvent(widget, event);
+  }
 }
 
 // Menu Identity
 void KeyhoteeMainWindow::onNewIdentity()
 {
    NewIdentityDialog* ident_dialog = new NewIdentityDialog(this);
+
+   QObject::connect(ident_dialog, SIGNAL(identityadded()),
+                    this, SLOT(enableNewMessageIcon()));
+
    ident_dialog->show();
+}
+
+bool KeyhoteeMainWindow::isIdentityPresent()
+{
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+
+    auto idents = profile->identities();
+    return (idents.size() != 0);
+}
+
+void KeyhoteeMainWindow::enableNewMessageIcon()
+{
+    if(isIdentityPresent() == true ) {
+         ui->actionNew_Message->setEnabled(true);
+         emit enableSendMailSignal(true);
+    }
 }
 
 void KeyhoteeMainWindow::onEnableMining(bool enabled)
@@ -587,10 +646,22 @@ void KeyhoteeMainWindow::onAbout()
   text += tr(APPLICATION_VERSION);
   text += tr("</b><br/><br/>");
   /// Build tag: <a href="https://github.com/InvictusInnovations/keyhotee/commit/xxxx">xxxx</a>
-  text += tr("Built from revision: <a href=\"https://github.com/InvictusInnovations/keyhotee/commit/");
+  text += tr("keyhotee Built from revision: <a href=\"https://github.com/InvictusInnovations/keyhotee/commit/");
   text += tr(g_GIT_SHA1);
   text += tr("\">");
   text += tr(g_GIT_SHA1);
+  text += tr("</a>");
+  text += tr("<br/>");
+  text += tr("BitShares Built from revision: <a href=\"https://github.com/InvictusInnovations/BitShares/commit/");
+  text += tr(g_GIT_SHA2);
+  text += tr("\">");
+  text += tr(g_GIT_SHA2);
+  text += tr("</a>");
+  text += tr("<br/>");
+  text += tr("fc Built from revision: <a href=\"https://github.com/InvictusInnovations/fc/commit/");
+  text += tr(g_GIT_SHA3);
+  text += tr("\">");
+  text += tr(g_GIT_SHA3);
   text += tr("</a>");
   text += tr("<br/>");
   text += tr("Invictus Innovations Inc<br/>");
@@ -668,6 +739,8 @@ void KeyhoteeMainWindow::createContactGui(int contact_id)
 
   auto       view = new ContactView(ui->widget_stack);
 
+  QObject::connect(this, SIGNAL(enableSendMailSignal(bool)),
+                   view, SLOT(enableSendMail(bool)));
   //add new contactGui to map
   _contact_guis[contact_id] = ContactGui(new_contact_item, view);
 
@@ -868,9 +941,23 @@ void KeyhoteeMainWindow::setEnabledAttachmentSaveOption( bool enable )
   ui->actionSave_attachement->setEnabled (enable);
   }
 
-void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable )
+void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable ) const
   {
   ui->actionDelete->setEnabled (enable);
+  }
+
+void KeyhoteeMainWindow::refreshDeleteContactOption() const
+  {
+  bool isContactTableSelected = ui->contacts_page->isSelection();
+  bool isContactTreeItemSelected = false;
+
+  if (ui->side_bar->selectedItems().size())
+  {
+    QTreeWidgetItem* selectedItem = ui->side_bar->selectedItems().first();
+    isContactTreeItemSelected =  (selectedItem->type() == ContactItem);
+  }
+
+  setEnabledDeleteOption( isContactTableSelected || isContactTreeItemSelected );
   }
 
 void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
@@ -885,7 +972,8 @@ void KeyhoteeMainWindow::onRemoveContact()
 {  
   QList<QTreeWidgetItem*> selected_items = ui->side_bar->selectedItems();
 
-  if (! ui->contacts_page->hasFocusContacts() && selected_items.size())
+  if (selected_items.size() && 
+      ( ! ui->contacts_page->hasFocusContacts() || ! ui->contacts_page->isSelection() ) )
   {
     QTreeWidgetItem* selectedItem = selected_items.first();
     if (selectedItem->type() == ContactItem)
@@ -902,4 +990,22 @@ void KeyhoteeMainWindow::onRemoveContact()
   }
   else
     ui->contacts_page->onDeleteContact();
+
+  refreshDeleteContactOption ();
+  if(isIdentityPresent() == false ){
+       ui->actionNew_Message->setEnabled(false);
+       emit enableSendMailSignal(false);
+  }
+}
+
+void KeyhoteeMainWindow::setMailSettings (MailSettings& mailSettings)
+{
+  mailSettings.sortColumnInbox = ui->inbox_page->getSortedColumn ();
+  mailSettings.sortOrderInbox = ui->inbox_page->getSortOrder ();
+  mailSettings.sortColumnSent = ui->sent_box_page->getSortedColumn ();
+  mailSettings.sortOrderSent = ui->sent_box_page->getSortOrder ();
+  mailSettings.sortColumnDraft = ui->draft_box_page->getSortedColumn ();
+  mailSettings.sortOrderDraft = ui->draft_box_page->getSortOrder ();
+  mailSettings.sortColumnOutbox = ui->out_box_page->getSortedColumn ();
+  mailSettings.sortOrderOutbox = ui->out_box_page->getSortOrder ();
 }

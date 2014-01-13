@@ -15,6 +15,8 @@ class NewIdentityDialog : public QDialog
       void onKey( const QString& name );
       void onSave();
 
+   signals:
+        void identityadded();
    private:
       std::unique_ptr<Ui::NewIdentityDialog>        ui;
 };

@@ -20,9 +20,9 @@ void LineEditReadOnly::setReadOnly(bool enabled)
 
 void LineEditReadOnly::mousePressEvent(QMouseEvent *mouse_event)
   {
-  if (_readOnly)
-    selectAll();
-  else
+//  if (_readOnly)
+//    selectAll(); //This is not standard behavior
+//  else
     QLineEdit::mousePressEvent(mouse_event);
   }
 
@@ -32,7 +32,8 @@ void LineEditReadOnly::keyPressEvent(QKeyEvent* key_event)
     return QLineEdit::keyPressEvent(key_event);
 
   bool isCtrlC = ((key_event->modifiers() & Qt::ControlModifier) && key_event->key() == Qt::Key_C); // Ctrl+C
-  if (isCtrlC)
+  bool isCtrlA = ((key_event->modifiers() & Qt::ControlModifier) && key_event->key() == Qt::Key_A); // Ctrl+A
+  if (isCtrlC || isCtrlA)
     {
     return QLineEdit::keyPressEvent(key_event);
     }
@@ -47,9 +48,12 @@ void LineEditReadOnly::keyPressEvent(QKeyEvent* key_event)
 
   #ifndef QT_NO_CLIPBOARD    
   QMenu *menu = new QMenu();
-  QAction *action = menu->addAction(QLineEdit::tr("&Copy"));
-  action->setEnabled(hasSelectedText());
-  connect(action, SIGNAL(triggered()), SLOT(copy()));
+  QAction *actionCopy = menu->addAction(QLineEdit::tr("&Copy"));
+  menu->addSeparator ();
+  QAction *actionSelectAll = menu->addAction(QLineEdit::tr("&Select All"));
+  actionCopy->setEnabled(hasSelectedText());
+  connect(actionCopy, SIGNAL(triggered()), SLOT(copy()));
+  connect(actionSelectAll, SIGNAL(triggered()), SLOT(selectAll())); 
   menu->exec(event->globalPos());
   delete menu;
   #endif

@@ -40,6 +40,9 @@ public:
   void saveAttachment ();
   bool isSelection () const;
   bool isOneEmailSelected() const;
+  Qt::SortOrder getSortOrder() const;
+  int getSortedColumn() const;
+  void selectAll ();
 
 private slots:
   void onDoubleClickedItem(QModelIndex);

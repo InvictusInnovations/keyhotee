@@ -61,6 +61,7 @@ Q_SIGNALS:
 private slots:
   void firstNameChanged(const QString& name);
   void lastNameChanged(const QString& name);
+  void enableSendMail( bool enable);
   void keyhoteeIdChanged(const QString& name);
   void keyhoteeIdEdited(const QString& name);
   void publicKeyEdited(const QString& public_key_string);
@@ -91,6 +92,7 @@ private slots:
 
   void currentTabChanged(int index);
   void onSend ();
+  void onTextChanged();
   void onSliderChanged(int mining_effort)
     {
     _current_contact.setMiningEffort(mining_effort);
@@ -139,6 +141,7 @@ private:
   QAction*                                cancel_edit_contact;
   QAction*                                separatorToolBar;
   QAction*                                label_createContact;
+  int static const                        _max_chat_char = 5000;
   bool                                    _addingNewContact;
   bool                                    _modyfied;
   bool                                    _editing;
