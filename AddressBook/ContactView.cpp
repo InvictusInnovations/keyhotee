@@ -182,6 +182,13 @@ void ContactView::addNewContact ()
   keyEdit(true);
 }
 
+void ContactView::setPublicKey(const QString& public_key_string)
+{
+  ui->public_key->setText(public_key_string);
+  publicKeyEdited(public_key_string);
+  setModyfied();
+}
+
 void ContactView::onSave()
 {
   try

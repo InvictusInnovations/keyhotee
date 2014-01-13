@@ -78,6 +78,26 @@ QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFo
     }
   }
 
+bool matchContact(const fc::ecc::public_key& pk, bts::addressbook::wallet_contact* matchedContact)
+{
+  assert(pk.valid());
+
+  auto address_book = bts::get_profile()->get_addressbook();
+  auto c = address_book->get_contact_by_public_key(pk);
+  if (c)
+  {
+    *matchedContact = *c;
+    return true;
+  }
+  else
+  {
+    *matchedContact = bts::addressbook::wallet_contact();
+    matchedContact->public_key = pk;
+  }
+
+  return false;
+}
+
 QString 
 makeContactListString(const std::vector<fc::ecc::public_key>& key_list, char separator /*= ','*/,
   TContactTextFormatting contactFormatting /* = KEYHOTEE_IDENTIFIER*/)

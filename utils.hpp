@@ -16,6 +16,7 @@ namespace bts
 namespace addressbook
 {
 struct contact;
+struct wallet_contact;
 } ///namespace addressbook
 } /// namespace bts
 
@@ -53,6 +54,8 @@ enum TContactTextFormatting
 */
 QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFormatting,
   bts::addressbook::contact* matchingContact = nullptr);
+
+bool matchContact(const fc::ecc::public_key& pk, bts::addressbook::wallet_contact* matchedContact);
 
 /** Allows to convert list of keys into textual form, separated by given character.
     \see above toString description to single key conversion details.
