@@ -50,6 +50,10 @@ public:
     {
     return _addingNewContact;
     }
+  bool isEditing() const
+    {
+    return _editing;
+    }
   bool CheckSaving();
   void addNewContact ();
   void setPublicKey(const QString& public_key_string);
@@ -107,12 +111,7 @@ private:
   bool isModyfied() const
     {
     return _modyfied;
-    }
-
-  bool isEditing() const
-    {
-    return _editing;
-    }
+    } 
 
   void setValid(bool valid);
   bool isValid() const

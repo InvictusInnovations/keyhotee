@@ -34,6 +34,7 @@ public:
   bool isSelection () const;
   bool hasFocusContacts() const;
   void selectAll ();
+  bool EscapeIfEditMode() const;
 
 private:
   ContactView* getCurrentView() const;

@@ -260,3 +260,16 @@ void ContactsTable::selectAll()
   ui->contact_table->selectAll();
   ui->contact_table->setFocus();
 }
+
+bool ContactsTable::EscapeIfEditMode() const
+{
+  if (ContactView * currentView = getCurrentView ())
+  {
+    if (currentView->isEditing())
+    {
+      currentView->onCancel();
+      return true;
+    }    
+  }
+  return false;
+}

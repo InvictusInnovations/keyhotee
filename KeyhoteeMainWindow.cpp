@@ -1011,3 +1011,17 @@ void KeyhoteeMainWindow::setMailSettings (MailSettings& mailSettings)
   mailSettings.sortColumnOutbox = ui->out_box_page->getSortedColumn ();
   mailSettings.sortOrderOutbox = ui->out_box_page->getSortOrder ();
 }
+
+void KeyhoteeMainWindow::keyPressEvent(QKeyEvent *key_event)
+{
+  if (key_event->key() == Qt::Key_Escape)
+  {
+    if (ui->widget_stack->currentWidget () == ui->contacts_page)
+    {
+      if (ui->contacts_page->EscapeIfEditMode())
+        return;
+    }
+  }
+
+  return ATopLevelWindowsContainer::keyPressEvent(key_event);
+}

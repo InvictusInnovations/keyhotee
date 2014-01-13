@@ -93,6 +93,7 @@ signals:
   void enableSendMailSignal(bool enable);
 protected:
   virtual void closeEvent(QCloseEvent *);
+  virtual void keyPressEvent(QKeyEvent *);
 
 private:
   /// application_delegate interface implementation
