@@ -15,7 +15,7 @@
 #include <QScrollBar>
 #include <QTextBlock>
 #include <QToolTip>
-#include <Qmenu>
+#include <QMenu>
 
 #include <fc/log/logger.hpp>
 
