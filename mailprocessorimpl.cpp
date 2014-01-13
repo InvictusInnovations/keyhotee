@@ -20,7 +20,6 @@ class TMailProcessor::TOutboxQueue
       Outbox = profile->get_pending_db();
       Sent = profile->get_sent_db();
       CancelPromise = new fc::promise<void>;
-      QueueStoppedPromise = new fc::promise<void>;
 
       checkForAvailableConnection();
       }
@@ -49,7 +48,12 @@ class TMailProcessor::TOutboxQueue
       if(transferActive || connectionActive)
         {
         CancelPromise->set_value();
-        QueueStoppedPromise->wait();
+
+        if(ConnectionCheckComplete.valid())
+         ConnectionCheckComplete.wait();
+
+        if(TransferLoopComplete.valid())
+         TransferLoopComplete.wait();
         }
 
       assert(AnyOperationsPending() == false);
@@ -109,7 +113,6 @@ class TMailProcessor::TOutboxQueue
     fc::future<void>       TransferLoopComplete;
     fc::future<void>       ConnectionCheckComplete;
     fc::promise<void>::ptr CancelPromise;
-    fc::promise<void>::ptr QueueStoppedPromise;
     mutable std::mutex     OutboxDbLock;
   };
 
@@ -166,9 +169,6 @@ void TMailProcessor::TOutboxQueue::transmissionLoop()
 
   if(notificationSent)
     Processor.Sink.OnMessageSendingEnd();
-
-  if(ConnectionCheckComplete.valid() == false || ConnectionCheckComplete.ready())
-    QueueStoppedPromise->set_value();
   }
 
 void TMailProcessor::TOutboxQueue::connectionCheckingLoop()
@@ -184,9 +184,6 @@ void TMailProcessor::TOutboxQueue::connectionCheckingLoop()
     fc::usleep(fc::milliseconds(250));
     }
   while(CancelPromise->ready() == false);
-
-  if(TransferLoopComplete.valid() == false || TransferLoopComplete.ready())
-    QueueStoppedPromise->set_value();
   }
 
 bool TMailProcessor::TOutboxQueue::fetchNextMessage(TStoredMailMessage* storedMsg,

@@ -145,7 +145,15 @@ int TKeyhoteeApplication::run()
 
     startup();
 
-    connect(this, &QApplication::aboutToQuit, [=](){ bts::application::instance()->quit(); });
+    connect(this, &QApplication::aboutToQuit,
+      [=]()
+      {
+        /// Delete the main window. if its object is still alive also mail queue is active what can lead to crash
+        delete _main_window;
+        _main_window = nullptr;
+        _backend_app->quit();
+        _backend_app.reset();
+      });
 
     QTimer fc_exec;
     QObject::connect(&fc_exec, &QTimer::timeout, 
@@ -155,6 +163,7 @@ int TKeyhoteeApplication::run()
 
     /// increment any QT specific status by last our one to avoid conflicts.
     int rawStatus = (unsigned int)exec();
+
     if(rawStatus != 0)
       _exit_status = TExitStatus::LAST_EXIT_STATUS + rawStatus;
     else

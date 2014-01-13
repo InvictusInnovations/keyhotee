@@ -915,7 +915,9 @@ void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
     ATopLevelWindowsContainer::closeEvent(closeEvent);
     }
   else
+    {
     closeEvent->ignore();
+    }
 }
 
 bool KeyhoteeMainWindow::checkSaving() const
