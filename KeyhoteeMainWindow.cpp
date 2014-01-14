@@ -304,6 +304,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   actionMenu->setCheckable(true);
   this->setMenuWindow(ui->menuWindow);
   this->registration(actionMenu);
+  actionMenu->setVisible(false);
 }
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()

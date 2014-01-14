@@ -5,10 +5,8 @@
 #include <QKeyEvent>
 
 ATopLevelWindow::ATopLevelWindow(ATopLevelWindowsContainer *parent) :
-  SelfSizingMainWindow(parent)
+  SelfSizingMainWindow()
 {
-  QMainWindow::setParent(parent);
-
   parentWin = parent;
 
   actionMenu = new QAction(tr("[*]"), this);
@@ -36,3 +34,14 @@ void ATopLevelWindow::closeEvent(QCloseEvent *event)
 {
   parentWin->unRegistration(actionMenu);
 }
+
+bool ATopLevelWindow::event(QEvent *event)
+{
+  if(event->type() == QEvent::WindowActivate)
+  {
+    actionMenu->setChecked(true);
+  }
+
+  return QMainWindow::event(event);
+}
+
