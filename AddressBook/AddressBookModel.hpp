@@ -59,6 +59,8 @@ public:
 
   void reloadContacts();
 
+  QModelIndex findModelIndex(const int wallet_index) const;
+
 private:
   int getContactRow(const Contact& contact) const;
 

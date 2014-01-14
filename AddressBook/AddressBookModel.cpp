@@ -383,3 +383,15 @@ QCompleter* AddressBookModel::getContactCompleter()
   return my->_contact_completer;
 }
 
+QModelIndex AddressBookModel::findModelIndex(const int wallet_index) const
+{
+  Contact temp_contact;
+  temp_contact.wallet_index = wallet_index;
+  int row  = getContactRow(temp_contact);
+  
+  if(row < 0)
+    return QModelIndex();
+  else
+    return index(row, 0);
+}
+

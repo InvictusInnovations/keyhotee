@@ -189,10 +189,9 @@ void ContactsTable::onSavedNewContact(int idxNewContact)
   showContactsTable (true);
   }
 
-void ContactsTable::selectRow(int index)
+void ContactsTable::selectRow(int contact_id)
 {
-  QModelIndex idx;
-  idx = _addressbook_model->index (index, 0);
+  QModelIndex idx = _addressbook_model->findModelIndex(contact_id);
   QModelIndex mapped_index = _sorted_addressbook_model->mapFromSource(idx);
 
   ui->contact_table->selectRow(mapped_index.row());
