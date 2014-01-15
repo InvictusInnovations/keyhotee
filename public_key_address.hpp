@@ -20,9 +20,11 @@ struct public_key_address
 
       Returns true if given key is ok, false otherwise.
    */
-  static bool is_valid(const std::string& keyStr)
+  static bool is_valid(const std::string& keyStr, bool* keySemanticallyValid = nullptr)
     {
     bool status = false;
+    if (keySemanticallyValid)
+      *keySemanticallyValid = false;
     try
       {
       std::vector<char> bin = fc::from_base58(keyStr);
@@ -34,15 +36,24 @@ struct public_key_address
         */
         fc::ecc::public_key_data rawData;
         memcpy( (char*)&rawData, bin.data(), 33);
-
         fc::ecc::public_key checker(rawData);
+        
+        if (checker.valid() && keySemanticallyValid)
+        {
+          std::string public_key_string_check = public_key_address(rawData);
+          if (public_key_string_check == keyStr)
+          {
+            *keySemanticallyValid = true;
+          }
+        }
+
         return checker.valid();
         }
       }
     catch (const fc::exception&)
       {
       status = false;
-      }
+      }        
 
     return status;
     }
