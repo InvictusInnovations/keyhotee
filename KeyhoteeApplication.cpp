@@ -17,9 +17,11 @@
 #include <QDebug>
 #include <QFile>
 #include <QMessageBox>
+#include <QtPlugin>
 #include <QStandardPaths>
 #include <QTimer>
 #include <QTemporaryFile>
+#include <QTranslator>
 
 #include <boost/filesystem/path.hpp>
 
@@ -28,7 +30,18 @@
 #ifndef WIN32
   #include <signal.h>
 #endif
-#include <QTranslator>
+
+/// \see http://qt-project.org/doc/qt-5/plugins-howto.html#static-plugins
+
+Q_IMPORT_PLUGIN(QICOPlugin)
+Q_IMPORT_PLUGIN(QMngPlugin)
+Q_IMPORT_PLUGIN(QTiffPlugin)
+Q_IMPORT_PLUGIN(QTgaPlugin)
+Q_IMPORT_PLUGIN(QWbmpPlugin)
+Q_IMPORT_PLUGIN(QSvgPlugin)
+Q_IMPORT_PLUGIN(QSvgIconPlugin)
+//Q_IMPORT_PLUGIN(QGtk2ThemePlugin)
+Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
 
 static TKeyhoteeApplication* s_Instance = nullptr;
 
