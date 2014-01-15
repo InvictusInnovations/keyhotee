@@ -77,11 +77,13 @@ void ATopLevelWindowsContainer::onActiveWindow(QAction* action)
 
 bool ATopLevelWindowsContainer::closeAllWindows()
 {
-  bool closeOK = true;
-  for(int i=listQActions.size()-1; i>0; i--)
-    closeOK &= listQActions[i]->parentWidget()->close();
+  bool close_ok = true;
+  QListIterator<QAction*> it(listQActions);
+  it.toBack();
+  while(it.hasPrevious())
+    close_ok &= it.previous()->parentWidget()->close();
 
-  return closeOK;
+  return close_ok;
 }
 
 void ATopLevelWindowsContainer::closeEvent(QCloseEvent *event)

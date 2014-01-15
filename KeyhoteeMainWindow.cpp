@@ -304,6 +304,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   actionMenu->setCheckable(true);
   this->setMenuWindow(ui->menuWindow);
   this->registration(actionMenu);
+  actionMenu->setVisible(false);
 }
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
@@ -440,7 +441,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       auto con_id = selected_items[0]->data(0, ContactIdRole).toInt();
       openContactGui(con_id);
 //    issue #51: Selecting contact on recent list should synchronize it in main list
-//    ui->contacts_page->selectRow(con_id);
+      ui->contacts_page->selectRow(con_id);
       connect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onRemoveContact()));
       connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
       if(ui->contacts_page->isShowDetailsHidden())

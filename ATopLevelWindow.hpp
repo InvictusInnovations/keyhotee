@@ -23,6 +23,7 @@ private:
 
 protected:
   virtual void closeEvent(QCloseEvent *event);
+  virtual bool event(QEvent *event);
 };
 
 #endif /// __ATOPLEVELWINDOW_HPP

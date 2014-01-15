@@ -26,10 +26,10 @@ private:
 private slots:
   void onNextWindow();
   void onPrevWindow();
+  void onActiveWindow(QAction* action);
 
 protected:
   virtual void closeEvent(QCloseEvent *event);
-  void onActiveWindow(QAction* action);
 
 private:
   QList<QAction*>   listQActions;
