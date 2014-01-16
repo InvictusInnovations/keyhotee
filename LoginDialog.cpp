@@ -4,6 +4,7 @@
 
 #include "KeyhoteeApplication.hpp"
 #include <QMessageBox>
+#include <QSettings>
 
 #include <bts/application.hpp>
 
@@ -22,6 +23,9 @@ LoginDialog::LoginDialog(TKeyhoteeApplication& mainApp, QWidget* parent)
   connect(ui->newProfile, &QPushButton::clicked, this, &LoginDialog::onNew);
   connect(ui->quit, &QPushButton::clicked, this, &LoginDialog::onQuit);
 
+  auto profile_name_to_load = _mainApp.getLoadedProfileName();
+  _selected_profile_ok = false;
+
   auto profiles = bts::application::instance()->get_profiles();
   for(const auto& profileName : profiles)
   {
@@ -29,6 +33,11 @@ LoginDialog::LoginDialog(TKeyhoteeApplication& mainApp, QWidget* parent)
     /// FIXME - fc::log cannot get std::wstring
     wlog( "profiles ${p}", ("p", profileItem.toStdString()) );
     ui->profileSelection->addItem(profileItem);
+    if(profile_name_to_load == profileItem)
+    {
+      ui->profileSelection->setCurrentIndex(ui->profileSelection->count()-1);
+      _selected_profile_ok = true;
+    }
   }
 }
 
@@ -45,7 +54,12 @@ void LoginDialog::onLogin()
     auto profileName = ui->profileSelection->currentText().toStdWString();
     auto profile = bts::application::instance()->load_profile(profileName,password);
     if (profile)
+    {
+      _mainApp.setLoadedProfileName(ui->profileSelection->currentText());
+      QSettings settings("Invictus Innovations", "Keyhotee");
+      settings.setValue("last_profile", ui->profileSelection->currentText());
       accept();
+    }
   }
   catch (const fc::db_in_use_exception& e)
   {

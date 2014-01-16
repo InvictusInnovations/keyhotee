@@ -118,7 +118,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->setupUi(this);
   setWindowIcon(QIcon(":/images/shield1024.png") );
 
-  QString profileName = QString::fromStdWString(mainApp.getLoadedProfileName());
+  QString profileName = mainApp.getLoadedProfileName();
 
   QString title = QString("%1 (%2)").arg(mainApp.getAppName().c_str()).arg(profileName);
   setWindowTitle(title);

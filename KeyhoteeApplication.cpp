@@ -20,6 +20,7 @@
 #include <QStandardPaths>
 #include <QTimer>
 #include <QTemporaryFile>
+#include <QSettings>
 
 #include <boost/filesystem/path.hpp>
 
@@ -69,7 +70,7 @@ int TKeyhoteeApplication::run(int& argc, char** argv)
   TKeyhoteeApplication app(argc, argv);
   if (argc > 1)
   {
-    app._loaded_profile_name = argv[1];
+    app._loaded_profile_name = app.arguments().at(1);
   }
 
   return app.run();
@@ -95,14 +96,9 @@ std::string TKeyhoteeApplication::getAppName() const
   return APP_NAME;
 }
 
-std::wstring TKeyhoteeApplication::getLoadedProfileName() const
-{
-  return bts::application::instance()->get_profile()->get_name(); //_loaded_profile_name;
-}
-
 TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv) 
 :QApplication(argc, argv),
- _loaded_profile_name(DEF_PROFILE_NAME),
+ _loaded_profile_name(""),
  _main_window(nullptr),
  _profile_wizard(nullptr),
  _exit_status(TExitStatus::SUCCESS)
@@ -118,6 +114,7 @@ TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv)
   fc::path data_dir(str_data_dir);
   fc::path profile_dir( data_dir / "profiles" );
   _backend_app->set_profile_directory( profile_dir );
+  _last_loaded_profile_name = false;
 }
 
 TKeyhoteeApplication::~TKeyhoteeApplication()
@@ -142,6 +139,14 @@ int TKeyhoteeApplication::run()
     QTranslator translator;
     translator.load(QString(":/keyhotee_")+locale);
     installTranslator(&translator);
+
+    if(_loaded_profile_name.isEmpty())
+    {
+      QSettings settings("Invictus Innovations", "Keyhotee");
+      _loaded_profile_name = settings.value("last_profile").toString();
+      if(!_loaded_profile_name.isEmpty())
+        _last_loaded_profile_name = true;
+    }
 
     startup();
 
@@ -194,6 +199,15 @@ void TKeyhoteeApplication::displayLogin()
     }
     );
   
+  if(!_loaded_profile_name.isEmpty())
+    if(!loginDialog->isSelectedProfile())
+      if(_last_loaded_profile_name)
+        QMessageBox::warning(loginDialog, tr("Keyhotee login"), tr("Unable to load last launched profile: ") +
+            _loaded_profile_name);
+      else
+        QMessageBox::warning(loginDialog, tr("Keyhotee login"), tr("Unable to load profile specified on the command line: ") +
+            _loaded_profile_name);
+
   loginDialog->show();
 }
 
