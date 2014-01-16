@@ -233,7 +233,9 @@ void ContactView::onSave()
         std::string enteredPKey = ui->public_key->text().toStdString();
         if (enteredPKey.empty() == false)
         {
-          assert(public_key_address::is_valid(enteredPKey) && "Some bug in control validator");
+          bool publicKeySemanticallyValid = false;
+          assert(public_key_address::is_valid(enteredPKey, &publicKeySemanticallyValid));
+          assert(publicKeySemanticallyValid);
           public_key_address key_address(enteredPKey);
           _current_contact.public_key = key_address.key;
         }
@@ -425,10 +427,20 @@ void ContactView::publicKeyEdited(const QString& public_key_string)
   if (gMiningIsPossible)
     lookupPublicKey();
   //check for validly hashed public key and enable/disable save button accordingly
-  bool public_key_is_valid = public_key_address::is_valid(public_key_string.toStdString());
+  bool publicKeySemanticallyValid = false;
+  bool public_key_is_valid = public_key_address::is_valid(public_key_string.toStdString(), 
+                                                          &publicKeySemanticallyValid);
+
+  ui->public_key->setStyleSheet("QLineEdit { color : black; }");
+
   bool doubleContact = false;
   if (public_key_is_valid)
   {
+    if (!publicKeySemanticallyValid)
+    {
+      ui->public_key->setStyleSheet("QLineEdit { color : red; }");
+    }
+
     if (! (doubleContact = existContactWithPublicKey(public_key_string.toStdString())))
     {
       ui->id_status->setText(tr("Public Key Only Mode: valid key") );
@@ -440,7 +452,7 @@ void ContactView::publicKeyEdited(const QString& public_key_string)
     ui->id_status->setText(tr("Public Key Only Mode: not a valid key") );
     ui->id_status->setStyleSheet("QLabel { color : red; }");
   }
-  setValid (public_key_is_valid && ! doubleContact);
+  setValid (public_key_is_valid && ! doubleContact && publicKeySemanticallyValid);
 }
 
 void ContactView::lookupId()
