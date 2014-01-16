@@ -31,6 +31,7 @@
   #include <signal.h>
 #endif
 
+#ifdef __STATIC_QT
 /// \see http://qt-project.org/doc/qt-5/plugins-howto.html#static-plugins
 
 Q_IMPORT_PLUGIN(QICOPlugin)
@@ -42,6 +43,8 @@ Q_IMPORT_PLUGIN(QSvgPlugin)
 Q_IMPORT_PLUGIN(QSvgIconPlugin)
 //Q_IMPORT_PLUGIN(QGtk2ThemePlugin)
 Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
+
+#endif /// __STATIC_QT
 
 static TKeyhoteeApplication* s_Instance = nullptr;
 

@@ -16,7 +16,7 @@ set ICU_ROOT=f:\Others\InvictusRoot\ICU
 set PATH=%ICU_ROOT%\bin;%GNUWIN32_ROOT%\bin;%PATH%
 call "%VS110COMNTOOLS%\..\..\VC\vcvarsall.bat"
 
-call ../src/configure.bat -nomake examples -nomake tests -opensource -platform win32-msvc2012 -mp -prefix %QTDIR% -debug-and-release -force-debug-info -shared -icu -I %ICU_ROOT%\include -L %ICU_ROOT%\lib -openssl -I %OPENSSL_ROOT%\inc32 -L %OPENSSL_ROOT%\out32 -I f:/Others/InvictusRoot/QT/src/qtbase/src/3rdparty/zlib -accessibility -qt-sql-sqlite -no-openvg -qt-libpng -qt-libjpeg -no-vcproj -plugin-manifests -qmake -process -rtti -sse2 -audio-backend -qt-style-windows -qt-style-windowsxp -qt-style-windowsvista -no-style-windowsce -no-style-windowsmobile -native-gestures 2>&1 | tee configure.log 
+call ../src/configure.bat -static -no-c++11 -skip qtwebkit -sse2 -no-sse3 -no-avx -no-avx2 -no-ssse3 -no-sse4.1 -no-sse4.2 -prefix %QTDIR% -nomake examples -nomake tests -opensource -platform win32-msvc2012 -mp -debug-and-release -force-debug-info -icu -I %ICU_ROOT%\include -L %ICU_ROOT%\lib -openssl -I %OPENSSL_ROOT%\inc32 -L %OPENSSL_ROOT%\out32 -I %QTDIR%/src/qtbase/src/3rdparty/zlib -accessibility -qt-sql-sqlite -no-openvg -qt-libpng -qt-libjpeg -no-vcproj -plugin-manifests -qmake -process -rtti -audio-backend -qt-style-windows -qt-style-windowsxp -qt-style-windowsvista -no-style-windowsce -no-style-windowsmobile -native-gestures 2>&1 | tee configure.log 
 
 nmake 2>&1 | tee build.log
 nmake install 2>&1 | tee install.log
