@@ -49,9 +49,31 @@ cd BitShares
 git clone https://github.com/InvictusInnovations/fc
 cd ..
 
-cmake -DCMAKE_CXX_COMPILER=$GXX_BIN -DCMAKE_C_COMPILER=$GCC_BIN -DCMAKE_LIBRARY_PATH=$BUILD_DIR/usr/local/lib  -DCMAKE_INCLUDE_PATH=$BUILD_DIR/usr/local/include -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc" ./CMakeLists.txt
+cmake -DBOOST_ROOT=$BUILD_DIR/usr/local/include -DCMAKE_CXX_COMPILER=$GXX_BIN -DCMAKE_C_COMPILER=$GCC_BIN -DCMAKE_LIBRARY_PATH=$BUILD_DIR/usr/local/lib  -DCMAKE_INCLUDE_PATH=$BUILD_DIR/usr/local/include  ./CMakeLists.txt
 #make VERBOSE=1
 make -j4
 
+
+# make a .app with all paths to dylibs correctly set
+
 cd bin
+
+mkdir Keyhotee.app/Contents/Frameworks
+
+export STDCXX_DYLIB=/usr/local/lib/gcc/x86_64-apple-darwin13.0.0/4.8.2/libstdc++.6.dylib
+export GCC_DYLIB=/usr/local/Cellar/gcc48/4.8.2/lib/gcc/x86_64-apple-darwin13.0.0/4.8.2/libgcc_s.1.dylib
+
+
+cp $STDCXX_DYLIB $GCC_DYLIB Keyhotee.app/Contents/Frameworks
+
+chmod a+w Keyhotee.app/Contents/Frameworks/*
+
+install_name_tool -change $GCC_DYLIB @executable_path/../Frameworks/libgcc_s.1.dylib Keyhotee.app/Contents/MacOS/Keyhotee
+install_name_tool -change $STDCXX_DYLIB @executable_path/../Frameworks/libstdc++.6.dylib Keyhotee.app/Contents/MacOS/Keyhotee
+
+install_name_tool -change $GCC_DYLIB @executable_path/../Frameworks/libgcc_s.1.dylib Keyhotee.app/Contents/Frameworks/libgcc_s.1.dylib
+install_name_tool -change $GCC_DYLIB @executable_path/../Frameworks/libgcc_s.1.dylib Keyhotee.app/Contents/Frameworks/libstdc++.6.dylib
+install_name_tool -change $STDCXX_DYLIB @executable_path/../Frameworks/libstdc++.6.dylib Keyhotee.app/Contents/Frameworks/libstdc++.6.dylib
+
+
 $QTDIR/bin/macdeployqt Keyhotee.app -dmg
