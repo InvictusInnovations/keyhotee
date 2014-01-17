@@ -4,7 +4,7 @@ cmake_minimum_required( VERSION 2.8.11 )
 set( CMAKE_INCLUDE_CURRENT_DIR ON)
 set( CMAKE_AUTOMOC ON  )
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/GitVersionGen/")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/fc/GitVersionGen/")
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
