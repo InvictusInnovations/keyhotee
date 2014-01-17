@@ -54,26 +54,24 @@ cmake -DBOOST_ROOT=$BUILD_DIR/usr/local/include -DCMAKE_CXX_COMPILER=$GXX_BIN -D
 make -j4
 
 
-# make a .app with all paths to dylibs correctly set
+# make a .app and a .dmg with all paths to dylibs correctly set
+
+STDCXX_DYLIB=/usr/local/lib/gcc/x86_64-apple-darwin13.0.0/4.8.2/libstdc++.6.dylib
+GCC_DYLIB=/usr/local/Cellar/gcc48/4.8.2/lib/gcc/x86_64-apple-darwin13.0.0/4.8.2/libgcc_s.1.dylib
+
+APP=Keyhotee.app/Contents
 
 cd bin
+mkdir $APP/Frameworks
+cp $STDCXX_DYLIB $GCC_DYLIB $APP/Frameworks
+chmod 644 $APP/Frameworks/*
 
-mkdir Keyhotee.app/Contents/Frameworks
+install_name_tool -change $GCC_DYLIB @executable_path/../Frameworks/libgcc_s.1.dylib $APP/MacOS/Keyhotee
+install_name_tool -change $STDCXX_DYLIB @executable_path/../Frameworks/libstdc++.6.dylib $APP/MacOS/Keyhotee
 
-export STDCXX_DYLIB=/usr/local/lib/gcc/x86_64-apple-darwin13.0.0/4.8.2/libstdc++.6.dylib
-export GCC_DYLIB=/usr/local/Cellar/gcc48/4.8.2/lib/gcc/x86_64-apple-darwin13.0.0/4.8.2/libgcc_s.1.dylib
-
-
-cp $STDCXX_DYLIB $GCC_DYLIB Keyhotee.app/Contents/Frameworks
-
-chmod a+w Keyhotee.app/Contents/Frameworks/*
-
-install_name_tool -change $GCC_DYLIB @executable_path/../Frameworks/libgcc_s.1.dylib Keyhotee.app/Contents/MacOS/Keyhotee
-install_name_tool -change $STDCXX_DYLIB @executable_path/../Frameworks/libstdc++.6.dylib Keyhotee.app/Contents/MacOS/Keyhotee
-
-install_name_tool -change $GCC_DYLIB @executable_path/../Frameworks/libgcc_s.1.dylib Keyhotee.app/Contents/Frameworks/libgcc_s.1.dylib
-install_name_tool -change $GCC_DYLIB @executable_path/../Frameworks/libgcc_s.1.dylib Keyhotee.app/Contents/Frameworks/libstdc++.6.dylib
-install_name_tool -change $STDCXX_DYLIB @executable_path/../Frameworks/libstdc++.6.dylib Keyhotee.app/Contents/Frameworks/libstdc++.6.dylib
+install_name_tool -change $GCC_DYLIB @executable_path/../Frameworks/libgcc_s.1.dylib $APP/Frameworks/libgcc_s.1.dylib
+install_name_tool -change $GCC_DYLIB @executable_path/../Frameworks/libgcc_s.1.dylib $APP/Frameworks/libstdc++.6.dylib
+install_name_tool -change $STDCXX_DYLIB @executable_path/../Frameworks/libstdc++.6.dylib $APP/Frameworks/libstdc++.6.dylib
 
 
 $QTDIR/bin/macdeployqt Keyhotee.app -dmg
