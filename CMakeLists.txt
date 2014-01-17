@@ -1,6 +1,29 @@
 project( keyhotee )
 cmake_minimum_required( VERSION 2.8.11 )
 
+macro(FillQtDependentLibraries)
+  GET_TARGET_PROPERTY(QT_LIB_DIR Qt5::Core LOCATION)
+  GET_FILENAME_COMPONENT(QT_LIB_DIR "${QT_LIB_DIR}" PATH)
+
+  # Warning this lib doesn't have an associated .cmake :-(
+  find_library(Qt5Platform_LIBRARIES_RELEASE Qt5PlatformSupport HINTS "${QT_LIB_DIR}")
+  find_library(Qt5Platform_LIBRARIES_DEBUG Qt5PlatformSupportd HINTS "${QT_LIB_DIR}")
+  
+  # Warning this lib doesn't have an associated .cmake :-(
+  find_library(Qt5SvgIcon_LIBRARIES_RELEASE qsvgicon HINTS "${QT_LIB_DIR}/../plugins/iconengines/")
+  find_library(Qt5SvgIcon_LIBRARIES_DEBUG qsvgicond HINTS "${QT_LIB_DIR}/../plugins/iconengines/")
+
+  if(WIN32)
+    message(STATUS "Setting up additional QT Dependencies for Windows platform")
+    # put here all system libraries which have to be linked 
+    LIST(APPEND "QT_DEPENDENCY_LIBRARIES" "Imm32.Lib" "Winmm.lib")
+  else(WIN32)
+    IF(UNIX)
+      message(STATUS "Setting up additional QT Dependencies for Unix platform")
+    ENDIF(UNIX)
+  ENDIF(WIN32)
+endmacro()
+
 set( CMAKE_INCLUDE_CURRENT_DIR ON)
 set( CMAKE_AUTOMOC ON  )
 
@@ -14,8 +37,17 @@ get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
 #message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
+SET(KH_STATIC_QT 1)
+SET(QT_DEPENDENCY_LIBRARIES "")
+SET(ICU_LIBS_PREFIX "")
+
 IF( WIN32 )
   MESSAGE(platform= "Compiling on WIN32")
+
+  IF(KH_STATIC_QT EQUAL 1)
+    # Use dedicated prefix to find static versions of libraries 
+    SET(ICU_LIBS_PREFIX "s")
+  ENDIF()
 
   #Set to allow xp compatibility
   set(CMAKE_GENERATOR_TOOLSET "v110_xp" CACHE INTERNAL "XP-compatible VS 11")
@@ -26,10 +58,16 @@ IF( WIN32 )
 
 ENDIF(WIN32)
 
+find_package( ICU )
 find_package( OpenSSL )
 find_package( Qt5Core )
 find_package( Qt5LinguistTools )
 find_package( Qt5PrintSupport )
+
+IF(KH_STATIC_QT EQUAL 1)
+  ADD_DEFINITIONS( -D__STATIC_QT )
+  FillQtDependentLibraries()
+ENDIF()
 
 #Note: bitshares repo should be checked out under keyhotee dir or path here should be changed
 set(BITSHARES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BitShares)
@@ -44,14 +82,9 @@ IF("${INVICTUS_ROOT}" STREQUAL "")
   SET(INVICTUS_ROOT "./")
 ENDIF("${INVICTUS_ROOT}" STREQUAL "")
 
-message("Using invictus root: " ${INVICTUS_ROOT})
-
-SET (KH_STATIC_QT 0)
+message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
 
 ADD_DEFINITIONS( -DALPHA_RELEASE )
-if( KH_STATIC_QT EQUAL 1 )
-  ADD_DEFINITIONS( -D__STATIC_QT )
-ENDIF()
 
 IF( WIN32 )
   ADD_DEFINITIONS( -DWIN32 )
@@ -117,38 +150,36 @@ ELSE(WIN32)
       list (APPEND QT_STATIC_PLUGINS "${FREETYPE_LIBRARY}")
 
       find_package (XCB)
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${XCB_XCB_LIBRARY}")
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${XCB_GLX_LIBRARY}")
-
-      find_package( ICU )
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${XCB_XCB_LIBRARY}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${XCB_GLX_LIBRARY}")
 
       find_package(X11_XCB)
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${X11_XCB_LIBRARIES}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_XCB_LIBRARIES}")
 
       find_package(X11)
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${X11_ICE_LIB}")
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${X11_SM_LIB}")
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${X11_X11_LIB}")
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${X11_Xext_LIB}")
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${X11_Xi_LIB}")
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${X11_Xrender_LIB}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_ICE_LIB}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_SM_LIB}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_X11_LIB}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_Xext_LIB}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_Xi_LIB}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_Xrender_LIB}")
 
 
       find_package(OpenGL)
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${OPENGL_gl_LIBRARY}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${OPENGL_gl_LIBRARY}")
 
       find_package(GTK2)
       message ("Found GTK2_GLIB: " "${GTK2_GLIB_LIBRARY_RELEASE}")
       message ("Found GTK2_GLIB: " "${GTK2_GOBJECT_LIBRARY_RELEASE}")
       message ("Found GTK2_GTHREAD: " "${GTK2_GTHREAD_LIBRARY_RELEASE}")
 
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${GTK2_GLIB_LIBRARY_RELEASE}")
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${GTK2_GOBJECT_LIBRARY_RELEASE}")
-      list (APPEND OS_DEPENDENCY_LIBRARIES "${GTK2_GTHREAD_LIBRARY_RELEASE}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${GTK2_GLIB_LIBRARY_RELEASE}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${GTK2_GOBJECT_LIBRARY_RELEASE}")
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${GTK2_GTHREAD_LIBRARY_RELEASE}")
 
       message ("QT static plugins: " ${QT_STATIC_PLUGINS})
       message ("CMAKE_DL_LIBS: " ${CMAKE_DL_LIBS})
-      message ("OS_DEPENDENCY_LIBRARIES: " ${OS_DEPENDENCY_LIBRARIES})
+      message ("QT_DEPENDENCY_LIBRARIES: " ${QT_DEPENDENCY_LIBRARIES})
     endif(KH_STATIC_QT)
 
   ENDIF( NOT APPLE )
@@ -377,13 +408,18 @@ qt5_use_modules(Keyhotee Widgets PrintSupport Svg)
 
 set(CMAKE_STATIC_TYPE true)
 
-
 #fc  miniupnpc
-target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras}  ${CMAKE_DL_LIBS} ${OS_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES} ${QT_STATIC_PLUGINS} ${APPKIT_LIBRARY} upnpc-static Qt5::Svg)
-
+target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES}
+  ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras}  ${CMAKE_DL_LIBS} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES}
+  ${QT_STATIC_PLUGINS} ${APPKIT_LIBRARY} upnpc-static Qt5::Widgets Qt5::Gui Qt5::PrintSupport Qt5::Svg ${Qt5Gui_PLUGINS} 
+  debug ${Qt5Platform_LIBRARIES_DEBUG}
+  optimized ${Qt5Platform_LIBRARIES_RELEASE}
+  debug ${Qt5SvgIcon_LIBRARIES_DEBUG}
+  optimized ${Qt5SvgIcon_LIBRARIES_RELEASE}
+)
 
 if (MSVC)
-  message("Setting up debug options for MSVC build")
+  message(STATUS "Setting up debug options for MSVC build")
 # Probably cmake has a bug and vcxproj generated for executable in Debug conf. has disabled debug info
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
 endif(MSVC)
