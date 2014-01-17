@@ -5,14 +5,21 @@ macro(FillQtDependentLibraries)
   GET_TARGET_PROPERTY(QT_LIB_DIR Qt5::Core LOCATION)
   GET_FILENAME_COMPONENT(QT_LIB_DIR "${QT_LIB_DIR}" PATH)
 
+  SET (DEBUG_SUFFIX "")
+
+  IF(WIN32)
+    # On windows platform release & debug libraries have different names
+    SET (DEBUG_SUFFIX "D")
+  ENDIF(WIN32)
+
   # Warning this lib doesn't have an associated .cmake :-(
   find_library(Qt5Platform_LIBRARIES_RELEASE Qt5PlatformSupport HINTS "${QT_LIB_DIR}")
-  find_library(Qt5Platform_LIBRARIES_DEBUG Qt5PlatformSupportd HINTS "${QT_LIB_DIR}")
-  
+  find_library(Qt5Platform_LIBRARIES_DEBUG Qt5PlatformSupport${DEBUG_SUFFIX} HINTS "${QT_LIB_DIR}")
+
   # Warning this lib doesn't have an associated .cmake :-(
   find_library(Qt5SvgIcon_LIBRARIES_RELEASE qsvgicon HINTS "${QT_LIB_DIR}/../plugins/iconengines/")
-  find_library(Qt5SvgIcon_LIBRARIES_DEBUG qsvgicond HINTS "${QT_LIB_DIR}/../plugins/iconengines/")
-
+  find_library(Qt5SvgIcon_LIBRARIES_DEBUG qsvgicon${DEBUG_SUFFIX} HINTS "${QT_LIB_DIR}/../plugins/iconengines/")
+  
   if(WIN32)
     message(STATUS "Setting up additional QT Dependencies for Windows platform")
     # put here all system libraries which have to be linked 
@@ -180,7 +187,7 @@ ELSE(WIN32)
       message ("QT static plugins: " ${QT_STATIC_PLUGINS})
       message ("CMAKE_DL_LIBS: " ${CMAKE_DL_LIBS})
       message ("QT_DEPENDENCY_LIBRARIES: " ${QT_DEPENDENCY_LIBRARIES})
-    endif(KH_STATIC_QT)
+    endif(KH_STATIC_QT EQUAL 1)
 
   ENDIF( NOT APPLE )
 ENDIF(WIN32)
