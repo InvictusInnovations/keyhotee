@@ -75,5 +75,6 @@ void MailViewer::displayMailMessage(Mailbox* mailbox, const QModelIndex& index, 
   ui->subject_label->setText(msg.subject);
 
   mailbox->previewImages(ui->message_content);
+  ui->message_content->moveCursor (QTextCursor::Start);
   }
 
