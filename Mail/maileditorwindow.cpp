@@ -69,15 +69,24 @@ TDocumentTransform::Do(TLoadForm loadForm, const TStoredMailMessage& msgHeader,
   Doc = doc;
 
   QString newSubject;
+  QString subject = QString::fromStdString(srcMsg.subject);
+  QString re = QObject::tr("Re: ");
+  QString fwd = QObject::tr("Fwd: ");
 
   switch(loadForm)
     {
     case TLoadForm::Reply:
     case TLoadForm::ReplyAll:
-      newSubject = "Re: ";
+      if(subject.startsWith(re))
+        newSubject = "";
+      else
+        newSubject = re;
       break;
     case TLoadForm::Forward:
-      newSubject = "FW: ";
+      if(subject.startsWith(fwd))
+        newSubject = "";
+      else
+        newSubject = fwd;
       break;
     case TLoadForm::Draft:
     default:
