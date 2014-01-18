@@ -23,16 +23,42 @@ macro(FillQtDependentLibraries)
   if(WIN32)
     message(STATUS "Setting up additional QT Dependencies for Windows platform")
     # put here all system libraries which have to be linked 
-    LIST(APPEND "QT_DEPENDENCY_LIBRARIES" "Imm32.Lib" "Winmm.lib")
+    LIST(APPEND "QT_DEPENDENCY_LIBRARIES" "imm32.lib" "winmm.lib")
   else(WIN32)
     IF(UNIX)
       message(STATUS "Setting up additional QT Dependencies for Unix platform")
+
+      find_library(QXcbStatic_LIBRARY xcb-static HINTS "${QT_LIB_DIR}/../plugins/platforms/xcb-static/")
+      list (APPEND QT_DEPENDENCY_LIBRARIES ${QXcbStatic_LIBRARY})
+
+      find_library(FONTCONFIG_LIBRARY fontconfig)
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${FONTCONFIG_LIBRARY}")
+
+      find_library(FREETYPE_LIBRARY freetype)
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${FREETYPE_LIBRARY}")
+
+      find_package (XCB)
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${XCB_XCB_LIBRARY}" "${XCB_GLX_LIBRARY}")
+
+      find_package(X11_XCB)
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_XCB_LIBRARIES}")
+
+      find_package(X11)
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_ICE_LIB}" "${X11_SM_LIB}" "${X11_X11_LIB}"
+        "${X11_Xext_LIB}" "${X11_Xi_LIB}" "${X11_Xrender_LIB}"
+      )
+
+      find_package(GTK2)
+      list (APPEND QT_DEPENDENCY_LIBRARIES "${GTK2_GLIB_LIBRARY_RELEASE}"
+       "${GTK2_GOBJECT_LIBRARY_RELEASE}" "${GTK2_GTHREAD_LIBRARY_RELEASE}"
+      )
     ENDIF(UNIX)
   ENDIF(WIN32)
 endmacro()
 
 set( CMAKE_INCLUDE_CURRENT_DIR ON)
 set( CMAKE_AUTOMOC ON  )
+SET( BUILD_SHARED_LIBS OFF )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/GitVersionGen/")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CmakeModules/")
@@ -67,9 +93,10 @@ ENDIF(WIN32)
 
 find_package( ICU )
 find_package( OpenSSL )
-find_package( Qt5Core )
 find_package( Qt5LinguistTools )
 find_package( Qt5PrintSupport )
+find_package( Qt5Svg )
+find_package( Qt5Widgets )
 
 IF(KH_STATIC_QT EQUAL 1)
   ADD_DEFINITIONS( -D__STATIC_QT )
@@ -123,7 +150,7 @@ ELSE(WIN32)
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-1.12.0/include )
   include_directories( ${BITSHARES_DIR}/vendor/qtmacextras/include )
 
-  MESSAGE(status "Compiling on UNIX")
+  MESSAGE(STATUS "Compiling on UNIX")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fnon-call-exceptions -std=c++0x -Wall -Wno-unused-local-typedefs -fmax-errors=3 ")#-msse4.2" ) 
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wno-unused-local-typedefs -fmax-errors=3 ") #-msse4.2" )
   #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -Wno-unused-local-typedefs" ) 
@@ -133,62 +160,6 @@ ELSE(WIN32)
 
   IF( NOT APPLE )
     SET( pthread pthread )
-
-    if(KH_STATIC_QT EQUAL 1)
-      set (QT_STATIC_PLUGINS "$ENV{QTDIR}/plugins/platforms/libqxcb.a")
-      list (APPEND QT_STATIC_PLUGINS "$ENV{QTDIR}/plugins/platforms/xcb-static/libxcb-static.a")
-      list (APPEND QT_STATIC_PLUGINS "$ENV{QTDIR}/plugins/imageformats/libqico.a")
-      list (APPEND QT_STATIC_PLUGINS "$ENV{QTDIR}/plugins/imageformats/libqmng.a")
-      list (APPEND QT_STATIC_PLUGINS "$ENV{QTDIR}/plugins/imageformats/libqsvg.a")
-      list (APPEND QT_STATIC_PLUGINS "$ENV{QTDIR}/plugins/imageformats/libqtga.a")
-      list (APPEND QT_STATIC_PLUGINS "$ENV{QTDIR}/plugins/imageformats/libqtiff.a")
-      list (APPEND QT_STATIC_PLUGINS "$ENV{QTDIR}/plugins/imageformats/libqwbmp.a")
-      list (APPEND QT_STATIC_PLUGINS "$ENV{QTDIR}/plugins/iconengines/libqsvgicon.a")
-      #list (APPEND QT_STATIC_PLUGINS "$ENV{QTDIR}/plugins/platformthemes/libqgtk2.a")
-
-      list (APPEND QT_STATIC_PLUGINS "$ENV{QTDIR}/lib/libQt5PlatformSupport.a")
-
-      find_library(FONTCONFIG_LIBRARY fontconfig)
-      message ("Found FONTCONFIG_LIBRARY:" ${FONTCONFIG_LIBRARY})
-      list (APPEND QT_STATIC_PLUGINS "${FONTCONFIG_LIBRARY}")
-
-      find_library(FREETYPE_LIBRARY freetype)
-      message ("Found FREETYPE_LIBRARY:" ${FREETYPE_LIBRARY})
-      list (APPEND QT_STATIC_PLUGINS "${FREETYPE_LIBRARY}")
-
-      find_package (XCB)
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${XCB_XCB_LIBRARY}")
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${XCB_GLX_LIBRARY}")
-
-      find_package(X11_XCB)
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_XCB_LIBRARIES}")
-
-      find_package(X11)
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_ICE_LIB}")
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_SM_LIB}")
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_X11_LIB}")
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_Xext_LIB}")
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_Xi_LIB}")
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${X11_Xrender_LIB}")
-
-
-      find_package(OpenGL)
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${OPENGL_gl_LIBRARY}")
-
-      find_package(GTK2)
-      message ("Found GTK2_GLIB: " "${GTK2_GLIB_LIBRARY_RELEASE}")
-      message ("Found GTK2_GLIB: " "${GTK2_GOBJECT_LIBRARY_RELEASE}")
-      message ("Found GTK2_GTHREAD: " "${GTK2_GTHREAD_LIBRARY_RELEASE}")
-
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${GTK2_GLIB_LIBRARY_RELEASE}")
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${GTK2_GOBJECT_LIBRARY_RELEASE}")
-      list (APPEND QT_DEPENDENCY_LIBRARIES "${GTK2_GTHREAD_LIBRARY_RELEASE}")
-
-      message ("QT static plugins: " ${QT_STATIC_PLUGINS})
-      message ("CMAKE_DL_LIBS: " ${CMAKE_DL_LIBS})
-      message ("QT_DEPENDENCY_LIBRARIES: " ${QT_DEPENDENCY_LIBRARIES})
-    endif(KH_STATIC_QT EQUAL 1)
-
   ENDIF( NOT APPLE )
 ENDIF(WIN32)
 
@@ -411,18 +382,18 @@ set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_DEBUG KeyhoteeD )
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
 
 # Use the Widgets module from Qt 5.
-qt5_use_modules(Keyhotee Widgets PrintSupport Svg)
+qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport)
 
 set(CMAKE_STATIC_TYPE true)
 
 #fc  miniupnpc
-target_link_libraries( Keyhotee keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES}
-  ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras}  ${CMAKE_DL_LIBS} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES}
-  ${QT_STATIC_PLUGINS} ${APPKIT_LIBRARY} upnpc-static Qt5::Widgets Qt5::Gui Qt5::PrintSupport Qt5::Svg ${Qt5Gui_PLUGINS} 
-  debug ${Qt5Platform_LIBRARIES_DEBUG}
-  optimized ${Qt5Platform_LIBRARIES_RELEASE}
-  debug ${Qt5SvgIcon_LIBRARIES_DEBUG}
-  optimized ${Qt5SvgIcon_LIBRARIES_RELEASE}
+target_link_libraries( Keyhotee keyhotee_library ${Qt5Gui_PLUGINS} 
+  debug ${Qt5Platform_LIBRARIES_DEBUG} optimized ${Qt5Platform_LIBRARIES_RELEASE}
+  debug ${Qt5SvgIcon_LIBRARIES_DEBUG} optimized ${Qt5SvgIcon_LIBRARIES_RELEASE}
+  Qt5::Svg Qt5::Widgets Qt5::Gui Qt5::PrintSupport
+  bshare upnpc-static fc leveldb ${BOOST_LIBRARIES}
+  ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES}
+  ${APPKIT_LIBRARY} ${CMAKE_DL_LIBS} 
 )
 
 if (MSVC)
