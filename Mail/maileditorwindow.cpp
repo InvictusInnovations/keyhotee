@@ -6,6 +6,7 @@
 #include "mailfieldswidget.hpp"
 #include "moneyattachementwidget.hpp"
 #include "utils.hpp"
+#include "Mailbox.hpp"
 
 #include <bts/profile.hpp>
 
@@ -288,7 +289,7 @@ void MailEditorMainWindow::SetRecipientList(const TRecipientPublicKeys& toList,
   setWindowModified(false);
   }
 
-void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
+void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessage& srcMsgHeader,
   const TPhysicalMailMessage& srcMsg, TLoadForm loadForm)
   {
   TPublicKeyIndex allRecipients, toRecipients;
@@ -325,6 +326,9 @@ void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
   
   ui->messageEdit->moveCursor(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor);
   onFileAttachementTriggered( FileAttachment->hasAttachment() );
+  
+  if ( !EditMode && FileAttachment->hasAttachment())
+    mailbox->previewImages(ui->messageEdit);
   }
 
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
