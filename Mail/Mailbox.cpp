@@ -1,4 +1,4 @@
-#include "Mailbox.hpp"
+﻿#include "Mailbox.hpp"
 
 #include "ui_Mailbox.h"
 
@@ -424,18 +424,21 @@ void Mailbox::previewImages (QTextEdit* textEdit)
   int     imageSize;
   QString imageName;
 
-  for (int i = 0; i < decodedMsg.attachments.size(); i++)
+  for (UINT i = 0; i < decodedMsg.attachments.size(); i++)
   {
     imageName = QString("imageName.%1").arg(i);
 	  imageData = (uchar*)decodedMsg.attachments[i].body.data ();
 	  imageSize = decodedMsg.attachments[i].body.size();
 
-	  //QImageReader::supportedImageFormats()
+	  //QImageReader::supportedImageFormats()    
 	  bool loadOk = image.loadFromData(imageData, imageSize);
     if (loadOk)
     {
-	    doc->addResource( QTextDocument::ImageResource, QUrl( imageName ), image);
-      textEdit->append("<br/><hr><br/><img src='" + imageName + "'>");
+      doc->addResource( QTextDocument::ImageResource, QUrl( imageName ), image);
+      QString attachmentFileName = "<br/><hr><font color=""grey"">" + 
+                                    QString(decodedMsg.attachments[i].filename.c_str()) + 
+                                    "</font><br/>";
+      textEdit->append(attachmentFileName +  "<center><img src='" + imageName + "'></center>");
     }
   }
 }
