@@ -148,6 +148,8 @@ set( sources
         qtreusable/selfsizingmainwindow.cpp
         qtreusable/AutoUpdateProgressBar.hpp
         qtreusable/AutoUpdateProgressBar.cpp
+        qtreusable/TImage.hpp
+        qtreusable/TImage.cpp
 
         profile_wizard/ProfileEditPage.ui
         profile_wizard/ProfileIntroPage.ui
