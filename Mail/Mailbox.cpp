@@ -424,7 +424,7 @@ void Mailbox::previewImages (QTextEdit* textEdit)
   int     imageSize;
   QString imageName;
 
-  for (UINT i = 0; i < decodedMsg.attachments.size(); i++)
+  for (int i = 0; i < decodedMsg.attachments.size(); i++)
   {
     imageName = QString("imageName.%1").arg(i);
 	  imageData = (uchar*)decodedMsg.attachments[i].body.data ();
