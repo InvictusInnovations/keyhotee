@@ -20,7 +20,7 @@ call ../src/configure.bat -static -no-c++11 -skip qtwebkit -sse2 -no-sse3 -no-av
 -no-sse4.1 -no-sse4.2 -prefix %QTDIR% -no-opengl -no-compile-examples -nomake examples -nomake tests -confirm-license -opensource ^
 -platform win32-msvc2012 -mp -debug-and-release -force-debug-info -icu -I %ICU_ROOT%\include -L %ICU_ROOT%\lib ^
 -openssl -I %OPENSSL_ROOT%\inc32 -L %OPENSSL_ROOT%\out32 -I %QTDIR%/src/qtbase/src/3rdparty/zlib -accessibility ^
--qt-sql-sqlite -no-openvg -qt-libpng -qt-libjpeg -no-vcproj -plugin-manifests -qmake -process -rtti ^
+-qt-sql-sqlite -no-openvg -qt-zlib -qt-libpng -qt-libjpeg -no-vcproj -plugin-manifests -qmake -process -rtti ^
 -audio-backend -qt-style-windows -qt-style-windowsxp -qt-style-windowsvista -no-style-windowsce ^
 -no-style-windowsmobile -native-gestures 2>&1 | tee configure.log && ^
 nmake 2>&1 | tee build.log && ^
