@@ -107,9 +107,9 @@ class TFileAttachmentWidget::AAttachmentItem : public QTableWidgetItem
   /// QTableWidgetItem override.
     virtual void setData(int role, const QVariant& value)
       {
+      QTableWidgetItem::setData(role, value);
       if(role == Qt::EditRole && value.toString().trimmed().isEmpty() == false)
-        {
-        QTableWidgetItem::setData(role, value);
+        {        
         Owner->OnAttachmentItemChanged();
         }
       }
