@@ -1,10 +1,9 @@
 #include "TImage.hpp"
 #include <QBuffer>
 
-TImage::TImage(uchar *data, int size) 
-  : QImage()
+
+TImage::TImage() : QImage()
 {
-  loadFromData(data, size);
 }
 
 /** Supporting images in ToolTips

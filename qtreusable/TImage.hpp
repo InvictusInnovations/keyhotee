@@ -6,7 +6,7 @@
 class TImage : public QImage
 {
 public:
-    explicit TImage(uchar *data, int size);
+    TImage();
     QString toHtml();
 };
 
