@@ -6,7 +6,9 @@
 #     library location typically will have to be provided explicitly using the
 #     -D command-line option. Alternatively, the ICUROOT environment variable
 #     can be set.
-#
+#   ICU_LIBS_PREFIX
+#     Should be set to 's' if static version of libraries should be found. Defaults to "" (shared libs).
+
 # Read-only variables:
 #   ICU_FOUND
 #     Indicates whether the library has been found.
@@ -305,9 +307,14 @@ IF (ICU_INCLUDE_DIR)
 
   SET (_ICU_DETECTED_SUFFIX ${ICU_VERSION_MAJOR}${ICU_VERSION_MINOR})
 
+  IF(NOT DEFINED ICU_LIBS_PREFIX)
+    SET (ICU_LIBS_PREFIX "")
+  ENDIF()
+
   # Loop over each components
   FOREACH (_ICU_COMPONENT ${ICU_FIND_COMPONENTS})
-    SET (_ICU_COMPONENT_BASE icu${_ICU_COMPONENT})
+
+    SET (_ICU_COMPONENT_BASE ${ICU_LIBS_PREFIX}icu${_ICU_COMPONENT})
 
     SET (_ICU_COMPONENT_POSSIBLE_DEBUG_NAMES
          ${_ICU_COMPONENT_BASE}d

@@ -32,17 +32,27 @@
   #include <signal.h>
 #endif
 
+#ifdef __STATIC_QT
 /// \see http://qt-project.org/doc/qt-5/plugins-howto.html#static-plugins
-
 Q_IMPORT_PLUGIN(QICOPlugin)
 Q_IMPORT_PLUGIN(QMngPlugin)
 Q_IMPORT_PLUGIN(QTiffPlugin)
 Q_IMPORT_PLUGIN(QTgaPlugin)
-Q_IMPORT_PLUGIN(QWbmpPlugin)
 Q_IMPORT_PLUGIN(QSvgPlugin)
 Q_IMPORT_PLUGIN(QSvgIconPlugin)
-//Q_IMPORT_PLUGIN(QGtk2ThemePlugin)
-Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
+Q_IMPORT_PLUGIN(QWbmpPlugin)
+
+Q_IMPORT_PLUGIN(QMinimalIntegrationPlugin)
+Q_IMPORT_PLUGIN(QOffscreenIntegrationPlugin)
+
+#ifdef WIN32
+  Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+#else
+//  Q_IMPORT_PLUGIN(QGtk2ThemePlugin)
+  Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
+#endif
+
+#endif /// __STATIC_QT
 
 static TKeyhoteeApplication* s_Instance = nullptr;
 
