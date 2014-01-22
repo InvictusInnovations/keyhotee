@@ -12,6 +12,7 @@ class MailboxModel;
 class QAbstractItemModel;
 class QItemSelection;
 class QSortFilterProxyModel;
+class QTextEdit;
 
 class Mailbox : public QWidget
 {
@@ -43,6 +44,7 @@ public:
   Qt::SortOrder getSortOrder() const;
   int getSortedColumn() const;
   void selectAll ();
+  void previewImages (QTextEdit* textEdit);
 
 private slots:
   void onDoubleClickedItem(QModelIndex);

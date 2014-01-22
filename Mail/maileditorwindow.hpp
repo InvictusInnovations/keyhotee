@@ -22,6 +22,7 @@ class AddressBookModel;
 class TFileAttachmentWidget;
 class MailFieldsWidget;
 class TMoneyAttachementWidget;
+class Mailbox;
 
 
 
@@ -86,7 +87,7 @@ class MailEditorMainWindow : public ATopLevelWindow
                           'cc' list should contain others contacts originally placed on 'cc' list
                           if they are not yet on 'to' list.
     */
-    void LoadMessage(const TStoredMailMessage& srcMsgHeader, const TPhysicalMailMessage& srcMsg,
+    void LoadMessage(Mailbox* mailbox, const TStoredMailMessage& srcMsgHeader, const TPhysicalMailMessage& srcMsg,
       TLoadForm loadForm);
 
   private:

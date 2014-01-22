@@ -9,6 +9,7 @@
 
 #include <QDesktopWidget>
 #include <QMessageBox>
+#include <QSettings>
 //#include <ui_ProfileNymPage.h>
 
 #include <fc/string.hpp>
@@ -308,6 +309,9 @@ void ProfileWizard::createProfile()
       },
       [=]() 
       {
+        mainApp->setLoadedProfileName(QString::fromStdWString(profileName));
+        QSettings settings("Invictus Innovations", "Keyhotee");
+        settings.setValue("last_profile", QString::fromStdWString(profileName));
         mainApp->displayMainWindow();
       },
         [=](QString e)

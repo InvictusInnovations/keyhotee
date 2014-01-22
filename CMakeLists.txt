@@ -4,7 +4,7 @@ cmake_minimum_required( VERSION 2.8.11 )
 set( CMAKE_INCLUDE_CURRENT_DIR ON)
 set( CMAKE_AUTOMOC ON  )
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/GitVersionGen/")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/fc/GitVersionGen/")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CmakeModules/")
 
 include(GetGitRevisionDescription)
@@ -147,6 +147,8 @@ set( sources
         qtreusable/selfsizingmainwindow.cpp
         qtreusable/AutoUpdateProgressBar.hpp
         qtreusable/AutoUpdateProgressBar.cpp
+        qtreusable/TImage.hpp
+        qtreusable/TImage.cpp
 
         profile_wizard/ProfileEditPage.ui
         profile_wizard/ProfileIntroPage.ui

@@ -6,6 +6,7 @@
 #include "mailfieldswidget.hpp"
 #include "moneyattachementwidget.hpp"
 #include "utils.hpp"
+#include "Mailbox.hpp"
 
 #include <bts/profile.hpp>
 
@@ -68,15 +69,24 @@ TDocumentTransform::Do(TLoadForm loadForm, const TStoredMailMessage& msgHeader,
   Doc = doc;
 
   QString newSubject;
+  QString subject = QString::fromStdString(srcMsg.subject);
+  QString re = QObject::tr("Re: ");
+  QString fwd = QObject::tr("Fwd: ");
 
   switch(loadForm)
     {
     case TLoadForm::Reply:
     case TLoadForm::ReplyAll:
-      newSubject = "Re: ";
+      if(subject.startsWith(re))
+        newSubject = "";
+      else
+        newSubject = re;
       break;
     case TLoadForm::Forward:
-      newSubject = "FW: ";
+      if(subject.startsWith(fwd))
+        newSubject = "";
+      else
+        newSubject = fwd;
       break;
     case TLoadForm::Draft:
     default:
@@ -288,7 +298,7 @@ void MailEditorMainWindow::SetRecipientList(const TRecipientPublicKeys& toList,
   setWindowModified(false);
   }
 
-void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
+void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessage& srcMsgHeader,
   const TPhysicalMailMessage& srcMsg, TLoadForm loadForm)
   {
   TPublicKeyIndex allRecipients, toRecipients;
@@ -325,6 +335,9 @@ void MailEditorMainWindow::LoadMessage(const TStoredMailMessage& srcMsgHeader,
   
   ui->messageEdit->moveCursor(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor);
   onFileAttachementTriggered( FileAttachment->hasAttachment() );
+  
+  if ( !EditMode && FileAttachment->hasAttachment())
+    mailbox->previewImages(ui->messageEdit);
   }
 
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)

@@ -6,6 +6,7 @@
 namespace Ui { class MailViewer; }
 class QToolBar;
 class MailboxModel;
+class Mailbox;
 
 class MailViewer : public QWidget
 {
@@ -18,7 +19,7 @@ public:
       \param index - model index referencing mail message to be displayed. Must be valid.
       \param mailbox - mailbox model, cannot be null.
   */
-  void displayMailMessage(const QModelIndex& index, MailboxModel* mailbox);
+  void displayMailMessage(Mailbox*, const QModelIndex& index, MailboxModel* mailbox);
 
   QToolBar* message_tools;
 private:

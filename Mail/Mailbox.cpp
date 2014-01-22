@@ -1,4 +1,4 @@
-#include "Mailbox.hpp"
+﻿#include "Mailbox.hpp"
 
 #include "ui_Mailbox.h"
 
@@ -12,6 +12,7 @@
 #include <fc/reflect/variant.hpp>
 
 #include <QMessageBox>
+#include <QTextEdit>
 #include <QToolBar>
 
 class MailSortFilterProxyModel : public QSortFilterProxyModel
@@ -59,7 +60,7 @@ void Mailbox::onDoubleClickedItem(QModelIndex index)
   sourceModel->getMessageData(sourceModelIndex, &encodedMsg, &decodedMsg);
   MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_mainWindow,
     sourceModel->getAddressBookModel(), *_mailProcessor, _type == Drafts);
-  mailEditor->LoadMessage(encodedMsg, decodedMsg, MailEditorMainWindow::TLoadForm::Draft);
+  mailEditor->LoadMessage(this, encodedMsg, decodedMsg, MailEditorMainWindow::TLoadForm::Draft);
   mailEditor->show();
   }
 
@@ -251,7 +252,7 @@ void Mailbox::duplicateMail(ReplyType replyType)
       assert(false);
     }
 
-  mailEditor->LoadMessage(encodedMsg, decodedMsg, loadForm);
+  mailEditor->LoadMessage(this, encodedMsg, decodedMsg, loadForm);
   mailEditor->show();
   }
 
@@ -296,7 +297,7 @@ void Mailbox::refreshMessageViewer()
     QModelIndex sourceModelIndex = model->mapToSource(indexes[0]);
     MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
     ui->mail_viewer->setCurrentWidget(ui->current_message);
-    ui->current_message->displayMailMessage(sourceModelIndex, sourceModel);
+    ui->current_message->displayMailMessage(this, sourceModelIndex, sourceModel);
     _attachmentSelected = sourceModel->hasAttachments(sourceModelIndex);
     getKeyhoteeWindow()->setEnabledAttachmentSaveOption(_attachmentSelected);
     }
@@ -403,4 +404,41 @@ void Mailbox::selectAll ()
 {
   ui->inbox_table->selectAll();
   ui->inbox_table->setFocus();
+}
+
+void Mailbox::previewImages (QTextEdit* textEdit)
+{
+  IMailProcessor::TPhysicalMailMessage decodedMsg;
+  IMailProcessor::TStoredMailMessage encodedMsg;
+  if (getSelectedMessageData (&encodedMsg, &decodedMsg) == false)
+    return;
+
+  QTextDocument *doc = new QTextDocument();
+  //Don't eat multiple whitespaces
+  doc->setDefaultStyleSheet("p, li { white-space: pre-wrap; }");
+  doc->setHtml( decodedMsg.body.c_str() );
+  textEdit->setDocument (doc);
+  
+  QImage  image;
+  uchar  *imageData;
+  int     imageSize;
+  QString imageName;
+
+  for (uint32_t i = 0; i < decodedMsg.attachments.size(); i++)
+  {
+    imageName = QString("imageName.%1").arg(i);
+	  imageData = (uchar*)decodedMsg.attachments[i].body.data ();
+	  imageSize = decodedMsg.attachments[i].body.size();
+
+	  //QImageReader::supportedImageFormats()    
+	  bool loadOk = image.loadFromData(imageData, imageSize);
+    if (loadOk)
+    {
+      doc->addResource( QTextDocument::ImageResource, QUrl( imageName ), image);
+      QString attachmentFileName = "<br/><hr><font color=""grey"">" + 
+                                    QString(decodedMsg.attachments[i].filename.c_str()) + 
+                                    "</font><br/>";
+      textEdit->append(attachmentFileName +  "<center><img src='" + imageName + "'></center>");
+    }
+  }
 }

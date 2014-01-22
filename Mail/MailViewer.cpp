@@ -4,6 +4,7 @@
 
 #include "KeyhoteeMainWindow.hpp"
 #include "MailboxModel.hpp"
+#include "Mailbox.hpp"
 #include "utils.hpp"
 
 #include <QImageReader>
@@ -27,16 +28,16 @@ MailViewer::~MailViewer()
   delete ui;
   }
 
-void MailViewer::displayMailMessage(const QModelIndex& index, MailboxModel* mailbox)
+void MailViewer::displayMailMessage(Mailbox* mailbox, const QModelIndex& index, MailboxModel* mailboxModel)
   {
   assert(index.isValid());
-  assert(mailbox != nullptr);
+  assert(mailboxModel != nullptr);
 
   //TODO: later, possibly set a timer and only mark as read if still displaying
   //      this message when timer expires?
-  mailbox->markMessageAsRead(index);
+  mailboxModel->markMessageAsRead(index);
   MessageHeader msg;
-  mailbox->getFullMessage(index, msg);
+  mailboxModel->getFullMessage(index, msg);
   QString       formatted_date = msg.date_sent.toString(Qt::DefaultLocaleShortDate);
   ui->date_label->setText(formatted_date);
   ui->from_label->clear();
@@ -72,6 +73,8 @@ void MailViewer::displayMailMessage(const QModelIndex& index, MailboxModel* mail
     }
   //TODO: add to and cc lists
   ui->subject_label->setText(msg.subject);
-  ui->message_content->setHtml(msg.body);
+
+  mailbox->previewImages(ui->message_content);
+  ui->message_content->moveCursor (QTextCursor::Start);
   }
 

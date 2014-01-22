@@ -1,10 +1,12 @@
 #include "fileattachmentwidget.hpp"
+#include "qtreusable/TImage.hpp"
 
 #include "ui_fileattachmentwidget.h"
 
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QTemporaryFile>
 #include <QUrl>
@@ -107,9 +109,9 @@ class TFileAttachmentWidget::AAttachmentItem : public QTableWidgetItem
   /// QTableWidgetItem override.
     virtual void setData(int role, const QVariant& value)
       {
+      QTableWidgetItem::setData(role, value);
       if(role == Qt::EditRole && value.toString().trimmed().isEmpty() == false)
-        {
-        QTableWidgetItem::setData(role, value);
+        {        
         Owner->OnAttachmentItemChanged();
         }
       }
@@ -164,7 +166,15 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
       FileInfo(fileInfo)
       {
       owner->TotalAttachmentSize += fileInfo.size();
-      setToolTip(fileInfo.absoluteFilePath());
+
+      QString path = fileInfo.absoluteFilePath();
+      TImage image;
+      
+      image.load(path);
+      if (image.isNull())
+        setToolTip(path);
+      else
+        setToolTip(image.toHtml() );
       }
 
     /// Constructor to build file size cell.
@@ -409,12 +419,16 @@ void TFileAttachmentWidget::LoadAttachedFiles(const TAttachmentContainer& attach
   for(const TPhysicalAttachment& a : attachedFiles)
     {
     size_t size = a.body.size();
+    uchar  *imageData = (uchar*)a.body.data ();
+    TImage image;
+    image.loadFromData(imageData, size);
 
     TScaledSize scaledSize = ScaleAttachmentSize(size);
 
     /// Allocate objects representing table items - name item automatically will register in the list.
     TVirtualAttachmentItem* fileNameItem = new TVirtualAttachmentItem(a, this);
     TVirtualAttachmentItem* fileSizeItem = new TVirtualAttachmentItem(fileNameItem, scaledSize);
+    fileNameItem->setToolTip( image.toHtml() );
     AddAttachmentItems(fileNameItem, fileSizeItem);
     }
 
@@ -604,8 +618,14 @@ void TFileAttachmentWidget::onAddTriggered()
   {
   bool sortEnabled = FreezeAttachmentTable();
 
-  QStringList selectedFiles = QFileDialog::getOpenFileNames(this, "File(s) to attach", QString("."));
+  QSettings settings("Invictus Innovations", "Keyhotee");
+  QString path = settings.value("AttachmentPath", ".").toString();  
+
+  QStringList selectedFiles = QFileDialog::getOpenFileNames(this, "File(s) to attach", path);
   
+  if (selectedFiles.size())
+    settings.setValue("AttachmentPath", QFileInfo(selectedFiles.first()).path());
+
   for(QStringList::const_iterator fileNameIt = selectedFiles.constBegin();
       fileNameIt != selectedFiles.constEnd(); ++fileNameIt)
     {
