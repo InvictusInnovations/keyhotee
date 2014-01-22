@@ -6,6 +6,7 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QTemporaryFile>
 #include <QUrl>
@@ -617,8 +618,14 @@ void TFileAttachmentWidget::onAddTriggered()
   {
   bool sortEnabled = FreezeAttachmentTable();
 
-  QStringList selectedFiles = QFileDialog::getOpenFileNames(this, "File(s) to attach", QString("."));
+  QSettings settings("Invictus Innovations", "Keyhotee");
+  QString path = settings.value("AttachmentPath", ".").toString();  
+
+  QStringList selectedFiles = QFileDialog::getOpenFileNames(this, "File(s) to attach", path);
   
+  if (selectedFiles.size())
+    settings.setValue("AttachmentPath", QFileInfo(selectedFiles.first()).path());
+
   for(QStringList::const_iterator fileNameIt = selectedFiles.constBegin();
       fileNameIt != selectedFiles.constEnd(); ++fileNameIt)
     {
