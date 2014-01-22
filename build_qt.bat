@@ -2,7 +2,8 @@ REM Assumptions:
 REM - there is created root directory (QTDIR)
 REM - inside them is created directory 'build' to perform shadow build. This script should be started from this directory
 REM - QTDIR/src contains all QT sources
-
+REM Before building QT statically you can edit src\qtbase\mkspecs\win32-msvc2012\qmake.conf and
+REM change all -Zi options to -Z7 to avoid debug info loss after deleting build directory.
 @echo off
 setlocal
 

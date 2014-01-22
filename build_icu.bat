@@ -4,6 +4,8 @@ REM - there is created root directory (ICU_ROOT)
 REM - inside them is extracted icu4c-52_1-src.zip
 REM - ICU_ROOT/sources contains all ICU sources.
 REM - ICU_ROOT/build is a cwd and this script must be started from it
+REM To preserve debug info (in produced static libraries) lets open source\runConfigureICU, find
+REM Cygwin/MSVC) platform section and change /Zi switches to /Z7
 
 setlocal
 
