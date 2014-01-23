@@ -4,6 +4,7 @@
 # libgtk2.0-dev
 # libfreetype6-dev
 # libreadline-dev
+# libdb++-dev
 
 project( keyhotee )
 cmake_minimum_required( VERSION 2.8.11 )
