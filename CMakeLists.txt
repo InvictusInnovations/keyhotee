@@ -19,14 +19,6 @@ macro(FillQtDependentLibraries)
     # On windows platform release & debug libraries have different names
     SET (DEBUG_SUFFIX "D")
   ENDIF(WIN32)
-
-  # Warning this lib doesn't have an associated .cmake :-(
-  find_library(Qt5Platform_LIBRARIES_RELEASE Qt5PlatformSupport HINTS "${QT_LIB_DIR}")
-  find_library(Qt5Platform_LIBRARIES_DEBUG Qt5PlatformSupport${DEBUG_SUFFIX} HINTS "${QT_LIB_DIR}")
-
-  # Warning this lib doesn't have an associated .cmake :-(
-  find_library(Qt5SvgIcon_LIBRARIES_RELEASE qsvgicon HINTS "${QT_LIB_DIR}/../plugins/iconengines/")
-  find_library(Qt5SvgIcon_LIBRARIES_DEBUG qsvgicon${DEBUG_SUFFIX} HINTS "${QT_LIB_DIR}/../plugins/iconengines/")
   
   if(WIN32)
     message(STATUS "Setting up additional QT Dependencies for Windows platform")
@@ -78,7 +70,7 @@ get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
 #message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
-SET(KH_STATIC_QT 1)
+SET(KH_STATIC_QT 0)
 SET(QT_DEPENDENCY_LIBRARIES "")
 SET(ICU_LIBS_PREFIX "")
 
@@ -397,14 +389,31 @@ qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport)
 set(CMAKE_STATIC_TYPE true)
 
 #fc  miniupnpc
-target_link_libraries( Keyhotee keyhotee_library ${Qt5Gui_PLUGINS} 
-  debug ${Qt5Platform_LIBRARIES_DEBUG} optimized ${Qt5Platform_LIBRARIES_RELEASE}
-  debug ${Qt5SvgIcon_LIBRARIES_DEBUG} optimized ${Qt5SvgIcon_LIBRARIES_RELEASE}
+target_link_libraries( Keyhotee keyhotee_library 
   Qt5::Svg Qt5::Widgets Qt5::Gui Qt5::PrintSupport
   bshare upnpc-static fc leveldb ${BOOST_LIBRARIES}
   ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES}
   ${APPKIT_LIBRARY} ${CMAKE_DL_LIBS} 
 )
+
+IF (KH_STATIC_QT EQUAL 1)
+  # Warning this lib doesn't have an associated .cmake :-(
+  find_library(Qt5Platform_LIBRARIES_RELEASE Qt5PlatformSupport HINTS "${QT_LIB_DIR}" "${QT_LIB_DIR}/../lib")
+  find_library(Qt5Platform_LIBRARIES_DEBUG Qt5PlatformSupport${DEBUG_SUFFIX} HINTS "${QT_LIB_DIR}" "${QT_LIB_DIR}/../lib")
+
+  # Warning this lib doesn't have an associated .cmake :-(
+  find_library(Qt5SvgIcon_LIBRARIES_RELEASE qsvgicon HINTS "${QT_LIB_DIR}/../plugins/iconengines/")
+  find_library(Qt5SvgIcon_LIBRARIES_DEBUG qsvgicon${DEBUG_SUFFIX} HINTS "${QT_LIB_DIR}/../plugins/iconengines/")
+  
+  IF(NOT Qt5SvgIcon_LIBRARIES_RELEASE)
+    MESSAGE(WARNING "Qt5SvgIcon_LIBRARIES_RELEASE not found, QT plugin static library may not installed, could set KH_STATIC_QT to 0 to disable __STATIC_QT")
+  ENDIF(NOT Qt5SvgIcon_LIBRARIES_RELEASE)
+
+  target_link_libraries( Keyhotee ${Qt5Gui_PLUGINS} 
+    debug ${Qt5Platform_LIBRARIES_DEBUG} optimized ${Qt5Platform_LIBRARIES_RELEASE}
+    debug ${Qt5SvgIcon_LIBRARIES_DEBUG} optimized ${Qt5SvgIcon_LIBRARIES_RELEASE}
+  )
+ENDIF()
 
 if (MSVC)
   message(STATUS "Setting up debug options for MSVC build")
