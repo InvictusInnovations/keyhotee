@@ -337,7 +337,10 @@ void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessag
   onFileAttachementTriggered( FileAttachment->hasAttachment() );
   
   if ( !EditMode && FileAttachment->hasAttachment())
+    {
     mailbox->previewImages(ui->messageEdit);
+    ui->messageEdit->document()->setModified(false);
+    }
   }
 
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
