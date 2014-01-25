@@ -19,6 +19,7 @@
 
 #include <bts/bitchat/bitchat_private_message.hpp>
 
+#include <QPlainTextEdit>
 #include <QTableView>
 #include <QTextBrowser>
 
@@ -534,24 +535,75 @@ void KeyhoteeMainWindow::onExit()
 // Menu Edit
 void KeyhoteeMainWindow::onCopy()
 {
-  notSupported();
+  QWidget *focused = focusWidget ();
+
+  if (focused == nullptr)
+    return;
+
+  if(focused->inherits("QTextEdit")) 
+  {
+    qobject_cast<QTextEdit*>(focused)->copy();
+  }
+  else if(focused->inherits("QLineEdit")) 
+  {
+    qobject_cast<QLineEdit*>(focused)->copy();
+  }
+  else if(focused->inherits("QPlainTextEdit")) 
+  {
+    qobject_cast<QPlainTextEdit*>(focused)->copy();
+  }
 }
 
 void KeyhoteeMainWindow::onCut()
 {
-  notSupported();
+  QWidget *focused = focusWidget ();
+
+  if (focused == nullptr)
+    return;
+
+  if(focused->inherits("QTextEdit")) 
+  {
+    qobject_cast<QTextEdit*>(focused)->cut();
+  }
+  else if(focused->inherits("QLineEdit")) 
+  {
+    qobject_cast<QLineEdit*>(focused)->cut();
+  }
+  else if(focused->inherits("QPlainTextEdit")) 
+  {
+    qobject_cast<QPlainTextEdit*>(focused)->cut();
+  }
 }
 
 void KeyhoteeMainWindow::onPaste()
 {
-  notSupported();
+  QWidget *focused = focusWidget ();
+
+  if (focused == nullptr)
+    return;
+
+  if(focused->inherits("QTextEdit")) 
+  {
+    qobject_cast<QTextEdit*>(focused)->paste();
+  }
+  else if(focused->inherits("QLineEdit")) 
+  {
+    qobject_cast<QLineEdit*>(focused)->paste();
+  }
+  else if(focused->inherits("QPlainTextEdit")) 
+  {
+    qobject_cast<QPlainTextEdit*>(focused)->paste();
+  }
 }
 
 void KeyhoteeMainWindow::onSelectAll()
 {
-  QWidget *widget = focusWidget ();
+  QWidget *focused = focusWidget ();
 
-  if(ui->side_bar == widget) //TreeView focused
+  if (focused == nullptr)
+    return;
+
+  if(ui->side_bar == focused) //TreeView focused
   {
     if (ui->widget_stack->currentWidget () == ui->contacts_page)
       ui->contacts_page->selectAll ();
@@ -562,18 +614,28 @@ void KeyhoteeMainWindow::onSelectAll()
     else
       assert (0);
   }
-  else if(QTableView *tableView = qobject_cast<QTableView*>(widget) ) 
+  //contact list, mail list
+  else if(focused->inherits("QTableView")) 
   {
-    tableView->selectAll();
+    qobject_cast<QTableView*>(focused)->selectAll();
   }
-  else if(QTextBrowser *textBrowser = qobject_cast<QTextBrowser*>(widget) ) 
+  //chat readOnly window
+  else if(focused->inherits("QTextEdit")) 
   {
-    textBrowser->selectAll();
+    qobject_cast<QTextEdit*>(focused)->selectAll();
+  }
+  //public key readOnly window
+  else if(focused->inherits("QLineEdit")) 
+  {
+    qobject_cast<QLineEdit*>(focused)->selectAll();
+  }
+  else if(focused->inherits("QPlainTextEdit")) 
+  {
+    qobject_cast<QPlainTextEdit*>(focused)->selectAll();
   }
   else
   {
-    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_A, Qt::ControlModifier, 0);
-    QApplication::postEvent(widget, event);
+    assert(0);
   }
 }
 
