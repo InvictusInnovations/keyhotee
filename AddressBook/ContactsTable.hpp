@@ -35,8 +35,8 @@ public:
   bool hasFocusContacts() const;
   void selectAll ();
   bool EscapeIfEditMode() const;
-  QWidget* ContactsTable::getContactsTableWidget () const;
-  void ContactsTable::copy();
+  QWidget* getContactsTableWidget () const;
+  void copy();
 
 private:
   ContactView* getCurrentView() const;
