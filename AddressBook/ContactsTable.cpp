@@ -272,3 +272,29 @@ bool ContactsTable::EscapeIfEditMode() const
   }
   return false;
 }
+
+QWidget* ContactsTable::getContactsTableWidget () const
+{
+  return static_cast<QWidget*>(ui->contact_table);
+}
+
+void ContactsTable::copy()
+{  
+  QString strContact = QString();
+  QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
+  QModelIndexList      indexes = selection_model->selectedRows();
+
+  for (int i = 0; i < indexes.count(); i++)
+  {
+    QModelIndex mapped_index = _sorted_addressbook_model->mapToSource(indexes[i]);
+    if (!strContact.isEmpty())
+      strContact += "\n";
+    strContact += _addressbook_model->getContact(mapped_index).get_display_name().c_str();
+  }
+  
+  if (!strContact.isEmpty())
+  {
+    QClipboard *clip = QApplication::clipboard();
+    clip->setText (strContact);
+  }
+}

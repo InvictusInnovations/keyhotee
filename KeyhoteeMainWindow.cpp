@@ -552,6 +552,11 @@ void KeyhoteeMainWindow::onCopy()
   {
     qobject_cast<QPlainTextEdit*>(focused)->copy();
   }
+  //contact list
+  else if(focused == ui->contacts_page->getContactsTableWidget())
+  {
+    ui->contacts_page->copy();
+  }
 }
 
 void KeyhoteeMainWindow::onCut()
