@@ -180,13 +180,13 @@ add_subdirectory(miner)
 
 IF( APPLE )
     SET_SOURCE_FILES_PROPERTIES(
-                                "images/shield.icns"
+                                "images/keyhotee.icns"
                                 PROPERTIES
                                 MACOSX_PACKAGE_LOCATION Resources
                                 )
     SET( MACOSX_BUNDLE_BUNDLE_NAME "Keyhotee" )
     SET( MACOSX_BUNDLE_GUI_IDENTIFIER "com.invictus-innovations.Keyhotee" ) 
-    set( MACOSX_BUNDLE_ICON_FILE shield.icns )
+    set( MACOSX_BUNDLE_ICON_FILE keyhotee.icns )
     SET( MACOSX_BUNDLE_INFO_STRING "Keyhotee - version 1.0" ) 
     SET( MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0" ) 
     SET( MACOSX_BUNDLE_LONG_VERSION_STRING "1.0.0" ) 
@@ -358,7 +358,7 @@ qt5_add_resources( KeyhoteeQRC  Keyhotee.qrc  ${QM_QRC_PATH})
 set( resources
         Keyhotee.qrc
         keyhotee_trans.qrc
-        images/shield.icns
+        images/keyhotee.icns
         qrc_keyhotee_trans.cpp 
         qrc_Keyhotee.cpp )
 

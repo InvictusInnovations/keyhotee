@@ -118,7 +118,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);
-  setWindowIcon(QIcon(":/images/shield1024.png") );
+  setWindowIcon(QIcon(":/images/keyhotee.png") );
 
   QString profileName = mainApp.getLoadedProfileName();
 
@@ -140,9 +140,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   //QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
   QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
   ui->side_bar->setAttribute(Qt::WA_MacShowFocusRect, 0);
-  QApplication::setWindowIcon(QIcon(":/images/shield1024.icns") );
+  QApplication::setWindowIcon(QIcon(":/images/keyhotee.icns") );
 #else
-  QApplication::setWindowIcon(QIcon(":/images/shield1024.png") );
+  QApplication::setWindowIcon(QIcon(":/images/keyhotee.png") );
 #endif
 
   setupStatusBar();
