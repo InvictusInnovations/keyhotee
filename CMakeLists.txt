@@ -326,6 +326,9 @@ set( sources
         ch/mailprocessor.hpp
         ch/ModificationsChecker.hpp
 
+        MenuEditControl.hpp
+        MenuEditControl.cpp
+
         main.cpp )
 
 set(FILES_TO_TRANSLATE ${sources})

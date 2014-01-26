@@ -8,6 +8,7 @@
 #include "BitShares/GitSHA2.h"
 #include "BitShares/fc/GitSHA3.h"
 #include "KeyhoteeApplication.hpp"
+#include "MenuEditControl.hpp"
 #include "public_key_address.hpp"
 
 #include "AddressBook/AddressBookModel.hpp"
@@ -133,7 +134,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   readSettings();
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
-  connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
+  
 
 #ifdef Q_OS_MAC
   //QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
@@ -173,6 +174,11 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->actionEnable_Mining->setVisible(gMiningIsPossible);
 
   ui->side_bar->setModificationsChecker (this);
+
+  menuEdit = new MenuEditControl(this, ui->actionCopy, ui->actionCut);
+  //init ui->actionPaste
+  onClipboardChanged();
+  connect(QApplication::clipboard(), &QClipboard::changed, this, &KeyhoteeMainWindow::onClipboardChanged);
 
   // ---------------------- MenuBar
   // File
@@ -310,6 +316,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
   {
+  delete menuEdit;
   delete ui;
   }
 
@@ -535,70 +542,17 @@ void KeyhoteeMainWindow::onExit()
 // Menu Edit
 void KeyhoteeMainWindow::onCopy()
 {
-  QWidget *focused = focusWidget ();
-
-  if (focused == nullptr)
-    return;
-
-  if(focused->inherits("QTextEdit")) 
-  {
-    qobject_cast<QTextEdit*>(focused)->copy();
-  }
-  else if(focused->inherits("QLineEdit")) 
-  {
-    qobject_cast<QLineEdit*>(focused)->copy();
-  }
-  else if(focused->inherits("QPlainTextEdit")) 
-  {
-    qobject_cast<QPlainTextEdit*>(focused)->copy();
-  }
-  //contact list
-  else if(focused == ui->contacts_page->getContactsTableWidget())
-  {
-    ui->contacts_page->copy();
-  }
+  menuEdit->copy();
 }
 
 void KeyhoteeMainWindow::onCut()
 {
-  QWidget *focused = focusWidget ();
-
-  if (focused == nullptr)
-    return;
-
-  if(focused->inherits("QTextEdit")) 
-  {
-    qobject_cast<QTextEdit*>(focused)->cut();
-  }
-  else if(focused->inherits("QLineEdit")) 
-  {
-    qobject_cast<QLineEdit*>(focused)->cut();
-  }
-  else if(focused->inherits("QPlainTextEdit")) 
-  {
-    qobject_cast<QPlainTextEdit*>(focused)->cut();
-  }
+  menuEdit->cut();
 }
 
 void KeyhoteeMainWindow::onPaste()
 {
-  QWidget *focused = focusWidget ();
-
-  if (focused == nullptr)
-    return;
-
-  if(focused->inherits("QTextEdit")) 
-  {
-    qobject_cast<QTextEdit*>(focused)->paste();
-  }
-  else if(focused->inherits("QLineEdit")) 
-  {
-    qobject_cast<QLineEdit*>(focused)->paste();
-  }
-  else if(focused->inherits("QPlainTextEdit")) 
-  {
-    qobject_cast<QPlainTextEdit*>(focused)->paste();
-  }
+  menuEdit->paste();
 }
 
 void KeyhoteeMainWindow::onSelectAll()
@@ -619,28 +573,9 @@ void KeyhoteeMainWindow::onSelectAll()
     else
       assert (0);
   }
-  //contact list, mail list
-  else if(focused->inherits("QTableView")) 
-  {
-    qobject_cast<QTableView*>(focused)->selectAll();
-  }
-  //chat readOnly window
-  else if(focused->inherits("QTextEdit")) 
-  {
-    qobject_cast<QTextEdit*>(focused)->selectAll();
-  }
-  //public key readOnly window
-  else if(focused->inherits("QLineEdit")) 
-  {
-    qobject_cast<QLineEdit*>(focused)->selectAll();
-  }
-  else if(focused->inherits("QPlainTextEdit")) 
-  {
-    qobject_cast<QPlainTextEdit*>(focused)->selectAll();
-  }
   else
   {
-    assert(0);
+    menuEdit->selectAll();
   }
 }
 
@@ -1092,4 +1027,22 @@ void KeyhoteeMainWindow::keyPressEvent(QKeyEvent *key_event)
   }
 
   return ATopLevelWindowsContainer::keyPressEvent(key_event);
+}
+
+void KeyhoteeMainWindow::onClipboardChanged()
+{
+#ifndef QT_NO_CLIPBOARD
+  if(const QMimeData *md = QApplication::clipboard()->mimeData())
+    ui->actionPaste->setEnabled(md->hasText());
+#endif
+}
+
+void KeyhoteeMainWindow::onFocusChanged(QWidget *old, QWidget *now)
+{
+  menuEdit->setEnabled(old, now);
+}
+
+ContactsTable* KeyhoteeMainWindow::getContactsPage()
+{
+    return ui->contacts_page;
 }

@@ -20,10 +20,12 @@ class QCompleter;
 class AddressBookModel;
 class Contact;
 class ContactView;
+class ContactsTable;
 class InboxView;
 class Mailbox;
 class MailboxModel;
 class Mailbox;
+class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
 
@@ -86,6 +88,7 @@ public:
   void refreshDeleteContactOption() const;
   void setEnabledMailActions(bool enable);
   void setMailSettings (MailSettings& mailSettings);  
+  ContactsTable* getContactsPage();
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 
@@ -156,6 +159,8 @@ private slots:
   void onSavedNewContact(int idxNewContact);
   void onItemContactRemoved (QTreeWidgetItem&);
   void onRemoveContact ();
+  void onClipboardChanged();
+  void onFocusChanged(QWidget *old, QWidget *now);
 
 private:
   bool isIdentityPresent();
@@ -201,6 +206,7 @@ private:
   TConnectionStatusDS                     ConnectionStatusDS;
   TMailProcessor                          MailProcessor;
   Mailbox*                                _currentMailbox;
+  MenuEditControl*                        menuEdit;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();
