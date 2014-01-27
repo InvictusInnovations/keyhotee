@@ -1,0 +1,17 @@
+#! /bin/sh
+
+BASE_PATH=`dirname $0`
+
+INVICTUS_ROOT=$BASE_PATH/..
+export INVICTUS_ROOT
+echo "Using: "$INVICTUS_ROOT "as INVICTUS_ROOT"
+
+QTDIR=$INVICTUS_ROOT/QT
+export QTDIR
+echo "Using: "$QTDIR "as QTDIR"
+
+DBROOTDIR=$INVICTUS_ROOT/BerkeleyDB
+export DBROOTDIR
+echo "Using: "$DBROOTDIR "as DBROOTDIR"
+
+
