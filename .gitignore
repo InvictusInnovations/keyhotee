@@ -29,6 +29,7 @@ ui_*
 #CMake->MSVC artifacts
 *.sln
 *.vcxproj
+*.depends
 ALL_BUILD
 ZERO_CHECK
 
