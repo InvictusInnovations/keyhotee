@@ -20,6 +20,7 @@ private:
     virtual void paste() = 0;
     virtual void selectAll() = 0;
     virtual bool isSelected() = 0;
+    virtual bool canPaste() = 0;
   protected:
     QWidget* _focused;
   };
@@ -30,7 +31,7 @@ private:
 
 
 public:
-  explicit MenuEditControl(QObject *parent, QAction *actionCopy, QAction *actionCut);
+  explicit MenuEditControl(QObject *parent, QAction *actionCopy, QAction *actionCut, QAction *actionPaste);
   virtual ~MenuEditControl();
   void copy() const;
   void cut();
@@ -49,6 +50,7 @@ private slots:
 private:
   QAction*    _actionCopy;
   QAction*    _actionCut;
+  QAction*    _actionPaste;
   QWidget *   _currentWidget;
   std::vector<ITextDoc*>   _textDocs;
 };

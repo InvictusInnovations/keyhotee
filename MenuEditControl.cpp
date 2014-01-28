@@ -44,6 +44,10 @@ class MenuEditControl::TextEdit : public ITextDoc
   {
     return !_focused->textCursor().selectedText().isEmpty();
   }
+  virtual bool canPaste()
+  {
+    return _focused->canPaste();
+  }
 };
 
 
@@ -81,6 +85,10 @@ class MenuEditControl::LineEdit : public ITextDoc
   {
     return !_focused->selectedText().isEmpty();
   }
+  virtual bool canPaste()
+  {
+   return  !_focused->isReadOnly();
+  }
 };
 
 class MenuEditControl::PlainTextEdit : public ITextDoc
@@ -117,12 +125,17 @@ class MenuEditControl::PlainTextEdit : public ITextDoc
   {
     return !_focused->textCursor().selectedText().isEmpty();
   }
+  virtual bool canPaste()
+  {
+    return _focused->canPaste();
+  }
 };
 
-MenuEditControl::MenuEditControl(QObject *parent, QAction *actionCopy, QAction *actionCut)
+MenuEditControl::MenuEditControl(QObject *parent, QAction *actionCopy, QAction *actionCut, QAction *actionPaste)
 :  QObject(parent), 
   _actionCopy (actionCopy),
-  _actionCut (actionCut)
+  _actionCut (actionCut),
+  _actionPaste (actionPaste)
 {
   _currentWidget = nullptr;
   _textDocs.push_back(new MenuEditControl::TextEdit() );
@@ -223,10 +236,19 @@ void MenuEditControl::setEnabled(QWidget *old, QWidget *now)
   selectedText = isSelected(now);
   _actionCopy->setEnabled(selectedText);
   _actionCut->setEnabled(selectedText);
+  _actionPaste->setEnabled(false);
 
   if (now == nullptr)
     return;
 
+  foreach(ITextDoc* doc, _textDocs)
+  {
+    if (doc->initWidget(now))
+    {
+      _actionPaste->setEnabled(doc->canPaste());
+      break;
+    }
+  }
 
   if (now != _currentWidget)
   {

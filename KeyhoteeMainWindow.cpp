@@ -176,7 +176,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   ui->side_bar->setModificationsChecker (this);
 
-  menuEdit = new MenuEditControl(this, ui->actionCopy, ui->actionCut);
+  menuEdit = new MenuEditControl(this, ui->actionCopy, ui->actionCut, ui->actionPaste);
   //init ui->actionPaste
   onClipboardChanged();
   connect(QApplication::clipboard(), &QClipboard::changed, this, &KeyhoteeMainWindow::onClipboardChanged);
