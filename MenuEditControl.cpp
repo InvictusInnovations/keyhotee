@@ -10,12 +10,130 @@
 #include <QWidget>
 
 
+class MenuEditControl::TextEdit : public ITextDoc
+{
+  QTextEdit* _focused;
+
+  virtual bool initWidget(QWidget* focused)
+  {
+    if(focused->inherits("QTextEdit"))
+    {
+      _focused = qobject_cast<QTextEdit*>(focused);
+      return true;
+    }
+    return false;
+  }
+
+  virtual void copy()
+  {
+    _focused->copy();
+  }
+  virtual void cut()
+  {
+    _focused->cut();
+  }
+  virtual void paste()
+  {
+    _focused->paste();
+  }
+  virtual void selectAll()
+  {
+    _focused->selectAll();
+  }
+  virtual bool isSelected()
+  {
+    return !_focused->textCursor().selectedText().isEmpty();
+  }
+};
+
+
+class MenuEditControl::LineEdit : public ITextDoc
+{
+  QLineEdit* _focused;
+
+  virtual bool initWidget(QWidget* focused)
+  {
+    if(focused->inherits("QLineEdit"))
+    {
+      _focused = qobject_cast<QLineEdit*>(focused);
+      return true;
+    }
+    return false;
+  }
+
+  virtual void copy()
+  {
+    _focused->copy();
+  }
+  virtual void cut()
+  {
+    _focused->cut();
+  }
+  virtual void paste()
+  {
+    _focused->paste();
+  }
+  virtual void selectAll()
+  {
+    _focused->selectAll();
+  }
+  virtual bool isSelected()
+  {
+    return !_focused->selectedText().isEmpty();
+  }
+};
+
+class MenuEditControl::PlainTextEdit : public ITextDoc
+{
+  QPlainTextEdit* _focused;
+
+  virtual bool initWidget(QWidget* focused)
+  {
+    if(focused->inherits("QPlainTextEdit"))
+    {
+      _focused = qobject_cast<QPlainTextEdit*>(focused);
+      return true;
+    }
+    return false;
+  }
+
+  virtual void copy()
+  {
+    _focused->copy();
+  }
+  virtual void cut()
+  {
+    _focused->cut();
+  }
+  virtual void paste()
+  {
+    _focused->paste();
+  }
+  virtual void selectAll()
+  {
+    _focused->selectAll();
+  }
+  virtual bool isSelected()
+  {
+    return !_focused->textCursor().selectedText().isEmpty();
+  }
+};
+
 MenuEditControl::MenuEditControl(QObject *parent, QAction *actionCopy, QAction *actionCut)
 :  QObject(parent), 
   _actionCopy (actionCopy),
   _actionCut (actionCut)
 {
   _currentWidget = nullptr;
+  _textDocs.push_back(new MenuEditControl::TextEdit() );
+  _textDocs.push_back(new MenuEditControl::LineEdit() );
+  _textDocs.push_back(new MenuEditControl::PlainTextEdit() );
+}
+
+MenuEditControl::~MenuEditControl()
+{
+  for (size_t i = 0; i < _textDocs.size(); i++)
+    delete _textDocs[i];
 }
 
 void MenuEditControl::copy() const
@@ -26,22 +144,13 @@ void MenuEditControl::copy() const
   if (focused == nullptr)
     return;
 
-  if(focused->inherits("QTextEdit")) 
+  foreach(ITextDoc* doc, _textDocs)
   {
-    qobject_cast<QTextEdit*>(focused)->copy();
-  }
-  else if(focused->inherits("QLineEdit")) 
-  {
-    qobject_cast<QLineEdit*>(focused)->copy();
-  }
-  else if(focused->inherits("QPlainTextEdit")) 
-  {
-    qobject_cast<QPlainTextEdit*>(focused)->copy();
-  }
-  //contact list
-  else if(focused == mainWin->getContactsPage()->getContactsTableWidget())
-  {
-    mainWin->getContactsPage()->copy();
+    if (doc->initWidget(focused))
+    {
+      doc->copy();
+      break;
+    }
   }
 }
 
@@ -53,17 +162,13 @@ void MenuEditControl::cut()
   if (focused == nullptr)
     return;
 
-  if(focused->inherits("QTextEdit")) 
+  foreach(ITextDoc* doc, _textDocs)
   {
-    qobject_cast<QTextEdit*>(focused)->cut();
-  }
-  else if(focused->inherits("QLineEdit")) 
-  {
-    qobject_cast<QLineEdit*>(focused)->cut();
-  }
-  else if(focused->inherits("QPlainTextEdit")) 
-  {
-    qobject_cast<QPlainTextEdit*>(focused)->cut();
+    if (doc->initWidget(focused))
+    {
+      doc->cut();
+      break;
+    }
   }
 }
 
@@ -75,17 +180,13 @@ void MenuEditControl::paste()
   if (focused == nullptr)
     return;
 
-  if(focused->inherits("QTextEdit")) 
+  foreach(ITextDoc* doc, _textDocs)
   {
-    qobject_cast<QTextEdit*>(focused)->paste();
-  }
-  else if(focused->inherits("QLineEdit")) 
-  {
-    qobject_cast<QLineEdit*>(focused)->paste();
-  }
-  else if(focused->inherits("QPlainTextEdit")) 
-  {
-    qobject_cast<QPlainTextEdit*>(focused)->paste();
+    if (doc->initWidget(focused))
+    {
+      doc->paste();
+      break;
+    }
   }
 }
 
@@ -102,23 +203,16 @@ void MenuEditControl::selectAll()
   {
     qobject_cast<QTableView*>(focused)->selectAll();
   }
-  //chat readOnly window
-  else if(focused->inherits("QTextEdit")) 
-  {
-    qobject_cast<QTextEdit*>(focused)->selectAll();
-  }
-  //public key readOnly window
-  else if(focused->inherits("QLineEdit")) 
-  {
-    qobject_cast<QLineEdit*>(focused)->selectAll();
-  }
-  else if(focused->inherits("QPlainTextEdit")) 
-  {
-    qobject_cast<QPlainTextEdit*>(focused)->selectAll();
-  }
   else
   {
-    assert(0);
+    foreach(ITextDoc* doc, _textDocs)
+    {
+      if (doc->initWidget(focused))
+      {
+        doc->selectAll();
+        break;
+      }
+    }
   }
 }
 
@@ -132,6 +226,7 @@ void MenuEditControl::setEnabled(QWidget *old, QWidget *now)
 
   if (now == nullptr)
     return;
+
 
   if (now != _currentWidget)
   {
@@ -157,23 +252,23 @@ bool MenuEditControl::isSelected(QWidget* focused) const
     return false;
   }
 
-  if(focused->inherits("QTextEdit")) 
-  {
-    selectedText = ! qobject_cast<QTextEdit*>(focused)->textCursor().selectedText().isEmpty();
-  }
-  else if(focused->inherits("QLineEdit")) 
-  {
-    selectedText = ! qobject_cast<QLineEdit*>(focused)->selectedText().isEmpty();
-  }
-  else if(focused->inherits("QPlainTextEdit")) 
-  {
-    selectedText = ! qobject_cast<QPlainTextEdit*>(focused)->textCursor().selectedText().isEmpty();
-  }
   //contact list
-  /*else if(focused == getKeyhoteeWindow()->getContactsPage()->getContactsTableWidget())
+  if(focused == getKeyhoteeWindow()->getContactsPage()->getContactsTableWidget())
+  {    
+    //enable/disable menu in the: void KeyhoteeMainWindow::refreshEditMenu() 
+    selectedText = true; 
+  }
+  else
   {
-    getKeyhoteeWindow()->getContactsPage()->getContactsTableWidget()->isSelected();
-  }*/
+    foreach(ITextDoc* doc, _textDocs)
+    {
+      if (doc->initWidget(focused))
+      {
+        selectedText = doc->isSelected();
+        break;
+      }
+    }  
+  }
 
   return selectedText;
 }

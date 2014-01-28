@@ -543,7 +543,24 @@ void KeyhoteeMainWindow::onExit()
 // Menu Edit
 void KeyhoteeMainWindow::onCopy()
 {
-  menuEdit->copy();
+  QWidget *focused = focusWidget ();
+  if (focused == nullptr)
+    return;
+
+  if(focused == ui->side_bar) //TreeView focused
+  {
+    if (ui->widget_stack->currentWidget () == ui->contacts_page)
+      ui->contacts_page->copy ();
+  }
+  //contact list
+  else if(focused == ui->contacts_page->getContactsTableWidget())
+  {
+    ui->contacts_page->copy ();
+  }
+  else
+  {
+    menuEdit->copy();
+  }
 }
 
 void KeyhoteeMainWindow::onCut()
@@ -965,6 +982,13 @@ void KeyhoteeMainWindow::refreshDeleteContactOption() const
 
   setEnabledDeleteOption( isContactTableSelected || isContactTreeItemSelected );
   }
+
+void KeyhoteeMainWindow::refreshEditMenu() const
+{
+  bool isContactTableSelected = ui->contacts_page->isSelection();
+  ui->actionCopy->setEnabled (isContactTableSelected);  
+  ui->actionCut->setEnabled (false);  
+}
 
 void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
   {

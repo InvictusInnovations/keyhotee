@@ -92,6 +92,7 @@ void ContactsTable::onSelectionChanged (const QItemSelection &selected, const QI
     }
 
   getKeyhoteeWindow()->refreshDeleteContactOption();
+  getKeyhoteeWindow()->refreshEditMenu();
   }
 
 void ContactsTable::onDeleteContact()

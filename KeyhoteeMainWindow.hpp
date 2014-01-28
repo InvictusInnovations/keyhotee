@@ -86,6 +86,7 @@ public:
   void setEnabledAttachmentSaveOption(bool enable);
   void setEnabledDeleteOption( bool enable ) const;
   void refreshDeleteContactOption() const;
+  void refreshEditMenu() const;
   void setEnabledMailActions(bool enable);
   void setMailSettings (MailSettings& mailSettings);  
   ContactsTable* getContactsPage();
