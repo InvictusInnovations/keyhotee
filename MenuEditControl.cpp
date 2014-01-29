@@ -15,29 +15,20 @@ MenuEditControl::ITextDoc::ITextDoc( MenuEditControl* parent )
   _focused = nullptr;  
 }
 
-class MenuEditControl::TextEdit : public ITextDoc
+template<class TWidgetClass>
+class MenuEditControl::ATextDoc : public ITextDoc
 {
 public:
-  TextEdit( MenuEditControl* parent )
+  ATextDoc( MenuEditControl* parent )
     : ITextDoc( parent )
   {
   }
-  virtual ~TextEdit() {};
 
-private:
-  QTextEdit* _focused;
+protected:
+  virtual ~ATextDoc() {};
 
-  virtual bool initWidget(QWidget* focused)
-  {
-    if(focused->inherits("QTextEdit"))
-    {
-      _focused = qobject_cast<QTextEdit*>(focused);
-      return true;
-    }
-    else
-      _focused = nullptr;
-    return false;
-  }
+protected:
+  TWidgetClass _focused;
 
   virtual void copy()
   {
@@ -55,6 +46,36 @@ private:
   {
     _focused->selectAll();
   }
+  virtual bool canCut()
+  {
+    return !_focused->isReadOnly();
+  }  
+};
+
+class MenuEditControl::TextEdit : public ATextDoc<QTextEdit*>
+{
+public:
+  TextEdit( MenuEditControl* parent )
+    : ATextDoc( parent )
+  {
+  }
+
+protected:
+  virtual ~TextEdit() {};
+
+private:
+  virtual bool initWidget(QWidget* focused)
+  {
+    if(focused->inherits("QTextEdit"))
+    {
+      _focused = qobject_cast<QTextEdit*>(focused);
+      return true;
+    }
+    else
+      _focused = nullptr;
+    return false;
+  }
+
   virtual bool isSelected()
   {
     return !_focused->textCursor().selectedText().isEmpty();
@@ -73,18 +94,18 @@ private:
 };
 
 
-class MenuEditControl::LineEdit : public ITextDoc
+class MenuEditControl::LineEdit : public ATextDoc<QLineEdit*>
 {
 public:
   LineEdit( MenuEditControl* parent )
-    : ITextDoc( parent )
+    : ATextDoc( parent )
   {
   }
+
+protected:
   virtual ~LineEdit() {};
 
 private:
-  QLineEdit* _focused;
-
   virtual bool initWidget(QWidget* focused)
   {
     if(focused->inherits("QLineEdit"))
@@ -97,22 +118,6 @@ private:
     return false;
   }
 
-  virtual void copy()
-  {
-    _focused->copy();
-  }
-  virtual void cut()
-  {
-    _focused->cut();
-  }
-  virtual void paste()
-  {
-    _focused->paste();
-  }
-  virtual void selectAll()
-  {
-    _focused->selectAll();
-  }
   virtual bool isSelected()
   {
     return !_focused->selectedText().isEmpty();
@@ -130,18 +135,18 @@ private:
   }
 };
 
-class MenuEditControl::PlainTextEdit : public ITextDoc
+class MenuEditControl::PlainTextEdit : public ATextDoc<QPlainTextEdit*>
 {
 public:
   PlainTextEdit( MenuEditControl* parent )
-    : ITextDoc( parent )
+    : ATextDoc( parent )
   {
   }
+
+protected:
   virtual ~PlainTextEdit() {};
 
 private:
-  QPlainTextEdit* _focused;
-
   virtual bool initWidget(QWidget* focused)
   {
     if(focused->inherits("QPlainTextEdit"))
@@ -154,22 +159,6 @@ private:
     return false;
   }
 
-  virtual void copy()
-  {
-    _focused->copy();
-  }
-  virtual void cut()
-  {
-    _focused->cut();
-  }
-  virtual void paste()
-  {
-    _focused->paste();
-  }
-  virtual void selectAll()
-  {
-    _focused->selectAll();
-  }
   virtual bool isSelected()
   {
     return !_focused->textCursor().selectedText().isEmpty();
@@ -291,7 +280,7 @@ void MenuEditControl::setEnabled(QWidget *old, QWidget *now)
   
   selectedText = isSelected(now);
   _actionCopy->setEnabled(selectedText);
-  _actionCut->setEnabled(selectedText);
+  _actionCut->setEnabled(false);
   _actionPaste->setEnabled(false);
 
   if (now == nullptr)
@@ -301,6 +290,7 @@ void MenuEditControl::setEnabled(QWidget *old, QWidget *now)
   {
     if (doc->initWidget(now))
     {
+      _actionCut->setEnabled(doc->canCut());
       _actionPaste->setEnabled(doc->canPaste());
       break;
     }

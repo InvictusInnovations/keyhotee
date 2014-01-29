@@ -24,12 +24,14 @@ private:
     virtual void selectAll() = 0;
     virtual bool isSelected() = 0;
     virtual bool canPaste() = 0;
+    virtual bool canCut() = 0;
     virtual void connectSelectionChanged(bool fConnect, QWidget* widget) = 0;
   protected:
     QWidget*          _focused;
     MenuEditControl*  _parent;
   };
 
+  template<class TWidgetClass> class ATextDoc;
   class TextEdit;
   class LineEdit;
   class PlainTextEdit;
