@@ -18,7 +18,7 @@ MenuEditControl::ITextDoc::ITextDoc( MenuEditControl* parent )
 class MenuEditControl::TextEdit : public ITextDoc
 {
 public:
-  TextEdit::TextEdit( MenuEditControl* parent )
+  TextEdit( MenuEditControl* parent )
     : ITextDoc( parent )
   {
   }
@@ -76,7 +76,7 @@ private:
 class MenuEditControl::LineEdit : public ITextDoc
 {
 public:
-  LineEdit::LineEdit( MenuEditControl* parent )
+  LineEdit( MenuEditControl* parent )
     : ITextDoc( parent )
   {
   }
@@ -133,7 +133,7 @@ private:
 class MenuEditControl::PlainTextEdit : public ITextDoc
 {
 public:
-  PlainTextEdit::PlainTextEdit( MenuEditControl* parent )
+  PlainTextEdit( MenuEditControl* parent )
     : ITextDoc( parent )
   {
   }
