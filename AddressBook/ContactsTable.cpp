@@ -111,12 +111,19 @@ void ContactsTable::onDeleteContact()
     indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
   auto sourceModel = model->sourceModel();
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+
   for (int i = indexes.count() - 1; i > -1; --i)
-    {
+  {
     auto contact_id = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).wallet_index;
-    sourceModel->removeRows(indexes.at(i).row(), 1);    
-    Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted
+    if(profile->isIdentityPresent(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string))
+    {
+      profile->removeIdentity(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
     }
+    sourceModel->removeRows(indexes.at(i).row(), 1);
+    Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted
+  }
   //model->setUpdatesEnabled(true);
   //TODO Remove fullname/bitname for deleted contacts from QCompleter
 
