@@ -9,9 +9,22 @@
 #include <QTableView>
 #include <QWidget>
 
+MenuEditControl::ITextDoc::ITextDoc( MenuEditControl* parent )
+{
+  _parent = parent;
+  _focused = nullptr;  
+}
 
 class MenuEditControl::TextEdit : public ITextDoc
 {
+public:
+  TextEdit::TextEdit( MenuEditControl* parent )
+    : ITextDoc( parent )
+  {
+  }
+  virtual ~TextEdit() {};
+
+private:
   QTextEdit* _focused;
 
   virtual bool initWidget(QWidget* focused)
@@ -21,6 +34,8 @@ class MenuEditControl::TextEdit : public ITextDoc
       _focused = qobject_cast<QTextEdit*>(focused);
       return true;
     }
+    else
+      _focused = nullptr;
     return false;
   }
 
@@ -48,11 +63,26 @@ class MenuEditControl::TextEdit : public ITextDoc
   {
     return _focused->canPaste();
   }
+  virtual void connectSelectionChanged(bool fConnect, QWidget* widget)
+  {
+    if (fConnect)
+      _parent->connect(qobject_cast<QTextEdit*>(widget),  &QTextEdit::selectionChanged, _parent, &MenuEditControl::onSelectionChanged);
+    else
+      _parent->disconnect(qobject_cast<QTextEdit*>(widget),  &QTextEdit::selectionChanged, _parent, &MenuEditControl::onSelectionChanged);
+  }
 };
 
 
 class MenuEditControl::LineEdit : public ITextDoc
 {
+public:
+  LineEdit::LineEdit( MenuEditControl* parent )
+    : ITextDoc( parent )
+  {
+  }
+  virtual ~LineEdit() {};
+
+private:
   QLineEdit* _focused;
 
   virtual bool initWidget(QWidget* focused)
@@ -62,6 +92,8 @@ class MenuEditControl::LineEdit : public ITextDoc
       _focused = qobject_cast<QLineEdit*>(focused);
       return true;
     }
+    else
+      _focused = nullptr;
     return false;
   }
 
@@ -89,10 +121,25 @@ class MenuEditControl::LineEdit : public ITextDoc
   {
    return  !_focused->isReadOnly();
   }
+  virtual void connectSelectionChanged(bool fConnect, QWidget* widget)
+  {
+    if (fConnect)
+      _parent->connect(qobject_cast<QLineEdit*>(widget),  &QLineEdit::selectionChanged, _parent, &MenuEditControl::onSelectionChanged);
+    else
+      _parent->disconnect(qobject_cast<QLineEdit*>(widget),  &QLineEdit::selectionChanged, _parent, &MenuEditControl::onSelectionChanged);
+  }
 };
 
 class MenuEditControl::PlainTextEdit : public ITextDoc
 {
+public:
+  PlainTextEdit::PlainTextEdit( MenuEditControl* parent )
+    : ITextDoc( parent )
+  {
+  }
+  virtual ~PlainTextEdit() {};
+
+private:
   QPlainTextEdit* _focused;
 
   virtual bool initWidget(QWidget* focused)
@@ -102,6 +149,8 @@ class MenuEditControl::PlainTextEdit : public ITextDoc
       _focused = qobject_cast<QPlainTextEdit*>(focused);
       return true;
     }
+    else
+      _focused = nullptr;
     return false;
   }
 
@@ -129,6 +178,13 @@ class MenuEditControl::PlainTextEdit : public ITextDoc
   {
     return _focused->canPaste();
   }
+  virtual void connectSelectionChanged(bool fConnect, QWidget* widget)
+  {
+    if (fConnect)
+      _parent->connect(qobject_cast<QPlainTextEdit*>(widget),  &QPlainTextEdit::selectionChanged, _parent, &MenuEditControl::onSelectionChanged);
+    else
+      _parent->disconnect(qobject_cast<QPlainTextEdit*>(widget),  &QPlainTextEdit::selectionChanged, _parent, &MenuEditControl::onSelectionChanged);
+  }
 };
 
 MenuEditControl::MenuEditControl(QObject *parent, QAction *actionCopy, QAction *actionCut, QAction *actionPaste)
@@ -138,9 +194,9 @@ MenuEditControl::MenuEditControl(QObject *parent, QAction *actionCopy, QAction *
   _actionPaste (actionPaste)
 {
   _currentWidget = nullptr;
-  _textDocs.push_back(new MenuEditControl::TextEdit() );
-  _textDocs.push_back(new MenuEditControl::LineEdit() );
-  _textDocs.push_back(new MenuEditControl::PlainTextEdit() );
+  _textDocs.push_back(new MenuEditControl::TextEdit(this) );
+  _textDocs.push_back(new MenuEditControl::LineEdit(this) );
+  _textDocs.push_back(new MenuEditControl::PlainTextEdit(this) );
 }
 
 MenuEditControl::~MenuEditControl()
@@ -252,9 +308,11 @@ void MenuEditControl::setEnabled(QWidget *old, QWidget *now)
 
   if (now != _currentWidget)
   {
-    connectSelectionChangedSignal(false, _currentWidget);
-    _currentWidget = now;
-    connectSelectionChangedSignal(true, _currentWidget);
+    connectSelectionChangedSignal(false, _currentWidget);    
+    if (connectSelectionChangedSignal(true, now))
+      _currentWidget = now;
+    else
+      _currentWidget = nullptr;
   }
 }
 
@@ -263,6 +321,11 @@ void MenuEditControl::onSelectionChanged()
   bool selectedText = isSelected(_currentWidget);
   _actionCopy->setEnabled(selectedText);
   _actionCut->setEnabled(selectedText);
+}
+
+void MenuEditControl::onDestroyed( QObject * obj )
+{
+  _currentWidget = nullptr;
 }
 
 bool MenuEditControl::isSelected(QWidget* focused) const
@@ -295,30 +358,24 @@ bool MenuEditControl::isSelected(QWidget* focused) const
   return selectedText;
 }
 
-void MenuEditControl::connectSelectionChangedSignal(bool fConnect, QWidget* widget)
+bool MenuEditControl::connectSelectionChangedSignal(bool fConnect, QWidget* widget)
 {
   if (widget == nullptr)
-    return;
+    return false;
 
-  if(widget->inherits("QTextEdit")) 
+  foreach(ITextDoc* doc, _textDocs)
   {
-    if (fConnect)
-      connect(qobject_cast<QTextEdit*>(widget),  &QTextEdit::selectionChanged, this, &MenuEditControl::onSelectionChanged);
-    else
-      disconnect(qobject_cast<QTextEdit*>(widget),  &QTextEdit::selectionChanged, this, &MenuEditControl::onSelectionChanged);
+    if (doc->initWidget(widget))
+    {
+      if (fConnect)
+        connect(widget,  &QObject::destroyed, this, &MenuEditControl::onDestroyed);
+      else
+        disconnect(widget,  &QObject::destroyed, this, &MenuEditControl::onDestroyed);
+
+      doc->connectSelectionChanged( fConnect, widget );
+      return true;
+    }
   }
-  else if(widget->inherits("QLineEdit")) 
-  {
-    if (fConnect)
-      connect(qobject_cast<QLineEdit*>(widget), &QLineEdit::selectionChanged, this, &MenuEditControl::onSelectionChanged);
-    else
-      disconnect(qobject_cast<QLineEdit*>(widget), &QLineEdit::selectionChanged, this, &MenuEditControl::onSelectionChanged);
-  }
-  else if(widget->inherits("QPlainTextEdit")) 
-  {
-    if (fConnect)
-      connect(qobject_cast<QPlainTextEdit*>(widget), &QPlainTextEdit::selectionChanged, this, &MenuEditControl::onSelectionChanged);
-    else
-      disconnect(qobject_cast<QPlainTextEdit*>(widget), &QPlainTextEdit::selectionChanged, this, &MenuEditControl::onSelectionChanged);
-  }
+
+  return false;
 }

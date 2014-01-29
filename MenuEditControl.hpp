@@ -13,6 +13,9 @@ class MenuEditControl : public QObject
 private:
   class ITextDoc
   {
+  public: //delete from MenuEditControl
+    ITextDoc(MenuEditControl* parent);
+    virtual ~ITextDoc(){};
   public:
     virtual bool initWidget(QWidget* focused) = 0;
     virtual void copy() = 0;
@@ -21,8 +24,10 @@ private:
     virtual void selectAll() = 0;
     virtual bool isSelected() = 0;
     virtual bool canPaste() = 0;
+    virtual void connectSelectionChanged(bool fConnect, QWidget* widget) = 0;
   protected:
-    QWidget* _focused;
+    QWidget*          _focused;
+    MenuEditControl*  _parent;
   };
 
   class TextEdit;
@@ -41,11 +46,12 @@ public:
 
 private:
   bool isSelected(QWidget* focused) const;
-  void connectSelectionChangedSignal(bool fConnect, QWidget* widget);
+  bool connectSelectionChangedSignal(bool fConnect, QWidget* widget);
 
 signals:
 private slots:
   void onSelectionChanged();
+  void onDestroyed ( QObject * obj = 0 );
 
 private:
   QAction*    _actionCopy;
