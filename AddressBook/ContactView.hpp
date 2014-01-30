@@ -62,10 +62,11 @@ Q_SIGNALS:
   void canceledNewContact();
   void savedNewContact(int idxNewContact);
 
+public slots:
+  void checkSendMailButton();
 private slots:
   void firstNameChanged(const QString& name);
   void lastNameChanged(const QString& name);
-  void enableSendMail( bool enable);
   void keyhoteeIdChanged(const QString& name);
   void keyhoteeIdEdited(const QString& name);
   void publicKeyEdited(const QString& public_key_string);

@@ -621,7 +621,7 @@ void KeyhoteeMainWindow::enableNewMessageIcon()
 {
     if(isIdentityPresent() == true ) {
          ui->actionNew_Message->setEnabled(true);
-         emit enableSendMailSignal(true);
+         emit checkSendMailSignal();
     }
 }
 
@@ -748,6 +748,7 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
     createContactGui(contact_id);
     contact_gui = getContactGui(contact_id);
   }
+  contact_gui->_view->checkSendMailButton();
   return contact_gui;
 }
 
@@ -760,8 +761,8 @@ void KeyhoteeMainWindow::createContactGui(int contact_id)
 
   auto       view = new ContactView(ui->widget_stack);
 
-  QObject::connect(this, SIGNAL(enableSendMailSignal(bool)),
-                   view, SLOT(enableSendMail(bool)));
+  QObject::connect(this, SIGNAL(checkSendMailSignal()),
+                   view, SLOT(checkSendMailButton()));
   //add new contactGui to map
   _contact_guis[contact_id] = ContactGui(new_contact_item, view);
 
@@ -1024,7 +1025,7 @@ void KeyhoteeMainWindow::onRemoveContact()
   refreshDeleteContactOption ();
   if(isIdentityPresent() == false ){
        ui->actionNew_Message->setEnabled(false);
-       emit enableSendMailSignal(false);
+       emit checkSendMailSignal();
   }
 }
 
