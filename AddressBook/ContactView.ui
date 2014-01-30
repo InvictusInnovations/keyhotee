@@ -507,7 +507,7 @@
             </widget>
            </item>
            <item row="3" column="2" colspan="2">
-            <widget class="LineEditReadOnly" name="public_key">
+            <widget class="QLineEdit" name="public_key">
              <property name="font">
               <font>
                <family>Andale Mono</family>
@@ -763,13 +763,6 @@ Enter</string>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="9"/>
- <customwidgets>
-  <customwidget>
-   <class>LineEditReadOnly</class>
-   <extends>QLineEdit</extends>
-   <header location="global">AddressBook/LineEditReadOnly.hpp</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>contact_pages</tabstop>
   <tabstop>icon_view</tabstop>
