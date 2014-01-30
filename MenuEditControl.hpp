@@ -47,7 +47,7 @@ public:
   void setEnabled(QWidget *old, QWidget *now);
 
 private:
-  bool isSelected(QWidget* focused) const;
+  bool isSelected(QWidget* focused, bool& canCut) const;
   bool connectSelectionChangedSignal(bool fConnect, QWidget* widget);
 
 signals:

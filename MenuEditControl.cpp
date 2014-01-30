@@ -277,10 +277,11 @@ void MenuEditControl::selectAll()
 void MenuEditControl::setEnabled(QWidget *old, QWidget *now)
 {  
   bool selectedText = false;
+  bool rCanCut = false;
   
-  selectedText = isSelected(now);
+  selectedText = isSelected(now, rCanCut);
   _actionCopy->setEnabled(selectedText);
-  _actionCut->setEnabled(false);
+  _actionCut->setEnabled(rCanCut);
   _actionPaste->setEnabled(false);
 
   if (now == nullptr)
@@ -289,8 +290,7 @@ void MenuEditControl::setEnabled(QWidget *old, QWidget *now)
   foreach(ITextDoc* doc, _textDocs)
   {
     if (doc->initWidget(now))
-    {
-      _actionCut->setEnabled(doc->canCut());
+    {      
       _actionPaste->setEnabled(doc->canPaste());
       break;
     }
@@ -308,9 +308,10 @@ void MenuEditControl::setEnabled(QWidget *old, QWidget *now)
 
 void MenuEditControl::onSelectionChanged()
 {
-  bool selectedText = isSelected(_currentWidget);
+  bool rCanCut = false;
+  bool selectedText = isSelected(_currentWidget, rCanCut);
   _actionCopy->setEnabled(selectedText);
-  _actionCut->setEnabled(selectedText);
+  _actionCut->setEnabled(rCanCut);
 }
 
 void MenuEditControl::onDestroyed( QObject * obj )
@@ -318,9 +319,10 @@ void MenuEditControl::onDestroyed( QObject * obj )
   _currentWidget = nullptr;
 }
 
-bool MenuEditControl::isSelected(QWidget* focused) const
+bool MenuEditControl::isSelected(QWidget* focused, bool& canCut) const
 {
   bool selectedText = false;
+  canCut = false;
 
   if (focused == nullptr)
   {
@@ -331,7 +333,7 @@ bool MenuEditControl::isSelected(QWidget* focused) const
   if(focused == getKeyhoteeWindow()->getContactsPage()->getContactsTableWidget())
   {    
     //enable/disable menu in the: void KeyhoteeMainWindow::refreshEditMenu() 
-    selectedText = true; 
+    selectedText = true;     
   }
   else
   {
@@ -340,6 +342,7 @@ bool MenuEditControl::isSelected(QWidget* focused) const
       if (doc->initWidget(focused))
       {
         selectedText = doc->isSelected();
+        canCut = doc->canCut() && selectedText;
         break;
       }
     }  
