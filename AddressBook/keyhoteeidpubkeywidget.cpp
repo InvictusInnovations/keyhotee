@@ -152,23 +152,23 @@ void KeyhoteeIDPubKeyWidget::publicKeyEdited(const QString& public_key_string)
 
 bool KeyhoteeIDPubKeyWidget::existContactWithPublicKey (const std::string& public_key_string)
 {
-   std::string my_public_key = public_key_address( _current_contact.public_key );
-   if (public_key_string != my_public_key)
-   {
-      auto addressbook = bts::get_profile()->get_addressbook();
-      if(! public_key_string.size()==0)
+  std::string my_public_key = public_key_address( _current_contact.public_key );
+  if (public_key_string != my_public_key)
+  {
+    auto addressbook = bts::get_profile()->get_addressbook();
+    if(! public_key_string.size()==0)
+    {
+      public_key_address key_address(public_key_string);
+      auto findContact = addressbook->get_contact_by_public_key( key_address.key );
+      if (findContact)
       {
-         public_key_address key_address(public_key_string);
-         auto findContact = addressbook->get_contact_by_public_key( key_address.key );
-         if (findContact)
-         {
-            ui->id_status->setText( tr("This contact is already added to the list") );
-            ui->id_status->setStyleSheet("QLabel { color : red; }");
-            return true;
-         }
-      }     
-   }
-   return false;
+        ui->id_status->setText( tr("This contact is already added to the list") );
+        ui->id_status->setStyleSheet("QLabel { color : red; }");
+        return true;
+      }
+    }     
+  }
+  return false;
 }
 
 void KeyhoteeIDPubKeyWidget::setValid(bool valid)
@@ -176,3 +176,7 @@ void KeyhoteeIDPubKeyWidget::setValid(bool valid)
   _validForm = valid;
 }
 
+void KeyhoteeIDPubKeyWidget::showCopyToClipboard(bool visible)
+{
+  ui->public_key_to_clipboard->setVisible(visible);
+}

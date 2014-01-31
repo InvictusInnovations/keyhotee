@@ -13,8 +13,10 @@ public:
   explicit RequestAuthorization(QWidget *parent = 0);
   ~RequestAuthorization();
 
-  void onKeyhoteeIDChanged(const QString& name);
-  void onPublicKeyChanged(const QString& name);
+  void setKeyhoteeID(const QString& name);
+  void setPublicKey(const QString& name);
+
+  void enableAddContact(bool active);
 
   void onSend();
 

@@ -2,6 +2,7 @@
 #include "ui_ContactView.h"
 #include "AddressBookModel.hpp"
 #include "public_key_address.hpp"
+#include "RequestAuthorization.hpp"
 
 #include <KeyhoteeMainWindow.hpp>
 #include <bts/application.hpp>
@@ -291,7 +292,13 @@ void ContactView::onShareContact()
 
 void ContactView::onRequestContact()
 {
-  QMessageBox::warning(this, tr("Warning"), tr("Not supported"));
+  RequestAuthorization *request = new RequestAuthorization(this);
+  if(!ui->id_edit->text().isEmpty())
+    request->setKeyhoteeID(ui->id_edit->text());
+  else
+    request->setPublicKey(ui->public_key->text());
+  request->enableAddContact(false);
+  request->show();
 }
 
 ContactView::~ContactView()
@@ -568,7 +575,7 @@ void ContactView::keyEdit(bool enable)
   chat_contact->setEnabled(!enable);
   edit_contact->setEnabled(!enable);
   share_contact->setEnabled(false);
-  request_contact->setEnabled(false);
+  request_contact->setEnabled(!enable);
 
   ui->contact_pages->setTabEnabled(chat, !enable);
 
