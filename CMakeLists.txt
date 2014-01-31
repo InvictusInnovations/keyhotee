@@ -213,6 +213,8 @@ qt5_wrap_ui( Uidiagnosticdialog                diagnosticdialog.ui )
 qt5_wrap_ui( UiNewIdentityDialog               AddressBook/NewIdentityDialog.ui )
 qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
 qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
+qt5_wrap_ui( UiRequestAuthorization            AddressBook/RequestAuthorization.ui )
+qt5_wrap_ui( UiKeyhoteeIDPubKeyWidget          AddressBook/keyhoteeidpubkeywidget.ui )
 qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
 qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
 qt5_wrap_ui( UiMailEditor                      Mail/maileditorwindow.ui )
@@ -253,6 +255,12 @@ set( sources
         AddressBook/LineEditReadOnly.cpp
         AddressBook/TableViewCustom.hpp
         AddressBook/TableViewCustom.cpp
+        AddressBook/RequestAuthorization.ui
+        AddressBook/RequestAuthorization.hpp
+        AddressBook/RequestAuthorization.cpp
+        AddressBook/keyhoteeidpubkeywidget.ui
+        AddressBook/keyhoteeidpubkeywidget.hpp
+        AddressBook/keyhoteeidpubkeywidget.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp

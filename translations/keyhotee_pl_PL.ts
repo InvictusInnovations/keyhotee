@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="pl_PL">
 <context>
@@ -6,7 +6,7 @@
     <message>
         <location filename="../ATopLevelWindow.cpp" line="13"/>
         <source>[*]</source>
-        <translation type="unfinished"></translation>
+        <translation>[*]</translation>
     </message>
 </context>
 <context>
@@ -79,7 +79,7 @@
     <message>
         <location filename="../AddressBook/AddressBookModel.cpp" line="122"/>
         <source> </source>
-        <translation type="unfinished"></translation>
+        <translation> </translation>
     </message>
     <message>
         <location filename="../AddressBook/AddressBookModel.cpp" line="124"/>
@@ -512,12 +512,12 @@ Enter</translation>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="405"/>
         <source>Public Key Only Mode: valid key</source>
-        <translation>Tryb Wyłącznie Klucza Publicznego: klucz ważny</translation>
+        <translation>Tryb Wyłącznie Klucza Publicznego: klucz poprawny</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="411"/>
         <source>Public Key Only Mode: not a valid key</source>
-        <translation>Tryb Wyłącznie Klucza Publicznego: klucz nie ważny</translation>
+        <translation>Tryb Wyłącznie Klucza Publicznego: błędny klucz</translation>
     </message>
     <message>
         <location filename="../AddressBook/ContactView.cpp" line="432"/>

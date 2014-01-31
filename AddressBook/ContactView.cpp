@@ -440,8 +440,7 @@ void ContactView::publicKeyEdited(const QString& public_key_string)
     {
       ui->public_key->setStyleSheet("QLineEdit { color : red; }");
     }
-
-    if (! (doubleContact = existContactWithPublicKey(public_key_string.toStdString())))
+    else if (! (doubleContact = existContactWithPublicKey(public_key_string.toStdString())))
     {
       ui->id_status->setText(tr("Public Key Only Mode: valid key") );
       ui->id_status->setStyleSheet("QLabel { color : green; }");

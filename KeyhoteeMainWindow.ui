@@ -393,6 +393,8 @@
     <addaction name="actionNew_Contact"/>
     <addaction name="actionSet_Icon"/>
     <addaction name="separator"/>
+    <addaction name="actionRequest_authorization"/>
+    <addaction name="separator"/>
     <addaction name="actionShow_Contacts"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -638,6 +640,15 @@
    </property>
    <property name="text">
     <string>Show details</string>
+   </property>
+  </action>
+  <action name="actionRequest_authorization">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/128x128/contact_info_request_authorisation.png</normaloff>:/images/128x128/contact_info_request_authorisation.png</iconset>
+   </property>
+   <property name="text">
+    <string>Request authorization...</string>
    </property>
   </action>
  </widget>

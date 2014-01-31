@@ -14,6 +14,7 @@
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/NewIdentityDialog.hpp"
 #include "AddressBook/ContactView.hpp"
+#include "AddressBook/RequestAuthorization.hpp"
 
 #include "Mail/MailboxModel.hpp"
 #include "Mail/maileditorwindow.hpp"
@@ -199,6 +200,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   connect(ui->actionNew_Contact, &QAction::triggered, this, &KeyhoteeMainWindow::addContact);
   connect(ui->actionSet_Icon, &QAction::triggered, this, &KeyhoteeMainWindow::onSetIcon);
   connect(ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts);
+  connect(ui->actionRequest_authorization, &QAction::triggered, this, &KeyhoteeMainWindow::onRequestAuthorization);
   // Help
   connect(ui->actionDiagnostic, &QAction::triggered, this, &KeyhoteeMainWindow::onDiagnostic);
   connect(ui->actionAbout, &QAction::triggered, this, &KeyhoteeMainWindow::onAbout);
@@ -625,6 +627,12 @@ void KeyhoteeMainWindow::onSaveAttachement()
 void KeyhoteeMainWindow::onSetIcon()
 {
   notSupported();
+}
+
+void KeyhoteeMainWindow::onRequestAuthorization()
+{
+  RequestAuthorization *request = new RequestAuthorization(this);
+  request->show();
 }
 
 void KeyhoteeMainWindow::displayDiagnosticLog()

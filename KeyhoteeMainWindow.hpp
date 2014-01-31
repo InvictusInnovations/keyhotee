@@ -151,6 +151,7 @@ private slots:
   void onSaveAttachement();
   // Contact
   void onSetIcon();
+  void onRequestAuthorization();
   // Help
   void onDiagnostic();
   void onAbout();
