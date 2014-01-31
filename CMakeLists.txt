@@ -7,7 +7,7 @@
 # libdb++-dev
 
 project( keyhotee )
-cmake_minimum_required( VERSION 2.8.11 )
+cmake_minimum_required( VERSION 2.8.12.1 )
 
 macro(FillQtDependentLibraries)
   GET_TARGET_PROPERTY(QT_LIB_DIR Qt5::Core LOCATION)
