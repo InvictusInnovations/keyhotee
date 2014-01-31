@@ -94,7 +94,7 @@ public:
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 
 signals:
-  void enableSendMailSignal(bool enable);
+  void checkSendMailSignal();
 protected:
   virtual void closeEvent(QCloseEvent *);
   virtual void keyPressEvent(QKeyEvent *);

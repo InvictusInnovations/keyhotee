@@ -257,8 +257,6 @@ set( sources
         AddressBook/ContactView.hpp
         AddressBook/ContactView.cpp
         AddressBook/Contact.cpp
-        AddressBook/LineEditReadOnly.hpp
-        AddressBook/LineEditReadOnly.cpp
         AddressBook/TableViewCustom.hpp
         AddressBook/TableViewCustom.cpp
 
