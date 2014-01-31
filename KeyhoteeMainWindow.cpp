@@ -177,7 +177,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   ui->side_bar->setModificationsChecker (this);
 
-  menuEdit = new MenuEditControl(this, ui->actionCopy, ui->actionCut);
+  menuEdit = new MenuEditControl(this, ui->actionCopy, ui->actionCut, ui->actionPaste);
   //init ui->actionPaste
   onClipboardChanged();
   connect(QApplication::clipboard(), &QClipboard::changed, this, &KeyhoteeMainWindow::onClipboardChanged);
@@ -545,7 +545,24 @@ void KeyhoteeMainWindow::onExit()
 // Menu Edit
 void KeyhoteeMainWindow::onCopy()
 {
-  menuEdit->copy();
+  QWidget *focused = focusWidget ();
+  if (focused == nullptr)
+    return;
+
+  if(focused == ui->side_bar) //TreeView focused
+  {
+    if (ui->widget_stack->currentWidget () == ui->contacts_page)
+      ui->contacts_page->copy ();
+  }
+  //contact list
+  else if(focused == ui->contacts_page->getContactsTableWidget())
+  {
+    ui->contacts_page->copy ();
+  }
+  else
+  {
+    menuEdit->copy();
+  }
 }
 
 void KeyhoteeMainWindow::onCut()
@@ -606,7 +623,7 @@ void KeyhoteeMainWindow::enableNewMessageIcon()
 {
     if(isIdentityPresent() == true ) {
          ui->actionNew_Message->setEnabled(true);
-         emit enableSendMailSignal(true);
+         emit checkSendMailSignal();
     }
 }
 
@@ -739,6 +756,7 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
     createContactGui(contact_id);
     contact_gui = getContactGui(contact_id);
   }
+  contact_gui->_view->checkSendMailButton();
   return contact_gui;
 }
 
@@ -751,8 +769,8 @@ void KeyhoteeMainWindow::createContactGui(int contact_id)
 
   auto       view = new ContactView(ui->widget_stack);
 
-  QObject::connect(this, SIGNAL(enableSendMailSignal(bool)),
-                   view, SLOT(enableSendMail(bool)));
+  QObject::connect(this, SIGNAL(checkSendMailSignal()),
+                   view, SLOT(checkSendMailButton()));
   //add new contactGui to map
   _contact_guis[contact_id] = ContactGui(new_contact_item, view);
 
@@ -974,6 +992,13 @@ void KeyhoteeMainWindow::refreshDeleteContactOption() const
   setEnabledDeleteOption( isContactTableSelected || isContactTreeItemSelected );
   }
 
+void KeyhoteeMainWindow::refreshEditMenu() const
+{
+  bool isContactTableSelected = ui->contacts_page->isSelection();
+  ui->actionCopy->setEnabled (isContactTableSelected);  
+  ui->actionCut->setEnabled (false);  
+}
+
 void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
   {
     ui->actionReply->setEnabled(enable);
@@ -1008,7 +1033,7 @@ void KeyhoteeMainWindow::onRemoveContact()
   refreshDeleteContactOption ();
   if(isIdentityPresent() == false ){
        ui->actionNew_Message->setEnabled(false);
-       emit enableSendMailSignal(false);
+       emit checkSendMailSignal();
   }
 }
 

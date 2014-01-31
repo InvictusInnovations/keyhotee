@@ -86,6 +86,7 @@ public:
   void setEnabledAttachmentSaveOption(bool enable);
   void setEnabledDeleteOption( bool enable ) const;
   void refreshDeleteContactOption() const;
+  void refreshEditMenu() const;
   void setEnabledMailActions(bool enable);
   void setMailSettings (MailSettings& mailSettings);  
   ContactsTable* getContactsPage();
@@ -93,7 +94,7 @@ public:
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 
 signals:
-  void enableSendMailSignal(bool enable);
+  void checkSendMailSignal();
 protected:
   virtual void closeEvent(QCloseEvent *);
   virtual void keyPressEvent(QKeyEvent *);
