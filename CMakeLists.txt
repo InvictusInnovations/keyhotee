@@ -86,6 +86,8 @@ SET(KH_STATIC_QT 1)
 SET(QT_DEPENDENCY_LIBRARIES "")
 SET(ICU_LIBS_PREFIX "")
 
+SET (ORIGINAL_LIB_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
+
 IF( WIN32 )
   MESSAGE(platform= "Compiling on WIN32")
 
@@ -100,11 +102,17 @@ IF( WIN32 )
   message("Setting up OpenSSL root and include vars on Win32 platform")
   set( OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT} )
   set( OPENSSL_INCLUDE_DIR ${OPENSSL_ROOT_DIR}/include )
-
+ELSE()
+  IF(KH_STATIC_QT EQUAL 1)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
+  ENDIF()
 ENDIF(WIN32)
 
-find_package( ICU )
 find_package( OpenSSL )
+find_package( ICU )
+
+SET (CMAKE_FIND_LIBRARY_SUFFIXES ${ORIGINAL_LIB_SUFFIXES})
+
 find_package( Qt5LinguistTools )
 find_package( Qt5PrintSupport )
 find_package( Qt5Svg )
@@ -411,7 +419,9 @@ IF (KH_STATIC_QT EQUAL 1)
     debug ${Qt5SvgIcon_LIBRARIES_DEBUG} optimized ${Qt5SvgIcon_LIBRARIES_RELEASE} 
     Qt5::Svg Qt5::Widgets Qt5::Gui Qt5::PrintSupport
     bshare upnpc-static fc leveldb ${BOOST_LIBRARIES}
-    ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES}
+# Since we would like to build KH against static versions of ICU, it is needed to specify them in
+# valid order (DT must be at the end)
+    ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES} ${ICU_DT_LIBRARY}
     ${APPKIT_LIBRARY} ${CMAKE_DL_LIBS} 
   )
 # without call FillQtDependentLibraries micro
