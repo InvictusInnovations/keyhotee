@@ -2,6 +2,7 @@
 #define MENUEDITCONTROL_HPP
 
 #include <QObject>
+#include <vector>
 
 class QAction;
 class QWidget;
