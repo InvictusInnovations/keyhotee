@@ -289,6 +289,8 @@ set( sources
         Mail/FileAttachmentDialog.ui
         Mail/FileAttachmentDialog.hpp
         Mail/FileAttachmentDialog.cpp
+        Mail/TableWidgetAttachments.hpp
+        Mail/TableWidgetAttachments.cpp
 
         KeyhoteeApplication.hpp
         KeyhoteeApplication.cpp

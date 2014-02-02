@@ -84,6 +84,8 @@ class TFileAttachmentWidget : public QWidget
     bool SaveAttachmentItem(const AAttachmentItem* iten, const QFileInfo& targetPath,
       bool checkForOverwrite);
     void RetrieveSelection(TSelection* storage) const;
+    /// Add attachments files
+    void addFiles(const QStringList& files);
 
   private slots:
     void onAddTriggered();
@@ -92,6 +94,8 @@ class TFileAttachmentWidget : public QWidget
     void onSaveTriggered();
     void onRenameTriggered();
     void onAttachementTableSelectionChanged();
+    void onPasteTriggered();
+    void onClipboardChanged();
 
   /// Class attributes:
   private:
