@@ -144,6 +144,30 @@ void NewIdentityDialog::onSave()
     auto profile = app->get_profile();
     auto trimmed_dac_id = ui->username->text().trimmed();
     fc::string dac_id = trimmed_dac_id.toStdString();
+
+    // make sure the key is unique..
+    try {
+        bts::addressbook::wallet_identity cur_ident = profile->get_identity( dac_id );
+        ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
+        ui->status_label->setStyleSheet("QLabel { color : red; }");
+        ui->publickey->setText( "" );
+        ui->status_label->setText( tr( "Status: You have already created this identity." ) );
+        return;
+    }
+    catch ( fc::key_not_found_exception& )
+    {
+        fc::optional<bts::bitname::name_record> current_record = bts::application::instance()->lookup_name(dac_id);
+        if(current_record)
+        {
+           ui->status_label->setStyleSheet("QLabel { color : red; }");
+           ui->status_label->setText(tr("Status: This Keyhotee ID was already registered by someone else."));
+           ui->publickey->setText( "" );
+           ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
+           return;
+        }
+    }
+
+
     bts::addressbook::wallet_identity ident;
     ident.first_name = fc::trim( ui->firstname->text().toUtf8().constData() );
     ident.last_name = fc::trim( ui->lastname->text().toUtf8().constData() );
