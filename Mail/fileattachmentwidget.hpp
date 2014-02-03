@@ -42,6 +42,8 @@ class TFileAttachmentWidget : public QWidget
     void selectAllFiles();
     bool saveAttachments();
     bool hasAttachment();
+    /// Add attachments files 
+    void addFiles(const QStringList& files);
     
     /// Signal emitted when attachment list changes.
     Q_SIGNAL void attachmentListChanged();
@@ -83,9 +85,7 @@ class TFileAttachmentWidget : public QWidget
     /// Helper function to implement attachment item saving.
     bool SaveAttachmentItem(const AAttachmentItem* iten, const QFileInfo& targetPath,
       bool checkForOverwrite);
-    void RetrieveSelection(TSelection* storage) const;
-    /// Add attachments files
-    void addFiles(const QStringList& files);
+    void RetrieveSelection(TSelection* storage) const;   
 
   private slots:
     void onAddTriggered();
@@ -95,7 +95,8 @@ class TFileAttachmentWidget : public QWidget
     void onRenameTriggered();
     void onAttachementTableSelectionChanged();
     void onPasteTriggered();
-    void onClipboardChanged();
+    void onClipboardChanged();    
+    void onDropEvent(QStringList files);
 
   /// Class attributes:
   private:

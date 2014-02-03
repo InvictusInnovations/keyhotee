@@ -1,7 +1,9 @@
 #include "TableWidgetAttachments.hpp"
+#include "fileattachmentwidget.hpp"
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDragEnterEvent>
 #include <QMimeData>
 #include <QUrl>
 #include <QFileInfo>
@@ -9,23 +11,45 @@
 TableWidgetAttachments::TableWidgetAttachments(QWidget *parent) :
     QTableWidget(parent)
 {
+ setAcceptDrops(true);
 }
 
-bool TableWidgetAttachments::dropMimeData(int row, int column, const QMimeData *data, Qt::DropAction action)
+void TableWidgetAttachments::dragEnterEvent(QDragEnterEvent *event)
 {
-  return QTableWidget::dropMimeData(row, column, data, action);
+  QStringList stringList = getFilesPathFromMimeData( event->mimeData() );
+  if (stringList.size())
+    event->acceptProposedAction();
+}
+ 
+void TableWidgetAttachments::dragMoveEvent(QDragMoveEvent *event)
+{
+    event->acceptProposedAction();
+}
+ 
+void TableWidgetAttachments::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    event->accept();
 }
 
-Qt::DropActions TableWidgetAttachments::supportedDropActions() const
-{
-  Qt::DropActions dropActions = QTableWidget::supportedDropActions();
-
-  return dropActions;
+void TableWidgetAttachments::dropEvent(QDropEvent *event)
+{  
+  QStringList stringList = getFilesPathFromMimeData(event->mimeData());
+  if (stringList.size())
+  {
+    emit dropEvent(stringList);
+    event->acceptProposedAction();
+  }
 }
 
 QStringList TableWidgetAttachments::getFilesPathFromClipboard()
 {
   const QMimeData *md = QApplication::clipboard()->mimeData();
+  QStringList stringList = getFilesPathFromMimeData(md);
+  return stringList;
+}
+
+QStringList TableWidgetAttachments::getFilesPathFromMimeData(const QMimeData *md)
+{
   QStringList stringList = QStringList();
 
   if(md)

@@ -481,6 +481,9 @@ void TFileAttachmentWidget::ConfigureContextMenu()
     connect(QApplication::clipboard(), &QClipboard::changed, this, &TFileAttachmentWidget::onClipboardChanged);
   }
 #endif 
+#ifndef QT_NO_DRAGANDDROP
+  connect(ui->attachmentTable, SIGNAL(dropEvent(QStringList)), this, SLOT(onDropEvent(QStringList)));
+#endif 
 
   sep = new QAction(this);
   sep->setSeparator(true);
@@ -809,4 +812,9 @@ void TFileAttachmentWidget::onClipboardChanged()
 {
   QStringList files = ui->attachmentTable->getFilesPathFromClipboard();
   ui->actionPaste->setEnabled( files.size() );
+}
+
+void TFileAttachmentWidget::onDropEvent(QStringList files)
+{
+  addFiles( files );
 }
