@@ -55,7 +55,10 @@ void NewIdentityDialog::onUserNameChanged( const QString& name )
           bts::addressbook::wallet_identity cur_ident = pro->get_identity( trim_name );
           ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
           ui->status_label->setStyleSheet("QLabel { color : red; }");
-          ui->status_label->setText( tr( "Status: You have already created this identity." ) );
+          if (cur_ident.dac_id_string == trim_name)
+              ui->status_label->setText( tr( "Status: You have already created this identity." ) );
+          else
+              ui->status_label->setText( tr( "Status: You have already created a similar id." ) );
       } 
       catch ( fc::key_not_found_exception& )
       {
@@ -151,7 +154,10 @@ void NewIdentityDialog::onSave()
         ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
         ui->status_label->setStyleSheet("QLabel { color : red; }");
         ui->publickey->setText( "" );
-        ui->status_label->setText( tr( "Status: You have already created this identity." ) );
+        if (cur_ident.dac_id_string == dac_id)
+            ui->status_label->setText( tr( "Status: You have already created this identity." ) );
+        else
+            ui->status_label->setText( tr( "Status: You have already created a similar id." ) );
         return;
     }
     catch ( fc::key_not_found_exception& )
