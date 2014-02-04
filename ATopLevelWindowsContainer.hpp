@@ -20,6 +20,8 @@ public:
 
   void setMenuWindow(QMenu* menuWindow);
 
+  void activateMainWindow();
+
 private:
   bool closeAllWindows(void);
 

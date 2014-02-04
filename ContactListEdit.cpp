@@ -464,9 +464,11 @@ bool ContactListEdit::isStoredContact()
 void ContactListEdit::onActiveAddContact()
 {
   getKeyhoteeWindow()->addToContacts(_clicked_contact);
+  getKeyhoteeWindow()->activateMainWindow();
 }
 
 void ContactListEdit::onActiveFindContact()
 {
   getKeyhoteeWindow()->openContactGui(_clicked_contact->wallet_index);
+  getKeyhoteeWindow()->activateMainWindow();
 }
