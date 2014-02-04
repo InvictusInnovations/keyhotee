@@ -44,6 +44,7 @@ void KeyhoteeIDPubKeyWidget::lookupId()
     if (current_id.empty() )
     {
       ui->id_status->setText(QString() );
+      emit currentState(InvalidData);
       return;
     }
     _current_record = bts::application::instance()->lookup_name(current_id);
@@ -53,17 +54,21 @@ void KeyhoteeIDPubKeyWidget::lookupId()
       ui->id_status->setText(tr("Registered") );
       std::string public_key_string = public_key_address(_current_record->active_key);
       ui->public_key->setText(public_key_string.c_str() );
-      if (_address_book != nullptr)
-      {
+//      if (_address_book != nullptr)
+//      {
         if (! existContactWithPublicKey (public_key_string))
+        {
+          emit currentState(OkKeyhoteeID);
           setValid (true);
-      }
+        }
+//      }
     }
     else
     {
       ui->id_status->setStyleSheet("QLabel { color : red; }");
       ui->id_status->setText(tr("Unable to find ID") );
       ui->public_key->setText(QString());
+      emit currentState(InvalidData);
     }
   }
   catch (const fc::exception& e)
@@ -135,17 +140,20 @@ void KeyhoteeIDPubKeyWidget::publicKeyEdited(const QString& public_key_string)
     if (!publicKeySemanticallyValid)
     {
       ui->public_key->setStyleSheet("QLineEdit { color : red; }");
+      emit currentState(InvalidData);
     }
     else if (! (doubleContact = existContactWithPublicKey(public_key_string.toStdString())))
     {
       ui->id_status->setText(tr("Public Key Only Mode: valid key") );
       ui->id_status->setStyleSheet("QLabel { color : green; }");
+      emit currentState(OkPubKey);
     }
   }
   else
   {
     ui->id_status->setText(tr("Public Key Only Mode: not a valid key") );
     ui->id_status->setStyleSheet("QLabel { color : red; }");
+    emit currentState(InvalidData);
   }
   setValid (public_key_is_valid && ! doubleContact && publicKeySemanticallyValid);
 }
@@ -162,9 +170,20 @@ bool KeyhoteeIDPubKeyWidget::existContactWithPublicKey (const std::string& publi
       auto findContact = addressbook->get_contact_by_public_key( key_address.key );
       if (findContact)
       {
-        ui->id_status->setText( tr("This contact is already added to the list") );
-        ui->id_status->setStyleSheet("QLabel { color : red; }");
-        return true;
+        switch(_my_mode)
+        {
+          case ModeWidget::AddContact:
+            ui->id_status->setText( tr("This contact is already added to the list") );
+            ui->id_status->setStyleSheet("QLabel { color : red; }");
+            return true;
+          case ModeWidget::RequestAuthorization:
+            ui->id_status->setText( tr("This contact is already added to the list") );
+            ui->id_status->setStyleSheet("QLabel { color : green; }");
+            emit currentState(IsStored);
+            return true;
+          default:
+            assert(false);
+        }
       }
     }     
   }
@@ -179,4 +198,10 @@ void KeyhoteeIDPubKeyWidget::setValid(bool valid)
 void KeyhoteeIDPubKeyWidget::showCopyToClipboard(bool visible)
 {
   ui->public_key_to_clipboard->setVisible(visible);
+}
+
+fc::ecc::public_key KeyhoteeIDPubKeyWidget::getPublicKey()
+{
+  public_key_address key_address(ui->public_key->text().toStdString());
+  return fc::ecc::public_key(key_address.key);
 }

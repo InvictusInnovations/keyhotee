@@ -9,10 +9,10 @@ RequestAuthorization::RequestAuthorization(QWidget *parent) :
   ui->setupUi(this);
   ui->button_send->setEnabled(false);
   ui->keyhoteeidpubkey->showCopyToClipboard(false);
+  ui->keyhoteeidpubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::RequestAuthorization);
 
-//  connect(ui->keyhotee_id, &QLineEdit::textChanged, this, &RequestAuthorization::onKeyhoteeIDChanged);
-//  connect(ui->public_key, &QLineEdit::textChanged, this, &RequestAuthorization::onPublicKeyChanged);
   connect(this, &QDialog::accepted, this, &RequestAuthorization::onSend);
+  connect(ui->keyhoteeidpubkey, &KeyhoteeIDPubKeyWidget::currentState, this, &RequestAuthorization::onStateWidget);
 }
 
 RequestAuthorization::~RequestAuthorization()
@@ -37,4 +37,42 @@ void RequestAuthorization::enableAddContact(bool active)
 
 void RequestAuthorization::onSend()
 {
+  auto                                          app = bts::application::instance();
+  auto                                          profile = app->get_profile();
+  auto                                          idents = profile->identities();
+  bts::bitchat::private_contact_request_message request_msg;
+  if (idents.size() )
+  {
+    request_msg.from_name = idents[0].get_full_name();
+    request_msg.greeting_message = ui->message->toPlainText().toStdString();          // ************************************************
+    request_msg.from_channel = bts::network::channel_id(1);
+
+    fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(idents[0].dac_id_string);
+    app->send_contact_request(ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);     // **************** !!!!!!!!! no request_msg
+    //appendChatMessage("me", msg);
+  }
+
+  //ui->chat_input->setPlainText(QString());
+}
+
+void RequestAuthorization::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)
+{
+  switch(state)
+  {
+    case KeyhoteeIDPubKeyWidget::CurrentState::InvalidData:
+      ui->button_send->setEnabled(false);;
+      ui->add_contact->setEnabled(false);
+      break;
+    case KeyhoteeIDPubKeyWidget::CurrentState::OkKeyhoteeID:
+    case KeyhoteeIDPubKeyWidget::CurrentState::OkPubKey:
+      ui->add_contact->setEnabled(true);
+      ui->button_send->setEnabled(true);
+      break;
+    case KeyhoteeIDPubKeyWidget::CurrentState::IsStored:
+      ui->add_contact->setEnabled(false);
+      ui->button_send->setEnabled(true);
+      break;
+    default:
+      assert(false);
+  }
 }

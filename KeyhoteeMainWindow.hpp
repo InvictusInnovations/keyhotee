@@ -103,6 +103,7 @@ private:
   /// application_delegate interface implementation
   virtual void received_text(const bts::bitchat::decrypted_message& msg);
   virtual void received_email(const bts::bitchat::decrypted_message& msg);
+  virtual void received_request( const bts::bitchat::decrypted_message& msg);
 
 private:
   /// \see IMessageProcessor::IUpdateSink interface description.

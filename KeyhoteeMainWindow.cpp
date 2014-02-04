@@ -837,6 +837,10 @@ void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& m
   _inbox_model->addMailHeader(header);
 }
 
+void KeyhoteeMainWindow::received_request( const bts::bitchat::decrypted_message& msg)
+{
+}
+
 void KeyhoteeMainWindow::OnMessageSaving()
 {
   /// FIXME - add some status bar messaging

@@ -1,5 +1,6 @@
 #pragma once
 #include <QDialog>
+#include "keyhoteeidpubkeywidget.hpp"
 
 namespace Ui {
 class RequestAuthorization;
@@ -18,9 +19,10 @@ public:
 
   void enableAddContact(bool active);
 
-  void onSend();
-
 private:
   Ui::RequestAuthorization *ui;
+
+  void onSend();
+  void onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state);
 };
 

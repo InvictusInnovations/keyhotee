@@ -9,15 +9,6 @@ class KeyhoteeIDPubKeyWidget;
 }
 class AddressBookModel;
 
-enum CurrentState{
-  Empty,
-  FailedKeyhoteeID,
-  FailedPubKey,
-  OkKeyhoteeID,
-  OkPubKey,
-  IsStored
-};
-
 class KeyhoteeIDPubKeyWidget : public QWidget
 {
   Q_OBJECT
@@ -26,6 +17,18 @@ public:
   explicit KeyhoteeIDPubKeyWidget(QWidget *parent = 0);
   ~KeyhoteeIDPubKeyWidget();
 
+  enum CurrentState{
+    InvalidData,
+    OkKeyhoteeID,
+    OkPubKey,
+    IsStored
+  };
+
+  enum ModeWidget{
+    AddContact,
+    RequestAuthorization
+  };
+
   void onPublicKeyToClipboard();
   void lookupId();
   void lookupPublicKey();
@@ -33,6 +36,9 @@ public:
   void setKeyhoteeID(const QString& keyhotee_id);
   void setPublicKey(const QString& public_key_string);
   void showCopyToClipboard(bool visible);
+  void setMode(ModeWidget mode = AddContact) {_my_mode = mode;};
+
+  fc::ecc::public_key getPublicKey();
 
 private:
   Ui::KeyhoteeIDPubKeyWidget *ui;
@@ -45,6 +51,7 @@ private:
   fc::optional<bts::bitname::name_record> _current_record;
   AddressBookModel*                       _address_book;
   bool                                    _validForm;
+  ModeWidget                              _my_mode;
 
 Q_SIGNALS:
   void currentState(CurrentState state);
