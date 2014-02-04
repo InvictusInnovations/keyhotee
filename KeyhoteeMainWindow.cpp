@@ -114,7 +114,8 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
 
 KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ATopLevelWindowsContainer(),
-  MailProcessor(*this, bts::application::instance()->get_profile())
+  MailProcessor(*this, bts::application::instance()->get_profile()),
+  _currentMailbox(nullptr)
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);
@@ -176,7 +177,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   ui->side_bar->setModificationsChecker (this);
 
-  menuEdit = new MenuEditControl(this, ui->actionCopy, ui->actionCut);
+  menuEdit = new MenuEditControl(this, ui->actionCopy, ui->actionCut, ui->actionPaste);
   //init ui->actionPaste
   onClipboardChanged();
   connect(QApplication::clipboard(), &QClipboard::changed, this, &KeyhoteeMainWindow::onClipboardChanged);
@@ -333,6 +334,8 @@ void KeyhoteeMainWindow::activateMailboxPage(Mailbox* mailBox)
   ui->actionShow_details->setChecked(checked);
 
   _currentMailbox = mailBox;
+  if(nullptr != _currentMailbox)
+    _currentMailbox->checksendmailbuttons();
   setEnabledAttachmentSaveOption(_currentMailbox->isAttachmentSelected());
   setEnabledDeleteOption (_currentMailbox->isSelection());
   setEnabledMailActions(_currentMailbox->isOneEmailSelected());
@@ -543,7 +546,24 @@ void KeyhoteeMainWindow::onExit()
 // Menu Edit
 void KeyhoteeMainWindow::onCopy()
 {
-  menuEdit->copy();
+  QWidget *focused = focusWidget ();
+  if (focused == nullptr)
+    return;
+
+  if(focused == ui->side_bar) //TreeView focused
+  {
+    if (ui->widget_stack->currentWidget () == ui->contacts_page)
+      ui->contacts_page->copy ();
+  }
+  //contact list
+  else if(focused == ui->contacts_page->getContactsTableWidget())
+  {
+    ui->contacts_page->copy ();
+  }
+  else
+  {
+    menuEdit->copy();
+  }
 }
 
 void KeyhoteeMainWindow::onCut()
@@ -604,7 +624,9 @@ void KeyhoteeMainWindow::enableNewMessageIcon()
 {
     if(isIdentityPresent() == true ) {
          ui->actionNew_Message->setEnabled(true);
-         emit enableSendMailSignal(true);
+         emit checkSendMailSignal();
+         if(nullptr != _currentMailbox)
+           _currentMailbox->checksendmailbuttons();
     }
 }
 
@@ -731,6 +753,9 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
     createContactGui(contact_id);
     contact_gui = getContactGui(contact_id);
   }
+  contact_gui->_view->checkSendMailButton();
+  if(nullptr != _currentMailbox)
+    _currentMailbox->checksendmailbuttons();
   return contact_gui;
 }
 
@@ -743,8 +768,8 @@ void KeyhoteeMainWindow::createContactGui(int contact_id)
 
   auto       view = new ContactView(ui->widget_stack);
 
-  QObject::connect(this, SIGNAL(enableSendMailSignal(bool)),
-                   view, SLOT(enableSendMail(bool)));
+  QObject::connect(this, SIGNAL(checkSendMailSignal()),
+                   view, SLOT(checkSendMailButton()));
   //add new contactGui to map
   _contact_guis[contact_id] = ContactGui(new_contact_item, view);
 
@@ -774,6 +799,8 @@ void KeyhoteeMainWindow::deleteContactGui(int contact_id)
     {
     _contacts_root->removeChild(contact_gui->_tree_item);
     _contact_guis.erase(contact_id);
+    if(nullptr != _currentMailbox)
+      _currentMailbox->checksendmailbuttons();
     }
 
   assert(_contact_guis.find(contact_id) == _contact_guis.end());
@@ -966,6 +993,13 @@ void KeyhoteeMainWindow::refreshDeleteContactOption() const
   setEnabledDeleteOption( isContactTableSelected || isContactTreeItemSelected );
   }
 
+void KeyhoteeMainWindow::refreshEditMenu() const
+{
+  bool isContactTableSelected = ui->contacts_page->isSelection();
+  ui->actionCopy->setEnabled (isContactTableSelected);  
+  ui->actionCut->setEnabled (false);  
+}
+
 void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
   {
     ui->actionReply->setEnabled(enable);
@@ -1000,7 +1034,9 @@ void KeyhoteeMainWindow::onRemoveContact()
   refreshDeleteContactOption ();
   if(isIdentityPresent() == false ){
        ui->actionNew_Message->setEnabled(false);
-       emit enableSendMailSignal(false);
+       if(nullptr != _currentMailbox)
+         _currentMailbox->checksendmailbuttons();
+       emit checkSendMailSignal();
   }
 }
 

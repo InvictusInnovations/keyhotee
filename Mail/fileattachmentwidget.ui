@@ -46,7 +46,7 @@
     </widget>
    </item>
    <item row="0" column="1" rowspan="3">
-    <widget class="QTableWidget" name="attachmentTable">
+    <widget class="TableWidgetAttachments" name="attachmentTable">
      <property name="minimumSize">
       <size>
        <width>300</width>
@@ -239,11 +239,33 @@
     <string>Ctrl+Shift+O</string>
    </property>
   </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/win/editpaste.png</normaloff>:/images/win/editpaste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="toolTip">
+    <string>Allows to paste new file(s) to the emai's attachement</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
   <zorder>delButton</zorder>
   <zorder>saveButton</zorder>
   <zorder>attachmentTable</zorder>
   <zorder>addButton</zorder>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TableWidgetAttachments</class>
+   <extends>QTableWidget</extends>
+   <header>Mail/TableWidgetAttachments.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../Keyhotee.qrc"/>
  </resources>
@@ -360,6 +382,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionPaste</sender>
+   <signal>triggered()</signal>
+   <receiver>TFileAttachmentWidget</receiver>
+   <slot>onPasteTriggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>attachmentListChanged()</signal>
@@ -369,5 +407,6 @@
   <slot>onAttachementTableSelectionChanged()</slot>
   <slot>onRenameTriggered()</slot>
   <slot>onOpenTriggered()</slot>
+  <slot>onPasteTriggered()</slot>
  </slots>
 </ui>

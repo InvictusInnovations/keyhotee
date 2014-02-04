@@ -365,7 +365,8 @@ void AddressBookModel::reloadContacts()
     QString id = contact.dac_id_string.c_str();    
     //add fullname to completion list
     QString fullName = contact.get_display_name().c_str();
-    completion_list.push_back( id );
+    if ( !id.isEmpty() )
+      completion_list.push_back( id );
     //don't duplicate
     if ( fullName.compare (id) != 0)
       completion_list.push_back( fullName );
