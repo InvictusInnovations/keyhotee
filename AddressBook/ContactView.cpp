@@ -174,10 +174,7 @@ ContactView::ContactView(QWidget* parent)
 
   keyEdit(false);
   ui->chat_input->installEventFilter(this);
-  auto app = bts::application::instance();
-  auto profile = app->get_profile();
 
-  auto idents = profile->identities();
   checkSendMailButton();
   setContact(Contact() );
 }

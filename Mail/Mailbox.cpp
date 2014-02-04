@@ -68,6 +68,21 @@ void Mailbox::showCurrentMail(const QModelIndex &selected,
                               const QModelIndex &deselected)
   {}
 
+void Mailbox::checksendmailbuttons()
+{
+    QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
+    QModelIndexList      indexes = selection_model->selectedRows();
+
+    bool                 oneEmailSelected = (indexes.size() == 1);
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+
+    auto idents = profile->identities();
+    reply_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
+    reply_all_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
+    forward_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
+}
+
 void Mailbox::onSelectionChanged(const QItemSelection &selected,
                                  const QItemSelection &deselected)
   {
@@ -75,9 +90,18 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
   QModelIndexList      indexes = selection_model->selectedRows();
   //disable reply buttons if more than one email selected
   bool                 oneEmailSelected = (indexes.size() == 1);
-  reply_mail->setEnabled(oneEmailSelected);
-  reply_all_mail->setEnabled(oneEmailSelected);
-  forward_mail->setEnabled(oneEmailSelected);
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+
+  auto idents = profile->identities();
+  reply_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
+  reply_all_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
+  forward_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
+
+  reply_mail->setEnabled(idents.size() > 0);
+  reply_all_mail->setEnabled(idents.size() > 0);
+  forward_mail->setEnabled(idents.size() > 0);
+
   //display selected email(s) in message preview window
   if (oneEmailSelected)
     {

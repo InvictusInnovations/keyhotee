@@ -45,6 +45,7 @@ public:
   int getSortedColumn() const;
   void selectAll ();
   void previewImages (QTextEdit* textEdit);
+  void checksendmailbuttons();
 
 private slots:
   void onDoubleClickedItem(QModelIndex);

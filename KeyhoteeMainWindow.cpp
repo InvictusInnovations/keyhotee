@@ -115,7 +115,8 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
 
 KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ATopLevelWindowsContainer(),
-  MailProcessor(*this, bts::application::instance()->get_profile())
+  MailProcessor(*this, bts::application::instance()->get_profile()),
+  _currentMailbox(nullptr)
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);
@@ -335,6 +336,8 @@ void KeyhoteeMainWindow::activateMailboxPage(Mailbox* mailBox)
   ui->actionShow_details->setChecked(checked);
 
   _currentMailbox = mailBox;
+  if(nullptr != _currentMailbox)
+    _currentMailbox->checksendmailbuttons();
   setEnabledAttachmentSaveOption(_currentMailbox->isAttachmentSelected());
   setEnabledDeleteOption (_currentMailbox->isSelection());
   setEnabledMailActions(_currentMailbox->isOneEmailSelected());
@@ -624,6 +627,8 @@ void KeyhoteeMainWindow::enableNewMessageIcon()
     if(isIdentityPresent() == true ) {
          ui->actionNew_Message->setEnabled(true);
          emit checkSendMailSignal();
+         if(nullptr != _currentMailbox)
+           _currentMailbox->checksendmailbuttons();
     }
 }
 
@@ -757,6 +762,8 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
     contact_gui = getContactGui(contact_id);
   }
   contact_gui->_view->checkSendMailButton();
+  if(nullptr != _currentMailbox)
+    _currentMailbox->checksendmailbuttons();
   return contact_gui;
 }
 
@@ -800,6 +807,8 @@ void KeyhoteeMainWindow::deleteContactGui(int contact_id)
     {
     _contacts_root->removeChild(contact_gui->_tree_item);
     _contact_guis.erase(contact_id);
+    if(nullptr != _currentMailbox)
+      _currentMailbox->checksendmailbuttons();
     }
 
   assert(_contact_guis.find(contact_id) == _contact_guis.end());
@@ -1037,6 +1046,8 @@ void KeyhoteeMainWindow::onRemoveContact()
   refreshDeleteContactOption ();
   if(isIdentityPresent() == false ){
        ui->actionNew_Message->setEnabled(false);
+       if(nullptr != _currentMailbox)
+         _currentMailbox->checksendmailbuttons();
        emit checkSendMailSignal();
   }
 }
