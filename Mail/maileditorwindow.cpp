@@ -248,6 +248,11 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
     mailFieldsMenu->addAction(ui->actionCC);
     mailFieldsMenu->addAction(ui->actionBCC);
 
+    /// Update state of sub-menu commands.
+    ui->actionBCC->setChecked(MailFields->isFieldVisible(MailFieldsWidget::BCC_FIELDS));
+    ui->actionCC->setChecked(MailFields->isFieldVisible(MailFieldsWidget::CC_FIELD));
+    ui->actionFrom->setChecked(MailFields->isFieldVisible(MailFieldsWidget::FROM_FIELD));
+
     ui->actionMailFields->setMenu(mailFieldsMenu);
     ui->mainToolBar->insertAction(ui->actionShowFormatOptions, ui->actionMailFields);
     }
