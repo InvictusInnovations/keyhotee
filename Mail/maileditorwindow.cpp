@@ -565,6 +565,18 @@ bool MailEditorMainWindow::onSave()
         return false;
       }
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
+
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+    auto idents = profile->identities();
+
+    if(0 == idents.size())
+      {
+      QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Keyhotee"),
+      tr("Cannot save this draft. No Identity is present.\nPlease create an Identity to save this draft"),
+      QMessageBox::Ok);
+      return false;
+      }
     //DLN we should probably add get_pointer implementation to fc::optional to avoid code like this
     TStoredMailMessage* oldMessage = DraftMessage.valid() ? &(*DraftMessage) : nullptr;
     DraftMessage = MailProcessor.Save(senderId, msg, oldMessage);
