@@ -24,6 +24,14 @@ class MailFieldsWidget : public QWidget
     typedef IMailProcessor::TRecipientPublicKey  TRecipientPublicKey;
     typedef IMailProcessor::TRecipientPublicKeys TRecipientPublicKeys;
 
+    /// Helper enum type to check which fields are visible.
+    enum TVisibleFields
+      {
+      FROM_FIELD  = 0x1,
+      CC_FIELD    = 0x2,
+      BCC_FIELDS  = 0x4
+      };
+
     MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel, bool editMode);
     virtual ~MailFieldsWidget();
 
@@ -58,17 +66,16 @@ class MailFieldsWidget : public QWidget
     void FillRecipientLists(TRecipientPublicKeys* toList, TRecipientPublicKeys* ccList,
       TRecipientPublicKeys* bccList) const;
 
+    /// Allows to check which field is visible.
+    bool isFieldVisible(TVisibleFields field) const
+      {
+      return (VisibleFields & field) != 0;
+      }
+
   Q_SIGNAL void subjectChanged(const QString& subject);
   Q_SIGNAL void recipientListChanged();
 
   private:
-    enum TVisibleFields
-      {
-      FROM_FIELD  = 0x1,
-      CC_FIELD    = 0x2,
-      BCC_FIELDS  = 0x4
-      };
-
     /// Allows to show/hide given layout & all widgets associated with it.
     void showChildLayout(QLayout* layout, bool show, int preferredPosition, unsigned int fieldFlag);
     /// Helper for showChildLayout.
@@ -84,7 +91,6 @@ class MailFieldsWidget : public QWidget
     */
     void selectSenderIdentity(const TRecipientPublicKey& senderPK);
     void setChosenSender(const TRecipientPublicKey& senderPK);
-    bool isFieldVisible(TVisibleFields field) const;
 
   private slots:
     void on_sendButton_clicked();

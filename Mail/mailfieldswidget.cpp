@@ -294,12 +294,6 @@ void MailFieldsWidget::setChosenSender(const TRecipientPublicKey& senderPK)
   ui->fromEdit->SetCollectedContacts(sender);
   }
 
-inline
-bool MailFieldsWidget::isFieldVisible(TVisibleFields field) const
-  {
-  return (VisibleFields & field) != 0;
-  }
-
 void MailFieldsWidget::on_sendButton_clicked()
   {
   ActionSend.trigger();
