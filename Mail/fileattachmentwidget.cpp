@@ -112,8 +112,11 @@ class TFileAttachmentWidget::AAttachmentItem : public QTableWidgetItem
       {
       QTableWidgetItem::setData(role, value);
       if(role == Qt::EditRole && value.toString().trimmed().isEmpty() == false)
-        {        
-        Owner->OnAttachmentItemChanged();
+        {
+        if(FileNameInfo != nullptr)
+          FileNameInfo->Owner->OnAttachmentItemChanged();
+        else
+          Owner->OnAttachmentItemChanged();
         }
       }
 
