@@ -12,6 +12,7 @@ public:
     explicit TableWidgetAttachments(QWidget *parent = 0);
     virtual ~TableWidgetAttachments() {};
     QStringList getFilesPathFromClipboard();
+    void setReadOnly(bool readOnly);
 protected:
     virtual void dragEnterEvent(QDragEnterEvent *event);
     virtual void dragMoveEvent(QDragMoveEvent *event);
@@ -23,6 +24,9 @@ private:
 signals:
   void dropEvent(QStringList);
 public slots:
+
+private:
+  bool _readOnly;
 
 };
 
