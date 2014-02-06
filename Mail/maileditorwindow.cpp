@@ -280,6 +280,7 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
     SLOT(setEnabled(bool)));
   connect(ui->messageEdit->document(), SIGNAL(modificationChanged(bool)), this,
     SLOT(setWindowModified(bool)));
+  connect(ui->messageEdit, SIGNAL(addAttachments(QStringList)), this, SLOT(onAddAttachments(QStringList)));
 
 #ifndef QT_NO_CLIPBOARD
   connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(onClipboardDataChanged()));
@@ -713,3 +714,8 @@ void MailEditorMainWindow::onAttachmentListChanged()
   /// Let's treat attachment list change also as document modification.
   ui->messageEdit->document()->setModified(true);
   }
+
+void MailEditorMainWindow::onAddAttachments(QStringList files)
+{
+  FileAttachment->addFiles( files );
+}

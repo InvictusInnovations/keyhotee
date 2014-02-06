@@ -241,6 +241,8 @@ set( sources
         qtreusable/AutoUpdateProgressBar.cpp
         qtreusable/TImage.hpp
         qtreusable/TImage.cpp
+        qtreusable/MimeDataChecker.hpp
+        qtreusable/MimeDataChecker.cpp
 
         profile_wizard/ProfileEditPage.ui
         profile_wizard/ProfileIntroPage.ui
@@ -291,6 +293,8 @@ set( sources
         Mail/FileAttachmentDialog.cpp
         Mail/TableWidgetAttachments.hpp
         Mail/TableWidgetAttachments.cpp
+        Mail/TMessageEdit.hpp
+        Mail/TMessageEdit.cpp
 
         KeyhoteeApplication.hpp
         KeyhoteeApplication.cpp

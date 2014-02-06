@@ -17,8 +17,6 @@ protected:
     virtual void dragMoveEvent(QDragMoveEvent *event);
     virtual void dragLeaveEvent(QDragLeaveEvent *event);
     virtual void dropEvent(QDropEvent *event);
-private:
-  QStringList getFilesPathFromMimeData(const QMimeData *md);
 
 signals:
   void dropEvent(QStringList);

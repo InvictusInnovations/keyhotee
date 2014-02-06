@@ -153,6 +153,7 @@ class MailEditorMainWindow : public ATopLevelWindow
     void onRecipientListChanged();
     /// Notification from attachment list widget about attachment list changes.
     void onAttachmentListChanged();
+    void onAddAttachments(QStringList files);
 
   private:
     Ui::MailEditorWindow*    ui;

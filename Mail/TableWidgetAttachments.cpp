@@ -1,5 +1,6 @@
 #include "TableWidgetAttachments.hpp"
 #include "fileattachmentwidget.hpp"
+#include "qtreusable/MimeDataChecker.hpp"
 
 #include <QApplication>
 #include <QClipboard>
@@ -16,8 +17,8 @@ TableWidgetAttachments::TableWidgetAttachments(QWidget *parent) :
 
 void TableWidgetAttachments::dragEnterEvent(QDragEnterEvent *event)
 {
-  QStringList stringList = getFilesPathFromMimeData( event->mimeData() );
-  if (stringList.size())
+  MimeDataChecker mime( event->mimeData() );
+  if (mime.isFiles())
     event->acceptProposedAction();
 }
  
@@ -33,7 +34,8 @@ void TableWidgetAttachments::dragLeaveEvent(QDragLeaveEvent *event)
 
 void TableWidgetAttachments::dropEvent(QDropEvent *event)
 {  
-  QStringList stringList = getFilesPathFromMimeData(event->mimeData());
+  MimeDataChecker mime( event->mimeData() );
+  QStringList stringList = mime.getFilesPath();
   if (stringList.size())
   {
     emit dropEvent(stringList);
@@ -43,33 +45,7 @@ void TableWidgetAttachments::dropEvent(QDropEvent *event)
 
 QStringList TableWidgetAttachments::getFilesPathFromClipboard()
 {
-  const QMimeData *md = QApplication::clipboard()->mimeData();
-  QStringList stringList = getFilesPathFromMimeData(md);
-  return stringList;
-}
-
-QStringList TableWidgetAttachments::getFilesPathFromMimeData(const QMimeData *md)
-{
-  QStringList stringList = QStringList();
-
-  if(md)
-  {
-    bool en = md->hasText();
-    if (md->hasUrls())
-    {
-      for (int i = 0; i < md->urls().size(); i++)
-      {
-        QUrl url = md->urls().at(i);      
-        if (url.isLocalFile ())
-        {
-          QString fileName = url.toLocalFile ();
-          QFileInfo fileInfo(fileName);
-          if (fileInfo.isFile())
-            stringList.push_back( fileName );
-        }
-      }
-    }
-  }
-
+  MimeDataChecker mime( QApplication::clipboard()->mimeData() );
+  QStringList stringList = mime.getFilesPath();
   return stringList;
 }
