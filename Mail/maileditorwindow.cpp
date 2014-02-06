@@ -370,7 +370,7 @@ bool MailEditorMainWindow::maybeSave()
     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
   
   if(ret == QMessageBox::Save)
-    onSave();
+    return onSave();
   else
   if(ret == QMessageBox::Cancel)
     return false;
@@ -400,6 +400,19 @@ void MailEditorMainWindow::setupEditorCommands()
   connect(FontSize, SIGNAL(activated(QString)), this, SLOT(onTextSizeChanged(QString)));
   FontSize->setCurrentIndex(FontSize->findText(QString::number(QApplication::font().pointSize())));
   }
+
+bool MailEditorMainWindow::isMsgSizeOK(const TPhysicalMailMessage& srcMsg)
+{
+  int msg_size = srcMsg.subject.size() + srcMsg.body.size();
+  for(int i=0; i<srcMsg.attachments.size(); i++)
+    msg_size += srcMsg.attachments[i].body.size();
+  if(msg_size > 1024*1024)
+  {
+    QMessageBox::warning(this, tr("Warning"), tr("Message size limit exceeded.\nMessage with attachments can not be larger than 1MB."));
+    return false;
+  }
+  return true;
+}
 
 void MailEditorMainWindow::alignmentChanged(Qt::Alignment a)
   {
@@ -541,17 +554,35 @@ void MailEditorMainWindow::toggleReadOnlyMode()
   ui->adjustToolbar->setEnabled(EditMode);
   }
 
-void MailEditorMainWindow::onSave()
+bool MailEditorMainWindow::onSave()
   {
   ui->messageEdit->document()->setModified(false);
   TPhysicalMailMessage msg;
   if(prepareMailMessage(&msg))
     {
+      if(!isMsgSizeOK(msg))
+      {
+        ui->messageEdit->document()->setModified(true);
+        return false;
+      }
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
+
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+    auto idents = profile->identities();
+
+    if(0 == idents.size())
+      {
+      QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Keyhotee"),
+      tr("Cannot save this draft. No Identity is present.\nPlease create an Identity to save this draft"),
+      QMessageBox::Ok);
+      return false;
+      }
     //DLN we should probably add get_pointer implementation to fc::optional to avoid code like this
     TStoredMailMessage* oldMessage = DraftMessage.valid() ? &(*DraftMessage) : nullptr;
     DraftMessage = MailProcessor.Save(senderId, msg, oldMessage);
     }
+  return true;
   }
 
 void MailEditorMainWindow::onClipboardDataChanged()
@@ -680,14 +711,8 @@ void MailEditorMainWindow::on_actionSend_triggered()
   TPhysicalMailMessage msg;
   if(prepareMailMessage(&msg))
     {
-    int msg_size = msg.subject.size() + msg.body.size();
-    for(int i=0; i<msg.attachments.size(); i++)
-      msg_size += msg.attachments[i].body.size();
-    if(msg_size > 1024*1024)
-    {
-      QMessageBox::warning(this, tr("Warning"), tr("Message too big. Limit size 1MB"));
-      return;
-    }
+      if(!isMsgSizeOK(msg))
+        return;
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
     MailProcessor.Send(senderId, msg, DraftMessage.valid() ? &(*DraftMessage) : nullptr);
     /// Clear potential modified flag to avoid asking for saving changes.

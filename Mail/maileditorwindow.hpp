@@ -97,6 +97,7 @@ class MailEditorMainWindow : public ATopLevelWindow
   /// Other helper methods:
     bool maybeSave();
     void setupEditorCommands();
+    bool isMsgSizeOK(const TPhysicalMailMessage& srcMsg);
     /// Updates UI status regarding to chosen alignment.
     void alignmentChanged(Qt::Alignment a);
     void fontChanged(const QFont& f);
@@ -120,7 +121,7 @@ class MailEditorMainWindow : public ATopLevelWindow
 
   private slots:
     /// Actual implementation of save operation.
-    void onSave();
+    bool onSave();
     /// Needed to properly update 'paste' controls.
     void onClipboardDataChanged();
 

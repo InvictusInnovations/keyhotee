@@ -10,13 +10,22 @@
 #include <QFileInfo>
 
 TableWidgetAttachments::TableWidgetAttachments(QWidget *parent) :
-    QTableWidget(parent)
+    QTableWidget(parent),
+    _readOnly (true)
 {
  setAcceptDrops(true);
 }
 
+void TableWidgetAttachments::setReadOnly(bool readOnly)
+{
+  _readOnly = readOnly;
+}
+
 void TableWidgetAttachments::dragEnterEvent(QDragEnterEvent *event)
 {
+  if (_readOnly)
+    return;
+
   MimeDataChecker mime( event->mimeData() );
   if (mime.isFiles())
     event->acceptProposedAction();
@@ -24,16 +33,25 @@ void TableWidgetAttachments::dragEnterEvent(QDragEnterEvent *event)
  
 void TableWidgetAttachments::dragMoveEvent(QDragMoveEvent *event)
 {
-    event->acceptProposedAction();
+  if (_readOnly)
+    return;
+
+  event->acceptProposedAction();
 }
  
 void TableWidgetAttachments::dragLeaveEvent(QDragLeaveEvent *event)
 {
-    event->accept();
+  if (_readOnly)
+    return;
+
+  event->accept();
 }
 
 void TableWidgetAttachments::dropEvent(QDropEvent *event)
 {  
+  if (_readOnly)
+    return;
+
   MimeDataChecker mime( event->mimeData() );
   QStringList stringList = mime.getFilesPath();
   if (stringList.size())
