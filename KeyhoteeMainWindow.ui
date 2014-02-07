@@ -289,6 +289,45 @@
          <set>ItemIsSelectable|ItemIsEnabled</set>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string/>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>REQUESTS</string>
+        </property>
+        <property name="font">
+         <font>
+          <family>Georgia</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="background">
+         <brush brushstyle="NoBrush">
+          <color alpha="255">
+           <red>127</red>
+           <green>127</green>
+           <blue>127</blue>
+          </color>
+         </brush>
+        </property>
+        <property name="foreground">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>91</red>
+           <green>91</green>
+           <blue>91</blue>
+          </color>
+         </brush>
+        </property>
+        <property name="flags">
+         <set>ItemIsSelectable|ItemIsEnabled</set>
+        </property>
+       </item>
       </widget>
       <widget class="QStackedWidget" name="widget_stack">
        <property name="sizePolicy">
@@ -298,7 +337,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>7</number>
        </property>
        <widget class="Mailbox" name="inbox_page">
         <layout class="QGridLayout" name="inboxlayout">
@@ -343,6 +382,7 @@
        </widget>
        <widget class="ContactView" name="new_contact"/>
        <widget class="Wallets" name="wallets"/>
+       <widget class="Authorization" name="requests"/>
       </widget>
      </widget>
     </item>
@@ -681,6 +721,12 @@
    <class>TreeWidgetCustom</class>
    <extends>QTreeWidget</extends>
    <header>TreeWidgetCustom.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>Authorization</class>
+   <extends>QWidget</extends>
+   <header>AddressBook/authorization.hpp</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

@@ -16,7 +16,8 @@ enum SidebarItemTypes
   {
   IdentityItem = 2,
   MailboxItem = 3,
-  ContactItem = 4
+  ContactItem = 4,
+  RequestItem = 5
   };
 
 enum WalletsChildren

@@ -407,7 +407,7 @@ bool MailEditorMainWindow::isMsgSizeOK(const TPhysicalMailMessage& srcMsg)
     msg_size += srcMsg.attachments[i].body.size();
   if(msg_size > 1024*1024)
   {
-    QMessageBox::warning(this, tr("Warning"), tr("Message size limit exceeded.\nMessage with attachments can not be larger than 1MB."));
+    QMessageBox::warning(this, tr("Warning"), tr("Message size limit exceeded.\nMessage with attachments can not be larger than 1 MB."));
     return false;
   }
   return true;

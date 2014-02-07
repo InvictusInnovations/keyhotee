@@ -187,6 +187,7 @@ private:
   QTreeWidgetItem*                        _mailboxes_root;
   QTreeWidgetItem*                        _wallets_root;
   QTreeWidgetItem*                        _contacts_root;
+  QTreeWidgetItem*                        _requests_root;
   QTreeWidgetItem*                        _inbox_root;
   QTreeWidgetItem*                        _drafts_root;
   QTreeWidgetItem*                        _out_box_root;

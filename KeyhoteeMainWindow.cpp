@@ -56,7 +56,9 @@ enum TopLevelItemIndexes
   Space2,
   Wallets,
   Space3,
-  Contacts
+  Contacts,
+  Space4,
+  Requests
 };
 
 void ContactGui::setUnreadMsgCount(unsigned int count)
@@ -225,8 +227,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _mailboxes_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Mailboxes);
   _contacts_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Contacts);
   _wallets_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Wallets);
+  _requests_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Requests);
 
   _contacts_root->setExpanded(true);
+  _requests_root->setExpanded(true);
   //_identities_root->setExpanded(true);
   _mailboxes_root->setExpanded(true);
   _inbox_root = _mailboxes_root->child(Inbox);
@@ -454,7 +458,6 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     {
       auto con_id = selected_items[0]->data(0, ContactIdRole).toInt();
       openContactGui(con_id);
-//    issue #51: Selecting contact on recent list should synchronize it in main list
       ui->contacts_page->selectRow(con_id);
       connect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onRemoveContact()));
       connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
@@ -480,6 +483,15 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
         ui->actionShow_details->setChecked(true);      
 
       refreshDeleteContactOption ();
+    }
+    else if(selectedItem == _requests_root)
+    {
+      QMessageBox::information(this, "Info", "Cliked _requests_root");
+      ui->widget_stack->setCurrentWidget(ui->requests);
+    }
+    if (selectedItem->type() == RequestItem)
+    {
+      QMessageBox::information(this, "Info", "Cliked RequestItem");
     }
     /*
        else if( selected_items[0] == _identities_root )
@@ -528,7 +540,7 @@ void KeyhoteeMainWindow::onSidebarDoubleClicked()
   if (selected_items.size() )
   {
     if (selected_items[0]->type() == ContactItem)
-    {        
+    {
       ui->contacts_page->selectChat ();
     }
   }
@@ -823,6 +835,8 @@ void KeyhoteeMainWindow::setupStatusBar()
 
 void KeyhoteeMainWindow::received_text(const bts::bitchat::decrypted_message& msg)
 {
+  received_request(msg);
+
   auto opt_contact = _addressbook->get_contact_by_public_key(*(msg.from_key) );
   if (!opt_contact)
   {
@@ -848,6 +862,12 @@ void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& m
 
 void KeyhoteeMainWindow::received_request( const bts::bitchat::decrypted_message& msg)
 {
+  auto new_request_item = new QTreeWidgetItem(_requests_root,
+                                              (QTreeWidgetItem::ItemType)RequestItem);
+  new_request_item->setIcon(0, QIcon(":/images/request_authorization.png") );
+  new_request_item->setData(0, ContactIdRole, 1);
+  new_request_item->setText(0, "authorization");
+  new_request_item->setHidden(false);
 }
 
 void KeyhoteeMainWindow::OnMessageSaving()

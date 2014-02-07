@@ -223,6 +223,7 @@ qt5_wrap_ui( UiContactsTable                   AddressBook/ContactsTable.ui )
 qt5_wrap_ui( UiContactView                     AddressBook/ContactView.ui )
 qt5_wrap_ui( UiRequestAuthorization            AddressBook/RequestAuthorization.ui )
 qt5_wrap_ui( UiKeyhoteeIDPubKeyWidget          AddressBook/keyhoteeidpubkeywidget.ui )
+qt5_wrap_ui( UiAuthorization                   AddressBook/authorization.ui )
 qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
 qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
 qt5_wrap_ui( UiMailEditor                      Mail/maileditorwindow.ui )
@@ -267,6 +268,9 @@ set( sources
         AddressBook/keyhoteeidpubkeywidget.ui
         AddressBook/keyhoteeidpubkeywidget.hpp
         AddressBook/keyhoteeidpubkeywidget.cpp
+        AddressBook/authorization.ui
+        AddressBook/authorization.hpp
+        AddressBook/authorization.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp
