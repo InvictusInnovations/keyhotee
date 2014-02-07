@@ -471,9 +471,10 @@ void TFileAttachmentWidget::ConfigureContextMenu()
   ui->attachmentTable->addAction(ui->actionDel);
   ui->attachmentTable->addAction(ui->actionRename);
   
-#ifndef QT_NO_CLIPBOARD
   if (EditMode == true)
   {
+
+#ifndef QT_NO_CLIPBOARD
     sep = new QAction(this);
     sep->setSeparator(true);
     ui->attachmentTable->addAction(sep);
@@ -482,11 +483,13 @@ void TFileAttachmentWidget::ConfigureContextMenu()
     onClipboardChanged();    
 
     connect(QApplication::clipboard(), &QClipboard::changed, this, &TFileAttachmentWidget::onClipboardChanged);
-  }
 #endif 
+
 #ifndef QT_NO_DRAGANDDROP
   connect(ui->attachmentTable, SIGNAL(dropEvent(QStringList)), this, SLOT(onDropEvent(QStringList)));
 #endif 
+
+  }
 
   sep = new QAction(this);
   sep->setSeparator(true);
@@ -503,6 +506,8 @@ void TFileAttachmentWidget::ConfigureAttachmentTable()
   ui->attachmentTable->setColumnWidth(NAME_COLUMN_IDX, width);
   width = tableSize.width() - width;
   ui->attachmentTable->setColumnWidth(SIZE_COLUMN_IDX, width);
+
+  ui->attachmentTable->setReadOnly( !EditMode );
 
   UpdateColumnHeaders();
   }

@@ -280,6 +280,7 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
     SLOT(setEnabled(bool)));
   connect(ui->messageEdit->document(), SIGNAL(modificationChanged(bool)), this,
     SLOT(setWindowModified(bool)));
+  connect(ui->messageEdit, SIGNAL(addAttachments(QStringList)), this, SLOT(onAddAttachments(QStringList)));
 
 #ifndef QT_NO_CLIPBOARD
   connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(onClipboardDataChanged()));
@@ -565,6 +566,18 @@ bool MailEditorMainWindow::onSave()
         return false;
       }
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
+
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+    auto idents = profile->identities();
+
+    if(0 == idents.size())
+      {
+      QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Keyhotee"),
+      tr("Cannot save this draft. No Identity is present.\nPlease create an Identity to save this draft"),
+      QMessageBox::Ok);
+      return false;
+      }
     //DLN we should probably add get_pointer implementation to fc::optional to avoid code like this
     TStoredMailMessage* oldMessage = DraftMessage.valid() ? &(*DraftMessage) : nullptr;
     DraftMessage = MailProcessor.Save(senderId, msg, oldMessage);
@@ -726,3 +739,8 @@ void MailEditorMainWindow::onAttachmentListChanged()
   /// Let's treat attachment list change also as document modification.
   ui->messageEdit->document()->setModified(true);
   }
+
+void MailEditorMainWindow::onAddAttachments(QStringList files)
+{
+  FileAttachment->addFiles( files );
+}
