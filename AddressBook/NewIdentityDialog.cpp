@@ -76,6 +76,12 @@ void NewIdentityDialog::onUserNameChanged( const QString& name )
              ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(true);
           }
       }
+      catch ( fc::assert_exception& )
+      {
+          ui->status_label->setStyleSheet("QLabel { color : red; }");
+          ui->status_label->setText(tr("Status: Invalid ID. This ID cannot be registered."));
+          ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
+      }
    }
    else
    {
