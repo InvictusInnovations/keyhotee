@@ -742,5 +742,7 @@ void MailEditorMainWindow::onAttachmentListChanged()
 
 void MailEditorMainWindow::onAddAttachments(QStringList files)
 {
+  if (files.size())
+    onFileAttachementTriggered( true );
   FileAttachment->addFiles( files );
 }
