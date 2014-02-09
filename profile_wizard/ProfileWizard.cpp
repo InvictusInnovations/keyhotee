@@ -219,6 +219,14 @@ ProfileWizard::ProfileWizard(TKeyhoteeApplication& mainApp) :
   _profile_intro_ui = new Ui::IntroPage();
   _profile_intro_ui->setupUi(intro_page);
 
+#ifdef Q_OS_MAC
+  _profile_intro_ui->introImage->setPixmap(QPixmap(QString::fromUtf8(":/images/keyhotee.icns")));
+#else
+  _profile_intro_ui->introImage->setPixmap(QPixmap(QString::fromUtf8(":/images/keyhotee.png")));
+#endif
+
+  _profile_intro_ui->gridLayout->addWidget(_profile_intro_ui->introImage, 0, 0, 1, 1, Qt::AlignHCenter|Qt::AlignBottom);
+
 //  _nym_page = new NymPage(this);
   _profile_edit = new ProfileEditPage(this);
 
