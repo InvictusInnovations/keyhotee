@@ -28,6 +28,7 @@ class Mailbox;
 class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
+class Authorization;
 
 /**
  *  GUI widgets and GUI state for a contact.
@@ -49,6 +50,27 @@ public:
 
   void updateTreeItemDisplay();
   void setUnreadMsgCount(unsigned int count);
+  bool isChatVisible();
+  void receiveChatMessage(const QString& from, const QString& msg, const QDateTime& dateTime);
+private:
+};
+
+/**
+ *  GUI widgets for request for authorization.
+ */
+class AuthorizationGui
+{
+  friend KeyhoteeMainWindow;
+
+private:
+  QTreeWidgetItem* _tree_item;
+  Authorization*   _view;
+
+public:
+  AuthorizationGui() {}
+  AuthorizationGui(QTreeWidgetItem* tree_item, Authorization* view)
+    : _tree_item(tree_item), _view(view) {}
+
   bool isChatVisible();
   void receiveChatMessage(const QString& from, const QString& msg, const QDateTime& dateTime);
 private:
@@ -179,6 +201,7 @@ private:
   void enableMenu(bool enable);
   bool checkSaving() const;
   void showContacts() const;
+  void createAuthorizationGui(const bts::bitchat::decrypted_message& msg);
 
   /// Class attributes:
 
