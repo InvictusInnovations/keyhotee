@@ -231,6 +231,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   _contacts_root->setExpanded(true);
   _requests_root->setExpanded(true);
+  _requests_root->setHidden(true);
   //_identities_root->setExpanded(true);
   _mailboxes_root->setExpanded(true);
   _inbox_root = _mailboxes_root->child(Inbox);
@@ -242,6 +243,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _bitcoin_root = _wallets_root->child(Bitcoin);
   _bitshares_root = _wallets_root->child(BitShares);
   _litecoin_root = _wallets_root->child(Litecoin);
+
+  _current_authorization = nullptr;
 
   auto app = bts::application::instance();
   app->set_application_delegate(this);
@@ -486,12 +489,11 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     }
     else if(selectedItem == _requests_root)
     {
-      QMessageBox::information(this, "Info", "Cliked _requests_root");
-      ui->widget_stack->setCurrentWidget(ui->requests);
+      notSupported();
     }
     if (selectedItem->type() == RequestItem)
     {
-      QMessageBox::information(this, "Info", "Cliked RequestItem");
+      showAuthorizationGui(selectedItem);
     }
     /*
        else if( selected_items[0] == _identities_root )
@@ -826,6 +828,67 @@ void KeyhoteeMainWindow::deleteContactGui(int contact_id)
   assert(_contact_guis.find(contact_id) == _contact_guis.end());
 }
 
+void KeyhoteeMainWindow::createAuthorizationGui(const bts::bitchat::decrypted_message& msg)
+{
+  QTreeWidgetItem *new_authorization_item;
+
+  int tmp = _requests_root->childCount();
+
+  if(_requests_root->childCount() > 1)
+    new_authorization_item = new QTreeWidgetItem(_requests_root->child(0),
+    (QTreeWidgetItem::ItemType)RequestItem);
+  else
+    new_authorization_item = new QTreeWidgetItem(_requests_root,
+    (QTreeWidgetItem::ItemType)RequestItem);
+
+  new_authorization_item->setIcon(0, QIcon(":/images/request_authorization.png") );
+  QDateTime dateTime;
+  dateTime.setTime_t(msg.sig_time.sec_since_epoch());
+  
+  new_authorization_item->setText(0, dateTime.toString());
+  new_authorization_item->setHidden(false);
+  
+  Authorization *view = new Authorization(ui->widget_stack);
+  
+  AuthorizationGui *authorization_gui = new AuthorizationGui(new_authorization_item, view);
+
+  QVariant v;
+  v.setValue(authorization_gui);
+  new_authorization_item->setData(0, Qt::UserRole, v);
+  
+  view->setMsg(msg);
+
+  // authorization_gui->setPrevWidget(ui->widget_stack->currentIndex());
+  ui->widget_stack->addWidget(view);
+
+  _requests_root->setHidden(false);
+}
+
+void KeyhoteeMainWindow::showAuthorizationGui(QTreeWidgetItem *item)
+{
+  QVariant v = item->data(0, Qt::UserRole);
+  AuthorizationGui *autorization_gui = v.value<AuthorizationGui*>();
+
+  _current_authorization = autorization_gui;
+
+  ui->widget_stack->setCurrentWidget(autorization_gui->_view);
+}
+
+void KeyhoteeMainWindow::deleteCurrentAuthorizationGui()
+{
+  AuthorizationGui* current_authorization = _current_authorization;
+  if(_requests_root->childCount() > 1)
+    showAuthorizationGui(_requests_root->child(0));
+  else
+  {
+    _requests_root->setHidden(true);
+    _current_authorization = nullptr;
+  }
+
+  _requests_root->removeChild(current_authorization->_tree_item);
+  ui->widget_stack->removeWidget(current_authorization->_view);
+}
+
 void KeyhoteeMainWindow::setupStatusBar()
 {
   QStatusBar*             sb = statusBar();
@@ -862,12 +925,7 @@ void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& m
 
 void KeyhoteeMainWindow::received_request( const bts::bitchat::decrypted_message& msg)
 {
-  auto new_request_item = new QTreeWidgetItem(_requests_root,
-                                              (QTreeWidgetItem::ItemType)RequestItem);
-  new_request_item->setIcon(0, QIcon(":/images/request_authorization.png") );
-  new_request_item->setData(0, ContactIdRole, 1);
-  new_request_item->setText(0, "authorization");
-  new_request_item->setHidden(false);
+  createAuthorizationGui(msg);
 }
 
 void KeyhoteeMainWindow::OnMessageSaving()

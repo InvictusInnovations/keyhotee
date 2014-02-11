@@ -14,6 +14,16 @@ TreeWidgetCustom::TreeWidgetCustom(QWidget* parent)
   _removeContact = new QAction(QIcon(":/images/128x128/contact_info_cancel_edit.png"), tr("Remove"), this);
   _menuContacts.addAction(_removeContact);  
   connect(_removeContact, &QAction::triggered, this, &TreeWidgetCustom::onRemoveContact);
+
+  _accept_request = new QAction(QIcon(":/images/request_accept.png"), tr("Accept"), this);
+  _deny_request = new QAction(QIcon(":/images/request_deny.png"), tr("Deny"), this);
+  _block_request = new QAction(QIcon(":/images/request_block.png"), tr("Block"), this);
+  _menu_requests.addAction(_accept_request);
+  _menu_requests.addAction(_deny_request);
+  _menu_requests.addAction(_block_request);
+  connect(_accept_request, &QAction::triggered, this, &TreeWidgetCustom::onAcceptRequest);
+  connect(_deny_request, &QAction::triggered, this, &TreeWidgetCustom::onDenyRequest);
+  connect(_block_request, &QAction::triggered, this, &TreeWidgetCustom::onBlockRequest);
   }
 
 TreeWidgetCustom::~TreeWidgetCustom(){}
@@ -26,12 +36,12 @@ bool TreeWidgetCustom::viewportEvent(QEvent *event)
         event->type() == QEvent::MouseButtonDblClick ||
         event->type() == QEvent::KeyPress ||
         event->type() == QEvent::MouseMove)
-		  {
+      {
         if (_modificationsChecker->canContinue())
           return QTreeWidget::viewportEvent(event);
         else
           return false;
-		  }
+      }
     }
 
   return QTreeWidget::viewportEvent(event);
@@ -60,6 +70,9 @@ void TreeWidgetCustom::showContextMenu(QTreeWidgetItem* item, const QPoint& glob
     case ContactItem:
         _menuContacts.exec(globalPos);
         break;
+    case RequestItem:
+        _menu_requests.exec(globalPos);
+        break;
     default:
         break;
     }
@@ -69,3 +82,18 @@ void TreeWidgetCustom::onRemoveContact ()
   {
     emit itemContactRemoved (*_currentItem);
   }
+
+void TreeWidgetCustom::onAcceptRequest()
+{
+  emit itemAcceptRequest(*_currentItem);
+}
+
+void TreeWidgetCustom::onDenyRequest()
+{
+  emit itemDenyRequest(*_currentItem);
+}
+
+void TreeWidgetCustom::onBlockRequest()
+{
+  emit itemBlockRequest(*_currentItem);
+}

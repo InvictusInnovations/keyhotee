@@ -70,11 +70,9 @@ public:
   AuthorizationGui() {}
   AuthorizationGui(QTreeWidgetItem* tree_item, Authorization* view)
     : _tree_item(tree_item), _view(view) {}
-
-  bool isChatVisible();
-  void receiveChatMessage(const QString& from, const QString& msg, const QDateTime& dateTime);
-private:
 };
+
+Q_DECLARE_METATYPE(AuthorizationGui*);
 
 class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
                             protected bts::application_delegate,
@@ -114,6 +112,8 @@ public:
   ContactsTable* getContactsPage();
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
+
+  void deleteCurrentAuthorizationGui();
 
 signals:
   void checkSendMailSignal();
@@ -202,6 +202,7 @@ private:
   bool checkSaving() const;
   void showContacts() const;
   void createAuthorizationGui(const bts::bitchat::decrypted_message& msg);
+  void showAuthorizationGui(QTreeWidgetItem *item);
 
   /// Class attributes:
 
@@ -234,6 +235,7 @@ private:
   TMailProcessor                          MailProcessor;
   Mailbox*                                _currentMailbox;
   MenuEditControl*                        menuEdit;
+  AuthorizationGui*                       _current_authorization;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();

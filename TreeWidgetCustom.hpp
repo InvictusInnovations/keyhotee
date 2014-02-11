@@ -42,13 +42,23 @@ protected:
 private slots:
     void onCustomContextMenuRequested(const QPoint& pos);
     void onRemoveContact ();
+    void onAcceptRequest();
+    void onDenyRequest();
+    void onBlockRequest();
 
 Q_SIGNALS:
     void itemContactRemoved (QTreeWidgetItem& item);
+    void itemAcceptRequest (QTreeWidgetItem& item);
+    void itemBlockRequest (QTreeWidgetItem& item);
+    void itemDenyRequest (QTreeWidgetItem& item);
 
 private:
   IModificationsChecker*    _modificationsChecker;
   QAction*                  _removeContact;
   QMenu                     _menuContacts;
+  QAction*                  _accept_request;
+  QAction*                  _deny_request;
+  QAction*                  _block_request;
+  QMenu                     _menu_requests;
   QTreeWidgetItem*          _currentItem;
 };

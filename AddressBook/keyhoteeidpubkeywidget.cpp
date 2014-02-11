@@ -200,8 +200,15 @@ void KeyhoteeIDPubKeyWidget::showCopyToClipboard(bool visible)
   ui->public_key_to_clipboard->setVisible(visible);
 }
 
+void KeyhoteeIDPubKeyWidget::setEditable(bool editable)
+{
+  ui->keyhotee_id->setReadOnly(!editable);
+  ui->public_key->setReadOnly(!editable);
+}
+
 fc::ecc::public_key KeyhoteeIDPubKeyWidget::getPublicKey()
 {
   public_key_address key_address(ui->public_key->text().toStdString());
   return fc::ecc::public_key(key_address.key);
 }
+

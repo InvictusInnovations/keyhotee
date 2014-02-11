@@ -37,6 +37,7 @@ public:
   void setPublicKey(const QString& public_key_string);
   void showCopyToClipboard(bool visible);
   void setMode(ModeWidget mode = AddContact) {_my_mode = mode;};
+  void setEditable(bool editable);
 
   fc::ecc::public_key getPublicKey();
 
