@@ -114,7 +114,8 @@ QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer
 
 KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ATopLevelWindowsContainer(),
-  MailProcessor(*this, bts::application::instance()->get_profile())
+  MailProcessor(*this, bts::application::instance()->get_profile()),
+  _currentMailbox(nullptr)
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);

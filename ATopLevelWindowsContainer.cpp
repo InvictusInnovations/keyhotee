@@ -32,6 +32,8 @@ void ATopLevelWindowsContainer::registration(QAction *newAction)
   menuGroup->addAction(newAction);
   newAction->setChecked(true);
   currentWindowIndex = listQActions.count()-1;
+  if(listQActions.size() > 1)
+    menuWindow->setEnabled(true);
 }
 
 void ATopLevelWindowsContainer::unRegistration(QAction *newAction)
@@ -40,12 +42,20 @@ void ATopLevelWindowsContainer::unRegistration(QAction *newAction)
   menuWindow->removeAction(newAction);
   menuGroup->removeAction(newAction);
   currentWindowIndex = 0;
+  if(listQActions.size() < 2)
+    menuWindow->setEnabled(false);
 }
 
 void ATopLevelWindowsContainer::setMenuWindow(QMenu* menu)
 {
   menuWindow = menu;
+  menuWindow->setEnabled(false);
   connect(menuWindow, &QMenu::triggered, this, &ATopLevelWindowsContainer::onActiveWindow);
+}
+
+void ATopLevelWindowsContainer::activateMainWindow()
+{
+  onActiveWindow(listQActions[0]);
 }
 
 void ATopLevelWindowsContainer::onNextWindow()

@@ -25,7 +25,7 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="QTextEdit" name="messageEdit"/>
+     <widget class="TMessageEdit" name="messageEdit"/>
     </item>
    </layout>
   </widget>
@@ -523,6 +523,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TMessageEdit</class>
+   <extends>QTextEdit</extends>
+   <header>Mail/TMessageEdit.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../Keyhotee.qrc"/>
  </resources>

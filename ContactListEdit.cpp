@@ -8,7 +8,6 @@
 
 #include <QAbstractItemView>
 #include <QCompleter>
-#include <QDebug>
 #include <QKeyEvent>
 #include <QMimeData>
 #include <QPainter>
@@ -102,8 +101,34 @@ void ContactListEdit::onCompleterRequest()
 QString ContactListEdit::textUnderCursor() const
   {
   QTextCursor text_cursor = textCursor();
-  text_cursor.select(QTextCursor::WordUnderCursor);
-  return text_cursor.selectedText();
+
+  int position_of_cursor = text_cursor.position();
+  text_cursor.movePosition ( QTextCursor::Left, QTextCursor::MoveAnchor);
+
+  do {
+    int pos_cursor = text_cursor.position();
+    QChar prev_char = this->toPlainText().at(pos_cursor);
+    if (prev_char==QChar(' '))
+      {
+      text_cursor.movePosition ( QTextCursor::Right, QTextCursor::MoveAnchor);
+      break;
+      }
+    text_cursor.movePosition ( QTextCursor::Left, QTextCursor::MoveAnchor);
+  } while(text_cursor.position() != 0);
+
+  text_cursor.setPosition(position_of_cursor, QTextCursor::KeepAnchor);
+
+  QString compilation_prefix = text_cursor.selectedText().trimmed();
+
+  _completer->setCompletionPrefix(compilation_prefix);
+
+  while(_completer->completionCount() == 0 && !compilation_prefix.isEmpty())
+  {
+      compilation_prefix.remove(0,1);
+      _completer->setCompletionPrefix(compilation_prefix);
+  }
+
+  return compilation_prefix;
   }
 
 void ContactListEdit::addContactEntry(const QString& contactText, const bts::addressbook::contact& c)
@@ -251,12 +276,10 @@ void ContactListEdit::keyPressEvent(QKeyEvent* key_event)
   if (!_completer || (ctrlOrShift && key_event->text().isEmpty()))
     return;
 
-  static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-=");   // end of word
   bool           hasModifier = (key_event->modifiers() != Qt::NoModifier) && !ctrlOrShift;
   QString        completionPrefix = textUnderCursor();
 
-  if (!isShortcut && (hasModifier || key_event->text().isEmpty() || completionPrefix.length() == 0
-                      || eow.contains(key_event->text().right(1))))
+  if (!isShortcut && (hasModifier || key_event->text().isEmpty() || completionPrefix.length() == 0 ))
     {
     _completer->popup()->hide();
     return;
@@ -464,9 +487,11 @@ bool ContactListEdit::isStoredContact()
 void ContactListEdit::onActiveAddContact()
 {
   getKeyhoteeWindow()->addToContacts(_clicked_contact);
+  getKeyhoteeWindow()->activateMainWindow();
 }
 
 void ContactListEdit::onActiveFindContact()
 {
   getKeyhoteeWindow()->openContactGui(_clicked_contact->wallet_index);
+  getKeyhoteeWindow()->activateMainWindow();
 }

@@ -3,6 +3,7 @@
 
 #include "ui_fileattachmentwidget.h"
 
+#include <QClipboard>
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -111,8 +112,11 @@ class TFileAttachmentWidget::AAttachmentItem : public QTableWidgetItem
       {
       QTableWidgetItem::setData(role, value);
       if(role == Qt::EditRole && value.toString().trimmed().isEmpty() == false)
-        {        
-        Owner->OnAttachmentItemChanged();
+        {
+        if(FileNameInfo != nullptr)
+          FileNameInfo->Owner->OnAttachmentItemChanged();
+        else
+          Owner->OnAttachmentItemChanged();
         }
       }
 
@@ -466,6 +470,26 @@ void TFileAttachmentWidget::ConfigureContextMenu()
   ui->attachmentTable->addAction(ui->actionAdd);
   ui->attachmentTable->addAction(ui->actionDel);
   ui->attachmentTable->addAction(ui->actionRename);
+  
+  if (EditMode == true)
+  {
+
+#ifndef QT_NO_CLIPBOARD
+    sep = new QAction(this);
+    sep->setSeparator(true);
+    ui->attachmentTable->addAction(sep);
+    ui->attachmentTable->addAction(ui->actionPaste);
+    //init actionPaste
+    onClipboardChanged();    
+
+    connect(QApplication::clipboard(), &QClipboard::changed, this, &TFileAttachmentWidget::onClipboardChanged);
+#endif 
+
+#ifndef QT_NO_DRAGANDDROP
+  connect(ui->attachmentTable, SIGNAL(dropEvent(QStringList)), this, SLOT(onDropEvent(QStringList)));
+#endif 
+
+  }
 
   sep = new QAction(this);
   sep->setSeparator(true);
@@ -482,6 +506,8 @@ void TFileAttachmentWidget::ConfigureAttachmentTable()
   ui->attachmentTable->setColumnWidth(NAME_COLUMN_IDX, width);
   width = tableSize.width() - width;
   ui->attachmentTable->setColumnWidth(SIZE_COLUMN_IDX, width);
+
+  ui->attachmentTable->setReadOnly( !EditMode );
 
   UpdateColumnHeaders();
   }
@@ -615,19 +641,28 @@ void TFileAttachmentWidget::RetrieveSelection(TSelection* storage) const
   }
 
 void TFileAttachmentWidget::onAddTriggered()
-  {
-  bool sortEnabled = FreezeAttachmentTable();
-
+{  
   QSettings settings("Invictus Innovations", "Keyhotee");
   QString path = settings.value("AttachmentPath", ".").toString();  
 
   QStringList selectedFiles = QFileDialog::getOpenFileNames(this, "File(s) to attach", path);
   
   if (selectedFiles.size())
+  {
     settings.setValue("AttachmentPath", QFileInfo(selectedFiles.first()).path());
+    addFiles( selectedFiles );
+  }
+}
 
-  for(QStringList::const_iterator fileNameIt = selectedFiles.constBegin();
-      fileNameIt != selectedFiles.constEnd(); ++fileNameIt)
+void TFileAttachmentWidget::addFiles(const QStringList& files)
+  {
+  if (files.size() == 0)
+    return;
+
+  bool sortEnabled = FreezeAttachmentTable();
+
+  for(QStringList::const_iterator fileNameIt = files.constBegin();
+      fileNameIt != files.constEnd(); ++fileNameIt)
     {
     const QString& fileName = *fileNameIt;
 
@@ -654,7 +689,7 @@ void TFileAttachmentWidget::onAddTriggered()
     TFileAttachmentItem* fileSizeItem = new TFileAttachmentItem(fileNameItem, scaledSize);
     AddAttachmentItems(fileNameItem, fileSizeItem);
     }
-
+  
   UnFreezeAttachmentTable(sortEnabled);
   
   UpdateColumnHeaders();
@@ -773,4 +808,21 @@ bool TFileAttachmentWidget::saveAttachments()
 bool TFileAttachmentWidget::hasAttachment()
 {
   return AttachmentList.size() > 0;
+}
+
+void TFileAttachmentWidget::onPasteTriggered()
+{
+  QStringList files = ui->attachmentTable->getFilesPathFromClipboard();
+  addFiles( files );
+}
+
+void TFileAttachmentWidget::onClipboardChanged()
+{
+  QStringList files = ui->attachmentTable->getFilesPathFromClipboard();
+  ui->actionPaste->setEnabled( files.size() );
+}
+
+void TFileAttachmentWidget::onDropEvent(QStringList files)
+{
+  addFiles( files );
 }
