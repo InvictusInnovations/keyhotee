@@ -160,7 +160,7 @@ IF( WIN32 )
   set(BOOST_ALL_DYN_LINK ON) # force dynamic linking for all libraries
 
   FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context)
-  # case sensitive in 2.8.12?
+  # cmake variable is case sensitive
   set( BOOST_LIBRARIES ${Boost_LIBRARIES})
   # For Boost 1.53 on windows, coroutine was not in BOOST_LIBRARYDIR and do not need it to build,  but if boost versin >= 1.54, find coroutine otherwise will cause link errors
   IF(NOT "${Boost_VERSION}" MATCHES "1.53(.*)")
