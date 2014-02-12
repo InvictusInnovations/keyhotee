@@ -29,6 +29,6 @@ SET (CMAKE_FIND_LIBRARY_SUFFIXES ${MINER_ORIGINAL_LIB_SUFFIXES})
 add_executable( pool_miner miner.cpp fast_momentum.cpp bitcoin.cpp sphlib-3.0/c/sha2big.c sha2.cpp )
 target_link_libraries( pool_miner bshare leveldb fc ${BOOST_LIBRARIES}  ${OPENSSL_LIBRARIES} ${rt_library} ${CMAKE_DL_LIBS})
 add_executable( pool_server server.cpp fast_momentum.cpp bitcoin.cpp sphlib-3.0/c/sha2big.c sha2.cpp )
-target_link_libraries( pool_server fc bshare leveldb fc ${BOOST_LIBRARIES} ${rt_library} ${CMAKE_DL_LIBS})
+target_link_libraries( pool_server fc bshare leveldb fc ${BOOST_LIBRARIES} ${OPENSSL_LIBRARIES} ${rt_library} ${CMAKE_DL_LIBS})
 
 

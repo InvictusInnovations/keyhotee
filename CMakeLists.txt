@@ -82,7 +82,7 @@ get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
 #message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
-SET(KH_STATIC_QT 0)
+SET(KH_STATIC_QT 1)
 SET(QT_DEPENDENCY_LIBRARIES "")
 SET(ICU_LIBS_PREFIX "")
 
@@ -160,9 +160,12 @@ IF( WIN32 )
   set(BOOST_ALL_DYN_LINK ON) # force dynamic linking for all libraries
 
   FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context)
+  # case sensitive in 2.8.12?
+  set( BOOST_LIBRARIES ${Boost_LIBRARIES})
   # For Boost 1.53 on windows, coroutine was not in BOOST_LIBRARYDIR and do not need it to build,  but if boost versin >= 1.54, find coroutine otherwise will cause link errors
   IF(NOT "${Boost_VERSION}" MATCHES "1.53(.*)")
     FIND_PACKAGE(Boost 1.54 REQUIRED COMPONENTS coroutine)
+    set( BOOST_LIBRARIES ${BOOST_LIBRARIES} ${Boost_LIBRARIES})
   ENDIF()
 
   include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
@@ -177,7 +180,8 @@ ELSE(WIN32)
   #SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wno-unused-local-typedefs" )
   SET(Boost_USE_STATIC_LIBS ON)
   FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context coroutine) 
-
+  set( BOOST_LIBRARIES ${Boost_LIBRARIES})
+  
   IF( NOT APPLE )
     SET( pthread pthread )
   ENDIF( NOT APPLE )
@@ -185,7 +189,7 @@ ENDIF(WIN32)
 
 include_directories( ${OPENSSL_INCLUDE_DIR} )
 include_directories( ${Boost_INCLUDE_DIR} )
-SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES})
+SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES} ) #${SSL_EAY_RELEASE} ${LIB_EAY_RELEASE}
 
 add_subdirectory(BitShares)
 add_subdirectory(miner)
@@ -426,7 +430,7 @@ IF (KH_STATIC_QT EQUAL 1)
 # Since we would like to build KH against static versions of ICU, it is needed to specify them in
 # valid order (DT must be at the end)
     ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES} ${ICU_DT_LIBRARY}
-    ${APPKIT_LIBRARY} ${CMAKE_DL_LIBS} 
+    ${APPKIT_LIBRARY} ${CMAKE_DL_LIBS} ${ALL_OPENSSL_LIBRARIES}
   )
 # without call FillQtDependentLibraries micro
 ELSE (KH_STATIC_QT EQUAL 1)
@@ -434,7 +438,7 @@ ELSE (KH_STATIC_QT EQUAL 1)
     Qt5::Svg Qt5::Widgets Qt5::Gui Qt5::PrintSupport
     bshare upnpc-static fc leveldb ${BOOST_LIBRARIES}
     ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES}
-    ${APPKIT_LIBRARY} ${CMAKE_DL_LIBS} 
+    ${APPKIT_LIBRARY} ${CMAKE_DL_LIBS} ${ALL_OPENSSL_LIBRARIES}
   )
 ENDIF (KH_STATIC_QT EQUAL 1)
 
