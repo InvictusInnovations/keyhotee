@@ -76,6 +76,10 @@ class MailFieldsWidget : public QWidget
   Q_SIGNAL void recipientListChanged();
 
   private:
+    /** Helper function to trim subject text and avoid crashes since looks like QT Line edit has
+        a bug and doesn't apply a limit configured to it.
+    */
+    QString trimSubject(const QString& subject) const;
     /// Allows to show/hide given layout & all widgets associated with it.
     void showChildLayout(QLayout* layout, bool show, int preferredPosition, unsigned int fieldFlag);
     /// Helper for showChildLayout.

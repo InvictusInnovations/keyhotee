@@ -12,6 +12,8 @@
 #include <QAction>
 #include <QMenu>
 
+const unsigned int SUBJECT_LEN_LIMIT = 1024;
+
 MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, AddressBookModel& abModel,
   bool editMode) :
   QWidget(&parent),
@@ -22,6 +24,11 @@ MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, Address
   {
   ui->setupUi(this);
 
+  /// Initially hide all controls to show what we will need
+  showFromControls(false);
+  showBccControls(false);
+  showCcControls(false);
+  
   QCompleter* completer = abModel.getContactCompleter();
 
   bool readOnly = editMode == false;
@@ -46,17 +53,6 @@ MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, Address
   if(editMode)
     fillSenderIdentities();
 
-
-
-  auto app = bts::application::instance();
-  auto profile = app->get_profile();
-
-  auto idents = profile->identities();
-  if(idents.size() == 0) {
-    ui->sendButton->setEnabled(false);
-  } else {
-    ui->sendButton->setEnabled(editMode);
-  }
   ui->sendButton->setVisible(editMode);
 
   validateSendButtonState();
@@ -102,7 +98,7 @@ void MailFieldsWidget::SetSubject(const std::string& subject)
 
 void MailFieldsWidget::SetSubject(const QString& subject)
   {
-  ui->subjectEdit->setText(subject);
+  ui->subjectEdit->setText(trimSubject(subject));
   }
 
 void MailFieldsWidget::LoadContents(const TRecipientPublicKey& senderPK,
@@ -150,7 +146,8 @@ void MailFieldsWidget::showBccControls(bool show)
 
 QString MailFieldsWidget::getSubject() const
   {
-  return ui->subjectEdit->text();
+  QString sourceText = ui->subjectEdit->text();
+  return trimSubject(sourceText);
   }
 
 void MailFieldsWidget::FillRecipientLists(TRecipientPublicKeys* toList, TRecipientPublicKeys* ccList,
@@ -159,6 +156,15 @@ void MailFieldsWidget::FillRecipientLists(TRecipientPublicKeys* toList, TRecipie
   ui->toEdit->GetCollectedContacts(toList);
   ui->ccEdit->GetCollectedContacts(ccList);
   ui->bccEdit->GetCollectedContacts(bccList);
+  }
+
+inline
+QString MailFieldsWidget::trimSubject(const QString& sourceText) const
+  {
+  if(sourceText.length() > SUBJECT_LEN_LIMIT)
+    return sourceText.left(SUBJECT_LEN_LIMIT);
+
+  return sourceText;
   }
 
 void MailFieldsWidget::showChildLayout(QLayout* layout, bool show, int preferredPosition,
@@ -209,6 +215,9 @@ void MailFieldsWidget::showLayoutWidgets(QLayout* layout, bool show)
 void MailFieldsWidget::validateSendButtonState()
   {
   bool anySender = Action2Identity.empty() == false;
+  auto profile = bts::application::instance()->get_profile();
+  anySender = anySender && profile->identities().size();
+
   IMailProcessor::TRecipientPublicKeys recipients;
   ui->toEdit->GetCollectedContacts(&recipients);
   ui->ccEdit->GetCollectedContacts(&recipients);
@@ -260,8 +269,8 @@ void MailFieldsWidget::fillSenderIdentities()
     }
 
   /// Show from controls when multiple identities are defined.
-  if(Action2Identity.size() > 1)
-    showFromControls(true);
+  bool showFromControl = Action2Identity.size() > 1;
+  showFromControls(showFromControl);
   }
 
 void MailFieldsWidget::selectSenderIdentity(const TRecipientPublicKey& senderPK)
