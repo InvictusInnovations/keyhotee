@@ -338,7 +338,7 @@ void ContactView::checkSendMailButton()
 
    Some choices in Display Status for id not found on block chain: Available, Unable to find, Not registered
 
- *** When creating new wallet_identity (this is for later implementation and some details may change):
+ *** When creating new wallet_identity0 (this is for later implementation and some details may change):
 
    Note: Public key field is not editable (only keyhotee-generated public keys are allowed as they must be tied to wallet)
 

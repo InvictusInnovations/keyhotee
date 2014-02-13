@@ -52,7 +52,7 @@ void NewIdentityDialog::onUserNameChanged( const QString& name )
 
       // make sure the key is unique..
       try {
-          bts::addressbook::wallet_identity cur_ident = pro->get_identity( trim_name );
+          bts::addressbook::wallet_identity0 cur_ident = pro->get_identity( trim_name );
           ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
           ui->status_label->setStyleSheet("QLabel { color : red; }");
           if (cur_ident.dac_id_string == trim_name)
@@ -156,7 +156,7 @@ void NewIdentityDialog::onSave()
 
     // make sure the key is unique..
     try {
-        bts::addressbook::wallet_identity cur_ident = profile->get_identity( dac_id );
+        bts::addressbook::wallet_identity0 cur_ident = profile->get_identity( dac_id );
         ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
         ui->status_label->setStyleSheet("QLabel { color : red; }");
         ui->publickey->setText( "" );
@@ -180,7 +180,7 @@ void NewIdentityDialog::onSave()
     }
 
 
-    bts::addressbook::wallet_identity ident;
+    bts::addressbook::wallet_identity0 ident;
     ident.first_name = fc::trim( ui->firstname->text().toUtf8().constData() );
     ident.last_name = fc::trim( ui->lastname->text().toUtf8().constData() );
     ident.mining_effort = ui->register_checkbox->isChecked();

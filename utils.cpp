@@ -40,7 +40,7 @@ QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFo
     {
     auto profile = bts::get_profile();
     /// If no contact found try one of registered identities.
-    std::vector<bts::addressbook::wallet_identity> identities = profile->identities();
+    std::vector<bts::addressbook::wallet_identity0> identities = profile->identities();
     for(const auto& identity : identities)
       {
       assert(identity.public_key.valid());

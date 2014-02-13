@@ -459,7 +459,7 @@ void MailEditorMainWindow::mergeFormatOnWordOrSelection(const QTextCharFormat &f
 
 bool MailEditorMainWindow::prepareMailMessage(TPhysicalMailMessage* storage)
   {
-  const bts::addressbook::wallet_identity& senderId = MailFields->GetSenderIdentity();
+  const bts::addressbook::wallet_identity0& senderId = MailFields->GetSenderIdentity();
   storage->subject = MailFields->getSubject().toStdString();
 
   MailFields->FillRecipientLists(&storage->to_list, &storage->cc_list, &storage->bcc_list);
