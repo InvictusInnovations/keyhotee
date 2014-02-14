@@ -24,6 +24,11 @@ TreeWidgetCustom::TreeWidgetCustom(QWidget* parent)
   connect(_accept_request, &QAction::triggered, this, &TreeWidgetCustom::onAcceptRequest);
   connect(_deny_request, &QAction::triggered, this, &TreeWidgetCustom::onDenyRequest);
   connect(_block_request, &QAction::triggered, this, &TreeWidgetCustom::onBlockRequest);
+
+  _deny_multi_request = new QAction(QIcon(":/images/request_deny.png"), tr("Deny All"), this);
+  _menu_multi_requests.addAction(_deny_multi_request);
+  _menu_multi_requests.addAction(_block_request);
+  connect(_deny_multi_request, &QAction::triggered, this, &TreeWidgetCustom::onDenyMultiRequest);
   }
 
 TreeWidgetCustom::~TreeWidgetCustom(){}
@@ -71,6 +76,9 @@ void TreeWidgetCustom::showContextMenu(QTreeWidgetItem* item, const QPoint& glob
         _menuContacts.exec(globalPos);
         break;
     case RequestItem:
+      if(item->data(0, Qt::UserRole).toBool())
+        _menu_multi_requests.exec(globalPos);
+      else
         _menu_requests.exec(globalPos);
         break;
     default:
@@ -96,4 +104,9 @@ void TreeWidgetCustom::onDenyRequest()
 void TreeWidgetCustom::onBlockRequest()
 {
   emit itemBlockRequest(*_currentItem);
+}
+
+void TreeWidgetCustom::onDenyMultiRequest()
+{
+  emit itemDenyMultiRequest(*_currentItem);
 }

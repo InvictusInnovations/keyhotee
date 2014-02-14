@@ -14,10 +14,10 @@ enum MailboxChildren
 
 enum SidebarItemTypes
   {
-  IdentityItem = 2,
-  MailboxItem = 3,
-  ContactItem = 4,
-  RequestItem = 5
+  IdentityItem  = 1000 + 2,
+  MailboxItem   = 1000 + 3,
+  ContactItem   = 1000 + 4,
+  RequestItem   = 1000 + 5
   };
 
 enum WalletsChildren
@@ -45,12 +45,14 @@ private slots:
     void onAcceptRequest();
     void onDenyRequest();
     void onBlockRequest();
+    void onDenyMultiRequest();
 
 Q_SIGNALS:
     void itemContactRemoved (QTreeWidgetItem& item);
     void itemAcceptRequest (QTreeWidgetItem& item);
     void itemBlockRequest (QTreeWidgetItem& item);
     void itemDenyRequest (QTreeWidgetItem& item);
+    void itemDenyMultiRequest (QTreeWidgetItem& item);
 
 private:
   IModificationsChecker*    _modificationsChecker;
@@ -60,5 +62,7 @@ private:
   QAction*                  _deny_request;
   QAction*                  _block_request;
   QMenu                     _menu_requests;
+  QAction*                  _deny_multi_request;
+  QMenu                     _menu_multi_requests;
   QTreeWidgetItem*          _currentItem;
 };

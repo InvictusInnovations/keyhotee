@@ -11,6 +11,8 @@
 #include "ch/ModificationsChecker.hpp"
 #include "ATopLevelWindowsContainer.hpp"
 
+#include <qtreewidget.h>
+
 namespace Ui { class KeyhoteeMainWindow; }
 
 class QTreeWidgetItem;
@@ -58,21 +60,25 @@ private:
 /**
  *  GUI widgets for request for authorization.
  */
-class AuthorizationGui
+class AuthorizationItem : public QTreeWidgetItem
 {
   friend KeyhoteeMainWindow;
 
 private:
-  QTreeWidgetItem* _tree_item;
-  Authorization*   _view;
+  typedef fc::ecc::public_key TPublicKey;
+
+  Authorization*    _view;
+  TPublicKey        _from_key;
 
 public:
-  AuthorizationGui() {}
-  AuthorizationGui(QTreeWidgetItem* tree_item, Authorization* view)
-    : _tree_item(tree_item), _view(view) {}
-};
+  AuthorizationItem() {}
+  AuthorizationItem( Authorization* view, QTreeWidgetItem *parent, int type = 0)
+    : _view(view), QTreeWidgetItem(parent, type) {}
+  ~AuthorizationItem();
 
-Q_DECLARE_METATYPE(AuthorizationGui*);
+  void setFromKey(TPublicKey from_key) {_from_key = from_key;}
+  bool isEqual(TPublicKey from_key);
+};
 
 class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
                             protected bts::application_delegate,
@@ -113,7 +119,7 @@ public:
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 
-  void deleteCurrentAuthorizationGui();
+  void deleteAuthorizationItem(AuthorizationItem *item);
 
 signals:
   void checkSendMailSignal();
@@ -186,6 +192,7 @@ private slots:
   void onRemoveContact ();
   void onClipboardChanged();
   void onFocusChanged(QWidget *old, QWidget *now);
+  void onDeleteAuthorizationItem();
 
 private:
   bool isIdentityPresent();
@@ -201,8 +208,9 @@ private:
   void enableMenu(bool enable);
   bool checkSaving() const;
   void showContacts() const;
-  void createAuthorizationGui(const bts::bitchat::decrypted_message& msg);
-  void showAuthorizationGui(QTreeWidgetItem *item);
+  void createAuthorizationItem(const bts::bitchat::decrypted_message& msg);
+  QTreeWidgetItem* findExistSenderItem(AuthorizationItem::TPublicKey from_key, bool &to_root);
+  void showAuthorizationItem(AuthorizationItem *item);
 
   /// Class attributes:
 
@@ -235,7 +243,7 @@ private:
   TMailProcessor                          MailProcessor;
   Mailbox*                                _currentMailbox;
   MenuEditControl*                        menuEdit;
-  AuthorizationGui*                       _current_authorization;
+//  AuthorizationItem*                      _current_authorization_item;          **************************************
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();

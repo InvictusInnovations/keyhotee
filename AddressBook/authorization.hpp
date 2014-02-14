@@ -7,23 +7,32 @@
 namespace Ui {
 class Authorization;
 }
+class QToolBar;
+class AuthorizationItem;
 
 class Authorization : public QWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    explicit Authorization(QWidget *parent = 0);
-    ~Authorization();
+  explicit Authorization(QWidget *parent = 0);
+  ~Authorization();
 
-    void onAccept();
-    void onDeny();
-    void onBlock();
+  void onAccept();
+  void onDeny();
+  void onBlock();
 
-    void setMsg(const bts::bitchat::decrypted_message& msg);
+  void setMsg(const bts::bitchat::decrypted_message& msg);
+  void setOwnerItem(AuthorizationItem* item);
 
 private:
-    Ui::Authorization *ui;
+  Ui::Authorization *ui;
+
+  QToolBar*             _toolbar;
+  QAction*              _accept;
+  QAction*              _deny;
+  QAction*              _block;
+  AuthorizationItem*    _owner_item;
 };
 
 #endif // AUTHORIZATION_H

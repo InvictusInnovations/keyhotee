@@ -337,7 +337,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>7</number>
+        <number>6</number>
        </property>
        <widget class="Mailbox" name="inbox_page">
         <layout class="QGridLayout" name="inboxlayout">
@@ -382,7 +382,6 @@
        </widget>
        <widget class="ContactView" name="new_contact"/>
        <widget class="Wallets" name="wallets"/>
-       <widget class="Authorization" name="requests"/>
       </widget>
      </widget>
     </item>
@@ -721,12 +720,6 @@
    <class>TreeWidgetCustom</class>
    <extends>QTreeWidget</extends>
    <header>TreeWidgetCustom.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>Authorization</class>
-   <extends>QWidget</extends>
-   <header>AddressBook/authorization.hpp</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
