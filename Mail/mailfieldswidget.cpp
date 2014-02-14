@@ -236,7 +236,7 @@ void MailFieldsWidget::fillSenderIdentities()
   QAction* first = nullptr;
 
   auto profile = bts::application::instance()->get_profile();
-  std::vector<bts::addressbook::wallet_identity0> identities = profile->identities();
+  std::vector<bts::addressbook::wallet_identity> identities = profile->identities();
 
   for(const auto& identity : identities)
     {

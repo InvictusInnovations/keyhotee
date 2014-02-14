@@ -58,7 +58,7 @@ class MailFieldsWidget : public QWidget
     /// Returns currently set subject text.
     QString getSubject() const;
     /// Returns an identity of currently selected sender.
-    const bts::addressbook::wallet_identity0& GetSenderIdentity() const
+    const bts::addressbook::wallet_identity& GetSenderIdentity() const
       {
       return SenderIdentity;
       }
@@ -107,9 +107,9 @@ class MailFieldsWidget : public QWidget
     Ui::MailFieldsWidget*             ui;
     QAction&                          ActionSend;
     unsigned int                      VisibleFields;
-    /// Helper map to associate action for created 'from-sub-menu' item to given wallet_identity0.
+    /// Helper map to associate action for created 'from-sub-menu' item to given wallet_identity.
     TAction2IdentityIndex             Action2Identity;
-    /// Can store selected wallet_identity0 or just one of known contacts...
+    /// Can store selected wallet_identity or just one of known contacts...
     IMailProcessor::TIdentity         SenderIdentity;
     bool                              EditMode;
   };

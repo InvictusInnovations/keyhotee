@@ -16,6 +16,7 @@ struct message_header;
 namespace addressbook
 {
 struct wallet_identity0;
+typedef wallet_identity0 wallet_identity;
 } ///namespace addressbook
 
 } /// namespace bts
@@ -32,7 +33,7 @@ class IMailProcessor
     typedef bts::bitchat::private_email_message TPhysicalMailMessage;
     /// Type holding a message data which has been stored in the mail_db.
     typedef bts::bitchat::message_header        TStoredMailMessage;
-    typedef bts::addressbook::wallet_identity0   TIdentity;
+    typedef bts::addressbook::wallet_identity   TIdentity;
     typedef fc::ecc::public_key                 TRecipientPublicKey;
     typedef std::vector<TRecipientPublicKey>    TRecipientPublicKeys;
 
