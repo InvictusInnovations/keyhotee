@@ -51,6 +51,13 @@ void ContactListEdit::setCompleter(QCompleter* completer)
   _completer->setWidget(this);
   _completer->setCompletionMode(QCompleter::PopupCompletion);
   _completer->setCaseSensitivity(Qt::CaseInsensitive);
+  
+  _completions.clear();
+  for (int i = 0; _completer->setCurrentRow(i); i++)
+  {
+    _completions.push_back(_completer->currentCompletion());
+  }
+  _completer->setCurrentRow(-1);
 
    connect(_completer, SIGNAL(activated(const QModelIndex&)),
            this, SLOT(insertCompletion(const QModelIndex&)));
@@ -79,7 +86,9 @@ void ContactListEdit::insertCompletion( const QString& completion, const bts::ad
     return;
 
   QTextCursor text_cursor = textCursor();
-  uint32_t    prefix_len = _completer->completionPrefix().length();
+  uint32_t    prefix_len = 0;
+  if (_completer->completionPrefix().length() > 0 && _prefixToDelete.length() > 0)
+    prefix_len = _prefixToDelete.length();
   for (uint32_t i = 0; i < prefix_len; ++i)
     text_cursor.deletePreviousChar();
 
@@ -105,27 +114,36 @@ QString ContactListEdit::textUnderCursor() const
   int position_of_cursor = text_cursor.position();
   text_cursor.movePosition ( QTextCursor::Left, QTextCursor::MoveAnchor);
 
-  do {
-    int pos_cursor = text_cursor.position();
-    QChar prev_char = this->toPlainText().at(pos_cursor);
-    if (prev_char==QChar(' '))
-      {
-      text_cursor.movePosition ( QTextCursor::Right, QTextCursor::MoveAnchor);
-      break;
-      }
-    text_cursor.movePosition ( QTextCursor::Left, QTextCursor::MoveAnchor);
-  } while(text_cursor.position() != 0);
+  if (! this->toPlainText().isEmpty())
+  {
+    do {
+      int pos_cursor = text_cursor.position();
+      QChar prev_char = this->toPlainText().at(pos_cursor);
+      if (prev_char==QChar(' '))
+        {
+        text_cursor.movePosition ( QTextCursor::Right, QTextCursor::MoveAnchor);
+        break;
+        }
+      text_cursor.movePosition ( QTextCursor::Left, QTextCursor::MoveAnchor);
+    } while(text_cursor.position() != 0);
+  }
 
   text_cursor.setPosition(position_of_cursor, QTextCursor::KeepAnchor);
 
   QString compilation_prefix = text_cursor.selectedText().trimmed();
-
   _completer->setCompletionPrefix(compilation_prefix);
+  _prefixToDelete = compilation_prefix;
 
-  while(_completer->completionCount() == 0 && !compilation_prefix.isEmpty())
+  if (_completer->completionCount() == 0 && !compilation_prefix.isEmpty())
   {
-      compilation_prefix.remove(0,1);
-      _completer->setCompletionPrefix(compilation_prefix);
+    for (const QString& completion : _completions)
+    {
+      if (completion.contains(compilation_prefix))
+      {
+        _completer->setCompletionPrefix(completion);
+        return completion;
+      }
+    }
   }
 
   return compilation_prefix;
@@ -281,6 +299,7 @@ void ContactListEdit::keyPressEvent(QKeyEvent* key_event)
 
   if (!isShortcut && (hasModifier || key_event->text().isEmpty() || completionPrefix.length() == 0 ))
     {
+    _prefixToDelete.clear();
     _completer->popup()->hide();
     return;
     }

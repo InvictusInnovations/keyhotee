@@ -77,8 +77,10 @@ private:
 
 private:
   int                               _fitted_height;
-  QCompleter*                       _completer;
+  QCompleter*                       _completer;  
   QPoint                            _right_click;
   QTextImageFormat                  _image_format;
   bts::addressbook::wallet_contact* _clicked_contact;
+  mutable QString                   _prefixToDelete;
+  QStringList                       _completions;
 };
