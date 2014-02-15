@@ -9,6 +9,9 @@
 project( keyhotee )
 cmake_minimum_required( VERSION 2.8.12.1 )
 
+add_subdirectory(BitShares)
+add_subdirectory(miner)
+
 macro(FillQtDependentLibraries)
   GET_TARGET_PROPERTY(QT_LIB_DIR Qt5::Core LOCATION)
   GET_FILENAME_COMPONENT(QT_LIB_DIR "${QT_LIB_DIR}" PATH)
@@ -72,24 +75,26 @@ set( CMAKE_INCLUDE_CURRENT_DIR ON)
 set( CMAKE_AUTOMOC ON  )
 SET( BUILD_SHARED_LIBS OFF )
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/fc/GitVersionGen/")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CmakeModules/")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/fc/GitVersionGen")
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-#  set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake;C:/gh/qt5.1.1/qtwebkit/WebKitBuild/Release/lib/cmake/Qt5WebKitWidgets;"  )
 set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
 #message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
-SET(KH_STATIC_QT 1)
+IF (NOT DEFINED KH_STATIC_QT)
+  SET(KH_STATIC_QT 1)
+ENDIF()
+
 SET(QT_DEPENDENCY_LIBRARIES "")
 SET(ICU_LIBS_PREFIX "")
 
 SET (ORIGINAL_LIB_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 IF( WIN32 )
-  MESSAGE(platform= "Compiling on WIN32")
+  MESSAGE(STATUS "Configuring Kehotee on WIN32")
 
   IF(KH_STATIC_QT EQUAL 1)
     # Use dedicated prefix to find static versions of libraries 
@@ -99,16 +104,12 @@ IF( WIN32 )
   #Set to allow xp compatibility
   set(CMAKE_GENERATOR_TOOLSET "v110_xp" CACHE INTERNAL "XP-compatible VS 11")
   #You need to set OPENSSL_ROOT environment variable for your system on WIN32
-  message("Setting up OpenSSL root and include vars on Win32 platform")
-  set( OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT} )
-  set( OPENSSL_INCLUDE_DIR ${OPENSSL_ROOT_DIR}/include )
 ELSE()
   IF(KH_STATIC_QT EQUAL 1)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
   ENDIF()
 ENDIF(WIN32)
 
-find_package( OpenSSL )
 find_package( ICU )
 
 SET (CMAKE_FIND_LIBRARY_SUFFIXES ${ORIGINAL_LIB_SUFFIXES})
@@ -118,17 +119,9 @@ find_package( Qt5PrintSupport )
 find_package( Qt5Svg )
 find_package( Qt5Widgets )
 
-IF(KH_STATIC_QT EQUAL 1)
-  ADD_DEFINITIONS( -D__STATIC_QT )
-  FillQtDependentLibraries()
-ENDIF()
-
 #Note: bitshares repo should be checked out under keyhotee dir or path here should be changed
 set(BITSHARES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BitShares)
-message(${BITSHARES_DIR})
-include_directories(${BITSHARES_DIR}/include)
-include_directories(${BITSHARES_DIR}/fc/include)
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+message(STATUS ${BITSHARES_DIR})
 
 SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
 
@@ -137,58 +130,6 @@ IF("${INVICTUS_ROOT}" STREQUAL "")
 ENDIF("${INVICTUS_ROOT}" STREQUAL "")
 
 message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
-
-ADD_DEFINITIONS( -DALPHA_RELEASE )
-
-IF( WIN32 )
-  ADD_DEFINITIONS( -DWIN32 )
-  ADD_DEFINITIONS( -DNOMINMAX )
-  ADD_DEFINITIONS( -D_SCL_SECURE_NO_WARNINGS )
-  ADD_DEFINITIONS( -D_WIN32_WINNT=0x0501 )
-  ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS )
-  ADD_DEFINITIONS( -DLEVELDB_PLATFORM_WINDOWS )
-  # Activate C++ exception handling inc. SEH to catch GPFs
-  IF (NOT CMAKE_CXX_FLAGS MATCHES "/EHa")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHa")
-  ENDIF()
-  #boost
-  SET(BOOST_ROOT $ENV{BOOST_ROOT})
-  add_definitions(-DBOOST_ALL_NO_LIB)  # Needed to disable MSVC autolinking feature (#pragma comment)
-  set(Boost_USE_DEBUG_PYTHON ON)
-  set(Boost_USE_MULTITHREADED ON)
-  set(Boost_USE_STATIC_LIBS OFF)
-  set(BOOST_ALL_DYN_LINK ON) # force dynamic linking for all libraries
-
-  FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context)
-  # For Boost 1.53 on windows, coroutine was not in BOOST_LIBRARYDIR and do not need it to build,  but if boost versin >= 1.54, find coroutine otherwise will cause link errors
-  IF(NOT "${Boost_VERSION}" MATCHES "1.53(.*)")
-    FIND_PACKAGE(Boost 1.54 REQUIRED COMPONENTS coroutine)
-  ENDIF()
-
-  include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
-ELSE(WIN32)
-  include_directories( ${BITSHARES_DIR}/vendor/leveldb-1.12.0/include )
-  include_directories( ${BITSHARES_DIR}/vendor/qtmacextras/include )
-
-  MESSAGE(STATUS "Compiling on UNIX")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fnon-call-exceptions -std=c++0x -Wall -Wno-unused-local-typedefs -fmax-errors=3 ")#-msse4.2" ) 
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wno-unused-local-typedefs -fmax-errors=3 ") #-msse4.2" )
-  #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -Wno-unused-local-typedefs" ) 
-  #SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wno-unused-local-typedefs" )
-  SET(Boost_USE_STATIC_LIBS ON)
-  FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context coroutine) 
-
-  IF( NOT APPLE )
-    SET( pthread pthread )
-  ENDIF( NOT APPLE )
-ENDIF(WIN32)
-
-include_directories( ${OPENSSL_INCLUDE_DIR} )
-include_directories( ${Boost_INCLUDE_DIR} )
-SET( ALL_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES})
-
-add_subdirectory(BitShares)
-add_subdirectory(miner)
 
 IF( APPLE )
     SET_SOURCE_FILES_PROPERTIES(
@@ -206,10 +147,6 @@ IF( APPLE )
     SET( MACOSX_BUNDLE_COPYRIGHT "(C) 2013 Invictus Innovations" ) 
   
 ENDIF( APPLE )
-
-set( headers
-        profile_wizard/ProfileWizard.hpp
-    )
 
 qt5_wrap_ui( profile_wizard/UiProfileEditPage  profile_wizard/ProfileEditPage.ui )
 qt5_wrap_ui( profile_wizard/UiProfileIntroPage profile_wizard/ProfileIntroPage.ui )
@@ -230,10 +167,6 @@ qt5_wrap_ui( UiFileAttachmentWidget            Mail/fileattachmentwidget.ui )
 qt5_wrap_ui( UiFileAttachmentDialog            Mail/FileAttachmentDialog.ui )
 qt5_wrap_ui( UiWallets                         wallets.ui )
 
-set( library_sources
-        AddressBook/AddressBookModel.hpp
-        AddressBook/AddressBookModel.cpp )
-
 set( sources  
         qtreusable/selfsizingmainwindow.h
         qtreusable/selfsizingmainwindow.cpp
@@ -249,6 +182,8 @@ set( sources
         profile_wizard/ProfileNymPage.ui
         profile_wizard/ProfileWizard.cpp
 
+        AddressBook/AddressBookModel.hpp
+        AddressBook/AddressBookModel.cpp
         AddressBook/NewIdentityDialog.ui
         AddressBook/NewIdentityDialog.hpp
         AddressBook/NewIdentityDialog.cpp
@@ -382,20 +317,13 @@ set( resources
 # Append files generated from git revision to the sources list
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" @ONLY)
 list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.h)
+list(APPEND sources ${headers})
 
 # Some unknown diff between windows and unix, this is quick fix, leave for DanL to clean-up
-IF(WIN32)
-ELSE(WIN32)
+IF(NOT WIN32)
   #apparently this is needed for Ubuntu (see commit from jefferylee), but it causes problems for windows (lib is brought in via upnpc-static on windows at least)
   set(MINIUPNP_LIB  miniupnpc)
-ENDIF(WIN32)
-
-# Configure dependencies of keyhotee_library module
-add_library( keyhotee_library ${library_sources} )
-qt5_use_modules(keyhotee_library Widgets)
-
-message(BOOST_LIBRARIES=${BOOST_LIBRARIES})
-target_link_libraries( keyhotee_library upnpc-static bshare fc leveldb ${BOOST_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${APPKIT_LIBRARY} )
+ENDIF(NOT WIN32)
 
 # Let's configure binaries output directory (by default invictus-root/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${INVICTUS_ROOT}/bin)
@@ -405,6 +333,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
 # Configure dependencies of keyhotee main application module
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} ${resources} )
 add_dependencies (Keyhotee translations_target)
+
+target_include_directories(Keyhotee
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
+  )
+
+target_compile_definitions(Keyhotee
+  PRIVATE ALPHA_RELEASE
+  )
+
+IF(KH_STATIC_QT EQUAL 1)
+  target_compile_definitions(Keyhotee PRIVATE __STATIC_QT)
+  FillQtDependentLibraries()
+ENDIF()
 
 # Let's configure different target names for release and debug builds.
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_DEBUG KeyhoteeD )
@@ -417,12 +358,12 @@ set(CMAKE_STATIC_TYPE true)
 
 #fc  miniupnpc
 IF (KH_STATIC_QT EQUAL 1)
-  target_link_libraries( Keyhotee keyhotee_library 
+  target_link_libraries( Keyhotee
     ${Qt5Gui_PLUGINS} 
     debug ${Qt5Platform_LIBRARIES_DEBUG} optimized ${Qt5Platform_LIBRARIES_RELEASE}
     debug ${Qt5SvgIcon_LIBRARIES_DEBUG} optimized ${Qt5SvgIcon_LIBRARIES_RELEASE} 
     Qt5::Svg Qt5::Widgets Qt5::Gui Qt5::PrintSupport
-    bshare upnpc-static fc leveldb ${BOOST_LIBRARIES}
+    bshare 
 # Since we would like to build KH against static versions of ICU, it is needed to specify them in
 # valid order (DT must be at the end)
     ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES} ${ICU_DT_LIBRARY}
@@ -430,9 +371,9 @@ IF (KH_STATIC_QT EQUAL 1)
   )
 # without call FillQtDependentLibraries micro
 ELSE (KH_STATIC_QT EQUAL 1)
-  target_link_libraries( Keyhotee keyhotee_library 
+  target_link_libraries( Keyhotee
     Qt5::Svg Qt5::Widgets Qt5::Gui Qt5::PrintSupport
-    bshare upnpc-static fc leveldb ${BOOST_LIBRARIES}
+    bshare 
     ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES}
     ${APPKIT_LIBRARY} ${CMAKE_DL_LIBS} 
   )

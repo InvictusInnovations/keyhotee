@@ -19,6 +19,14 @@ LoginDialog::LoginDialog(TKeyhoteeApplication& mainApp, QWidget* parent)
 {
   ui->setupUi(this);
   ui->password->setFocus();
+
+#ifdef Q_OS_MAC
+  ui->frame->setStyleSheet(QStringLiteral("image: url(:/images/keyhotee.icns);"));
+#else
+  ui->frame->setStyleSheet(QStringLiteral("image: url(:/images/keyhotee.png);"));
+#endif
+
+  ui->frame->setFrameShape(QFrame::NoFrame);
   connect(ui->login, &QPushButton::clicked, this, &LoginDialog::onLogin);
   connect(ui->newProfile, &QPushButton::clicked, this, &LoginDialog::onNew);
   connect(ui->quit, &QPushButton::clicked, this, &LoginDialog::onQuit);

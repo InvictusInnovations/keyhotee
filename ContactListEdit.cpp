@@ -6,10 +6,8 @@
 #include "KeyhoteeMainWindow.hpp"
 #include "AddressBook/AddressBookModel.hpp"
 
-#include <QDebug>
 #include <QAbstractItemView>
 #include <QCompleter>
-#include <QDebug>
 #include <QKeyEvent>
 #include <QMimeData>
 #include <QPainter>
