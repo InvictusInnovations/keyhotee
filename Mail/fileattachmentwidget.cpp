@@ -195,6 +195,17 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
         setToolTip(image.toHtml() );
       }
 
+    /// Constructor to build item representing share contact cell.
+    TFileAttachmentItem(const QFileInfo& fileInfo, TFileAttachmentWidget* owner, int contactDataSize) :
+      AAttachmentItem(fileInfo.fileName().toStdString().c_str(), owner, nullptr),
+      FileInfo(fileInfo)
+      {
+      owner->TotalAttachmentSize += contactDataSize;
+
+      QString path = fileInfo.absoluteFilePath();
+      setToolTip(tr("Share contact"));
+      }
+
     /// Constructor to build file size cell.
     TFileAttachmentItem(TFileAttachmentItem* fileNameItem, const TScaledSize& scaledSize) :
       AAttachmentItem(fileNameItem, scaledSize),
@@ -839,4 +850,19 @@ void TFileAttachmentWidget::onClipboardChanged()
 void TFileAttachmentWidget::onDropEvent(QStringList files)
 {
   addFiles( files );
+}
+
+void TFileAttachmentWidget::shareContact(const QByteArray& contactData)
+{
+  QFileInfo fileInfo("*<contact>*");
+
+  AttachmentIndex.push_back(fileInfo);
+
+  unsigned long long size = contactData.size();
+  TScaledSize scaledSize = ScaleAttachmentSize(size);
+
+  /// Allocate objects representing table items - name item automatically will register in the list.
+  TFileAttachmentItem* fileNameItem = new TFileAttachmentItem(fileInfo, this, size);
+  TFileAttachmentItem* fileSizeItem = new TFileAttachmentItem(fileNameItem, scaledSize);
+  AddAttachmentItems(fileNameItem, fileSizeItem);
 }
