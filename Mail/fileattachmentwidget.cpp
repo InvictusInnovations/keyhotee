@@ -130,17 +130,31 @@ class TFileAttachmentWidget::AAttachmentItem : public QTableWidgetItem
       assert(owner != nullptr);
       /// Only items representing name should be registered.
       AttachmentListPos = owner->AttachmentList.insert(owner->AttachmentList.end(), this);
+      updateItemFlags();
       }
 
     /// Constructor to build item for size column.
     AAttachmentItem(AAttachmentItem* fileNameInfo, const TScaledSize& scaledSize) :
       QTableWidgetItem(TFileAttachmentWidget::toString(scaledSize)),
       Owner(nullptr),
-      FileNameInfo(fileNameInfo) {}
+      FileNameInfo(fileNameInfo)
+      {
+      updateItemFlags();
+      }
 
     virtual ~AAttachmentItem() {}
 
   private:
+    void updateItemFlags()
+      {
+      TFileAttachmentWidget* itemOwner = GetOwner();
+      Qt::ItemFlags itemFlags = flags();
+      if(itemOwner->AllowEdits())
+        setFlags(itemFlags | Qt::ItemFlag::ItemIsEditable);
+      else
+        setFlags(itemFlags & ~Qt::ItemFlag::ItemIsEditable);
+      }
+
     TFileAttachmentWidget*  GetOwner() const
       {
       return FileNameInfo != nullptr ? FileNameInfo->GetOwner() : Owner;
@@ -480,7 +494,7 @@ void TFileAttachmentWidget::ConfigureContextMenu()
     ui->attachmentTable->addAction(sep);
     ui->attachmentTable->addAction(ui->actionPaste);
     //init actionPaste
-    onClipboardChanged();    
+    onClipboardChanged();
 
     connect(QApplication::clipboard(), &QClipboard::changed, this, &TFileAttachmentWidget::onClipboardChanged);
 #endif 

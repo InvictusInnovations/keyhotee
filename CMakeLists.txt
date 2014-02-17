@@ -119,16 +119,9 @@ find_package( Qt5PrintSupport )
 find_package( Qt5Svg )
 find_package( Qt5Widgets )
 
-IF(KH_STATIC_QT EQUAL 1)
-  ADD_DEFINITIONS( -D__STATIC_QT )
-  FillQtDependentLibraries()
-ENDIF()
-
 #Note: bitshares repo should be checked out under keyhotee dir or path here should be changed
 set(BITSHARES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BitShares)
 message(STATUS ${BITSHARES_DIR})
-
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
 
@@ -137,28 +130,6 @@ IF("${INVICTUS_ROOT}" STREQUAL "")
 ENDIF("${INVICTUS_ROOT}" STREQUAL "")
 
 message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
-
-ADD_DEFINITIONS( -DALPHA_RELEASE )
-
-IF( WIN32 )
-
-  include_directories( ${BITSHARES_DIR}/vendor/leveldb-win/include )
-ELSE(WIN32)
-  include_directories( ${BITSHARES_DIR}/vendor/leveldb-1.12.0/include )
-
-  MESSAGE(STATUS "Compiling on UNIX")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fnon-call-exceptions -std=c++0x -Wall -Wno-unused-local-typedefs -fmax-errors=3 ")#-msse4.2" ) 
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wno-unused-local-typedefs -fmax-errors=3 ") #-msse4.2" )
-  #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -Wno-unused-local-typedefs" ) 
-  #SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wno-unused-local-typedefs" )
-  SET(Boost_USE_STATIC_LIBS ON)
-  FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS thread date_time system filesystem program_options signals serialization chrono unit_test_framework context coroutine) 
-
-  IF( NOT APPLE )
-    SET( pthread pthread )
-  ENDIF( NOT APPLE )
-ENDIF(WIN32)
-
 
 IF( APPLE )
     SET_SOURCE_FILES_PROPERTIES(
@@ -209,6 +180,7 @@ set( sources
         profile_wizard/ProfileEditPage.ui
         profile_wizard/ProfileIntroPage.ui
         profile_wizard/ProfileNymPage.ui
+        profile_wizard/ProfileWizard.hpp
         profile_wizard/ProfileWizard.cpp
 
         AddressBook/AddressBookModel.hpp
@@ -223,6 +195,7 @@ set( sources
         AddressBook/ContactView.hpp
         AddressBook/ContactView.cpp
         AddressBook/Contact.cpp
+        AddressBook/Contact.hpp
         AddressBook/TableViewCustom.hpp
         AddressBook/TableViewCustom.cpp
 
@@ -240,6 +213,7 @@ set( sources
         Mail/maileditorwindow.ui
         Mail/maileditorwindow.hpp
         Mail/maileditorwindow.cpp
+        Mail/RepliedMailPattern.html
 
         Mail/mailfieldswidget.ui
         Mail/mailfieldswidget.hpp
@@ -249,6 +223,7 @@ set( sources
         Mail/moneyattachementwidget.hpp
         Mail/moneyattachementwidget.cpp
 
+        Mail/MessageHeader.hpp
         Mail/fileattachmentwidget.ui
         Mail/fileattachmentwidget.hpp
         Mail/fileattachmentwidget.cpp
@@ -270,6 +245,8 @@ set( sources
         ContactListEdit.hpp
         ContactListEdit.cpp
 
+	GitSHA1.h
+
         TreeWidgetCustom.hpp
         TreeWidgetCustom.cpp
 
@@ -281,6 +258,8 @@ set( sources
         ATopLevelWindowsContainer.cpp
         ATopLevelWindow.hpp
         ATopLevelWindow.cpp
+
+	bitsharesguiprecomp.h
 
         diagnosticdialog.ui
         diagnosticdialog.h
@@ -296,6 +275,8 @@ set( sources
         wallets.ui
         wallets.hpp
         wallets.cpp
+
+	public_key_address.hpp
 
         dataaccessimpl.h
         dataaccessimpl.cpp
@@ -362,6 +343,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
 # Configure dependencies of keyhotee main application module
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} ${resources} )
 add_dependencies (Keyhotee translations_target)
+
+target_include_directories(Keyhotee
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
+  )
+
+target_compile_definitions(Keyhotee
+  PRIVATE ALPHA_RELEASE
+  )
+
+IF(KH_STATIC_QT EQUAL 1)
+  target_compile_definitions(Keyhotee PRIVATE __STATIC_QT)
+  FillQtDependentLibraries()
+ENDIF()
 
 # Let's configure different target names for release and debug builds.
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_DEBUG KeyhoteeD )

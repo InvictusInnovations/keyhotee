@@ -39,6 +39,13 @@ class TFileAttachmentWidget : public QWidget
                          (because they don't exist anymore or are not readable).
     */
     bool GetAttachedFiles(TAttachmentContainer* storage, TFileInfoList* failedFilesStorage) const;
+
+    /// Returns true when widget allows to make any changes in its contents.
+    bool AllowEdits() const
+      {
+      return EditMode;
+      }
+
     void selectAllFiles();
     bool saveAttachments();
     bool hasAttachment();
