@@ -3,8 +3,6 @@
 
 #include "ch/mailprocessor.hpp"
 
-#include <bts/profile.hpp>
-
 /** Implementation of mail processor storing sent mail in actual folders (outbox and next in sent db).
     Send operation is performed in separate thread.
     Save operation puts given mail message into drafts db.
