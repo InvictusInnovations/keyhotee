@@ -108,6 +108,16 @@ makeContactListString(const std::vector<fc::ecc::public_key>& key_list, char sep
 
   return to_list.join(separator);
   }
+QString lTrim(const QString& s)
+{
+  int n = s.size() ;
+  for (int i = 0; i < n; i++) {
+    if (!(s.at(i) == ' ')) {
+      return s.right(n - i);
+    }
+  }
+  return ""; 
+}
 
 } ///namespace Utils
 

@@ -5,6 +5,7 @@
 //#include "AddressBook/Contact.hpp"
 #include "KeyhoteeMainWindow.hpp"
 #include "AddressBook/AddressBookModel.hpp"
+#include "utils.hpp"
 
 #include <QAbstractItemView>
 #include <QCompleter>
@@ -131,9 +132,7 @@ QString ContactListEdit::textUnderCursor() const
 
   QString compilation_prefix = text_cursor.selectedText();
 
-  while(compilation_prefix.at(0).isSpace()) {
-      compilation_prefix = compilation_prefix.right(compilation_prefix.size() - 1);
-  }
+  compilation_prefix = Utils::lTrim(compilation_prefix);
 
   _completer->setCompletionPrefix(compilation_prefix);
   _prefixToDelete = compilation_prefix;

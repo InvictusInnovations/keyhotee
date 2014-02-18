@@ -62,6 +62,9 @@ bool matchContact(const fc::ecc::public_key& pk, bts::addressbook::wallet_contac
 */
 QString makeContactListString(const std::vector<fc::ecc::public_key>& key_list, char separator = ',',
   TContactTextFormatting contactFormatting = TContactTextFormatting::KEYHOTEE_IDENTIFIER);
+/* ltrim of QString
+*/
+QString lTrim(const QString& s);
 
 } ///namespace Utils
 
