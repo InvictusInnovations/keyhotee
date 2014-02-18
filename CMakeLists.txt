@@ -280,6 +280,14 @@ set( sources
         MenuEditControl.hpp
         MenuEditControl.cpp
 
+        vCard/vcardproperty.h
+        vCard/vcardparam.h
+        vCard/vcard.h
+        vCard/libvcard_global.h
+        vCard/vcardproperty.cpp
+        vCard/vcardparam.cpp
+        vCard/vcard.cpp
+
         main.cpp )
 
 set(FILES_TO_TRANSLATE ${sources})
