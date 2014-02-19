@@ -852,13 +852,14 @@ void TFileAttachmentWidget::onDropEvent(QStringList files)
   addFiles( files );
 }
 
-void TFileAttachmentWidget::shareContact(const QByteArray& contactData)
+
+void TFileAttachmentWidget::addContactCard(const QByteArray& vCard)
 {
   QFileInfo fileInfo("*<contact>*");
 
   AttachmentIndex.push_back(fileInfo);
 
-  unsigned long long size = contactData.size();
+  unsigned long long size = vCard.size();
   TScaledSize scaledSize = ScaleAttachmentSize(size);
 
   /// Allocate objects representing table items - name item automatically will register in the list.

@@ -52,7 +52,7 @@ class TFileAttachmentWidget : public QWidget
     /// Add attachments files 
     void addFiles(const QStringList& files);
     /// Add contact to attachment list
-    void shareContact(const QByteArray& contactData);
+    void addContactCard(const QByteArray& contactData);
     
     /// Signal emitted when attachment list changes.
     Q_SIGNAL void attachmentListChanged();

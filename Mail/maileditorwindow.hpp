@@ -89,6 +89,7 @@ class MailEditorMainWindow : public ATopLevelWindow
     */
     void LoadMessage(Mailbox* mailbox, const TStoredMailMessage& srcMsgHeader, const TPhysicalMailMessage& srcMsg,
       TLoadForm loadForm);
+    void setContactSharing (const QByteArray& vCard);
 
   private:
     /// QWidget reimplementation to support query for save mod. contents.

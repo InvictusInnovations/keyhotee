@@ -24,7 +24,7 @@
 #define VCARDPARAM_H
 
 #include "libvcard_global.h"
-#include <QtCore/QString>
+#include <QString>
 
 class vCardParam
 {

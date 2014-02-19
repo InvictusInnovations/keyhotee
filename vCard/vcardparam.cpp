@@ -21,7 +21,7 @@
  */
 
 #include "vcardparam.h"
-#include <QtCore/QStringList>
+#include <QStringList>
 
 #define VC_GROUP_TOKEN "%1=%2"
 #define VC_TYPE_TOKEN "TYPE"

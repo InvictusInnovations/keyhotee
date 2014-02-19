@@ -24,6 +24,7 @@
 #define VCARD_H
 
 #include "vcardproperty.h"
+#include <QList>
 
 class vCard
 {

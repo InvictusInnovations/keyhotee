@@ -23,7 +23,7 @@
 #ifndef VCARD_GLOBAL_H
 #define VCARD_GLOBAL_H
 
-#include <QtCore/qglobal.h>
+#include <qglobal.h>
 
 #define VC_SEPARATOR_TOKEN ';'
 #define VC_END_LINE_TOKEN '\n'

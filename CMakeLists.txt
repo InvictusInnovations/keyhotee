@@ -196,6 +196,8 @@ set( sources
         AddressBook/Contact.cpp
         AddressBook/TableViewCustom.hpp
         AddressBook/TableViewCustom.cpp
+        AddressBook/ContactvCard.hpp
+        AddressBook/ContactvCard.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp

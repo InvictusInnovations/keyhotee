@@ -24,8 +24,8 @@
 #define VCARDPROPERTY_H
 
 #include "vcardparam.h"
-#include <QtCore/QDateTime>
-#include <QtCore/QStringList>
+#include <QDateTime>
+#include <QStringList>
 
 #define VC_ADDRESS              "ADR"
 #define VC_AGENT                "AGENT"
