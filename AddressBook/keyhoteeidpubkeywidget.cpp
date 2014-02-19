@@ -206,9 +206,27 @@ void KeyhoteeIDPubKeyWidget::setEditable(bool editable)
   ui->public_key->setReadOnly(!editable);
 }
 
+bool KeyhoteeIDPubKeyWidget::event(QEvent *e)
+{
+  if (e->type() == QEvent::Show)
+  {
+    if(ui->keyhotee_id->text().size() > 0)
+      setKeyhoteeID(ui->keyhotee_id->text());
+    else if(ui->public_key->text().size() > 0)
+      setPublicKey(ui->public_key->text());
+  }
+  return QWidget::event(e);
+}
+
 fc::ecc::public_key KeyhoteeIDPubKeyWidget::getPublicKey()
 {
   public_key_address key_address(ui->public_key->text().toStdString());
   return fc::ecc::public_key(key_address.key);
 }
+
+QString KeyhoteeIDPubKeyWidget::getKeyhoteeID()
+{
+  return ui->keyhotee_id->text();
+}
+
 

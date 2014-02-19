@@ -119,8 +119,6 @@ public:
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 
-  void deleteAuthorizationItem(AuthorizationItem *item);
-
 signals:
   void checkSendMailSignal();
 protected:
@@ -193,6 +191,13 @@ private slots:
   void onClipboardChanged();
   void onFocusChanged(QWidget *old, QWidget *now);
   void onDeleteAuthorizationItem();
+  void onItemContextAcceptRequest(QTreeWidgetItem *item);
+  void onItemContextDenyRequest(QTreeWidgetItem *item);
+  void onItemContextBlockRequest(QTreeWidgetItem *item);
+  void onItemAcceptRequest(AuthorizationItem *item);
+  void onItemDenyRequest(AuthorizationItem *item);
+  void onItemBlockRequest(AuthorizationItem *item);
+
 
 private:
   bool isIdentityPresent();
@@ -211,6 +216,7 @@ private:
   void createAuthorizationItem(const bts::bitchat::decrypted_message& msg);
   QTreeWidgetItem* findExistSenderItem(AuthorizationItem::TPublicKey from_key, bool &to_root);
   void showAuthorizationItem(AuthorizationItem *item);
+  void deleteAuthorizationItem(AuthorizationItem *item);
 
   /// Class attributes:
 

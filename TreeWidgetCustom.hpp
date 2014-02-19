@@ -38,21 +38,20 @@ public:
 protected:
   virtual bool viewportEvent(QEvent *event) override;
   void showContextMenu(QTreeWidgetItem* item, const QPoint& globalPos);
-  
+
 private slots:
-    void onCustomContextMenuRequested(const QPoint& pos);
-    void onRemoveContact ();
-    void onAcceptRequest();
-    void onDenyRequest();
-    void onBlockRequest();
-    void onDenyMultiRequest();
+  void onCustomContextMenuRequested(const QPoint& pos);
+  void onRemoveContact ();
+  void onAcceptRequest();
+  void onDenyRequest();
+  void onBlockRequest();
+  void onDenyMultiRequest();
 
 Q_SIGNALS:
-    void itemContactRemoved (QTreeWidgetItem& item);
-    void itemAcceptRequest (QTreeWidgetItem& item);
-    void itemBlockRequest (QTreeWidgetItem& item);
-    void itemDenyRequest (QTreeWidgetItem& item);
-    void itemDenyMultiRequest (QTreeWidgetItem& item);
+  void itemContactRemoved (QTreeWidgetItem& item);
+  void itemContextAcceptRequest (QTreeWidgetItem* item);
+  void itemContextBlockRequest (QTreeWidgetItem* item);
+  void itemContextDenyRequest (QTreeWidgetItem* item);
 
 private:
   IModificationsChecker*    _modificationsChecker;

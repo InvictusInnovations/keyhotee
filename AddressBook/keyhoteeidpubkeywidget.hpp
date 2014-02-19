@@ -40,6 +40,7 @@ public:
   void setEditable(bool editable);
 
   fc::ecc::public_key getPublicKey();
+  QString getKeyhoteeID();
 
 private:
   Ui::KeyhoteeIDPubKeyWidget *ui;
@@ -60,5 +61,7 @@ Q_SIGNALS:
 private slots:
   void keyhoteeIdEdited(const QString& keyhotee_id);
   void publicKeyEdited(const QString& public_key_string);
+
+  bool event(QEvent *e);
 };
 

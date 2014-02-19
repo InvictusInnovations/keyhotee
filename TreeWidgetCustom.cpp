@@ -17,6 +17,7 @@ TreeWidgetCustom::TreeWidgetCustom(QWidget* parent)
 
   _accept_request = new QAction(QIcon(":/images/request_accept.png"), tr("Accept"), this);
   _deny_request = new QAction(QIcon(":/images/request_deny.png"), tr("Deny"), this);
+  _deny_request->setShortcut(Qt::Key_Delete);
   _block_request = new QAction(QIcon(":/images/request_block.png"), tr("Block"), this);
   _menu_requests.addAction(_accept_request);
   _menu_requests.addAction(_deny_request);
@@ -26,6 +27,7 @@ TreeWidgetCustom::TreeWidgetCustom(QWidget* parent)
   connect(_block_request, &QAction::triggered, this, &TreeWidgetCustom::onBlockRequest);
 
   _deny_multi_request = new QAction(QIcon(":/images/request_deny.png"), tr("Deny All"), this);
+  _deny_multi_request->setShortcut(Qt::Key_Delete);
   _menu_multi_requests.addAction(_deny_multi_request);
   _menu_multi_requests.addAction(_block_request);
   connect(_deny_multi_request, &QAction::triggered, this, &TreeWidgetCustom::onDenyMultiRequest);
@@ -93,20 +95,20 @@ void TreeWidgetCustom::onRemoveContact ()
 
 void TreeWidgetCustom::onAcceptRequest()
 {
-  emit itemAcceptRequest(*_currentItem);
+  emit itemContextAcceptRequest(_currentItem);
 }
 
 void TreeWidgetCustom::onDenyRequest()
 {
-  emit itemDenyRequest(*_currentItem);
+  emit itemContextDenyRequest(_currentItem);
 }
 
 void TreeWidgetCustom::onBlockRequest()
 {
-  emit itemBlockRequest(*_currentItem);
+  emit itemContextBlockRequest(_currentItem);
 }
 
 void TreeWidgetCustom::onDenyMultiRequest()
 {
-  emit itemDenyMultiRequest(*_currentItem);
+  emit itemContextDenyRequest(_currentItem);
 }
