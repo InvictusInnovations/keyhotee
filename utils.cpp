@@ -108,16 +108,27 @@ makeContactListString(const std::vector<fc::ecc::public_key>& key_list, char sep
 
   return to_list.join(separator);
   }
-QString lTrim(const QString& s)
-{
-  int n = s.size() ;
-  for (int i = 0; i < n; i++) {
-    if (!(s.at(i) == ' ')) {
-      return s.right(n - i);
+
+QString lTrim(QString const& str)
+  {
+    if (str.size() == 0)
+        return str;
+    const QChar *s = (const QChar*)str.data();
+    if (!s->isSpace() )
+        return str;
+    int start = 0;
+    int end = str.size() - 1;
+    while (start<=end && s[start].isSpace())  // skip white space from start
+        start++;
+    int l = end - start + 1;
+    if (l <= 0) {
+        QStringDataPtr empty = { QString::Data::allocate(0) };
+        return QString(empty);
     }
-  }
-  return ""; 
+    return QString(s + start, l);
 }
+
+
 
 } ///namespace Utils
 

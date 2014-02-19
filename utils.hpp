@@ -64,7 +64,7 @@ QString makeContactListString(const std::vector<fc::ecc::public_key>& key_list, 
   TContactTextFormatting contactFormatting = TContactTextFormatting::KEYHOTEE_IDENTIFIER);
 /* ltrim of QString
 */
-QString lTrim(const QString& s);
+QString lTrim(QString const &str);
 
 } ///namespace Utils
 
