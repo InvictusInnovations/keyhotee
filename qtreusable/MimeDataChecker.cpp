@@ -11,36 +11,44 @@ MimeDataChecker::MimeDataChecker(const QMimeData* mimeData)
 	_mimeData = mimeData;
 }
 
-
-bool MimeDataChecker::isFiles()
+bool MimeDataChecker::containsFiles() const
 {
-  QStringList files =  getFilesPath();
-  if (files.size())
-    return true;
+  if(_mimeData == nullptr || _mimeData->hasUrls() == false)
+    return false;
+
+  QList<QUrl> urlList = _mimeData->urls();
+
+  for (const QUrl& url : urlList)
+  {
+    if (url.isLocalFile ())
+    {
+      QString fileName = url.toLocalFile ();
+      QFileInfo fileInfo(fileName);
+      if (fileInfo.isFile())
+        return true;
+    }
+  }
 
   return false;
 }
 
-QStringList MimeDataChecker::getFilesPath()
+QStringList MimeDataChecker::getFilesPath() const
 {
-  QStringList stringList = QStringList();
+  QStringList stringList;
 
-  if(_mimeData)
+  if(_mimeData == nullptr || _mimeData->hasUrls() == false)
+    return stringList;
+
+  QList<QUrl> urlList = _mimeData->urls();
+
+  for (const QUrl& url : urlList)
   {
-    bool en = _mimeData->hasText();
-    if (_mimeData->hasUrls())
+    if (url.isLocalFile ())
     {
-      for (int i = 0; i < _mimeData->urls().size(); i++)
-      {
-        QUrl url = _mimeData->urls().at(i);      
-        if (url.isLocalFile ())
-        {
-          QString fileName = url.toLocalFile ();
-          QFileInfo fileInfo(fileName);
-          if (fileInfo.isFile())
-            stringList.push_back( fileName );
-        }
-      }
+      QString fileName = url.toLocalFile ();
+      QFileInfo fileInfo(fileName);
+      if (fileInfo.isFile())
+        stringList.push_back( fileName );
     }
   }
 

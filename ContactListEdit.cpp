@@ -5,10 +5,10 @@
 //#include "AddressBook/Contact.hpp"
 #include "KeyhoteeMainWindow.hpp"
 #include "AddressBook/AddressBookModel.hpp"
+#include "utils.hpp"
 
 #include <QAbstractItemView>
 #include <QCompleter>
-#include <QDebug>
 #include <QKeyEvent>
 #include <QMimeData>
 #include <QPainter>
@@ -52,6 +52,13 @@ void ContactListEdit::setCompleter(QCompleter* completer)
   _completer->setWidget(this);
   _completer->setCompletionMode(QCompleter::PopupCompletion);
   _completer->setCaseSensitivity(Qt::CaseInsensitive);
+  
+  _completions.clear();
+  for (int i = 0; _completer->setCurrentRow(i); i++)
+  {
+    _completions.push_back(_completer->currentCompletion());
+  }
+  _completer->setCurrentRow(-1);
 
    connect(_completer, SIGNAL(activated(const QModelIndex&)),
            this, SLOT(insertCompletion(const QModelIndex&)));
@@ -80,7 +87,9 @@ void ContactListEdit::insertCompletion( const QString& completion, const bts::ad
     return;
 
   QTextCursor text_cursor = textCursor();
-  uint32_t    prefix_len = _completer->completionPrefix().length();
+  uint32_t    prefix_len = 0;
+  if (_completer->completionPrefix().length() > 0 && _prefixToDelete.length() > 0)
+    prefix_len = _prefixToDelete.length();
   for (uint32_t i = 0; i < prefix_len; ++i)
     text_cursor.deletePreviousChar();
 
@@ -102,8 +111,45 @@ void ContactListEdit::onCompleterRequest()
 QString ContactListEdit::textUnderCursor() const
   {
   QTextCursor text_cursor = textCursor();
-  text_cursor.select(QTextCursor::WordUnderCursor);
-  return text_cursor.selectedText();
+
+  int position_of_cursor = text_cursor.position();
+
+  if (! this->toPlainText().isEmpty())
+  {
+    do {
+      text_cursor.movePosition ( QTextCursor::Left, QTextCursor::MoveAnchor);
+      int pos_cursor = text_cursor.position();
+      QChar prev_char = this->toPlainText().at(pos_cursor);
+      if (prev_char==QChar(QChar::ObjectReplacementCharacter))
+        {
+        text_cursor.movePosition ( QTextCursor::Right, QTextCursor::MoveAnchor);
+        break;
+        }
+    } while(text_cursor.position() != 0);
+  }
+
+  text_cursor.setPosition(position_of_cursor, QTextCursor::KeepAnchor);
+
+  QString compilation_prefix = text_cursor.selectedText();
+
+  compilation_prefix = Utils::lTrim(compilation_prefix);
+
+  _completer->setCompletionPrefix(compilation_prefix);
+  _prefixToDelete = compilation_prefix;
+
+  if (_completer->completionCount() == 0 && !compilation_prefix.isEmpty())
+  {
+    for (const QString& completion : _completions)
+    {
+      if (completion.contains(compilation_prefix))
+      {
+        _completer->setCompletionPrefix(completion);
+        return completion;
+      }
+    }
+  }
+
+  return compilation_prefix;
   }
 
 void ContactListEdit::addContactEntry(const QString& contactText, const bts::addressbook::contact& c)
@@ -251,13 +297,12 @@ void ContactListEdit::keyPressEvent(QKeyEvent* key_event)
   if (!_completer || (ctrlOrShift && key_event->text().isEmpty()))
     return;
 
-  static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-=");   // end of word
   bool           hasModifier = (key_event->modifiers() != Qt::NoModifier) && !ctrlOrShift;
   QString        completionPrefix = textUnderCursor();
 
-  if (!isShortcut && (hasModifier || key_event->text().isEmpty() || completionPrefix.length() == 0
-                      || eow.contains(key_event->text().right(1))))
+  if (!isShortcut && (hasModifier || key_event->text().isEmpty() || completionPrefix.length() == 0 ))
     {
+    _prefixToDelete.clear();
     _completer->popup()->hide();
     return;
     }

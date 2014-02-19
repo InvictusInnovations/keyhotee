@@ -27,7 +27,7 @@ void TableWidgetAttachments::dragEnterEvent(QDragEnterEvent *event)
     return;
 
   MimeDataChecker mime( event->mimeData() );
-  if (mime.isFiles())
+  if (mime.containsFiles())
     event->acceptProposedAction();
 }
  
