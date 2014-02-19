@@ -858,7 +858,6 @@ void KeyhoteeMainWindow::createAuthorizationItem(const bts::bitchat::decrypted_m
   if(add_to_root)
   {
     Authorization *view_root = new Authorization();
-    //view_root->setAddressBook(_addressbook_model);
 
     AuthorizationItem *authorization_root_item = new AuthorizationItem(view_root,
       item, (QTreeWidgetItem::ItemType)RequestItem);
@@ -930,18 +929,12 @@ void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
   ui->widget_stack->removeWidget(item->_view);
   QTreeWidgetItem* item_parent = item->parent();
   item_parent->removeChild(item);
-//  delete item;
 
   if(item_parent != _requests_root && item_parent->childCount() == 0)
-  {
     item_parent->parent()->removeChild(item_parent);
-//    delete item_parent;
-  }
 
   if(_requests_root->childCount() == 0)
-  {
     _requests_root->setHidden(true);
-  }
 }
 
 void KeyhoteeMainWindow::onItemAcceptRequest(AuthorizationItem *item)
@@ -961,7 +954,14 @@ void KeyhoteeMainWindow::onItemBlockRequest(AuthorizationItem *item)
 
 void KeyhoteeMainWindow::onItemContextAcceptRequest(QTreeWidgetItem *item)
 {
-  static_cast<AuthorizationItem*>(item)->_view->onAccept();
+  if(item->childCount() > 0)
+  {
+    while(item->child(0))
+      static_cast<AuthorizationItem*>(item->child(0))->_view->onAccept();
+  }
+  else
+    static_cast<AuthorizationItem*>(item)->_view->onAccept();
+
 //  deleteAuthorizationItem(static_cast<AuthorizationItem*>(item));
 }
 
@@ -969,16 +969,28 @@ void KeyhoteeMainWindow::onItemContextDenyRequest(QTreeWidgetItem *item)
 {
   if(QMessageBox::question(this, tr("Deny request"), tr("Are you sure you want to deny selected request(s) for authorization?")) == QMessageBox::Button::No)
     return;
-  static_cast<AuthorizationItem*>(item)->_view->onDeny();
-  //deleteAuthorizationItem(static_cast<AuthorizationItem*>(item));
+
+  if(item->childCount() > 0)
+  {
+    while(item->child(0))
+      static_cast<AuthorizationItem*>(item->child(0))->_view->onDeny();
+  }
+  else
+    static_cast<AuthorizationItem*>(item)->_view->onDeny();
 }
 
 void KeyhoteeMainWindow::onItemContextBlockRequest(QTreeWidgetItem *item)
 {
   if(QMessageBox::question(this, tr("Block request"), tr("Are you sure you want to block selected request(s) for authorization?")) == QMessageBox::Button::No)
     return;
-  static_cast<AuthorizationItem*>(item)->_view->onBlock();
-  //deleteAuthorizationItem(static_cast<AuthorizationItem*>(item));
+
+  if(item->childCount() > 0)
+  {
+    while(item->child(0))
+      static_cast<AuthorizationItem*>(item->child(0))->_view->onBlock();
+  }
+  else
+    static_cast<AuthorizationItem*>(item)->_view->onBlock();
 }
 
 void KeyhoteeMainWindow::onDeleteAuthorizationItem()
