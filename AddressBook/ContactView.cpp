@@ -18,7 +18,7 @@
 extern bool gMiningIsPossible;
 
 //#ifndef _DEBUG
-//#define ALPHA_RELEASE
+#define ALPHA_RELEASE
 //#endif
 
 #ifdef ALPHA_RELEASE
