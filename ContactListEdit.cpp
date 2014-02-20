@@ -5,6 +5,7 @@
 //#include "AddressBook/Contact.hpp"
 #include "KeyhoteeMainWindow.hpp"
 #include "AddressBook/AddressBookModel.hpp"
+#include "utils.hpp"
 
 #include <QAbstractItemView>
 #include <QCompleter>
@@ -112,25 +113,27 @@ QString ContactListEdit::textUnderCursor() const
   QTextCursor text_cursor = textCursor();
 
   int position_of_cursor = text_cursor.position();
-  text_cursor.movePosition ( QTextCursor::Left, QTextCursor::MoveAnchor);
 
   if (! this->toPlainText().isEmpty())
   {
     do {
+      text_cursor.movePosition ( QTextCursor::Left, QTextCursor::MoveAnchor);
       int pos_cursor = text_cursor.position();
       QChar prev_char = this->toPlainText().at(pos_cursor);
-      if (prev_char==QChar(' '))
+      if (prev_char==QChar(QChar::ObjectReplacementCharacter))
         {
         text_cursor.movePosition ( QTextCursor::Right, QTextCursor::MoveAnchor);
         break;
         }
-      text_cursor.movePosition ( QTextCursor::Left, QTextCursor::MoveAnchor);
     } while(text_cursor.position() != 0);
   }
 
   text_cursor.setPosition(position_of_cursor, QTextCursor::KeepAnchor);
 
-  QString compilation_prefix = text_cursor.selectedText().trimmed();
+  QString compilation_prefix = text_cursor.selectedText();
+
+  compilation_prefix = Utils::lTrim(compilation_prefix);
+
   _completer->setCompletionPrefix(compilation_prefix);
   _prefixToDelete = compilation_prefix;
 

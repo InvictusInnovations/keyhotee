@@ -352,8 +352,16 @@ void MailboxModel::getMessageData(const QModelIndex& index,
   const MessageHeader& cachedMsg = my->_headers[index.row()];
   *encodedMsg = cachedMsg.header;
 
-  auto rawData = my->_mail_db->fetch_data(cachedMsg.header.digest);
-  *decodedMsg = fc::raw::unpack<private_email_message>(rawData);
+  try
+    {
+    auto rawData = my->_mail_db->fetch_data(cachedMsg.header.digest);
+    *decodedMsg = fc::raw::unpack<private_email_message>(rawData);
+    }
+  catch(const fc::exception& e)
+    {
+    elog("${e}", ("e", e.to_detail_string()));
+    *decodedMsg = IMailProcessor::TPhysicalMailMessage();
+    }
   }
 
 AddressBookModel& MailboxModel::getAddressBookModel() const

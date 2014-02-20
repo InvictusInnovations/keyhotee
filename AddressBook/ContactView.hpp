@@ -39,6 +39,7 @@ public:
 
   bool isChatSelected();
   void sendChatMessage();
+  void checkcontactstatus();
   void appendChatMessage(const QString& from, const QString& msg, const QDateTime& date_time = QDateTime::currentDateTime() );
   void setAddingNewContact(bool addNew)
     {
@@ -121,6 +122,7 @@ private:
 
   void onIconSearch();
   bool doDataExchange (bool valid);
+
   bool existContactWithPublicKey (const std::string& public_key_string);
   void keyEdit(bool enable);  
   void setEnabledSaveContact ();

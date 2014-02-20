@@ -742,6 +742,30 @@ bool ContactView::doDataExchange (bool valid)
    return true;
 }
 
+void ContactView::checkcontactstatus()
+{
+    auto name_record = bts::application::instance()->lookup_name(_current_contact.dac_id_string);
+    ui->keyhotee_founder->setVisible(!_editing && _current_contact.isKeyhoteeFounder());
+    if (name_record)
+      {
+      //  if keyhoteeId's public key matches ours.
+      if (name_record->active_key == _current_contact.public_key)
+        { //Registered to us
+        ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : green; color : black; }");
+        ui->keyhoteeID_status->setText(tr("Registered"));
+        }
+      else //Not Available (someone else owns it)
+        {
+        ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : red; color : black; }");
+        ui->keyhoteeID_status->setText(tr("Not Available"));
+        }
+      }
+    else //Unregistered (no one has it yet)
+      {
+      ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : yellow; color : black; }");
+      ui->keyhoteeID_status->setText(tr("Unregistered"));
+      }
+}
 
 bool ContactView::existContactWithPublicKey (const std::string& public_key_string)
 {

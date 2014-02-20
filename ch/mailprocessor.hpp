@@ -2,6 +2,7 @@
 #define __MAILPROCESSOR_HPP
 
 #include <fc/crypto/elliptic.hpp>
+#include <bts/profile.hpp>
 
 #include <vector>
 
@@ -12,12 +13,6 @@ namespace bitchat
 struct private_email_message;
 struct message_header;
 } ///namespace bitchat
-
-namespace addressbook
-{
-struct wallet_identity0;
-typedef wallet_identity0 wallet_identity;
-} ///namespace addressbook
 
 } /// namespace bts
 
