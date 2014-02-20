@@ -14,7 +14,6 @@
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/NewIdentityDialog.hpp"
 #include "AddressBook/ContactView.hpp"
-#include "AddressBook/ContactvCard.hpp"
 
 #include "Mail/MailboxModel.hpp"
 #include "Mail/maileditorwindow.hpp"
@@ -728,14 +727,12 @@ void KeyhoteeMainWindow::shareContact(QList<const Contact*>& contacts)
 
   MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
     MailProcessor, true);
-  
-  ContactvCard cards;
+
   for(const Contact* contact : contacts)
   {
-    cards.add(contact);
+    mailWindow->addContactCard (contact);
   }
 
-  mailWindow->setContactSharing (*cards.getByteArray());
   mailWindow->show();
 }
 

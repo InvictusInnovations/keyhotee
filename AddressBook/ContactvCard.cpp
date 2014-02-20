@@ -5,23 +5,21 @@ ContactvCard::ContactvCard()
   
 }
 
-void ContactvCard::add(const Contact* contact)
+ void ContactvCard::getvCardData(const Contact* contact, QByteArray* vCardData)
 { 
-  //*********** TESTING
-
-   // First we create a valid vCard object...
   vCard vcard;
-
-  vCardProperty name_prop = vCardProperty::createName("John", "Smith");
-  //vCardProperty name_prop = vCardProperty::createKHID("John", "Smith");
-
+  vCardProperty name_prop = vCardProperty::createName(contact->first_name.c_str(), 
+                                                      contact->last_name.c_str()); 
   vcard.addProperty(name_prop);
 
-  // ...and then we can serialize it and send everywhere.
-  QByteArray output = vcard.toByteArray();  
+  name_prop = vCardProperty::createKHID(contact->dac_id_string.c_str());
+  vcard.addProperty(name_prop);
+
+  *vCardData = vcard.toByteArray();  
+
 
     // Imagine we've read a byte stream from a data source.
-  QByteArray in = output;
+  /*QByteArray in = output;
 
   // Now we can parse it...
   QList<vCard> vcards = vCard::fromByteArray(in);
@@ -39,10 +37,5 @@ void ContactvCard::add(const Contact* contact)
           QString firstname = values.at(vCardProperty::Firstname);
           QString lastname = values.at(vCardProperty::Lastname);
 //      }
-  }
-}
-
-QByteArray* ContactvCard::getByteArray()
-{
-  return new QByteArray();
+  }*/
 }

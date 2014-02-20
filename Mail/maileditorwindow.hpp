@@ -19,6 +19,7 @@ class QModelIndex;
 class QTextCharFormat;
 
 class AddressBookModel;
+class Contact;
 class TFileAttachmentWidget;
 class MailFieldsWidget;
 class TMoneyAttachementWidget;
@@ -89,7 +90,7 @@ class MailEditorMainWindow : public ATopLevelWindow
     */
     void LoadMessage(Mailbox* mailbox, const TStoredMailMessage& srcMsgHeader, const TPhysicalMailMessage& srcMsg,
       TLoadForm loadForm);
-    void setContactSharing (const QByteArray& vCard);
+    void addContactCard (const Contact*);
 
   private:
     /// QWidget reimplementation to support query for save mod. contents.

@@ -9,6 +9,8 @@
 #include <list>
 #include <utility>
 
+class Contact;
+
 namespace Ui {
 class TFileAttachmentWidget;
 }
@@ -52,7 +54,7 @@ class TFileAttachmentWidget : public QWidget
     /// Add attachments files 
     void addFiles(const QStringList& files);
     /// Add contact to attachment list
-    void addContactCard(const QByteArray& contactData);
+    void addContactCard(const Contact* contact);
     
     /// Signal emitted when attachment list changes.
     Q_SIGNAL void attachmentListChanged();

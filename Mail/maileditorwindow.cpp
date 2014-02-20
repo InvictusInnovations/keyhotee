@@ -747,7 +747,8 @@ void MailEditorMainWindow::onAddAttachments(QStringList files)
   FileAttachment->addFiles( files );
 }
 
-void MailEditorMainWindow::setContactSharing(const QByteArray& vCard)
+void MailEditorMainWindow::addContactCard (const Contact* contact)
 {
-  FileAttachment->addContactCard(vCard);
+  FileAttachment->addContactCard(contact);
+  ui->fileAttachementToolBar->setVisible(true);
 }

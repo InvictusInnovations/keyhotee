@@ -54,6 +54,7 @@
 #define VC_TITLE                "TITLE"
 #define VC_URL                  "URL"
 #define VC_VERSION              "VERSION"
+#define VC_KHID                 "X-KHID"
 
 class vCardProperty
 {
@@ -121,6 +122,7 @@ public:
     static vCardProperty createGeographicPosition(qreal latitude, qreal longitude, const vCardParamList& params = vCardParamList());
     static vCardProperty createName(const QString& firstname, const QString& lastname, const QString& additional = "", const QString& prefix = "", const QString& suffix = "", const vCardParamList& params = vCardParamList());
     static vCardProperty createOrganization(const QString& name, const QStringList& levels = QStringList(), const vCardParamList& params = vCardParamList());
+    static vCardProperty createKHID(const QString& khID, const vCardParamList& params = vCardParamList());
 };
 
 typedef QList<vCardProperty> vCardPropertyList;

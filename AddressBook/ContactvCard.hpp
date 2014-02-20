@@ -11,8 +11,7 @@ class ContactvCard
 {
 public:
   ContactvCard();
-  void add(const Contact*);
-  QByteArray* getByteArray();
+  void getvCardData(const Contact* contact, QByteArray* vCardData);
 
 private:
   vCardList _vCards;
