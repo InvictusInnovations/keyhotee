@@ -180,6 +180,7 @@ set( sources
         profile_wizard/ProfileEditPage.ui
         profile_wizard/ProfileIntroPage.ui
         profile_wizard/ProfileNymPage.ui
+        profile_wizard/ProfileWizard.hpp
         profile_wizard/ProfileWizard.cpp
 
         AddressBook/AddressBookModel.hpp
@@ -194,6 +195,7 @@ set( sources
         AddressBook/ContactView.hpp
         AddressBook/ContactView.cpp
         AddressBook/Contact.cpp
+        AddressBook/Contact.hpp
         AddressBook/TableViewCustom.hpp
         AddressBook/TableViewCustom.cpp
         AddressBook/ContactvCard.hpp
@@ -213,6 +215,7 @@ set( sources
         Mail/maileditorwindow.ui
         Mail/maileditorwindow.hpp
         Mail/maileditorwindow.cpp
+        Mail/RepliedMailPattern.html
 
         Mail/mailfieldswidget.ui
         Mail/mailfieldswidget.hpp
@@ -222,6 +225,7 @@ set( sources
         Mail/moneyattachementwidget.hpp
         Mail/moneyattachementwidget.cpp
 
+        Mail/MessageHeader.hpp
         Mail/fileattachmentwidget.ui
         Mail/fileattachmentwidget.hpp
         Mail/fileattachmentwidget.cpp
@@ -243,6 +247,8 @@ set( sources
         ContactListEdit.hpp
         ContactListEdit.cpp
 
+	GitSHA1.h
+
         TreeWidgetCustom.hpp
         TreeWidgetCustom.cpp
 
@@ -254,6 +260,8 @@ set( sources
         ATopLevelWindowsContainer.cpp
         ATopLevelWindow.hpp
         ATopLevelWindow.cpp
+
+	bitsharesguiprecomp.h
 
         diagnosticdialog.ui
         diagnosticdialog.h
@@ -269,6 +277,8 @@ set( sources
         wallets.ui
         wallets.hpp
         wallets.cpp
+
+	public_key_address.hpp
 
         dataaccessimpl.h
         dataaccessimpl.cpp

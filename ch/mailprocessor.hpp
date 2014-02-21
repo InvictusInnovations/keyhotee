@@ -15,7 +15,8 @@ struct message_header;
 
 namespace addressbook
 {
-struct wallet_identity;
+struct wallet_identity0;
+typedef wallet_identity0 wallet_identity;
 } ///namespace addressbook
 
 } /// namespace bts
