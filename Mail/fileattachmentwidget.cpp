@@ -251,8 +251,8 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
 
         physicalAttachment.filename = GetDisplayedFileName().toStdString();
         qint64 fileSize = _contactCardData->size();
-        physicalAttachment.body.resize(fileSize+1000);
-        strcpy(physicalAttachment.body.data(), _contactCardData->data());
+        physicalAttachment.body.resize(fileSize);
+        memcpy(physicalAttachment.body.data(), _contactCardData->data(), fileSize);
       }
       else
       {
