@@ -739,7 +739,7 @@ Enter</string>
   <customwidget>
    <class>KeyhoteeIDPubKeyWidget</class>
    <extends>QWidget</extends>
-   <header>keyhoteeidpubkeywidget.hpp</header>
+   <header>AddressBook/keyhoteeidpubkeywidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
