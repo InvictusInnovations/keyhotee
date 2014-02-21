@@ -94,7 +94,6 @@ void ContactGui::updateTreeItemDisplay()
 
 AuthorizationItem::~AuthorizationItem()
 {
-  delete _view;
 }
 
 bool AuthorizationItem::isEqual(TPublicKey from_key)
@@ -1013,7 +1012,7 @@ void KeyhoteeMainWindow::setupStatusBar()
 
 void KeyhoteeMainWindow::received_text(const bts::bitchat::decrypted_message& msg)
 {
-  received_request(msg);
+  // received_request(msg);   // for testing 
 
   auto opt_contact = _addressbook->get_contact_by_public_key(*(msg.from_key) );
   if (!opt_contact)

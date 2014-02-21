@@ -16,9 +16,9 @@ Authorization::Authorization(QWidget *parent) :
   _address_book = nullptr;
   _owner_item = nullptr;
 
+  ui->keyhoteeidpubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::RequestAuthorization);
   ui->keyhoteeidpubkey->setEditable(false);
   ui->keyhoteeidpubkey->showCopyToClipboard(false);
-  ui->keyhoteeidpubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::RequestAuthorization);
 
   _toolbar = new QToolBar(ui->toolbar_container);
   QGridLayout* grid_layout = new QGridLayout(ui->toolbar_container);

@@ -7,9 +7,10 @@ RequestAuthorization::RequestAuthorization(QWidget *parent) :
     QDialog(parent), ui(new Ui::RequestAuthorization)
 {
   ui->setupUi(this);
+
+  ui->keyhoteeidpubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::RequestAuthorization);
   ui->button_send->setEnabled(false);
   ui->keyhoteeidpubkey->showCopyToClipboard(false);
-  ui->keyhoteeidpubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::RequestAuthorization);
 
   connect(this, &QDialog::accepted, this, &RequestAuthorization::onSend);
   connect(ui->keyhoteeidpubkey, &KeyhoteeIDPubKeyWidget::currentState, this, &RequestAuthorization::onStateWidget);

@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>922</width>
-    <height>425</height>
+    <width>974</width>
+    <height>493</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -208,7 +208,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1" colspan="2">
+           <item row="0" column="1">
             <widget class="QLabel" name="first_name_label">
              <property name="text">
               <string>First Name</string>
@@ -218,7 +218,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="3">
+           <item row="0" column="2">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
               <widget class="QLineEdit" name="firstname">
@@ -308,8 +308,14 @@
              </item>
             </layout>
            </item>
-           <item row="1" column="1" colspan="2">
+           <item row="1" column="1">
             <widget class="QLabel" name="last_name_label">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string>Last Name</string>
              </property>
@@ -318,7 +324,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="3">
+           <item row="1" column="2">
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <widget class="QLineEdit" name="lastname">
@@ -376,175 +382,111 @@
              </item>
             </layout>
            </item>
-           <item row="2" column="0" colspan="2">
-            <widget class="QLabel" name="public_key_label_2">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Keyhotee ID</string>
-             </property>
-             <property name="buddy">
-              <cstring>id_edit</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2" colspan="2">
+           <item row="2" column="0" colspan="3">
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
-              <widget class="QLineEdit" name="id_edit">
-               <property name="placeholderText">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="keyhoteeID_status">
+              <widget class="KeyhoteeIDPubKeyWidget" name="khid_pubkey" native="true">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>100</width>
-                 <height>20</height>
+                 <width>0</width>
+                 <height>72</height>
                 </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">background-color: rgb(255, 255, 127);</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="text">
-                <string>Unregistered</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::NoTextInteraction</set>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="keyhotee_founder">
-               <property name="enabled">
-                <bool>true</bool>
+              <layout class="QVBoxLayout" name="verticalLayout">
+               <property name="topMargin">
+                <number>6</number>
                </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+               <property name="bottomMargin">
+                <number>6</number>
                </property>
-               <property name="minimumSize">
-                <size>
-                 <width>150</width>
-                 <height>20</height>
-                </size>
-               </property>
-               <property name="layoutDirection">
-                <enum>Qt::LeftToRight</enum>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(35, 40, 3, 255), stop:0.102273 rgba(136, 106, 22, 255), stop:0.225 rgba(166, 140, 41, 255), stop:0.285 rgba(204, 181, 74, 255), stop:0.345 rgba(235, 219, 102, 255), stop:0.415 rgba(245, 236, 112, 255), stop:0.52 rgba(209, 190, 76, 255), stop:0.57 rgba(187, 156, 51, 255), stop:0.635 rgba(168, 142, 42, 255), stop:0.695 rgba(202, 174, 68, 255), stop:0.75 rgba(218, 202, 86, 255), stop:0.815 rgba(208, 187, 73, 255), stop:0.88 rgba(187, 156, 51, 255), stop:0.935 rgba(137, 108, 26, 255), stop:1 rgba(35, 40, 3, 255));</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::Panel</enum>
-               </property>
-               <property name="text">
-                <string>Keyhotee Founder</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::NoTextInteraction</set>
-               </property>
-              </widget>
+               <item>
+                <widget class="QLabel" name="keyhotee_founder">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(35, 40, 3, 255), stop:0.102273 rgba(136, 106, 22, 255), stop:0.225 rgba(166, 140, 41, 255), stop:0.285 rgba(204, 181, 74, 255), stop:0.345 rgba(235, 219, 102, 255), stop:0.415 rgba(245, 236, 112, 255), stop:0.52 rgba(209, 190, 76, 255), stop:0.57 rgba(187, 156, 51, 255), stop:0.635 rgba(168, 142, 42, 255), stop:0.695 rgba(202, 174, 68, 255), stop:0.75 rgba(218, 202, 86, 255), stop:0.815 rgba(208, 187, 73, 255), stop:0.88 rgba(187, 156, 51, 255), stop:0.935 rgba(137, 108, 26, 255), stop:1 rgba(35, 40, 3, 255));</string>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Panel</enum>
+                 </property>
+                 <property name="text">
+                  <string>Keyhotee Founder</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>false</bool>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::NoTextInteraction</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="keyhoteeID_status">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: rgb(255, 255, 127);</string>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="text">
+                  <string>Unregistered</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>false</bool>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::NoTextInteraction</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </item>
-           <item row="2" column="4">
-            <widget class="QLabel" name="id_status">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>200</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>ID Status</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="public_key_label">
-             <property name="text">
-              <string>Public Key</string>
-             </property>
-             <property name="buddy">
-              <cstring>public_key</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2" colspan="2">
-            <widget class="QLineEdit" name="public_key">
-             <property name="font">
-              <font>
-               <family>Andale Mono</family>
-               <pointsize>10</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="4">
-            <widget class="QToolButton" name="public_key_to_clipboard">
-             <property name="maximumSize">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Copy to clipboard</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../Keyhotee.qrc">
-               <normaloff>:/images/win/editcopy.png</normaloff>:/images/win/editcopy.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0" colspan="2">
+           <item row="3" column="0" colspan="2">
             <widget class="QLabel" name="privacy_level_label">
              <property name="text">
               <string>Privacy Level</string>
@@ -554,7 +496,7 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="2" colspan="2">
+           <item row="3" column="2">
             <widget class="QComboBox" name="privacy_comboBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -579,7 +521,7 @@
              </item>
             </widget>
            </item>
-           <item row="5" column="0">
+           <item row="4" column="0">
             <widget class="QLabel" name="email_label">
              <property name="text">
               <string>Email</string>
@@ -589,10 +531,10 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="2" colspan="2">
+           <item row="4" column="1" colspan="2">
             <widget class="QLineEdit" name="email"/>
            </item>
-           <item row="6" column="0">
+           <item row="5" column="0">
             <widget class="QLabel" name="phone_label">
              <property name="text">
               <string>Phone</string>
@@ -602,10 +544,10 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="2" colspan="2">
+           <item row="5" column="1" colspan="2">
             <widget class="QLineEdit" name="phone"/>
            </item>
-           <item row="7" column="0" colspan="5">
+           <item row="6" column="0" colspan="3">
             <widget class="QGroupBox" name="notes_groupbox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -654,16 +596,16 @@
           <zorder>email</zorder>
           <zorder>phone_label</zorder>
           <zorder>phone</zorder>
-          <zorder>public_key_label</zorder>
-          <zorder>public_key</zorder>
           <zorder>notes_groupbox</zorder>
           <zorder>privacy_level_label</zorder>
-          <zorder>public_key_label_2</zorder>
           <zorder>first_name_label</zorder>
           <zorder>last_name_label</zorder>
-          <zorder>public_key_to_clipboard</zorder>
           <zorder>icon_view</zorder>
-          <zorder>id_status</zorder>
+          <zorder>khid_pubkey</zorder>
+          <zorder>notes</zorder>
+          <zorder></zorder>
+          <zorder>keyhoteeID_status</zorder>
+          <zorder>keyhotee_founder</zorder>
          </widget>
         </widget>
        </item>
@@ -763,14 +705,19 @@ Enter</string>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="9"/>
+ <customwidgets>
+  <customwidget>
+   <class>KeyhoteeIDPubKeyWidget</class>
+   <extends>QWidget</extends>
+   <header>keyhoteeidpubkeywidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>contact_pages</tabstop>
   <tabstop>icon_view</tabstop>
   <tabstop>firstname</tabstop>
   <tabstop>lastname</tabstop>
-  <tabstop>id_edit</tabstop>
-  <tabstop>public_key</tabstop>
-  <tabstop>public_key_to_clipboard</tabstop>
   <tabstop>privacy_comboBox</tabstop>
   <tabstop>email</tabstop>
   <tabstop>phone</tabstop>

@@ -4,6 +4,7 @@
 #include "Contact.hpp"
 #include <fc/time.hpp>
 #include <bts/application.hpp>
+#include "keyhoteeidpubkeywidget.hpp"
 
 namespace Ui { class ContactView; }
 class AddressBookModel;
@@ -33,18 +34,10 @@ public:
   void onRequestContact();
   void onInfo();
 
-  void onPublicKeyToClipboard();
-  void lookupId();
-  void lookupPublicKey();
-
   bool isChatSelected();
   void sendChatMessage();
   void appendChatMessage(const QString& from, const QString& msg, const QDateTime& date_time = QDateTime::currentDateTime() );
-  void setAddingNewContact(bool addNew)
-    {
-    _addingNewContact = addNew;
-    }
-
+  void setAddingNewContact(bool addNew);
   bool isAddingNewContact() const
     {
     return _addingNewContact;
@@ -66,13 +59,6 @@ public slots:
 private slots:
   void firstNameChanged(const QString& name);
   void lastNameChanged(const QString& name);
-  void keyhoteeIdChanged(const QString& name);
-  void keyhoteeIdEdited(const QString& name);
-  void publicKeyEdited(const QString& public_key_string);
-  void publicKeyChanged(const QString&)
-    {
-    setModyfied();
-    }
 
   void emailChanged(const QString&)
     {
@@ -102,6 +88,7 @@ private slots:
     _current_contact.setMiningEffort(mining_effort);
     setModyfied();
     }
+  void onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state);
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event);
@@ -121,7 +108,6 @@ private:
 
   void onIconSearch();
   bool doDataExchange (bool valid);
-  bool existContactWithPublicKey (const std::string& public_key_string);
   void keyEdit(bool enable);  
   void setEnabledSaveContact ();
 
