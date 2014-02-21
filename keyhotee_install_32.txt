@@ -1,12 +1,4 @@
 c:\gh\bin\KEYHOTEE.EXE
-c:\gh\icu\bin\ICUDT52.DLL
-c:\gh\icu\bin\ICUIN52.DLL
-c:\gh\icu\bin\ICUUC52.DLL
-C:\gh\qt\bin\LIBEGL.DLL
-c:\gh\qt\bin\LIBGLESV2.DLL
-c:\gh\qt\bin\QT5CORE.DLL
-c:\gh\qt\bin\QT5GUI.DLL
-c:\gh\qt\bin\QT5WIDGETS.DLL
 c:\lib\boost\stage\lib\BOOST_CHRONO-VC110-MT-1_53.DLL
 c:\lib\boost\stage\lib\BOOST_CONTEXT-VC110-MT-1_53.DLL
 c:\lib\boost\stage\lib\BOOST_DATE_TIME-VC110-MT-1_53.DLL
@@ -16,5 +8,3 @@ c:\lib\boost\stage\lib\BOOST_THREAD-VC110-MT-1_53.DLL
 c:\openssl\bin\LIBEAY32.DLL
 c:\gh\msvc32\msvcp110.dll
 c:\gh\msvc32\msvcr110.dll
-c:\gh\msvc32\msvcp100.dll
-c:\gh\msvc32\msvcr100.dll

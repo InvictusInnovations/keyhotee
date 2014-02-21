@@ -2,7 +2,7 @@ import shutil
 import os
 import zipfile
 
-version = "0.5.2"
+version = "0.5.3"
 
 def zipdir(path, zip):
     for root, dirs, files in os.walk(path):
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     for line in open("keyhotee_install_32.txt",'r'):
         line=line.strip()
         if line:
-            print(line)
+            print("copy " + line)
             shutil.copy(line,binDir)
     platformDir = binDir + '/platforms'
     os.mkdir(platformDir)
