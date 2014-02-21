@@ -111,10 +111,10 @@ fc::string register_key_on_server(const QString& keyhotee_id, const QString& key
   return points;
 }
 
-void display_founder_key_status(const QString& keyhotee_id, const QString& key, QLabel* status_label)
+void display_founder_key_status(const QString& keyhotee_id, const QString& founder_code, QLabel* status_label)
 {
    try {
-      auto points = register_key_on_server(keyhotee_id, key);
+      auto points = register_key_on_server(keyhotee_id, founder_code);
       fc::usleep(fc::seconds(1));
       status_label->setText( ("Registered with " + points + " points").c_str() );
    } 
@@ -124,9 +124,16 @@ void display_founder_key_status(const QString& keyhotee_id, const QString& key, 
    }
    catch ( fc::exception& e )
    {
-      fc::string msg = "Invalid KehoteeID/FounderKey Pair: " + e.to_string();
+      fc::string msg = "Founder Key Status exception: " + e.to_string();
       elog("${msg}",("msg",msg));
-      status_label->setText( "Invalid ID/FounderKey Pair" );
+      if (founder_code.size())
+      {
+        status_label->setText( "Invalid ID/FounderKey Pair" );
+      }
+      else
+      {
+        status_label->setText( "Unregistered" );
+      }
    }
    catch ( ... )
    {
