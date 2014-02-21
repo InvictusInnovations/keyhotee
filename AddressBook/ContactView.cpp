@@ -122,7 +122,7 @@ ContactView::ContactView(QWidget* parent)
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
   chat_contact = new QAction( QIcon( ":/images/chat.png"), tr("Chat"), this);  
   edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png"), tr("Edit"), this);
-  share_contact = new QAction(QIcon(":/images/read-icon.png"), tr("Share (need new icon)"), this);
+  share_contact = new QAction(QIcon(":/images/128x128/contact_share.png"), tr("Share contact"), this);
   request_contact = new QAction( QIcon(":/images/128x128/contact_info_request_authorisation.png"), tr("Request authorisation"), this);
   save_contact = new QAction( QIcon(":/images/128x128/contact_info_save.png"), tr( "Save"), this );
   cancel_edit_contact = new QAction( QIcon(":/images/128x128/contact_info_cancel_edit.png"), tr("Discard changes"), this);
