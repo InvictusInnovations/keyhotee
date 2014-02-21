@@ -380,6 +380,7 @@ void ContactView::keyEdit(bool enable)
   ui->keyhotee_founder->setVisible(!enable && _current_contact.isKeyhoteeFounder());
   bool is_owner = _current_contact.isOwn();
   ui->keyhoteeID_status->setVisible(!enable && is_owner);
+  ui->authorization_status->setVisible(!enable && !is_owner);
   ui->mining_effort_slider->setDisabled(!enable && is_owner);
   
   cancel_edit_contact->setEnabled(enable);
