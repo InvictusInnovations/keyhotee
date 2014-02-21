@@ -198,6 +198,8 @@ set( sources
         AddressBook/Contact.hpp
         AddressBook/TableViewCustom.hpp
         AddressBook/TableViewCustom.cpp
+        AddressBook/ContactvCard.hpp
+        AddressBook/ContactvCard.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp
@@ -289,6 +291,14 @@ set( sources
 
         MenuEditControl.hpp
         MenuEditControl.cpp
+
+        vCard/vcardproperty.h
+        vCard/vcardparam.h
+        vCard/vcard.h
+        vCard/libvcard_global.h
+        vCard/vcardproperty.cpp
+        vCard/vcardparam.cpp
+        vCard/vcard.cpp
 
         main.cpp )
 

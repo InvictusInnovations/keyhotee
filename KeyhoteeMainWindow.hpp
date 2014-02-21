@@ -11,6 +11,8 @@
 #include "ch/ModificationsChecker.hpp"
 #include "ATopLevelWindowsContainer.hpp"
 
+#include <QList>
+
 namespace Ui { class KeyhoteeMainWindow; }
 
 class QTreeWidgetItem;
@@ -90,6 +92,7 @@ public:
   void setEnabledMailActions(bool enable);
   void setMailSettings (MailSettings& mailSettings);  
   ContactsTable* getContactsPage();
+  void shareContact(QList<const Contact*>& contacts);
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 

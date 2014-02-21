@@ -283,7 +283,10 @@ void ContactView::onMail()
 
 void ContactView::onShareContact()
 {
-  QMessageBox::warning(this, tr("Warning"), tr("Not supported"));
+  QList<const Contact*> contacts;
+  contacts.push_back(&_current_contact);
+
+  getKeyhoteeWindow()->shareContact(contacts);
 }
 
 void ContactView::onRequestContact()
@@ -565,7 +568,7 @@ void ContactView::keyEdit(bool enable)
   send_mail->setEnabled(!enable);
   chat_contact->setEnabled(!enable);
   edit_contact->setEnabled(!enable);
-  share_contact->setEnabled(false);
+  share_contact->setEnabled(!enable);
   request_contact->setEnabled(false);
 
   ui->contact_pages->setTabEnabled(chat, !enable);

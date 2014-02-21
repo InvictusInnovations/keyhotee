@@ -721,6 +721,21 @@ void KeyhoteeMainWindow::newMailMessageTo(const Contact& contact)
   mailWindow->show();
 }
 
+void KeyhoteeMainWindow::shareContact(QList<const Contact*>& contacts)
+{
+  assert (contacts.size());
+
+  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
+    MailProcessor, true);
+
+  for(const Contact* contact : contacts)
+  {
+    mailWindow->addContactCard (contact);
+  }
+
+  mailWindow->show();
+}
+
 ContactGui* KeyhoteeMainWindow::getContactGui(int contact_id)
 {
   auto itr = _contact_guis.find(contact_id);
