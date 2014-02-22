@@ -817,7 +817,7 @@ void TFileAttachmentWidget::onRenameTriggered()
   }
 
 void TFileAttachmentWidget::onAttachementTableSelectionChanged()
-  {
+{
   TSelection selection;
   RetrieveSelection(&selection);
 
@@ -830,8 +830,26 @@ void TFileAttachmentWidget::onAttachementTableSelectionChanged()
   ui->actionOpen->setEnabled(singleSelection);
   ui->actionSave->setEnabled(anySelection);
   ui->actionRename->setEnabled(singleSelection && EditMode);
-  ui->actionAddContact->setEnabled(singleSelection);
+
+  bool vCardVaild = false;
+  if (singleSelection  && !EditMode)
+  {
+    AAttachmentItem* item = selection.front();
+
+    QString fileName = item->GetDisplayedFileName();
+    QString extFile = ".vcf";
+    if (fileName.contains(extFile))
+    {
+      const TPhysicalAttachment *data = item->getContactData();
+      if (data != nullptr)
+      {
+        if (ContactvCard::isValid(data->body) )
+          vCardVaild = true;
+      }
+    }    
   }
+  ui->actionAddContact->setEnabled(vCardVaild);
+}
 
 void TFileAttachmentWidget::selectAllFiles()
 {

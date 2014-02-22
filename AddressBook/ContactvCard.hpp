@@ -13,6 +13,7 @@ public:
   ContactvCard();
   ContactvCard(QByteArray* vCardData);
   void getvCardData(const Contact* contact, QByteArray* vCardData);
+  static bool isValid(const std::vector<char>&);
 
   QString getFirstName();
   QString getLastName();

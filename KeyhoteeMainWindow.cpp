@@ -380,7 +380,7 @@ void KeyhoteeMainWindow::addContactfromvCard(const bts::addressbook::wallet_cont
   {
     ui->new_contact->setKHID (wallet_contact->dac_id_string.c_str());
     //stored key and calculated key should be the same
-    assert (public_key_string == ui->new_contact->getPublicKey());
+    //assert (public_key_string == ui->new_contact->getPublicKey());
   }
 }
 

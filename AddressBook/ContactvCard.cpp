@@ -58,3 +58,19 @@ QString ContactvCard::getPublicKey()
   QString value = name_prop.value();
   return value;
 }
+
+
+bool ContactvCard::isValid(const std::vector<char>& card)
+{
+  QByteArray bytes(card.data());
+
+  QList<QByteArray> lines = bytes.split(VC_END_LINE_TOKEN);
+  if (lines.size() >= 3)
+  {
+    if (lines.first() == VC_BEGIN_TOKEN &&
+        lines.at(1) == VC_VERSION_2_1_TOKEN)
+      return true;
+  }
+
+  return false;
+}

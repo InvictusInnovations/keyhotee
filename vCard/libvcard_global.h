@@ -29,6 +29,7 @@
 #define VC_END_LINE_TOKEN '\n'
 #define VC_BEGIN_TOKEN "BEGIN:VCARD"
 #define VC_END_TOKEN "END:VCARD"
+#define VC_VERSION_2_1_TOKEN "VERSION:2.1"
 
 enum vCardVersion
 {
