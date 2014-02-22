@@ -509,38 +509,8 @@ bool ContactView::doDataExchange (bool valid)
       ui->keyhotee_founder->setVisible(!_editing && _current_contact.isKeyhoteeFounder());
       //DLNFIX TODO: add check to see if we are synced on blockchain. If not synched,
       //             display "Keyhotee ledger not accessible"
+      checkKeyhoteeIdStatus();
       bool is_owner = _current_contact.isOwn();
-      if(is_owner)
-      {
-    #ifdef ALPHA_RELEASE
-        QString keyhotee_id = ui->khid_pubkey->getKeyhoteeID();
-        QString founder_code = _current_contact.notes.c_str();
-        display_founder_key_status(keyhotee_id,founder_code,ui->keyhoteeID_status);
-    #else
-        ui->mining_effort_slider->setValue( static_cast<int>(_current_contact.getMiningEffort()));
-        //if registered keyhoteeId
-        auto name_record = bts::application::instance()->lookup_name(_current_contact.dac_id_string);
-        if (name_record)
-        {
-          //  if keyhoteeId's public key matches ours.
-          if (name_record->active_key == _current_contact.public_key)
-          { //Registered to us
-            ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : green; color : black; }");
-            ui->keyhoteeID_status->setText(tr("Registered"));
-          }
-          else //Not Available (someone else owns it)
-          {
-            ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : red; color : black; }");
-            ui->keyhoteeID_status->setText(tr("Not Available"));
-          }
-        }
-        else //Unregistered (no one has it yet)
-        {
-          ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : yellow; color : black; }");
-          ui->keyhoteeID_status->setText(tr("Unregistered"));
-        }
-    #endif
-      }
       ui->keyhoteeID_status->setVisible(!_editing && is_owner);
       ui->authorization_status->setVisible(!_editing && !is_owner);
       ui->mining_effort->setVisible(is_owner);
@@ -565,12 +535,18 @@ bool ContactView::doDataExchange (bool valid)
   return true;
 }
 
-void ContactView::checkcontactstatus()
+void ContactView::checkKeyhoteeIdStatus()
 {
-    if (!gMiningIsPossible)
-      return;
-    auto name_record = bts::application::instance()->lookup_name(_current_contact.dac_id_string);
+  bool is_owner = _current_contact.isOwn();
+  if(is_owner)
+  {
+    #ifdef ALPHA_RELEASE
+        QString keyhotee_id = ui->khid_pubkey->getKeyhoteeID();
+        QString founder_code = _current_contact.notes.c_str();
+        display_founder_key_status(keyhotee_id,founder_code,ui->keyhoteeID_status);
+    #else
     ui->keyhotee_founder->setVisible(!_editing && _current_contact.isKeyhoteeFounder());
+    auto name_record = bts::application::instance()->lookup_name(_current_contact.dac_id_string);
     if (name_record)
       {
       //  if keyhoteeId's public key matches ours.
@@ -590,11 +566,10 @@ void ContactView::checkcontactstatus()
       ui->keyhoteeID_status->setStyleSheet("QLabel { background-color : yellow; color : black; }");
       ui->keyhoteeID_status->setText(tr("Unregistered"));
       }
-
-  // set authorization state
-  ui->authorization_status->setStyleSheet("QLabel { color : red; }");
-  ui->authorization_status->setText(tr("Unauthorized"));
+    #endif //!ALPHA_RELEASE
+  }
 }
+
 void ContactView::setEnabledSaveContact ()
 {
   save_contact->setEnabled(_validForm && isEditing() && isModyfied());
