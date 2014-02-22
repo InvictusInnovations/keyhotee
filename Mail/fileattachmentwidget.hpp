@@ -9,6 +9,8 @@
 #include <list>
 #include <utility>
 
+class Contact;
+
 namespace Ui {
 class TFileAttachmentWidget;
 }
@@ -51,6 +53,8 @@ class TFileAttachmentWidget : public QWidget
     bool hasAttachment();
     /// Add attachments files 
     void addFiles(const QStringList& files);
+    /// Add contact to attachment list
+    void addContactCard(const Contact* contact);
     
     /// Signal emitted when attachment list changes.
     Q_SIGNAL void attachmentListChanged();
@@ -102,6 +106,7 @@ class TFileAttachmentWidget : public QWidget
     void onRenameTriggered();
     void onAttachementTableSelectionChanged();
     void onPasteTriggered();
+    void onAddContactTriggered();
     void onClipboardChanged();    
     void onDropEvent(QStringList files);
 

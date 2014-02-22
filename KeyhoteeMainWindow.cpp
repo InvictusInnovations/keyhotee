@@ -366,6 +366,24 @@ void KeyhoteeMainWindow::addToContacts(const bts::addressbook::wallet_contact* w
   ui->new_contact->setPublicKey(public_key_string.c_str());
 }
 
+void KeyhoteeMainWindow::addContactfromvCard(const bts::addressbook::wallet_contact* wallet_contact, 
+                                             const QString& public_key_string)
+{
+  addContact();
+  ui->new_contact->setFirstName (wallet_contact->first_name.c_str());
+  ui->new_contact->setLastName (wallet_contact->last_name.c_str());
+  if (wallet_contact->dac_id_string.empty())
+  {
+    ui->new_contact->setPublicKey(public_key_string);
+  }
+  else
+  {
+    ui->new_contact->setKHID (wallet_contact->dac_id_string.c_str());
+    //stored key and calculated key should be the same
+    //assert (public_key_string == ui->new_contact->getPublicKey());
+  }
+}
+
 void KeyhoteeMainWindow::sideBarSplitterMoved(int pos, int index)
 {
   if (pos <= 5)
@@ -718,6 +736,21 @@ void KeyhoteeMainWindow::newMailMessageTo(const Contact& contact)
   IMailProcessor::TRecipientPublicKeys toList, emptyList;
   toList.push_back(contact.public_key);
   mailWindow->SetRecipientList(toList, emptyList, emptyList);
+  mailWindow->show();
+}
+
+void KeyhoteeMainWindow::shareContact(QList<const Contact*>& contacts)
+{
+  assert (contacts.size());
+
+  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
+    MailProcessor, true);
+
+  for(const Contact* contact : contacts)
+  {
+    mailWindow->addContactCard (contact);
+  }
+
   mailWindow->show();
 }
 
