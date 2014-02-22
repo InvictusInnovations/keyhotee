@@ -55,6 +55,7 @@
 #define VC_URL                  "URL"
 #define VC_VERSION              "VERSION"
 #define VC_KHID                 "X-KHID"
+#define VC_PUBLIC_KEY           "X-KEY"
 
 class vCardProperty
 {
@@ -123,6 +124,7 @@ public:
     static vCardProperty createName(const QString& firstname, const QString& lastname, const QString& additional = "", const QString& prefix = "", const QString& suffix = "", const vCardParamList& params = vCardParamList());
     static vCardProperty createOrganization(const QString& name, const QStringList& levels = QStringList(), const vCardParamList& params = vCardParamList());
     static vCardProperty createKHID(const QString& khID, const vCardParamList& params = vCardParamList());
+    static vCardProperty createPublicKey(const QString& publicKey, const vCardParamList& params = vCardParamList());
 };
 
 typedef QList<vCardProperty> vCardPropertyList;

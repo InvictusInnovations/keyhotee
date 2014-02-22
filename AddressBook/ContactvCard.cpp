@@ -1,8 +1,16 @@
 #include "ContactvCard.hpp"
+#include "public_key_address.hpp"
 
 ContactvCard::ContactvCard()
-{
-  
+{  
+}
+
+ContactvCard::ContactvCard(QByteArray* vCardData)
+{  
+  vCardList cards = vCard::fromByteArray(*vCardData);
+
+  assert (!cards.isEmpty());
+  _vcard = cards.takeFirst();
 }
 
  void ContactvCard::getvCardData(const Contact* contact, QByteArray* vCardData)
@@ -15,27 +23,38 @@ ContactvCard::ContactvCard()
   name_prop = vCardProperty::createKHID(contact->dac_id_string.c_str());
   vcard.addProperty(name_prop);
 
+  std::string public_key_string = public_key_address(contact->public_key);
+  name_prop = vCardProperty::createPublicKey(public_key_string.c_str());
+  vcard.addProperty(name_prop);
+
   *vCardData = vcard.toByteArray();  
+    
+}
 
+QString ContactvCard::getFirstName()
+{
+  vCardProperty name_prop = _vcard.property(VC_NAME);
+  QStringList values = name_prop.values();
+  return values.at(vCardProperty::Firstname);  
+}
 
-    // Imagine we've read a byte stream from a data source.
-  /*QByteArray in = output;
+QString ContactvCard::getLastName()
+{
+  vCardProperty name_prop = _vcard.property(VC_NAME);
+  QStringList values = name_prop.values();
+  return values.at(vCardProperty::Lastname);  
+}
 
-  // Now we can parse it...
-  QList<vCard> vcards = vCard::fromByteArray(in);
+QString ContactvCard::getKHID()
+{
+  vCardProperty name_prop = _vcard.property(VC_KHID);
+  QString value = name_prop.value();
+  return value;
+}
 
-  // ...and then we can use it.
-  if (!vcards.isEmpty())
-  {
-      vCard vcard = vcards.takeFirst();
-
-      vCardProperty name_prop = vcard.property(VC_NAME);
-//      if (name_prop.isValid())
-//      {
-          QStringList values = name_prop.values();
-
-          QString firstname = values.at(vCardProperty::Firstname);
-          QString lastname = values.at(vCardProperty::Lastname);
-//      }
-  }*/
+QString ContactvCard::getPublicKey()
+{
+  vCardProperty name_prop = _vcard.property(VC_PUBLIC_KEY);
+  QString value = name_prop.value();
+  return value;
 }

@@ -216,6 +216,14 @@ vCardProperty vCardProperty::createKHID(const QString& khID, const vCardParamLis
     return vCardProperty(VC_KHID, values, params);
 }
 
+vCardProperty vCardProperty::createPublicKey(const QString& publicKey, const vCardParamList& params)
+{
+    QStringList values;
+    values.append(publicKey);
+
+    return vCardProperty(VC_PUBLIC_KEY, values, params);
+}
+
 vCardProperty vCardProperty::createOrganization(const QString& name, const QStringList& levels, const vCardParamList& params)
 {
     QStringList values;

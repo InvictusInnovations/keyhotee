@@ -11,8 +11,14 @@ class ContactvCard
 {
 public:
   ContactvCard();
+  ContactvCard(QByteArray* vCardData);
   void getvCardData(const Contact* contact, QByteArray* vCardData);
 
+  QString getFirstName();
+  QString getLastName();
+  QString getKHID();
+  QString getPublicKey();
+
 private:
-  vCardList _vCards;
+  vCard _vcard;
 };

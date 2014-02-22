@@ -1,6 +1,7 @@
 #include "fileattachmentwidget.hpp"
 #include "qtreusable/TImage.hpp"
 #include "AddressBook/ContactvCard.hpp"
+#include "KeyhoteeMainWindow.hpp"
 
 #include "ui_fileattachmentwidget.h"
 
@@ -96,6 +97,10 @@ class TFileAttachmentWidget::AAttachmentItem : public QTableWidgetItem
         Returns status of save operation.
     */
     virtual TSaveStatus Save(QFile& target) const = 0;
+
+    /** Retrieves contact attachment data
+    */
+    virtual const TPhysicalAttachment* getContactData() const = 0;
 
     /** Retrieves file name being displayed. It can be different than real underlying file name when
         user rename the attachment.
@@ -343,6 +348,11 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
       return saveStatus;
       }
 
+    virtual const TPhysicalAttachment* getContactData() const override
+    {
+      return nullptr;
+    }
+
   /// QTableWidgetItem override.
     virtual TFileAttachmentItem* clone() const override
       {
@@ -419,6 +429,11 @@ class TFileAttachmentWidget::TVirtualAttachmentItem : public AAttachmentItem
 
       return saveStatus;
       }
+
+    virtual const TPhysicalAttachment* getContactData() const override
+    {
+      return &Data;
+    }
 
   /// QTableWidgetItem override.
     virtual TVirtualAttachmentItem* clone() const override
@@ -512,6 +527,14 @@ void TFileAttachmentWidget::ConfigureContextMenu()
   ui->attachmentTable->addAction(ui->actionOpen);
   ui->attachmentTable->addAction(ui->actionSave);
   ui->attachmentTable->addAction(sep);
+
+  if (EditMode == false)
+  {
+    ui->attachmentTable->addAction(ui->actionAddContact);
+    sep = new QAction(this);
+    sep->setSeparator(true);
+    ui->attachmentTable->addAction(sep);
+  }
 
   ui->attachmentTable->addAction(ui->actionAdd);
   ui->attachmentTable->addAction(ui->actionDel);
@@ -807,6 +830,7 @@ void TFileAttachmentWidget::onAttachementTableSelectionChanged()
   ui->actionOpen->setEnabled(singleSelection);
   ui->actionSave->setEnabled(anySelection);
   ui->actionRename->setEnabled(singleSelection && EditMode);
+  ui->actionAddContact->setEnabled(singleSelection);
   }
 
 void TFileAttachmentWidget::selectAllFiles()
@@ -873,7 +897,6 @@ void TFileAttachmentWidget::onDropEvent(QStringList files)
   addFiles( files );
 }
 
-
 void TFileAttachmentWidget::addContactCard(const Contact* contact)
 {
   bool sortEnabled = FreezeAttachmentTable();
@@ -901,4 +924,31 @@ void TFileAttachmentWidget::addContactCard(const Contact* contact)
 
   UpdateColumnHeaders();
   emit attachmentListChanged();
+}
+
+void TFileAttachmentWidget::onAddContactTriggered()
+{
+  TSelection selection;
+  RetrieveSelection(&selection);
+
+  assert(selection.size() == 1 &&
+    "Bad code in command update ui (onAttachementTableSelectionChanged)");
+
+  const AAttachmentItem* item = selection.front();
+  const TPhysicalAttachment *data = item->getContactData();
+  assert (data != nullptr);
+
+  QByteArray *vCardData = new QByteArray(data->body.data(), data->body.size());
+  ContactvCard converter(vCardData);
+
+  bts::addressbook::wallet_contact* walletContact = new bts::addressbook::wallet_contact();
+
+  walletContact->first_name = converter.getFirstName().toStdString();
+  walletContact->last_name = converter.getLastName().toStdString();
+  walletContact->dac_id_string = converter.getKHID().toStdString();
+  getKeyhoteeWindow()->addContactfromvCard(walletContact, converter.getPublicKey());
+  getKeyhoteeWindow()->activateMainWindow();
+
+  delete walletContact;
+  delete vCardData;
 }

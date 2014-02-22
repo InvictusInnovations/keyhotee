@@ -200,6 +200,11 @@ void ContactView::setPublicKey(const QString& public_key_string)
   setModyfied();
 }
 
+QString ContactView::getPublicKey() const
+{
+  return ui->public_key->text();
+}
+
 void ContactView::onSave()
 {
   try
@@ -817,3 +822,22 @@ void ContactView::onSend ()
   sendChatMessage();
   ui->chat_input->setFocus ();
   }
+
+void ContactView::setFirstName(const QString& name)
+{
+  ui->firstname->setText(name);
+  setModyfied();
+}
+
+void ContactView::setLastName(const QString& name)
+{
+  ui->lastname->setText(name);
+  setModyfied();
+}
+
+void ContactView::setKHID(const QString& name)
+{
+  ui->id_edit->setText(name);
+  keyhoteeIdEdited(name);
+  setModyfied();
+}
