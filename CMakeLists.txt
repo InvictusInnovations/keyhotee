@@ -208,8 +208,6 @@ set( sources
         AddressBook/keyhoteeidpubkeywidget.hpp
         AddressBook/keyhoteeidpubkeywidget.cpp
         AddressBook/authorization.ui
-        AddressBook/authorization.hpp
-        AddressBook/authorization.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp
@@ -301,6 +299,14 @@ set( sources
 
         MenuEditControl.hpp
         MenuEditControl.cpp
+
+        vCard/vcardproperty.h
+        vCard/vcardparam.h
+        vCard/vcard.h
+        vCard/libvcard_global.h
+        vCard/vcardproperty.cpp
+        vCard/vcardparam.cpp
+        vCard/vcard.cpp
 
         main.cpp )
 

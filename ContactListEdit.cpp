@@ -2,7 +2,6 @@
 
 #include "utils.hpp"
 
-//#include "AddressBook/Contact.hpp"
 #include "KeyhoteeMainWindow.hpp"
 #include "AddressBook/AddressBookModel.hpp"
 #include "utils.hpp"

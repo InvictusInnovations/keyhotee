@@ -119,7 +119,7 @@ ContactView::ContactView(QWidget* parent)
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
   chat_contact = new QAction( QIcon( ":/images/chat.png"), tr("Chat"), this);  
   edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png"), tr("Edit"), this);
-  share_contact = new QAction(QIcon(":/images/read-icon.png"), tr("Share (need new icon)"), this);
+  share_contact = new QAction(QIcon(":/images/128x128/contact_share.png"), tr("Share contact"), this);
   request_contact = new QAction( QIcon(":/images/128x128/contact_info_request_authorisation.png"), tr("Request authorisation"), this);
   save_contact = new QAction( QIcon(":/images/128x128/contact_info_save.png"), tr( "Save"), this );
   cancel_edit_contact = new QAction( QIcon(":/images/128x128/contact_info_cancel_edit.png"), tr("Discard changes"), this);
@@ -200,6 +200,11 @@ void ContactView::addNewContact ()
 void ContactView::setPublicKey(const QString& public_key_string)
 {
   ui->khid_pubkey->setPublicKey(public_key_string);
+}
+
+QString ContactView::getPublicKey() const
+{
+  return ui->public_key->text();
 }
 
 void ContactView::onSave()
@@ -285,7 +290,10 @@ void ContactView::onMail()
 
 void ContactView::onShareContact()
 {
-  QMessageBox::warning(this, tr("Warning"), tr("Not supported"));
+  QList<const Contact*> contacts;
+  contacts.push_back(&_current_contact);
+
+  getKeyhoteeWindow()->shareContact(contacts);
 }
 
 void ContactView::onRequestContact()
@@ -387,7 +395,7 @@ void ContactView::keyEdit(bool enable)
   send_mail->setEnabled(!enable);
   chat_contact->setEnabled(!enable);
   edit_contact->setEnabled(!enable);
-  share_contact->setEnabled(false);
+  share_contact->setEnabled(!enable);
   request_contact->setEnabled(!enable);
 
   ui->contact_pages->setTabEnabled(chat, !enable);
@@ -610,14 +618,12 @@ void ContactView::onSend ()
   ui->chat_input->setFocus ();
   }
 
-void ContactView::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)
 {
+  ui->firstname->setText(name);
   setModyfied();
+}
 
-  switch(state)
   {
-    case KeyhoteeIDPubKeyWidget::CurrentState::InvalidData:
-      setValid(false);
       break;
     case KeyhoteeIDPubKeyWidget::CurrentState::OkKeyhoteeID:
     case KeyhoteeIDPubKeyWidget::CurrentState::OkPubKey:
@@ -628,5 +634,11 @@ void ContactView::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)
     default:
       assert(false);
   }
+
+void ContactView::setKHID(const QString& name)
+{
+  ui->id_edit->setText(name);
+  keyhoteeIdEdited(name);
+  setModyfied();
 }
 

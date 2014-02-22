@@ -11,7 +11,6 @@
 #include "ch/ModificationsChecker.hpp"
 #include "ATopLevelWindowsContainer.hpp"
 
-#include <qtreewidget.h>
 
 namespace Ui { class KeyhoteeMainWindow; }
 
@@ -92,6 +91,7 @@ public:
   void newMailMessageTo(const Contact& contact);
   void addContact();
   void addToContacts(const bts::addressbook::wallet_contact* wallet_contact);
+  void addContactfromvCard(const bts::addressbook::wallet_contact* wallet_contact, const QString& public_key_string);
   void onSidebarSelectionChanged();
   void onSidebarDoubleClicked();
   void selectContactItem(QTreeWidgetItem* item);
@@ -116,6 +116,7 @@ public:
   void setEnabledMailActions(bool enable);
   void setMailSettings (MailSettings& mailSettings);  
   ContactsTable* getContactsPage();
+  void shareContact(QList<const Contact*>& contacts);
 
   AddressBookModel* getAddressBookModel() { return _addressbook_model; }
 
