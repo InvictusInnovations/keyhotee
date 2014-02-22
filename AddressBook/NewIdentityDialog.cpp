@@ -132,7 +132,7 @@ void display_founder_key_status(const QString& keyhotee_id, const QString& found
       }
       else
       {
-        status_label->setText( "Unregistered" );
+        status_label->setText( "Unregistered or failed to reach server" );
       }
    }
    catch ( ... )

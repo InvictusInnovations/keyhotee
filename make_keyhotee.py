@@ -2,7 +2,7 @@ import shutil
 import os
 import zipfile
 
-version = "0.5.3"
+version = "0.5.5"
 
 def zipdir(path, zip):
     for root, dirs, files in os.walk(path):

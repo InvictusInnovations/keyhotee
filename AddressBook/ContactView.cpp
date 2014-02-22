@@ -494,13 +494,13 @@ bool ContactView::doDataExchange (bool valid)
       ui->firstname->setText( _current_contact.first_name.c_str() );
       ui->lastname->setText( _current_contact.last_name.c_str() );
 
-      if(!_current_contact.dac_id_string.c_str() && gMiningIsPossible)
-        ui->khid_pubkey->setKeyhoteeID(_current_contact.dac_id_string.c_str());
-      else
-      {
-        std::string public_key_string = public_key_address( _current_contact.public_key );
-        ui->khid_pubkey->setPublicKey( public_key_string.c_str() );
-      }
+      //set public key from contact record initially
+      std::string public_key_string = public_key_address( _current_contact.public_key );
+      ui->khid_pubkey->setPublicKey( public_key_string.c_str() );
+      //set keyhoteeID from contact record, this may override public key from contact record
+      //if mining is enabled and ID is registered in blockchain
+      ui->khid_pubkey->setKeyhoteeID(_current_contact.dac_id_string.c_str());
+
       ui->icon_view->setIcon( _current_contact.getIcon() );
       ui->notes->setPlainText( _current_contact.notes.c_str() );
       //ui->email->setText( _current_contact.email_address );
@@ -567,6 +567,8 @@ bool ContactView::doDataExchange (bool valid)
 
 void ContactView::checkcontactstatus()
 {
+    if (!gMiningIsPossible)
+      return;
     auto name_record = bts::application::instance()->lookup_name(_current_contact.dac_id_string);
     ui->keyhotee_founder->setVisible(!_editing && _current_contact.isKeyhoteeFounder());
     if (name_record)

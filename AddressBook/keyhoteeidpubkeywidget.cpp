@@ -122,15 +122,17 @@ void KeyhoteeIDPubKeyWidget::publicKeyChanged(const QString& name)
 
 void KeyhoteeIDPubKeyWidget::keyhoteeIdEdited(const QString& keyhotee_id)
 {
-  _last_validate = fc::time_point::now();
-  ui->id_status->setText(tr("Looking up id...") );
-
-  fc::async( [ = ](){
-      fc::usleep(fc::microseconds(500 * 1000) );
-      if (fc::time_point::now() > (_last_validate + fc::microseconds(500 * 1000)))
-        lookupId();
-    }
-    );
+  if (gMiningIsPossible)
+  {
+    _last_validate = fc::time_point::now();
+    ui->id_status->setText(tr("Looking up id...") );
+    fc::async( [ = ](){
+        fc::usleep(fc::microseconds(500 * 1000) );
+        if (fc::time_point::now() > (_last_validate + fc::microseconds(500 * 1000)))
+          lookupId();
+      }
+      );
+  }
 }
 
 //implement real version and put in bitshares or fc (probably should be in fc) ***************
