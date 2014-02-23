@@ -11,6 +11,8 @@
 #include "ch/ModificationsChecker.hpp"
 #include "ATopLevelWindowsContainer.hpp"
 
+#include <qtreewidget.h>
+#include <QList>
 
 namespace Ui { class KeyhoteeMainWindow; }
 

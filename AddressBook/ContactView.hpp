@@ -36,7 +36,7 @@ public:
 
   bool isChatSelected();
   void sendChatMessage();
-  void checkKeyhoteeIdStatus();
+  void checkcontactstatus();
   void appendChatMessage(const QString& from, const QString& msg, const QDateTime& date_time = QDateTime::currentDateTime() );
   void setAddingNewContact(bool addNew);
   bool isAddingNewContact() const

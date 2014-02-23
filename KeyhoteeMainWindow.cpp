@@ -825,8 +825,7 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
     createContactGui(contact_id);
     contact_gui = getContactGui(contact_id);
   }
-  contact_gui->_view->checkKeyhoteeIdStatus();
-
+  contact_gui->_view->checkcontactstatus();
   contact_gui->_view->checkSendMailButton();
   if(nullptr != _currentMailbox)
     _currentMailbox->checksendmailbuttons();

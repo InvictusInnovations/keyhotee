@@ -208,6 +208,10 @@ set( sources
         AddressBook/keyhoteeidpubkeywidget.hpp
         AddressBook/keyhoteeidpubkeywidget.cpp
         AddressBook/authorization.ui
+        AddressBook/authorization.hpp
+        AddressBook/authorization.cpp
+        AddressBook/ContactvCard.hpp
+        AddressBook/ContactvCard.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp
