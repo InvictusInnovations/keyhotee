@@ -1,6 +1,6 @@
 #pragma once
 #include "Contact.hpp"
-#include "vcard/vcard.h"
+#include "vCard/vcard.h"
 
 #include <QList>
 
