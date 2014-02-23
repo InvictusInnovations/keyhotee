@@ -672,8 +672,12 @@ void ContactView::setLastName(const QString& name)
   setModyfied();
 }
 
-void ContactView::setKHID(const QString& khid)
+void ContactView::setKHID_or_PublicKey(const QString& khid, const QString& publicKey)
 {
-  ui->khid_pubkey->setKeyhoteeID(khid);
+  if(!ui->khid_pubkey->getKeyhoteeID().isEmpty() && gMiningIsPossible && !khid.isEmpty())
+    ui->khid_pubkey->setKeyhoteeID(khid);
+  else
+    ui->khid_pubkey->setPublicKey(publicKey);
+  
   setModyfied();
 }
