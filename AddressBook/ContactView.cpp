@@ -202,12 +202,6 @@ void ContactView::setPublicKey(const QString& public_key_string)
   ui->khid_pubkey->setPublicKey(public_key_string);
 }
 
-QString ContactView::getPublicKey() const
-{
-// FIXP return ui->public_key->text();
-  return "";
-}
-
 void ContactView::onSave()
 {
   try
@@ -668,19 +662,18 @@ void ContactView::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)
 
 void ContactView::setFirstName(const QString& name)
 {
-  //FIXP ui->firstname->setText(name);
+  ui->firstname->setText(name);
   setModyfied();
 }
 
 void ContactView::setLastName(const QString& name)
 {
-  //FIXP ui->lastname->setText(name);
+  ui->lastname->setText(name);
   setModyfied();
 }
 
-void ContactView::setKHID(const QString& name)
+void ContactView::setKHID(const QString& khid)
 {
-  //FIXP ui->id_edit->setText(name);
-  //keyhoteeIdEdited(name);
+  ui->khid_pubkey->setKeyhoteeID(khid);
   setModyfied();
 }

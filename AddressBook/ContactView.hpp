@@ -50,7 +50,6 @@ public:
   bool CheckSaving();
   void addNewContact ();
   void setPublicKey(const QString& public_key_string);
-  QString getPublicKey() const;
   void setFirstName(const QString& name);
   void setLastName(const QString& name);
   void setKHID(const QString& name);
