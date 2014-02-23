@@ -20,6 +20,10 @@ ContactvCard::ContactvCard(QByteArray* vCardData)
                                                       contact->last_name.c_str()); 
   vcard.addProperty(name_prop);
 
+  QString formattedName = contact->first_name.c_str() + QString(" ") + contact->last_name.c_str();
+  name_prop = vCardProperty::createdFormattedName(formattedName); 
+  vcard.addProperty(name_prop);
+
   name_prop = vCardProperty::createKHID(contact->dac_id_string.c_str());
   vcard.addProperty(name_prop);
 

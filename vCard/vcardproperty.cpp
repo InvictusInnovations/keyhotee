@@ -208,6 +208,14 @@ vCardProperty vCardProperty::createName(const QString& firstname, const QString&
     return vCardProperty(VC_NAME, values, params);
 }
 
+vCardProperty vCardProperty::createdFormattedName(const QString& name)
+{
+    QStringList values;
+    values.append(name);
+
+    return vCardProperty(VC_FORMATTED_NAME, values);
+}
+
 vCardProperty vCardProperty::createKHID(const QString& khID, const vCardParamList& params)
 {
     QStringList values;
