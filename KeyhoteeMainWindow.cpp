@@ -825,7 +825,12 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
     createContactGui(contact_id);
     contact_gui = getContactGui(contact_id);
   }
-  contact_gui->_view->checkcontactstatus();
+  //DLNFIX not too sure we're doing everything in this call that's necessary
+  // (or that this is the proper call to do it). Anywyas, this is quick fix
+  // by yuvaraj that should be replaced eventually once we get a proper
+  // signal emitted when registration occurs for a displayed KeyhoteeId.
+  contact_gui->_view->checkKeyhoteeIdStatus();
+
   contact_gui->_view->checkSendMailButton();
   if(nullptr != _currentMailbox)
     _currentMailbox->checksendmailbuttons();
