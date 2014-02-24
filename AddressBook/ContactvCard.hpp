@@ -11,9 +11,9 @@ class ContactvCard
 {
 public:
   ContactvCard();
-  ContactvCard(QByteArray* vCardData);
+  ContactvCard(const QByteArray& vCardData);
   void getvCardData(const Contact* contact, QByteArray* vCardData);
-  static bool isValid(const std::vector<char>&);
+  static bool isValid(const QByteArray& card);
 
   QString getFirstName();
   QString getLastName();
