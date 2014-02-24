@@ -3,6 +3,8 @@
 
 #include <QFrame>
 
+#include <utility>
+
 namespace Ui {
 class ConnectionStatusFrame;
 }
@@ -24,7 +26,10 @@ class TConnectionStatusFrame : public QFrame
     void updateConnectionStatus();
 
   private:
+    typedef std::pair<unsigned int, bool> TStatus;
     const IConnectionStatusDataSource& DataSource;
+    TStatus PrevStatus;
+
     Ui::ConnectionStatusFrame *ui;
   };
 
