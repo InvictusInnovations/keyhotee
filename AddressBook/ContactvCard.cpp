@@ -58,7 +58,7 @@ QString ContactvCard::getKHID()
 
 QString ContactvCard::getPublicKey()
 {
-  vCardProperty name_prop = _vcard.property(VC_PUBLIC_KEY);
+  vCardProperty name_prop = _vcard.property(VC_KH_PUBLIC_KEY);
   QString value = name_prop.value();
   return value;
 }
