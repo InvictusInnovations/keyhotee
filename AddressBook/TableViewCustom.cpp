@@ -12,7 +12,7 @@ TableViewCustom::~TableViewCustom(){}
 
 bool TableViewCustom::viewportEvent(QEvent *event)
   { 
-  //Don't change selection if you can't continue (data invalid or modyfied)
+  //Don't change selection if you can't continue (data invalid or modified)
   if (_modificationsChecker)
     {
     if (event->type() == QEvent::MouseButtonPress ||

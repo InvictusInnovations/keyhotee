@@ -14,7 +14,16 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
     <number>2</number>
    </property>
    <property name="spacing">
@@ -227,7 +236,9 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset theme="file-open"/>
+    <iconset theme="file-open">
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -252,6 +263,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionAddContact">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/add_user.png</normaloff>:/images/add_user.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add contact</string>
+   </property>
+   <property name="toolTip">
+    <string>Allows to add this contact to the contact list</string>
    </property>
   </action>
   <zorder>delButton</zorder>
@@ -398,6 +421,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionAddContact</sender>
+   <signal>triggered()</signal>
+   <receiver>TFileAttachmentWidget</receiver>
+   <slot>onAddContactTriggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>attachmentListChanged()</signal>
@@ -408,5 +447,6 @@
   <slot>onRenameTriggered()</slot>
   <slot>onOpenTriggered()</slot>
   <slot>onPasteTriggered()</slot>
+  <slot>onAddContactTriggered()</slot>
  </slots>
 </ui>

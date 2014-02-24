@@ -10,7 +10,6 @@ namespace Ui { class ContactView; }
 class AddressBookModel;
 class QToolBar;
 
-
 class ContactView : public QWidget
 {
   Q_OBJECT
@@ -21,7 +20,6 @@ public:
 
   void setAddressBook(AddressBookModel* address_book);
   AddressBookModel* getAddressBook() const;
-
   void setContact(const Contact& current_contact);
   Contact getContact() const;
 
@@ -36,20 +34,17 @@ public:
 
   bool isChatSelected();
   void sendChatMessage();
-  void checkcontactstatus();
+  void checkKeyhoteeIdStatus();
   void appendChatMessage(const QString& from, const QString& msg, const QDateTime& date_time = QDateTime::currentDateTime() );
   void setAddingNewContact(bool addNew);
-  bool isAddingNewContact() const
-    {
-    return _addingNewContact;
-    }
-  bool isEditing() const
-    {
-    return _editing;
-    }
+  bool isAddingNewContact() const { return _addingNewContact; }
+  bool isEditing() const { return _editing; }
   bool CheckSaving();
   void addNewContact ();
   void setPublicKey(const QString& public_key_string);
+  void setFirstName(const QString& name);
+  void setLastName(const QString& name);
+  void setKHID_or_PublicKey(const QString& khid, const QString& publicKey);
 
 Q_SIGNALS:
   void canceledNewContact();
@@ -60,57 +55,32 @@ public slots:
 private slots:
   void firstNameChanged(const QString& name);
   void lastNameChanged(const QString& name);
-
-  void emailChanged(const QString&)
-    {
-    setModyfied();
-    }
-
-  void phoneChanged(const QString&)
-    {
-    setModyfied();
-    }
-
-  void notesChanged()
-    {
-    setModyfied();
-    }
-
-  void privacyLevelChanged(int)
-    {
-    setModyfied();
-    }
-
+  void emailChanged(const QString&) { setModified(); }
+  void phoneChanged(const QString&) { setModified(); }
+  void notesChanged()               { setModified(); }
+  void privacyLevelChanged(int)     { setModified(); }
   void currentTabChanged(int index);
   void onSend ();
   void onTextChanged();
   void onSliderChanged(int mining_effort)
     {
     _current_contact.setMiningEffort(mining_effort);
-    setModyfied();
+    setModified();
     }
   void onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state);
-
 protected:
   bool eventFilter(QObject *obj, QEvent *event);
-
+  void contactEditable(bool enable);
 private:
-  void setModyfied(bool modyfied = true);
-  bool isModyfied() const
-    {
-    return _modyfied;
-    } 
+  void setModified(bool modified = true);
+  bool isModified() const { return _modified; } 
 
   void setValid(bool valid);
-  bool isValid() const
-    {
-    return _validForm;
-    }
+  bool isValid() const { return _validForm; }
 
   void onIconSearch();
   bool doDataExchange (bool valid);
-  void keyEdit(bool enable);  
-  void setEnabledSaveContact ();
+  void setEnabledSaveContact();
 
   fc::time_point                          _last_validate;
   Contact                                 _current_contact;
@@ -129,7 +99,8 @@ private:
   QAction*                                label_createContact;
   int static const                        _max_chat_char = 5000;
   bool                                    _addingNewContact;
-  bool                                    _modyfied;
+  bool                                    _modified;
   bool                                    _editing;
   bool                                    _validForm;
 };
+

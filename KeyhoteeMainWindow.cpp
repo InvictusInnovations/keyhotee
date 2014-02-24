@@ -390,6 +390,18 @@ void KeyhoteeMainWindow::addToContacts(const bts::addressbook::wallet_contact* w
   ui->new_contact->setPublicKey(public_key_string.c_str());
 }
 
+void KeyhoteeMainWindow::addContactfromvCard(const bts::addressbook::wallet_contact* wallet_contact, 
+                                             const QString& public_key_string)
+{
+  addContact();
+  ui->new_contact->setFirstName (wallet_contact->first_name.c_str());
+  ui->new_contact->setLastName (wallet_contact->last_name.c_str());
+
+  ui->new_contact->setKHID_or_PublicKey (wallet_contact->dac_id_string.c_str(), public_key_string);
+  //stored key and calculated key should be the same
+  //assert (public_key_string == ui->new_contact->getPublicKey());
+}
+
 void KeyhoteeMainWindow::sideBarSplitterMoved(int pos, int index)
 {
   if (pos <= 5)
@@ -760,6 +772,21 @@ void KeyhoteeMainWindow::newMailMessageTo(const Contact& contact)
   mailWindow->show();
 }
 
+void KeyhoteeMainWindow::shareContact(QList<const Contact*>& contacts)
+{
+  assert (contacts.size());
+
+  MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
+    MailProcessor, true);
+
+  for(const Contact* contact : contacts)
+  {
+    mailWindow->addContactCard (contact);
+  }
+
+  mailWindow->show();
+}
+
 ContactGui* KeyhoteeMainWindow::getContactGui(int contact_id)
 {
   auto itr = _contact_guis.find(contact_id);
@@ -792,7 +819,12 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
     createContactGui(contact_id);
     contact_gui = getContactGui(contact_id);
   }
-  contact_gui->_view->checkcontactstatus();
+  //DLNFIX not too sure we're doing everything in this call that's necessary
+  // (or that this is the proper call to do it). Anywyas, this is quick fix
+  // by yuvaraj that should be replaced eventually once we get a proper
+  // signal emitted when registration occurs for a displayed KeyhoteeId.
+  contact_gui->_view->checkKeyhoteeIdStatus();
+
   contact_gui->_view->checkSendMailButton();
   if(nullptr != _currentMailbox)
     _currentMailbox->checksendmailbuttons();

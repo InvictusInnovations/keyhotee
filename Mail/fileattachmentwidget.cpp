@@ -1,5 +1,7 @@
 #include "fileattachmentwidget.hpp"
 #include "qtreusable/TImage.hpp"
+#include "AddressBook/ContactvCard.hpp"
+#include "KeyhoteeMainWindow.hpp"
 
 #include "ui_fileattachmentwidget.h"
 
@@ -96,6 +98,10 @@ class TFileAttachmentWidget::AAttachmentItem : public QTableWidgetItem
     */
     virtual TSaveStatus Save(QFile& target) const = 0;
 
+    /** Retrieves contact attachment data
+    */
+    virtual const TPhysicalAttachment* getContactData() const = 0;
+
     /** Retrieves file name being displayed. It can be different than real underlying file name when
         user rename the attachment.
     */
@@ -181,7 +187,8 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
     /// Constructor to build item representing file name cell.
     TFileAttachmentItem(const QFileInfo& fileInfo, TFileAttachmentWidget* owner) :
       AAttachmentItem(fileInfo.fileName().toStdString().c_str(), owner, nullptr),
-      FileInfo(fileInfo)
+      FileInfo(fileInfo), 
+      _contactCardData(nullptr)
       {
       owner->TotalAttachmentSize += fileInfo.size();
 
@@ -195,12 +202,28 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
         setToolTip(image.toHtml() );
       }
 
+    /// Constructor to build item representing share contact cell.
+    TFileAttachmentItem(const QFileInfo& fileInfo, TFileAttachmentWidget* owner, QByteArray *vCardData) :
+      AAttachmentItem(fileInfo.fileName().toStdString().c_str(), owner, nullptr),
+      FileInfo(fileInfo),
+      _contactCardData(vCardData)
+      {
+        owner->TotalAttachmentSize += vCardData->size();
+
+        QString path = fileInfo.fileName();
+        setToolTip(path);
+      }
+
     /// Constructor to build file size cell.
     TFileAttachmentItem(TFileAttachmentItem* fileNameItem, const TScaledSize& scaledSize) :
       AAttachmentItem(fileNameItem, scaledSize),
-      FileInfo(fileNameItem->FileInfo) {}
+      FileInfo(fileNameItem->FileInfo),
+      _contactCardData(nullptr) {}
 
-    virtual ~TFileAttachmentItem() {}
+    virtual ~TFileAttachmentItem()
+    {
+      delete _contactCardData;
+    }
 
   /// AAttachmentItem class reimplementation:
     /// \see AAttachmentItem description.
@@ -220,37 +243,50 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
 
     /// \see AAttachmentItem description.
     virtual void Store(TAttachmentContainer* storage, TFileInfoList* failedFiles) const override
-      {
+    {
       assert(storage != nullptr);
       assert(failedFiles != nullptr);
 
       const QFileInfo& fileInfo = FileInfo;
 
-      QFile file(fileInfo.absoluteFilePath());
-      bool success = file.open(QIODevice::ReadOnly);
-      if(success)
-        {
+      if (_contactCardData != nullptr)
+      {
         storage->push_back(TPhysicalAttachment());
         TPhysicalAttachment& physicalAttachment = storage->back();
 
         physicalAttachment.filename = GetDisplayedFileName().toStdString();
-        qint64 fileSize = file.size();
+        qint64 fileSize = _contactCardData->size();
         physicalAttachment.body.resize(fileSize);
-        qint64 readLen = file.read(physicalAttachment.body.data(), fileSize);
-        file.close();
+        memcpy(physicalAttachment.body.data(), _contactCardData->data(), fileSize);
+      }
+      else
+      {
+        QFile file(fileInfo.absoluteFilePath());
+        bool success = file.open(QIODevice::ReadOnly);
+        if(success)
+        {
+          storage->push_back(TPhysicalAttachment());
+          TPhysicalAttachment& physicalAttachment = storage->back();
 
-        if(readLen != fileSize)
+          physicalAttachment.filename = GetDisplayedFileName().toStdString();
+          qint64 fileSize = file.size();
+          physicalAttachment.body.resize(fileSize);
+          qint64 readLen = file.read(physicalAttachment.body.data(), fileSize);
+          file.close();
+
+          if(readLen != fileSize)
           {
-          /// File read was incomplete. Mark it as failure and remove from physical attachment.
-          storage->pop_back();
-          failedFiles->push_back(fileInfo);
+            /// File read was incomplete. Mark it as failure and remove from physical attachment.
+            storage->pop_back();
+            failedFiles->push_back(fileInfo);
           }
         }
-      else
+        else
         {
-        failedFiles->push_back(fileInfo);
+          failedFiles->push_back(fileInfo);
         }
       }
+    }
     
     /// \see AAttachmentItem description.
     virtual TSaveStatus Save(QFile& target) const
@@ -312,6 +348,11 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
       return saveStatus;
       }
 
+    virtual const TPhysicalAttachment* getContactData() const override
+    {
+      return nullptr;
+    }
+
   /// QTableWidgetItem override.
     virtual TFileAttachmentItem* clone() const override
       {
@@ -327,7 +368,8 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
 
   /// Class attributes:
   private:
-    QFileInfo FileInfo;
+    QFileInfo   FileInfo;
+    QByteArray* _contactCardData;
   };
 
 /** Represents attachment item built from already existing mail message contents, for example
@@ -387,6 +429,11 @@ class TFileAttachmentWidget::TVirtualAttachmentItem : public AAttachmentItem
 
       return saveStatus;
       }
+
+    virtual const TPhysicalAttachment* getContactData() const override
+    {
+      return &Data;
+    }
 
   /// QTableWidgetItem override.
     virtual TVirtualAttachmentItem* clone() const override
@@ -480,6 +527,14 @@ void TFileAttachmentWidget::ConfigureContextMenu()
   ui->attachmentTable->addAction(ui->actionOpen);
   ui->attachmentTable->addAction(ui->actionSave);
   ui->attachmentTable->addAction(sep);
+
+  if (EditMode == false)
+  {
+    ui->attachmentTable->addAction(ui->actionAddContact);
+    sep = new QAction(this);
+    sep->setSeparator(true);
+    ui->attachmentTable->addAction(sep);
+  }
 
   ui->attachmentTable->addAction(ui->actionAdd);
   ui->attachmentTable->addAction(ui->actionDel);
@@ -762,7 +817,7 @@ void TFileAttachmentWidget::onRenameTriggered()
   }
 
 void TFileAttachmentWidget::onAttachementTableSelectionChanged()
-  {
+{
   TSelection selection;
   RetrieveSelection(&selection);
 
@@ -775,7 +830,26 @@ void TFileAttachmentWidget::onAttachementTableSelectionChanged()
   ui->actionOpen->setEnabled(singleSelection);
   ui->actionSave->setEnabled(anySelection);
   ui->actionRename->setEnabled(singleSelection && EditMode);
+
+  bool vCardVaild = false;
+  if (singleSelection  && !EditMode)
+  {
+    AAttachmentItem* item = selection.front();
+
+    QString fileName = item->GetDisplayedFileName();
+    QString extFile = ".vcf";
+    if (fileName.contains(extFile))
+    {
+      const TPhysicalAttachment *data = item->getContactData();
+      if (data != nullptr)
+      {
+        if (ContactvCard::isValid(data->body) )
+          vCardVaild = true;
+      }
+    }    
   }
+  ui->actionAddContact->setEnabled(vCardVaild);
+}
 
 void TFileAttachmentWidget::selectAllFiles()
 {
@@ -839,4 +913,60 @@ void TFileAttachmentWidget::onClipboardChanged()
 void TFileAttachmentWidget::onDropEvent(QStringList files)
 {
   addFiles( files );
+}
+
+void TFileAttachmentWidget::addContactCard(const Contact* contact)
+{
+  bool sortEnabled = FreezeAttachmentTable();
+
+  QString displayName = contact->get_display_name().c_str() + QString(".vcf");
+  //replace illegal characters in the file
+  displayName.replace("<", "(");
+  displayName.replace(">", ")");
+  QFileInfo fileInfo(displayName);
+  //delete object in the TFileAttachmentItem destructor
+  QByteArray* vCardData = new QByteArray();
+  ContactvCard converter;
+  converter.getvCardData(contact, vCardData);
+
+  AttachmentIndex.push_back(fileInfo);
+
+  TScaledSize scaledSize = ScaleAttachmentSize(vCardData->size());
+
+  /// Allocate objects representing table items - name item automatically will register in the list.
+  TFileAttachmentItem* fileNameItem = new TFileAttachmentItem(fileInfo, this, vCardData);
+  TFileAttachmentItem* fileSizeItem = new TFileAttachmentItem(fileNameItem, scaledSize);
+  AddAttachmentItems(fileNameItem, fileSizeItem);
+
+  UnFreezeAttachmentTable(sortEnabled);
+
+  UpdateColumnHeaders();
+  emit attachmentListChanged();
+}
+
+void TFileAttachmentWidget::onAddContactTriggered()
+{
+  TSelection selection;
+  RetrieveSelection(&selection);
+
+  assert(selection.size() == 1 &&
+    "Bad code in command update ui (onAttachementTableSelectionChanged)");
+
+  const AAttachmentItem* item = selection.front();
+  const TPhysicalAttachment *data = item->getContactData();
+  assert (data != nullptr);
+
+  QByteArray *vCardData = new QByteArray(data->body.data(), data->body.size());
+  ContactvCard converter(vCardData);
+
+  bts::addressbook::wallet_contact* walletContact = new bts::addressbook::wallet_contact();
+
+  walletContact->first_name = converter.getFirstName().toStdString();
+  walletContact->last_name = converter.getLastName().toStdString();
+  walletContact->dac_id_string = converter.getKHID().toStdString();
+  getKeyhoteeWindow()->addContactfromvCard(walletContact, converter.getPublicKey());
+  getKeyhoteeWindow()->activateMainWindow();
+
+  delete walletContact;
+  delete vCardData;
 }

@@ -40,7 +40,7 @@ macro(FillQtDependentLibraries)
     # put here all system libraries which have to be linked 
     LIST(APPEND "QT_DEPENDENCY_LIBRARIES" "imm32.lib" "winmm.lib")
   else(WIN32)
-    IF(UNIX)
+    IF(UNIX AND NOT APPLE)
       message(STATUS "Setting up additional QT Dependencies for Unix platform")
 
       find_library(QXcbStatic_LIBRARY xcb-static HINTS "${QT_LIB_DIR}/../plugins/platforms/xcb-static/")
@@ -67,7 +67,7 @@ macro(FillQtDependentLibraries)
       list (APPEND QT_DEPENDENCY_LIBRARIES "${GTK2_GLIB_LIBRARY_RELEASE}"
        "${GTK2_GOBJECT_LIBRARY_RELEASE}" "${GTK2_GTHREAD_LIBRARY_RELEASE}"
       )
-    ENDIF(UNIX)
+    ENDIF(UNIX AND NOT APPLE)
   ENDIF(WIN32)
 endmacro()
 
@@ -132,6 +132,10 @@ ENDIF("${INVICTUS_ROOT}" STREQUAL "")
 message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
 
 IF( APPLE )
+    SET(KH_STATIC_QT 0)
+
+    SET(CMAKE_CXX_FLAGS "-std=c++11")
+
     SET_SOURCE_FILES_PROPERTIES(
                                 "images/keyhotee.icns"
                                 PROPERTIES
@@ -210,6 +214,8 @@ set( sources
         AddressBook/authorization.ui
         AddressBook/authorization.hpp
         AddressBook/authorization.cpp
+        AddressBook/ContactvCard.hpp
+        AddressBook/ContactvCard.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp
@@ -301,6 +307,14 @@ set( sources
 
         MenuEditControl.hpp
         MenuEditControl.cpp
+
+        vCard/vcardproperty.h
+        vCard/vcardparam.h
+        vCard/vcard.h
+        vCard/libvcard_global.h
+        vCard/vcardproperty.cpp
+        vCard/vcardparam.cpp
+        vCard/vcard.cpp
 
         main.cpp )
 

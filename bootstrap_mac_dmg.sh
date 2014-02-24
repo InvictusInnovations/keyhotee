@@ -25,8 +25,12 @@ sudo xcodebuild -license
 
 ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
 
-brew install cmake boost qt5
-export QTDIR=/usr/local/Cellar/qt5/5.2.0
+brew install pkg-config cmake boost berkeley-db qt5
+
+brew tap homebrew/versions
+brew install openssl098 && brew link --force openssl098
+
+export QTDIR=/usr/local/Cellar/qt5/5.2.1
 
 
 ## git clone keyhotee and compile it
