@@ -54,8 +54,8 @@
 #define VC_TITLE                "TITLE"
 #define VC_URL                  "URL"
 #define VC_VERSION              "VERSION"
-#define VC_KHID                 "X-KHID"
-#define VC_PUBLIC_KEY           "X-KEY"
+#define VC_KHID                 "X-KEYHOTEE-ID"
+#define VC_KH_PUBLIC_KEY        "X-KEYHOTEE-PublicKey"
 
 class vCardProperty
 {
