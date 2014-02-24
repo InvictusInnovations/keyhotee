@@ -62,11 +62,7 @@ private slots:
   void currentTabChanged(int index);
   void onSend ();
   void onTextChanged();
-  void onSliderChanged(int mining_effort)
-    {
-    _current_contact.setMiningEffort(mining_effort);
-    setModified();
-    }
+  void onMiningEffortSliderChanged(int mining_effort);
   void onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state);
 protected:
   bool eventFilter(QObject *obj, QEvent *event);

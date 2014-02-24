@@ -163,7 +163,7 @@ ContactView::ContactView(QWidget* parent)
 
   connect(ui->contact_pages, &QTabWidget::currentChanged, this, &ContactView::currentTabChanged);
 
-  connect(ui->mining_effort_slider, &QSlider::valueChanged, this, &ContactView::onSliderChanged);
+  connect(ui->mining_effort_slider, &QSlider::valueChanged, this, &ContactView::onMiningEffortSliderChanged);
   connect(ui->khid_pubkey, &KeyhoteeIDPubKeyWidget::currentState, this, &ContactView::onStateWidget);
 
   contactEditable(false);
@@ -614,6 +614,14 @@ void ContactView::onSend ()
   {
   sendChatMessage();
   ui->chat_input->setFocus ();
+  }
+
+void ContactView::onMiningEffortSliderChanged(int mining_effort)
+  {
+  _current_contact.setMiningEffort(mining_effort);
+  //DLN right now this is set in identity object, not in contact, so it's immediate and
+  //non-cancelable edit, eventually we probably should somehow fix this.
+  setModified();
   }
 
 void ContactView::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)

@@ -42,12 +42,8 @@ public:
   QString getNotes() const;
   void setNotes(const QString& phone);
 
-  float getMiningEffort() const
-    {
-    return 50;  // expected range 0 - 100 
-    }
-
-  void setMiningEffort(float miningEffort){} // range from 0 to 100 %
+  float getMiningEffort() const;
+  void setMiningEffort(float miningEffort);
 
   bool operator<(const Contact& rhs) const { return wallet_index < rhs.wallet_index; }
 private:

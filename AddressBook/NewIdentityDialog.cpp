@@ -147,12 +147,6 @@ void NewIdentityDialog::onKey( const QString& key )
   display_founder_key_status(ui->username->text(), key, ui->status_label);
 }
 
-//#ifndef _DEBUG
-/// defined in CmakeLists.txt
-//#define ALPHA_RELEASE
- //Q&D hack: remove all references to this for real release
-//#endif
-
 void NewIdentityDialog::onSave()
 {
     //store new identity in profile
