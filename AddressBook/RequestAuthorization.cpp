@@ -44,16 +44,15 @@ void RequestAuthorization::onSend()
   bts::bitchat::private_contact_request_message request_msg;
   if (idents.size() )
   {
-    request_msg.from_name = idents[0].get_full_name();
-    request_msg.greeting_message = ui->message->toPlainText().toStdString();          // ************************************************
-    request_msg.from_channel = bts::network::channel_id(1);
+    //request_msg.from_first_name = idents[0].first_name;
+    //request_msg.from_last_name = idents[0].last_name;
+    //request_msg.from_keyhotee_id = "";
+    //request_msg.greeting_message = ui->message->toPlainText().toStdString();          // ************************************************
+    //request_msg.from_channel = bts::network::channel_id(1);
 
-    fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(idents[0].dac_id_string);
-    app->send_contact_request(ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);     // **************** !!!!!!!!! no request_msg
-    //appendChatMessage("me", msg);
+    //fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(idents[0].dac_id_string);
+    //app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);     // **************** !!!!!!!!! no request_msg
   }
-
-  //ui->chat_input->setPlainText(QString());
 }
 
 void RequestAuthorization::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)
