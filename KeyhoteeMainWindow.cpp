@@ -301,9 +301,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   for (size_t i = 0; i < idents.size(); ++i)
   {
      try {
-        app->mine_name(idents[i].dac_id_string,
-                       profile->get_keychain().get_identity_key(idents[i].dac_id_string).get_public_key(),
-                       idents[i].mining_effort);
+          app->mine_name(idents[i].dac_id_string,
+                         profile->get_keychain().get_identity_key(idents[i].dac_id_string).get_public_key(),
+                         idents[i].mining_effort);
      } 
      catch ( const fc::exception& e )
      {

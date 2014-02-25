@@ -91,10 +91,14 @@ float Contact::getMiningEffort() const
 
 void Contact::setMiningEffort(float mining_effort)
   { //Note: this edits identity, not contact object!
-  auto profile = bts::application::instance()->get_profile();
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
   auto cur_ident = profile->get_identity( dac_id_string );
   cur_ident.mining_effort = mining_effort;
   profile->store_identity(cur_ident);
+  app->mine_name(cur_ident.dac_id_string,
+                 profile->get_keychain().get_identity_key(cur_ident.dac_id_string).get_public_key(),
+                 cur_ident.mining_effort);
   }
 
 QString Contact::getLabel() const
