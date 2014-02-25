@@ -13,7 +13,9 @@ class TConnectionStatusDS : public IConnectionStatusDataSource
 
   /// IConnectionStatusDataSource interface implementation:
     /// \see IConnectionStatusDataSource interface description.
-    virtual unsigned int GetConnectionCount() const;
+    virtual unsigned int GetPeerConnectionCount() const override;
+    /// \see IConnectionStatusDataSource interface description.
+    virtual bool IsMailConnected() const override;
 
   private:
     std::shared_ptr<bts::application> App;

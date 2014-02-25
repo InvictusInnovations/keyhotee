@@ -113,8 +113,8 @@ public:
   void displayDiagnosticLog();
   void setEnabledAttachmentSaveOption(bool enable);
   void setEnabledDeleteOption( bool enable ) const;
-  void refreshDeleteContactOption() const;
-  void refreshEditMenu() const;
+  void setEnabledShareContactOption( bool enable ) const;
+  void refreshMenuOptions() const;
   void setEnabledMailActions(bool enable);
   void setMailSettings (MailSettings& mailSettings);  
   ContactsTable* getContactsPage();
@@ -183,6 +183,7 @@ private slots:
   // Contact
   void onSetIcon();
   void onRequestAuthorization();
+  void onShareContact();
   // Help
   void onDiagnostic();
   void onAbout();

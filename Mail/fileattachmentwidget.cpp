@@ -100,7 +100,7 @@ class TFileAttachmentWidget::AAttachmentItem : public QTableWidgetItem
 
     /** Retrieves contact attachment data
     */
-    virtual const TPhysicalAttachment* getContactData() const = 0;
+    virtual void getContactData(QByteArray& contactCardData) const = 0;
 
     /** Retrieves file name being displayed. It can be different than real underlying file name when
         user rename the attachment.
@@ -290,67 +290,89 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
     
     /// \see AAttachmentItem description.
     virtual TSaveStatus Save(QFile& target) const
-      {
-      QFileInfo targetFI(target);
-
-      if(FileInfo.isReadable() == false)
-        return TSaveStatus::READ_SOURCE_ERROR;
-
-      if(FileInfo == targetFI)
-        return TSaveStatus::SUCCESS;
-
-      QFile source(FileInfo.absoluteFilePath());
-
-      if(source.open(QFile::ReadOnly) == false)
-        return TSaveStatus::READ_SOURCE_ERROR;
-
-        /** We assume the user would like to overwrite specified target (it should be asked earlier
-            when selecting target file).
-        */
-      if(target.open(QFile::WriteOnly) == false)
-        {
-        source.close();
-        return TSaveStatus::WRITE_TARGET_ERROR;
-        }
-
-      qint64 sourceSize = source.size();
-      qint64 readSize = 0;
-
-      const size_t bufferSize = 4*1024*1024;
-      std::vector<char> buffer(bufferSize);
-
-      TSaveStatus saveStatus = TSaveStatus::SUCCESS;
-
-      do
-        {
-        qint64 toBeRead = sourceSize - readSize;
-        qint64 readBytes = source.read(buffer.data(), toBeRead > bufferSize ? bufferSize : toBeRead);
-        if(readBytes == -1)
-          {
-          saveStatus = TSaveStatus::READ_SOURCE_ERROR;
-          break;
-          }
-
-        qint64 writtenBytes = target.write(buffer.data(), readBytes);
-        if(readBytes != writtenBytes)
-          {
-          saveStatus = TSaveStatus::WRITE_TARGET_ERROR;
-          break;
-          }
-
-        readSize += readBytes;
-        }
-      while(sourceSize > readSize);
-
-      source.close();
-      target.close();
-
-      return saveStatus;
-      }
-
-    virtual const TPhysicalAttachment* getContactData() const override
     {
-      return nullptr;
+      QByteArray contactData;
+      if (TFileAttachmentWidget::isValidContactvCard(target.fileName(), this, contactData))
+      {
+        bool success = target.open(QFile::WriteOnly);
+        if(success == false)
+          return TSaveStatus::WRITE_TARGET_ERROR;
+
+        long long writtenBytes = target.write(contactData.data(), contactData.size());
+
+        TSaveStatus saveStatus = TSaveStatus::SUCCESS;
+
+        if(writtenBytes != contactData.size())
+          saveStatus = TSaveStatus::WRITE_TARGET_ERROR;
+
+        target.close();
+
+        return saveStatus;
+      }
+      else
+      {
+        QFileInfo targetFI(target);
+
+        if(FileInfo.isReadable() == false)
+          return TSaveStatus::READ_SOURCE_ERROR;
+
+        if(FileInfo == targetFI)
+          return TSaveStatus::SUCCESS;
+
+        QFile source(FileInfo.absoluteFilePath());
+
+        if(source.open(QFile::ReadOnly) == false)
+          return TSaveStatus::READ_SOURCE_ERROR;
+
+          /** We assume the user would like to overwrite specified target (it should be asked earlier
+              when selecting target file).
+          */
+        if(target.open(QFile::WriteOnly) == false)
+          {
+          source.close();
+          return TSaveStatus::WRITE_TARGET_ERROR;
+          }
+
+        qint64 sourceSize = source.size();
+        qint64 readSize = 0;
+
+        const size_t bufferSize = 4*1024*1024;
+        std::vector<char> buffer(bufferSize);
+
+        TSaveStatus saveStatus = TSaveStatus::SUCCESS;
+
+        do
+        {
+          qint64 toBeRead = sourceSize - readSize;
+          qint64 readBytes = source.read(buffer.data(), toBeRead > bufferSize ? bufferSize : toBeRead);
+          if(readBytes == -1)
+          {
+            saveStatus = TSaveStatus::READ_SOURCE_ERROR;
+            break;
+          }
+
+          qint64 writtenBytes = target.write(buffer.data(), readBytes);
+          if(readBytes != writtenBytes)
+          {
+            saveStatus = TSaveStatus::WRITE_TARGET_ERROR;
+            break;
+          }
+
+          readSize += readBytes;
+        }
+        while(sourceSize > readSize);
+
+        source.close();
+        target.close();
+
+        return saveStatus;
+      }
+    }
+
+    virtual void getContactData(QByteArray& contactCardData) const override
+    {
+      if (_contactCardData != nullptr)
+        contactCardData = *_contactCardData;
     }
 
   /// QTableWidgetItem override.
@@ -430,9 +452,9 @@ class TFileAttachmentWidget::TVirtualAttachmentItem : public AAttachmentItem
       return saveStatus;
       }
 
-    virtual const TPhysicalAttachment* getContactData() const override
+    virtual void getContactData(QByteArray& contactCardData) const override
     {
-      return &Data;
+      contactCardData.setRawData (Data.body.data(), Data.body.size());
     }
 
   /// QTableWidgetItem override.
@@ -828,27 +850,23 @@ void TFileAttachmentWidget::onAttachementTableSelectionChanged()
   ui->actionAdd->setEnabled(EditMode);
   ui->actionDel->setEnabled(anySelection && EditMode);
   ui->actionOpen->setEnabled(singleSelection);
-  ui->actionSave->setEnabled(anySelection);
-  ui->actionRename->setEnabled(singleSelection && EditMode);
+  ui->actionSave->setEnabled(anySelection);  
 
   bool vCardVaild = false;
-  if (singleSelection  && !EditMode)
+  if (singleSelection)
   {
     AAttachmentItem* item = selection.front();
-
     QString fileName = item->GetDisplayedFileName();
-    QString extFile = ".vcf";
-    if (fileName.contains(extFile))
+
+    QByteArray contactData;
+    if (TFileAttachmentWidget::isValidContactvCard(fileName, item, contactData))
     {
-      const TPhysicalAttachment *data = item->getContactData();
-      if (data != nullptr)
-      {
-        if (ContactvCard::isValid(data->body) )
-          vCardVaild = true;
-      }
+      vCardVaild = true;
     }    
   }
-  ui->actionAddContact->setEnabled(vCardVaild);
+
+  ui->actionAddContact->setEnabled(!EditMode && vCardVaild);
+  ui->actionRename->setEnabled(singleSelection && EditMode && !vCardVaild);
 }
 
 void TFileAttachmentWidget::selectAllFiles()
@@ -953,11 +971,12 @@ void TFileAttachmentWidget::onAddContactTriggered()
     "Bad code in command update ui (onAttachementTableSelectionChanged)");
 
   const AAttachmentItem* item = selection.front();
-  const TPhysicalAttachment *data = item->getContactData();
-  assert (data != nullptr);
 
-  QByteArray *vCardData = new QByteArray(data->body.data(), data->body.size());
-  ContactvCard converter(vCardData);
+  QByteArray contactData;
+  item->getContactData(contactData);
+  assert (contactData.size() > 0);
+
+  ContactvCard converter(contactData);
 
   bts::addressbook::wallet_contact* walletContact = new bts::addressbook::wallet_contact();
 
@@ -968,5 +987,18 @@ void TFileAttachmentWidget::onAddContactTriggered()
   getKeyhoteeWindow()->activateMainWindow();
 
   delete walletContact;
-  delete vCardData;
+}
+
+bool TFileAttachmentWidget::isValidContactvCard(QString fileName, const AAttachmentItem* item, QByteArray& contactData)
+{
+  QString extFile = ".vcf";
+  if (fileName.contains(extFile))
+  {
+    item->getContactData(contactData);
+    if (contactData.size() && ContactvCard::isValid(contactData))
+    {
+      return true;
+    }
+  }
+  return false;
 }

@@ -229,7 +229,7 @@ vCardProperty vCardProperty::createPublicKey(const QString& publicKey, const vCa
     QStringList values;
     values.append(publicKey);
 
-    return vCardProperty(VC_PUBLIC_KEY, values, params);
+    return vCardProperty(VC_KH_PUBLIC_KEY, values, params);
 }
 
 vCardProperty vCardProperty::createOrganization(const QString& name, const QStringList& levels, const vCardParamList& params)

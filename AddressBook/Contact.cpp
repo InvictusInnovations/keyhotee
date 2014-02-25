@@ -81,6 +81,26 @@ void Contact::setNotes(const QString& phone)
   notes = phone.toStdString();
   }
 
+// returns percentage between 0 - 100 
+float Contact::getMiningEffort() const
+  {
+  auto profile = bts::application::instance()->get_profile();
+  auto cur_ident = profile->get_identity( dac_id_string );
+  return cur_ident.mining_effort;
+  }
+
+void Contact::setMiningEffort(float mining_effort)
+  { //Note: this edits identity, not contact object!
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+  auto cur_ident = profile->get_identity( dac_id_string );
+  cur_ident.mining_effort = mining_effort;
+  profile->store_identity(cur_ident);
+  app->mine_name(cur_ident.dac_id_string,
+                 profile->get_keychain().get_identity_key(cur_ident.dac_id_string).get_public_key(),
+                 cur_ident.mining_effort);
+  }
+
 QString Contact::getLabel() const
   {
   QString label = (first_name + " " + last_name).c_str();

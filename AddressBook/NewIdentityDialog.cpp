@@ -147,12 +147,6 @@ void NewIdentityDialog::onKey( const QString& key )
   display_founder_key_status(ui->username->text(), key, ui->status_label);
 }
 
-//#ifndef _DEBUG
-/// defined in CmakeLists.txt
-//#define ALPHA_RELEASE
- //Q&D hack: remove all references to this for real release
-//#endif
-
 void NewIdentityDialog::onSave()
 {
     //store new identity in profile
@@ -190,7 +184,7 @@ void NewIdentityDialog::onSave()
     bts::addressbook::wallet_identity ident;
     ident.first_name = fc::trim( ui->firstname->text().toUtf8().constData() );
     ident.last_name = fc::trim( ui->lastname->text().toUtf8().constData() );
-    ident.mining_effort = ui->register_checkbox->isChecked();
+    ident.mining_effort = ui->register_checkbox->isChecked() ? 25.0 : 0.0;
     ident.wallet_ident = dac_id;
     ident.set_dac_id( dac_id );
     auto priv_key = profile->get_keychain().get_identity_key(dac_id);

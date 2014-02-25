@@ -6,21 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>75</width>
+    <width>100</width>
     <height>20</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>75</width>
+    <width>100</width>
     <height>20</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Frame</string>
-  </property>
-  <property name="toolTip">
-   <string>Number of active connections to bitshares network</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -40,11 +37,14 @@
   <widget class="QLabel" name="countLbl">
    <property name="geometry">
     <rect>
-     <x>19</x>
+     <x>45</x>
      <y>2</y>
      <width>55</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Number of active connections to bitshares network</string>
    </property>
    <property name="text">
     <string>0</string>
@@ -54,6 +54,34 @@
    </property>
   </widget>
   <widget class="QLabel" name="iconLbl">
+   <property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>2</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="toolTip">
+    <string>Bitshares network connection status</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="Keyhotee.qrc">:/images/16x16/no_connectionstatus.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="mailConnectionLbl">
    <property name="geometry">
     <rect>
      <x>3</x>
@@ -68,11 +96,14 @@
      <height>16</height>
     </size>
    </property>
+   <property name="toolTip">
+    <string>Mail server connection status</string>
+   </property>
    <property name="text">
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="Keyhotee.qrc">:/images/16x16/connectionstatus.png</pixmap>
+    <pixmap resource="Keyhotee.qrc">:/images/24x24/no_mailconnectionstatus.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>

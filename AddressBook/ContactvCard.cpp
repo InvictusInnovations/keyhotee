@@ -5,9 +5,9 @@ ContactvCard::ContactvCard()
 {  
 }
 
-ContactvCard::ContactvCard(QByteArray* vCardData)
+ContactvCard::ContactvCard(const QByteArray& vCardData)
 {  
-  vCardList cards = vCard::fromByteArray(*vCardData);
+  vCardList cards = vCard::fromByteArray(vCardData);
 
   assert (!cards.isEmpty());
   _vcard = cards.takeFirst();
@@ -58,17 +58,15 @@ QString ContactvCard::getKHID()
 
 QString ContactvCard::getPublicKey()
 {
-  vCardProperty name_prop = _vcard.property(VC_PUBLIC_KEY);
+  vCardProperty name_prop = _vcard.property(VC_KH_PUBLIC_KEY);
   QString value = name_prop.value();
   return value;
 }
 
 
-bool ContactvCard::isValid(const std::vector<char>& card)
+bool ContactvCard::isValid(const QByteArray& card)
 {
-  QByteArray bytes(card.data());
-
-  QList<QByteArray> lines = bytes.split(VC_END_LINE_TOKEN);
+  QList<QByteArray> lines = card.split(VC_END_LINE_TOKEN);
   if (lines.size() >= 3)
   {
     if (lines.first() == VC_BEGIN_TOKEN &&
