@@ -252,7 +252,6 @@ private:
   TMailProcessor                          MailProcessor;
   Mailbox*                                _currentMailbox;
   MenuEditControl*                        menuEdit;
-//  AuthorizationItem*                      _current_authorization_item;          **************************************
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();

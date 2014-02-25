@@ -276,7 +276,7 @@ bool KeyhoteeIDPubKeyWidget::existContactWithPublicKey (const std::string& publi
             ui->id_status->setStyleSheet("QLabel { color : red; }");
             return true;
           case ModeWidget::RequestAuthorization:
-            ui->id_status->setText( tr("This contact is already added to the list") );
+            ui->id_status->setText( tr("Public Key Only Mode: valid key") ); //tr("This contact is already added to the list") );
             ui->id_status->setStyleSheet("QLabel { color : green; }");
             emit currentState(IsStored);
             return true;
@@ -313,7 +313,7 @@ void KeyhoteeIDPubKeyWidget::setEditable(bool editable)
       ui->id_status->setVisible(editable);
       break;
     case ModeWidget::RequestAuthorization:
-      ui->keyhotee_id->setEnabled(true);
+      ui->keyhotee_id->setEnabled(editable && gMiningIsPossible);
       ui->keyhotee_id->setReadOnly(!editable);
       ui->public_key->setReadOnly(!editable);
       break;

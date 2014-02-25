@@ -1,6 +1,7 @@
 #include "authorization.hpp"
 #include "ui_authorization.h"
 
+#include <fc/reflect/variant.hpp>
 #include "public_key_address.hpp"
 #include "AddressBookModel.hpp"
 #include "Contact.hpp"
@@ -67,15 +68,21 @@ void Authorization::setAddressBook(AddressBookModel* addressbook)
 void Authorization::setMsg(const TDecryptedMessage& msg)
 {
   _msg = msg;
-  //ui->keyhoteeidpubkey->setKeyhoteeID(.......);
+  TRequestMessage  reqmsg = msg.as<TRequestMessage>();
+
   TPublicKey public_key = *_msg.from_key;
   std::string public_key_string = public_key_address(public_key.serialize());
   ui->keyhoteeidpubkey->setPublicKey(public_key_string.c_str());
-  ui->first_name->setText( "John" );
+  ui->keyhoteeidpubkey->setKeyhoteeID(reqmsg.from_keyhotee_id.c_str());
 
-  QDateTime dateTime;
-  dateTime.setTime_t(msg.sig_time.sec_since_epoch());
-  ui->last_name->setText(dateTime.toString(Qt::SystemLocaleShortDate));
+  ui->first_name->setText( reqmsg.from_first_name.c_str() );
+  ui->last_name->setText(reqmsg.from_last_name.c_str() );
+  
+  ui->check_box_chat->setChecked(reqmsg.request_param & 0x01);
+  ui->check_box_mail->setChecked(reqmsg.request_param>>1 & 0x01);
+  ui->extend_public_key->setChecked(reqmsg.request_param>>8 & 0x01);
+
+  ui->message->setText(reqmsg.greeting_message.c_str());
 }
 
 void Authorization::setOwnerItem(AuthorizationItem* item)

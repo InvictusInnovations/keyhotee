@@ -299,6 +299,7 @@ void ContactView::onRequestContact()
   else
     request->setPublicKey(ui->khid_pubkey->getPublicKeyText());
   request->enableAddContact(false);
+  request->setAddressBook(_address_book);
   request->show();
 }
 
@@ -334,6 +335,8 @@ void ContactView::checkSendMailButton()
 
     auto idents = profile->identities();
     send_mail->setEnabled(idents.size() > 0);
+
+    request_contact->setEnabled(idents.size() > 0 && !_current_contact.isOwn() && !isEditing());
 }
 
 void ContactView::setAddressBook(AddressBookModel* addressbook)
@@ -390,10 +393,8 @@ void ContactView::contactEditable(bool enable)
   send_mail->setEnabled(!enable);
   chat_contact->setEnabled(!enable);
   edit_contact->setEnabled(!enable);
-  share_contact->setEnabled(false);
-  request_contact->setEnabled(!enable);
   share_contact->setEnabled(!enable);
-  request_contact->setEnabled(!enable);
+  request_contact->setEnabled(!enable && !is_owner);
 
   ui->contact_pages->setTabEnabled(chat, !enable);
 
