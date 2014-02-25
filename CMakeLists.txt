@@ -376,6 +376,7 @@ target_include_directories(Keyhotee
 
 #Pass define to disable some GUI functionality (being in dev) only in release
 set_target_properties( Keyhotee PROPERTIES COMPILE_DEFINITIONS_RELEASE ALPHA_RELEASE )
+set_target_properties( Keyhotee PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO ALPHA_RELEASE )
 
 IF(KH_STATIC_QT EQUAL 1)
   target_compile_definitions(Keyhotee PRIVATE __STATIC_QT)
