@@ -4,12 +4,15 @@
 
 #include "ch/ModificationsChecker.hpp"
 
+#include <QList>
+
 namespace Ui { class ContactsTable; }
 
 class AddressBookModel;
 class QSortFilterProxyModel;
 class QItemSelection;
 class ContactView;
+class Contact;
 
 class ContactsTable  : public QWidget,
                        public IModificationsChecker
@@ -37,6 +40,7 @@ public:
   bool EscapeIfEditMode() const;
   QWidget* getContactsTableWidget () const;
   void copy();
+  void getSelectedContacts (QList<const Contact*>& contacts);
 
 private:
   ContactView* getCurrentView() const;
