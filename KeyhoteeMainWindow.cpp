@@ -719,8 +719,9 @@ void KeyhoteeMainWindow::onAbout()
   QString text;
   text = tr("<p align='center'><b>");
   text += windowTitle();
-  text += tr(" version ");
-  text += tr(APPLICATION_VERSION);
+/// Commented out to avoid difference against install package version.
+//  text += tr(" version ");
+//  text += tr(APPLICATION_VERSION);
   text += tr("</b><br/><br/>");
   /// Build tag: <a href="https://github.com/InvictusInnovations/keyhotee/commit/xxxx">xxxx</a>
   text += tr("keyhotee Built from revision: <a href=\"https://github.com/InvictusInnovations/keyhotee/commit/");
