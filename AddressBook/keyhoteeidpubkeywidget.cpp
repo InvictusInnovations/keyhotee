@@ -11,6 +11,33 @@
 
 extern bool gMiningIsPossible;
 
+bool isOwnedPublicKey(fc::ecc::public_key public_key)
+  {
+  bts::application_ptr app = bts::application::instance();
+  bts::profile_ptr     currentProfile = app->get_profile();
+  bts::keychain        keyChain = currentProfile->get_keychain();
+
+  typedef std::set<fc::ecc::public_key_data> TPublicKeyIndex;
+  try
+    {
+    //put all public keys owned by profile into a set
+    TPublicKeyIndex myPublicKeys;
+    for (const auto& id : currentProfile->identities())
+      {
+      auto myPublicKey = keyChain.get_identity_key(id.dac_id_string).get_public_key();
+      fc::ecc::public_key_data keyData = myPublicKey;
+      myPublicKeys.insert(keyData);
+      }
+    //check if we have a public key in our set matching the contact's public key
+    return myPublicKeys.find(public_key) != myPublicKeys.end();
+    }
+  catch (const fc::exception&)
+    {
+    return false;
+    }
+  }
+
+
 KeyhoteeIDPubKeyWidget::KeyhoteeIDPubKeyWidget(QWidget *parent) :
   QWidget(parent),
   ui(new Ui::KeyhoteeIDPubKeyWidget)
@@ -44,104 +71,11 @@ void KeyhoteeIDPubKeyWidget::setPublicKey(const QString& public_key_string)
   publicKeyEdited(public_key_string);
 }
 
-void KeyhoteeIDPubKeyWidget::keyhoteeIdChanged(const QString& /*name*/)
+void KeyhoteeIDPubKeyWidget::keyhoteeIdChanged(const QString& /*keyhotee_id*/)
 {
 }
 
-void KeyhoteeIDPubKeyWidget::publicKeyChanged(const QString& name)
-{
-}
-
-
-/*****************  Algorithm for handling keyhoteeId, keyhoteeeId status, and public key fields
-   Notes:
-   If gMiningIsPossible,
-   We can lookup a public key from a kehoteeId
-   We can validate a public key is registered,
-    but we can't lookup the associated keyhoteeId, only a hash of the keyhoteeId
-
-   Some choices in Display Status for id not found on block chain: Available, Unable to find, Not registered
-
- *** When creating new wallet_identity (this is for later implementation and some details may change):
-
-   Note: Public key field is not editable (only keyhotee-generated public keys are allowed as they must be tied to wallet)
-
-   If gMiningPossible,
-   Display Mining Effort combo box:
-    options: Let Expire, Renew Quarterly, Renew Monthly, Renew Weekly, Renew Daily, Max Effort
-
-   If keyhoteeId changed, lookup id and report status
-    Display status: Not Available (red), Available (black), Registered To Me (green), Registering (yellow)
-        (If keyhoteeId is not registered and mining effort is not 'Let Expire', then status is "Registering')
-    OR:
-    Display status: Registered (red), Not Registered (black), Registered To Me (green), Registering (yellow)
-        (If keyhoteeId is not registered and mining effort is not 'Let Expire', then status is "Registering')
-    Generate new public key based on keyhoteeId change and display it
-
-
-   If not gMiningPossible,
-   Hide Mining Effort combo box:
-
-   If keyhoteeId changed, just keep it
-    Generate new public key based on keyhoteeId change and display it
-
- *** When adding a contact:
-
-   If gMiningPossible,
-   If keyhoteeId changed, lookup id and report status
-    Display status: Registered (green), Unable to find (red)
-    if keyhoteeId registered in block chain, set public key field to display it
-    if keyhoteeId field not registered in block chain, clear public key field
-    enable save if valid public key or disable save
-
-   If public key changed, validate it
-    if public key is registered, change keyhotee field to ********
-    if public key is not registered, clear keyhotee id field
-    enable save if valid public key or disable save
-
-   If not gMiningPossible,
-   Disable keyhoteeId field
-   If public key changed, validate it
-    enable save if valid public key or disable save
-
- *** When editing a contact:
-
-   If gMiningPossible,
-   Public key is not editable
-   if keyhotee set, set as not editable
-   If keyhoteeId blank, lookup id and report status
-    Display status: Matches (green)
-                    Mismatch (red)
-   Doesn't save keyhoteeId on mismatch (i.e. field data isn't transferred to the contact record)
-
-   If not gMiningPossible,
-   Public key is not editable
-   KeyhoteeId is not editable
-
- */
-
-void KeyhoteeIDPubKeyWidget::keyhoteeIdEdited(const QString& keyhotee_id)
-{
-  if (gMiningIsPossible)
-  {
-    _last_validate = fc::time_point::now();
-    ui->id_status->setText(tr("Looking up id...") );
-    fc::async( [ = ](){
-        fc::usleep(fc::microseconds(500 * 1000) );
-        if (fc::time_point::now() > (_last_validate + fc::microseconds(500 * 1000)))
-          lookupId();
-      }
-      );
-  }
-}
-
-//implement real version and put in bitshares or fc (probably should be in fc) ***************
-bool is_registered_public_key_(std::string public_key_string)
-{
-  return false;  //(public_key_string == "invictus");
-}
-
-void KeyhoteeIDPubKeyWidget::publicKeyEdited(const QString& public_key_string)
+void KeyhoteeIDPubKeyWidget::publicKeyChanged(const QString& public_key_string)
 {
   ui->keyhotee_id->clear();  //clear keyhotee id field
   if (gMiningIsPossible)
@@ -185,6 +119,100 @@ void KeyhoteeIDPubKeyWidget::publicKeyEdited(const QString& public_key_string)
       ui->id_status->setStyleSheet("QLabel { color : red; }");
     }
   }
+
+}
+
+
+/*****************  Algorithm for handling keyhoteeId, keyhoteeeId status, and public key fields
+   Notes:
+   If gMiningIsPossible,
+   We can lookup a public key from a kehoteeId
+   We can validate a public key is registered,
+    but we can't lookup the associated keyhoteeId, only a hash of the keyhoteeId
+
+   Some choices in Display Status for id not found on block chain: Available, Unable to find, Not registered
+
+ *** When creating new wallet_identity:
+
+   Note: Public key field is not editable (only keyhotee-generated public keys are allowed as they must be tied to wallet)
+
+   If gMiningPossible,
+   Display Mining Effort combo box:
+    options: Let Expire, Renew Quarterly, Renew Monthly, Renew Weekly, Renew Daily, Max Effort
+
+   If keyhoteeId changed, lookup id and report status
+    Display status: Not Available (red), Available (black), Registered To Me (green), Registering (yellow)
+        (If keyhoteeId is not registered and mining effort is not 'Let Expire', then status is "Registering')
+    OR:
+    Display status: Registered (red), Not Registered (black), Registered To Me (green), Registering (yellow)
+        (If keyhoteeId is not registered and mining effort is not 'Let Expire', then status is "Registering')
+    Generate new public key based on keyhoteeId change and display it
+
+
+   If not gMiningPossible,
+     Grey out Mining Effort combo box:
+
+   If keyhoteeId changed, just keep it
+    Generate new public key based on keyhoteeId change and display it
+
+ *** When adding a contact:
+
+   If gMiningPossible,
+   If keyhoteeId changed, lookup id and report status
+    Display status: Registered (green), Unable to find (red)
+    if keyhoteeId registered in block chain, set public key field to display it
+    if keyhoteeId field not registered in block chain, clear public key field
+    enable save if valid public key or disable save
+
+   If public key changed, validate it
+    if public key is registered, change keyhotee field to ********
+    if public key is not registered, clear keyhotee id field
+    enable save if valid public key or disable save
+
+   If not gMiningPossible,
+   Disable keyhoteeId field
+   If public key changed, validate it
+    enable save if valid public key or disable save
+
+ *** When editing a contact:
+
+   If gMiningPossible,
+   Public key is not editable
+   if keyhoteeId set, set as not editable
+   If keyhoteeId blank, lookup id and report status
+    Display status: Matches (green)
+                    Mismatch (red)
+   Doesn't save keyhoteeId on mismatch (i.e. field data isn't transferred to the contact record)
+
+   If not gMiningPossible,
+   Public key is not editable
+   KeyhoteeId is not editable
+
+ */
+
+void KeyhoteeIDPubKeyWidget::keyhoteeIdEdited(const QString& keyhotee_id)
+{
+  if (gMiningIsPossible)
+  {
+    _last_validate = fc::time_point::now();
+    ui->id_status->setText(tr("Looking up id...") );
+    fc::async( [ = ](){
+        fc::usleep(fc::microseconds(500 * 1000) );
+        if (fc::time_point::now() > (_last_validate + fc::microseconds(500 * 1000)))
+          lookupId();
+      }
+      );
+  }
+}
+
+//implement real version and put in bitshares or fc (probably should be in fc) ***************
+bool is_registered_public_key_(std::string public_key_string)
+{
+  return false;  //(public_key_string == "invictus");
+}
+
+void KeyhoteeIDPubKeyWidget::publicKeyEdited(const QString& public_key_string)
+{
 }
 
 void KeyhoteeIDPubKeyWidget::lookupId()

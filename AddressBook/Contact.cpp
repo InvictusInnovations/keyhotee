@@ -8,6 +8,8 @@
 /// QT headers
 #include <QBuffer>
 
+bool isOwnedPublicKey(fc::ecc::public_key public_key);
+
 const QIcon& Contact::getIcon() const
   {
   return icon;
@@ -111,28 +113,7 @@ QString Contact::getLabel() const
 
 bool Contact::isOwn() const
   {
-  bts::application_ptr app = bts::application::instance();
-  bts::profile_ptr     currentProfile = app->get_profile();
-  bts::keychain        keyChain = currentProfile->get_keychain();
-
-  typedef std::set<fc::ecc::public_key_data> TPublicKeyIndex;
-  try
-    {
-    //put all public keys owned by profile into a set
-    TPublicKeyIndex myPublicKeys;
-    for (const auto& id : currentProfile->identities())
-      {
-      auto myPublicKey = keyChain.get_identity_key(id.dac_id_string).get_public_key();
-      fc::ecc::public_key_data keyData = myPublicKey;
-      myPublicKeys.insert(keyData);
-      }
-    //check if we have a public key in our set matching the contact's public key
-    return myPublicKeys.find(public_key) != myPublicKeys.end();
-    }
-  catch (const fc::exception&)
-    {
-    return false;
-    }
+  return isOwnedPublicKey(public_key);
   }
 
 int Contact::getAge() const
