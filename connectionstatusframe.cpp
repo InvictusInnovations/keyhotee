@@ -13,6 +13,11 @@ TConnectionStatusFrame::TConnectionStatusFrame(const IConnectionStatusDataSource
   {
   ui->setupUi(this);
 
+  MailConnSourceTooltip = ui->mailConnectionLbl->toolTip();
+  PeerConnSourceTooltip = ui->iconLbl->toolTip();
+
+  updateConnectionStatus(true);
+
   QTimer* statusUpdateTimer = new QTimer(this);
   connect(statusUpdateTimer, SIGNAL(timeout()), this, SLOT(updateConnectionStatus()));
   statusUpdateTimer->start(2000); // update it every 2 seconds
@@ -25,6 +30,11 @@ TConnectionStatusFrame::~TConnectionStatusFrame()
 
 void TConnectionStatusFrame::updateConnectionStatus()
   {
+  updateConnectionStatus(false);
+  }
+
+void TConnectionStatusFrame::updateConnectionStatus(bool initialUpdate)
+  {
   const unsigned int tooltipShowTime = 1500; /// ms
 
   unsigned int count = DataSource.GetPeerConnectionCount();
@@ -35,16 +45,35 @@ void TConnectionStatusFrame::updateConnectionStatus()
   else
     ui->mailConnectionLbl->setPixmap(QPixmap(":/images/24x24/no_mailconnectionstatus.png"));
 
-  if(PrevStatus.second != isMailConnected)
+  QString txt;
+
+  if(PrevStatus.second != isMailConnected || initialUpdate)
     {
-    QString txt = isMailConnected ? tr("Connection to mailserver succeeded...") :
-      tr("Connection to mailserver has been lost...");
+    QString tooltip(MailConnSourceTooltip);
+
+    if(isMailConnected)
+      {
+      tooltip += " (<b>";
+      tooltip += tr("Connected");
+      tooltip += "</b>)";
+      txt = tr("Connection to mailserver succeeded...");
+      }
+    else
+      {
+      tooltip += " (<b>";
+      tooltip += tr("Disconnected");
+      tooltip += "</b>)";
+
+      txt = tr("Connection to mailserver has been lost...");
+      }
+
+    ui->mailConnectionLbl->setToolTip(tooltip);
 
     QPoint pos = ui->mailConnectionLbl->pos();
-    QToolTip::showText(mapToGlobal(pos), txt, this, QRect(), tooltipShowTime);
+    /// Don't pass here parent widget to avoid switching active window when tooltip appears
+    QToolTip::showText(mapToGlobal(pos), txt, nullptr, QRect(), tooltipShowTime);
     }
 
-  QString      txt;
   txt.setNum(count);
   ui->countLbl->setText(txt);
 
@@ -53,13 +82,32 @@ void TConnectionStatusFrame::updateConnectionStatus()
   else
     ui->iconLbl->setPixmap(QPixmap(":/images/16x16/no_connectionstatus.png"));
 
-  if(PrevStatus.first != count)
+  if(PrevStatus.first != count || initialUpdate)
     {
-    QString txt = PrevStatus.first == 0 ? tr("Connection to Bitshares network succeeded...") :
-      tr("Connection to Bitshares network has been lost...");
+    QString tooltip(PeerConnSourceTooltip);
+
+    if(PrevStatus.first == 0 && count != 0)
+      {
+      txt =  tr("Connection to Bitshares network succeeded...");
+
+      tooltip += " (<b>";
+      tooltip += tr("Connected");
+      tooltip += "</b>)";
+      }
+    else
+    if(count == 0)
+      {
+      txt = tr("Connection to Bitshares network has been lost...");
+      tooltip += " (<b>";
+      tooltip += tr("Disconnected");
+      tooltip += "</b>)";
+      }
+
+    ui->iconLbl->setToolTip(tooltip);
 
     QPoint pos = ui->iconLbl->pos();
-    QToolTip::showText(mapToGlobal(pos), txt, this, QRect(), tooltipShowTime);
+    /// Don't pass here parent widget to avoid switching active window when tooltip appears
+    QToolTip::showText(mapToGlobal(pos), txt, nullptr, QRect(), tooltipShowTime);
     }
 
   PrevStatus.first = count;

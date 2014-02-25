@@ -113,18 +113,22 @@ QString ContactListEdit::textUnderCursor() const
 
   int position_of_cursor = text_cursor.position();
 
-  if (! this->toPlainText().isEmpty())
+  QString text = toPlainText();
+
+  if (text.isEmpty() == false)
   {
-    do {
+    do
+      {
       text_cursor.movePosition ( QTextCursor::Left, QTextCursor::MoveAnchor);
       int pos_cursor = text_cursor.position();
-      QChar prev_char = this->toPlainText().at(pos_cursor);
+      QChar prev_char = text.at(pos_cursor);
       if (prev_char==QChar(QChar::ObjectReplacementCharacter))
         {
         text_cursor.movePosition ( QTextCursor::Right, QTextCursor::MoveAnchor);
         break;
         }
-    } while(text_cursor.position() != 0);
+      }
+    while(text_cursor.position() != 0);
   }
 
   text_cursor.setPosition(position_of_cursor, QTextCursor::KeepAnchor);
