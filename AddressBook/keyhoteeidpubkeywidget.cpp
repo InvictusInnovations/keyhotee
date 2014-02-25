@@ -77,49 +77,6 @@ void KeyhoteeIDPubKeyWidget::keyhoteeIdChanged(const QString& /*keyhotee_id*/)
 
 void KeyhoteeIDPubKeyWidget::publicKeyChanged(const QString& public_key_string)
 {
-  ui->keyhotee_id->clear();  //clear keyhotee id field
-  if (gMiningIsPossible)
-    lookupPublicKey();
-  //check for validly hashed public key and enable/disable save button accordingly
-  bool publicKeySemanticallyValid = false;
-  bool public_key_is_valid = public_key_address::is_valid(public_key_string.toStdString(), 
-                                                          &publicKeySemanticallyValid);
-
-  ui->public_key->setStyleSheet("QLineEdit { color : black; }");
-
-  bool doubleContact = false;
-  if (public_key_is_valid)
-  {
-    if (!publicKeySemanticallyValid)
-    {
-      ui->public_key->setStyleSheet("QLineEdit { color : red; }");
-      emit currentState(InvalidData);
-    }
-    else if (! (doubleContact = existContactWithPublicKey(public_key_string.toStdString())))
-    {
-      ui->id_status->setText(tr("Public Key Only Mode: valid key") );
-      ui->id_status->setStyleSheet("QLabel { color : green; }");
-      emit currentState(OkPubKey);
-    }
-  }
-  else
-  {
-    emit currentState(InvalidData);
-    if(public_key_string.isEmpty())
-    {
-      ui->id_status->setStyleSheet("QLabel { color : black; }");
-      if (gMiningIsPossible)
-        ui->id_status->setText(tr("Please provide a valid ID or public key") );
-      else
-        ui->id_status->setText(tr("Public Key Only Mode") );
-    }
-    else
-    {
-      ui->id_status->setText(tr("Public Key Only Mode: not a valid key") );
-      ui->id_status->setStyleSheet("QLabel { color : red; }");
-    }
-  }
-
 }
 
 
@@ -211,8 +168,52 @@ bool is_registered_public_key_(std::string public_key_string)
   return false;  //(public_key_string == "invictus");
 }
 
+//TODO decide whether this code and keyhoteeIdEdited can be moved to Changed versions instead
 void KeyhoteeIDPubKeyWidget::publicKeyEdited(const QString& public_key_string)
 {
+  ui->keyhotee_id->clear();  //clear keyhotee id field
+  if (gMiningIsPossible)
+    lookupPublicKey();
+  //check for validly hashed public key and enable/disable save button accordingly
+  bool publicKeySemanticallyValid = false;
+  bool public_key_is_valid = public_key_address::is_valid(public_key_string.toStdString(), 
+                                                          &publicKeySemanticallyValid);
+
+  ui->public_key->setStyleSheet("QLineEdit { color : black; }");
+
+  bool doubleContact = false;
+  if (public_key_is_valid)
+  {
+    if (!publicKeySemanticallyValid)
+    {
+      ui->public_key->setStyleSheet("QLineEdit { color : red; }");
+      emit currentState(InvalidData);
+    }
+    else if (! (doubleContact = existContactWithPublicKey(public_key_string.toStdString())))
+    {
+      ui->id_status->setText(tr("Public Key Only Mode: valid key") );
+      ui->id_status->setStyleSheet("QLabel { color : green; }");
+      emit currentState(OkPubKey);
+    }
+  }
+  else
+  {
+    emit currentState(InvalidData);
+    if(public_key_string.isEmpty())
+    {
+      ui->id_status->setStyleSheet("QLabel { color : black; }");
+      if (gMiningIsPossible)
+        ui->id_status->setText(tr("Please provide a valid ID or public key") );
+      else
+        ui->id_status->setText(tr("Public Key Only Mode") );
+    }
+    else
+    {
+      ui->id_status->setText(tr("Public Key Only Mode: not a valid key") );
+      ui->id_status->setStyleSheet("QLabel { color : red; }");
+    }
+  }
+
 }
 
 void KeyhoteeIDPubKeyWidget::lookupId()
