@@ -144,6 +144,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   setEnabledAttachmentSaveOption(false);
   setEnabledDeleteOption(false);
   setEnabledMailActions(false);
+  setEnabledShareContactOption(false);
 
   QString settings_file = "keyhotee_";
   settings_file.append(profileName);
@@ -217,6 +218,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   connect(ui->actionSet_Icon, &QAction::triggered, this, &KeyhoteeMainWindow::onSetIcon);
   connect(ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts);
   connect(ui->actionRequest_authorization, &QAction::triggered, this, &KeyhoteeMainWindow::onRequestAuthorization);
+  connect(ui->actionShare_contact, &QAction::triggered, this, &KeyhoteeMainWindow::onShareContact);
   // Help
   connect(ui->actionDiagnostic, &QAction::triggered, this, &KeyhoteeMainWindow::onDiagnostic);
   connect(ui->actionAbout, &QAction::triggered, this, &KeyhoteeMainWindow::onAbout);
@@ -481,6 +483,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     setEnabledDeleteOption (false);
     setEnabledAttachmentSaveOption(false);
     setEnabledMailActions(false);
+    setEnabledShareContactOption(false);
     _currentMailbox = nullptr;
     ui->actionShow_details->setEnabled(true);
 
@@ -498,7 +501,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);
 
-      refreshDeleteContactOption ();
+      refreshMenuOptions();
     }
     else if (selectedItem->type() == IdentityItem)
     {
@@ -514,7 +517,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);      
 
-      refreshDeleteContactOption ();
+      refreshMenuOptions();
     }
     else if(selectedItem == _requests_root)
     {
@@ -1173,6 +1176,7 @@ void KeyhoteeMainWindow::enableMenu(bool enable)
   ui->actionNew_Contact->setEnabled (enable);
   ui->actionShow_Contacts->setEnabled (enable);
   _search_edit->setEnabled (enable);  
+  setEnabledShareContactOption(enable);
 }
 
 void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
@@ -1217,8 +1221,13 @@ void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable ) const
   ui->actionDelete->setEnabled (enable);
   }
 
-void KeyhoteeMainWindow::refreshDeleteContactOption() const
+void KeyhoteeMainWindow::setEnabledShareContactOption( bool enable ) const
   {
+  ui->actionShare_contact->setEnabled (enable);
+  }
+
+void KeyhoteeMainWindow::refreshMenuOptions() const
+{
   bool isContactTableSelected = ui->contacts_page->isSelection();
   bool isContactTreeItemSelected = false;
 
@@ -1228,14 +1237,12 @@ void KeyhoteeMainWindow::refreshDeleteContactOption() const
     isContactTreeItemSelected =  (selectedItem->type() == ContactItem);
   }
 
-  setEnabledDeleteOption( isContactTableSelected || isContactTreeItemSelected );
-  }
+  bool enabled = isContactTableSelected || isContactTreeItemSelected;
 
-void KeyhoteeMainWindow::refreshEditMenu() const
-{
-  bool isContactTableSelected = ui->contacts_page->isSelection();
-  ui->actionCopy->setEnabled (isContactTableSelected);  
+  ui->actionCopy->setEnabled (enabled);  
   ui->actionCut->setEnabled (false);  
+  setEnabledDeleteOption(enabled);
+  setEnabledShareContactOption(enabled);
 }
 
 void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
@@ -1269,7 +1276,7 @@ void KeyhoteeMainWindow::onRemoveContact()
   else
     ui->contacts_page->onDeleteContact();
 
-  refreshDeleteContactOption ();
+  refreshMenuOptions();
   if(isIdentityPresent() == false ){
        ui->actionNew_Message->setEnabled(false);
        if(nullptr != _currentMailbox)
@@ -1320,4 +1327,12 @@ void KeyhoteeMainWindow::onFocusChanged(QWidget *old, QWidget *now)
 ContactsTable* KeyhoteeMainWindow::getContactsPage()
 {
     return ui->contacts_page;
+}
+
+void KeyhoteeMainWindow::onShareContact()
+{
+  QList<const Contact*> contacts;
+  ui->contacts_page->getSelectedContacts(contacts);
+  assert(contacts.size());
+  shareContact(contacts);
 }

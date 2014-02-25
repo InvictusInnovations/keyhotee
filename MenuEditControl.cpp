@@ -332,7 +332,7 @@ bool MenuEditControl::isSelected(QWidget* focused, bool& canCut) const
   //contact list
   if(focused == getKeyhoteeWindow()->getContactsPage()->getContactsTableWidget())
   {    
-    //enable/disable menu in the: void KeyhoteeMainWindow::refreshEditMenu() 
+    //enable/disable menu in the: void KeyhoteeMainWindow::refreshMenuOptions() 
     selectedText = true;     
   }
   else
