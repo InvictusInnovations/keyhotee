@@ -339,6 +339,7 @@ void ContactView::checkSendMailButton()
 void ContactView::setAddressBook(AddressBookModel* addressbook)
 {
   _address_book = addressbook;
+  ui->khid_pubkey->setAddressBook(addressbook);
 }
 
 AddressBookModel* ContactView::getAddressBook() const
