@@ -69,5 +69,7 @@
         <file>images/request_accept.png</file>
         <file>images/request_block.png</file>
         <file>images/request_deny.png</file>
+        <file>images/24x24/mailconnectionstatus.png</file>
+        <file>images/24x24/no_mailconnectionstatus.png</file>
     </qresource>
 </RCC>

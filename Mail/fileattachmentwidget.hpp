@@ -97,6 +97,7 @@ class TFileAttachmentWidget : public QWidget
     bool SaveAttachmentItem(const AAttachmentItem* iten, const QFileInfo& targetPath,
       bool checkForOverwrite);
     void RetrieveSelection(TSelection* storage) const;   
+    static bool isValidContactvCard(QString fileName, const AAttachmentItem* item, QByteArray& contactData);
 
   private slots:
     void onAddTriggered();
