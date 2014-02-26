@@ -298,7 +298,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   wlog("idents: ${idents}", ("idents", idents) );
 
   if(isIdentityPresent() == false )
+  {
       ui->actionNew_Message->setEnabled(false);
+      ui->actionRequest_authorization->setEnabled(false);
+  }
 
   for (size_t i = 0; i < idents.size(); ++i)
   {
@@ -672,6 +675,7 @@ void KeyhoteeMainWindow::enableNewMessageIcon()
 {
     if(isIdentityPresent() == true ) {
          ui->actionNew_Message->setEnabled(true);
+         ui->actionRequest_authorization->setEnabled(true);
          emit checkSendMailSignal();
          if(nullptr != _currentMailbox)
            _currentMailbox->checksendmailbuttons();
@@ -700,6 +704,7 @@ void KeyhoteeMainWindow::onSetIcon()
 void KeyhoteeMainWindow::onRequestAuthorization()
 {
   RequestAuthorization *request = new RequestAuthorization(this);
+  request->setAddressBook(_addressbook_model);
   request->show();
 }
 
@@ -1049,8 +1054,6 @@ void KeyhoteeMainWindow::setupStatusBar()
 
 void KeyhoteeMainWindow::received_text(const bts::bitchat::decrypted_message& msg)
 {
-  // received_request(msg);   // for testing 
-
   auto opt_contact = _addressbook->get_contact_by_public_key(*(msg.from_key) );
   if (!opt_contact)
   {
@@ -1076,6 +1079,7 @@ void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& m
 
 void KeyhoteeMainWindow::received_request( const bts::bitchat::decrypted_message& msg)
 {
+  //bts::get_profile()->get_request_db()->store_message(msg, nullptr);
   createAuthorizationItem(msg);
 }
 
@@ -1279,6 +1283,7 @@ void KeyhoteeMainWindow::onRemoveContact()
   refreshMenuOptions();
   if(isIdentityPresent() == false ){
        ui->actionNew_Message->setEnabled(false);
+       ui->actionRequest_authorization->setEnabled(false);
        if(nullptr != _currentMailbox)
          _currentMailbox->checksendmailbuttons();
        emit checkSendMailSignal();

@@ -49,7 +49,7 @@ private:
 public:
   ContactGui() {}
   ContactGui(QTreeWidgetItem* tree_item, ContactView* view)
-    : _tree_item(tree_item), _view(view), _unread_msg_count(0) {}
+    : _unread_msg_count(0), _tree_item(tree_item), _view(view) {}
 
   void updateTreeItemDisplay();
   void setUnreadMsgCount(unsigned int count);
@@ -74,7 +74,7 @@ private:
 public:
   AuthorizationItem() {}
   AuthorizationItem( Authorization* view, QTreeWidgetItem *parent, int type = 0)
-    : _view(view), QTreeWidgetItem(parent, type) {}
+    : QTreeWidgetItem(parent, type), _view(view) {}
   ~AuthorizationItem();
 
   void setFromKey(TPublicKey from_key) {_from_key = from_key;}
@@ -253,7 +253,6 @@ private:
   TMailProcessor                          MailProcessor;
   Mailbox*                                _currentMailbox;
   MenuEditControl*                        menuEdit;
-//  AuthorizationItem*                      _current_authorization_item;          **************************************
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();

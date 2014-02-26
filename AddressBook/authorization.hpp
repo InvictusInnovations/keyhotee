@@ -2,7 +2,6 @@
 #define AUTHORIZATION_H
 
 #include <QWidget>
-#include <bts/profile.hpp>
 #include "keyhoteeidpubkeywidget.hpp"
 
 namespace Ui {
@@ -40,8 +39,9 @@ private:
 
   void onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state);
 
-  typedef bts::bitchat::decrypted_message TDecryptedMessage;
-  typedef fc::ecc::public_key             TPublicKey;
+  typedef bts::bitchat::decrypted_message               TDecryptedMessage;
+  typedef bts::bitchat::private_contact_request_message TRequestMessage;
+  typedef fc::ecc::public_key                           TPublicKey;
 
   Ui::Authorization *ui;
 
