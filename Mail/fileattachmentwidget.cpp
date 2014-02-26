@@ -1,7 +1,7 @@
 #include "fileattachmentwidget.hpp"
+#include "KeyhoteeMainWindow.hpp"
 #include "qtreusable/TImage.hpp"
 #include "AddressBook/ContactvCard.hpp"
-#include "KeyhoteeMainWindow.hpp"
 
 #include "ui_fileattachmentwidget.h"
 
@@ -978,15 +978,9 @@ void TFileAttachmentWidget::onAddContactTriggered()
 
   ContactvCard converter(contactData);
 
-  bts::addressbook::wallet_contact* walletContact = new bts::addressbook::wallet_contact();
-
-  walletContact->first_name = converter.getFirstName().toStdString();
-  walletContact->last_name = converter.getLastName().toStdString();
-  walletContact->dac_id_string = converter.getKHID().toStdString();
-  getKeyhoteeWindow()->addContactfromvCard(walletContact, converter.getPublicKey());
+  getKeyhoteeWindow()->addContactfromvCard(converter.getFirstName(), converter.getLastName(), 
+                                           converter.getKHID(), converter.getPublicKey());
   getKeyhoteeWindow()->activateMainWindow();
-
-  delete walletContact;
 }
 
 bool TFileAttachmentWidget::isValidContactvCard(QString fileName, const AAttachmentItem* item, QByteArray& contactData)

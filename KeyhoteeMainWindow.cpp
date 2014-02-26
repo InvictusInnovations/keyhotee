@@ -5,22 +5,23 @@
 #include "connectionstatusframe.h"
 #include "diagnosticdialog.h"
 #include "GitSHA1.h"
-#include "BitShares/GitSHA2.h"
-#include "BitShares/fc/GitSHA3.h"
 #include "KeyhoteeApplication.hpp"
 #include "MenuEditControl.hpp"
 #include "public_key_address.hpp"
 
 #include "AddressBook/AddressBookModel.hpp"
-#include "AddressBook/NewIdentityDialog.hpp"
-#include "AddressBook/ContactView.hpp"
-#include "AddressBook/RequestAuthorization.hpp"
 #include "AddressBook/authorization.hpp"
+#include "AddressBook/ContactView.hpp"
+#include "AddressBook/NewIdentityDialog.hpp"
+#include "AddressBook/RequestAuthorization.hpp"
+
+#include "BitShares/GitSHA2.h"
+#include "BitShares/fc/GitSHA3.h"
+
+#include <bts/bitchat/bitchat_private_message.hpp>
 
 #include "Mail/MailboxModel.hpp"
 #include "Mail/maileditorwindow.hpp"
-
-#include <bts/bitchat/bitchat_private_message.hpp>
 
 #include <QPlainTextEdit>
 #include <QTableView>
@@ -395,14 +396,13 @@ void KeyhoteeMainWindow::addToContacts(const bts::addressbook::wallet_contact& w
   ui->new_contact->setPublicKey(public_key_string.c_str());
 }
 
-void KeyhoteeMainWindow::addContactfromvCard(const bts::addressbook::wallet_contact* wallet_contact, 
-                                             const QString& public_key_string)
+void KeyhoteeMainWindow::addContactfromvCard(const QString& firstName, const QString& lastName, 
+                                             const QString& khid, const QString& public_key_string)
 {
   addContact();
-  ui->new_contact->setFirstName (wallet_contact->first_name.c_str());
-  ui->new_contact->setLastName (wallet_contact->last_name.c_str());
-
-  ui->new_contact->setKHID_or_PublicKey (wallet_contact->dac_id_string.c_str(), public_key_string);
+  ui->new_contact->setFirstName (firstName);
+  ui->new_contact->setLastName (lastName);
+  ui->new_contact->setKHID_or_PublicKey (khid, public_key_string);
   //stored key and calculated key should be the same
   //assert (public_key_string == ui->new_contact->getPublicKey());
 }
