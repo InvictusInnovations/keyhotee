@@ -203,6 +203,8 @@ set( sources
         AddressBook/ContactView.cpp
         AddressBook/Contact.cpp
         AddressBook/Contact.hpp
+        AddressBook/ContactCompleterModel.hpp
+        AddressBook/ContactCompleterModel.cpp
         AddressBook/TableViewCustom.hpp
         AddressBook/TableViewCustom.cpp
         AddressBook/RequestAuthorization.ui
@@ -263,7 +265,7 @@ set( sources
         ContactListEdit.hpp
         ContactListEdit.cpp
 
-	GitSHA1.h
+        GitSHA1.h
 
         TreeWidgetCustom.hpp
         TreeWidgetCustom.cpp
@@ -277,7 +279,7 @@ set( sources
         ATopLevelWindow.hpp
         ATopLevelWindow.cpp
 
-	bitsharesguiprecomp.h
+        bitsharesguiprecomp.h
 
         diagnosticdialog.ui
         diagnosticdialog.h
@@ -294,7 +296,7 @@ set( sources
         wallets.hpp
         wallets.cpp
 
-	public_key_address.hpp
+        public_key_address.hpp
 
         dataaccessimpl.h
         dataaccessimpl.cpp

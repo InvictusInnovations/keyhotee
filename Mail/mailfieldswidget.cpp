@@ -29,8 +29,6 @@ MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, Address
   showBccControls(false);
   showCcControls(false);
   
-  QCompleter* completer = abModel.getContactCompleter();
-
   bool readOnly = editMode == false;
 
   ContactListEdit* recipientEdits[4];
@@ -42,7 +40,7 @@ MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, Address
   for(unsigned int i = 0; i < sizeof(recipientEdits)/sizeof(ContactListEdit*); ++i)
     {
     ContactListEdit* edit = recipientEdits[i];
-    edit->setCompleter(completer);
+    edit->setAddressBookModel(abModel);
     edit->setReadOnly(readOnly);
 
     connect(edit->document(), SIGNAL(contentsChanged()), this, SLOT(onRecipientListChanged()));

@@ -92,7 +92,7 @@ public:
   void newMailMessage();
   void newMailMessageTo(const Contact& contact);
   void addContact();
-  void addToContacts(const bts::addressbook::wallet_contact* wallet_contact);
+  void addToContacts(const bts::addressbook::wallet_contact& wallet_contact);
   void addContactfromvCard(const bts::addressbook::wallet_contact* wallet_contact, const QString& public_key_string);
   void onSidebarSelectionChanged();
   void onSidebarDoubleClicked();
@@ -105,9 +105,6 @@ public:
   ContactGui* createContactGuiIfNecessary(int contact_id);
   bool isSelectedContactGui(ContactGui* contactGui);
 
-  void openDraft(int draft_id);
-  void openMail(int message_id);
-  void openSent(int message_id);
   virtual bool canContinue() const;
 
   void displayDiagnosticLog();

@@ -383,10 +383,10 @@ void KeyhoteeMainWindow::addContact()
   }
 }
 
-void KeyhoteeMainWindow::addToContacts(const bts::addressbook::wallet_contact* wallet_contact)
+void KeyhoteeMainWindow::addToContacts(const bts::addressbook::wallet_contact& wallet_contact)
 {
   addContact();
-  std::string public_key_string = public_key_address(wallet_contact->public_key);
+  std::string public_key_string = public_key_address(wallet_contact.public_key);
   ui->new_contact->setPublicKey(public_key_string.c_str());
 }
 

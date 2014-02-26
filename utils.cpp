@@ -12,7 +12,7 @@ namespace Utils
 {
 
 QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFormatting,
-  bts::addressbook::contact* matchingContact /*= nullptr*/)
+  bts::addressbook::contact* matchingContact /*= nullptr*/, bool* isKnownContact /*= nullptr*/)
   {
   assert(pk.valid());
 
@@ -22,6 +22,8 @@ QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFo
     {
     if(matchingContact != nullptr)
       *matchingContact = *c;
+    if(isKnownContact != nullptr)
+      *isKnownContact = true;
 
     switch(contactFormatting)
       {
@@ -49,6 +51,8 @@ QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFo
         {
         if(matchingContact != nullptr)
           *matchingContact = identity;
+        if(isKnownContact != nullptr)
+          *isKnownContact = true;
 
         switch(contactFormatting)
           {
@@ -71,6 +75,10 @@ QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFo
       *matchingContact = bts::addressbook::wallet_contact();
       matchingContact->public_key = pk;
       }
+
+    if(isKnownContact != nullptr)
+      *isKnownContact = false;
+
 
     /// If code reached this point the publick key is unknown - lets display it as base58
     std::string public_key_string = public_key_address(pk);
@@ -128,6 +136,27 @@ QString lTrim(QString const& str)
     return QString(s + start, l);
 }
 
+void convertToASCII(const std::string& input, std::string* buffer)
+  {
+  assert(buffer != nullptr);
+  buffer->reserve(input.size());
+
+  for(const auto& c : input)
+    {
+    unsigned int cCode = c;
+    if(cCode > 0x7F)
+      {
+      /// Non ASCII character
+      char numBuffer[64];
+      sprintf(numBuffer, "_0x%X_", cCode);
+      buffer->append(numBuffer);
+      }
+    else
+      {
+      *buffer += c;
+      }
+    }
+  }
 
 
 } ///namespace Utils

@@ -1,20 +1,23 @@
 #include "ContactView.hpp"
 #include "ui_ContactView.h"
+
 #include "AddressBookModel.hpp"
+#include "Contact.hpp"
+#include "KeyhoteeMainWindow.hpp"
 #include "public_key_address.hpp"
 #include "RequestAuthorization.hpp"
 
-#include <KeyhoteeMainWindow.hpp>
 #include <bts/application.hpp>
 #include <bts/address.hpp>
 
 #include <fc/thread/thread.hpp>
 #include <fc/log/logger.hpp>
 
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QStandardPaths>
 #include <QToolBar>
 #include <QToolButton>
-#include <QMessageBox>
-#include <QFileDialog>
 
 extern bool gMiningIsPossible;
 
