@@ -14,6 +14,8 @@ public:
   explicit RequestAuthorization(QWidget *parent = 0);
   ~RequestAuthorization();
 
+  void setAddressBook(AddressBookModel* address_book);
+
   void setKeyhoteeID(const QString& name);
   void setPublicKey(const QString& name);
 
@@ -21,8 +23,11 @@ public:
 
 private:
   Ui::RequestAuthorization *ui;
+  AddressBookModel*         _address_book;
+
+  void fillSelectIdentities();
 
   void onSend();
+  void addAsNewContact();
   void onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state);
 };
-

@@ -75,7 +75,8 @@ private:
   bool isValid() const { return _validForm; }
 
   void onIconSearch();
-  bool doDataExchange (bool valid);
+  void ToDialog();
+  bool FromDialog();
   void setEnabledSaveContact();
 
   fc::time_point                          _last_validate;

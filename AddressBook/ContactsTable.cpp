@@ -92,9 +92,9 @@ void ContactsTable::onSelectionChanged (const QItemSelection &selected, const QI
     ui->contact_details_view->setCurrentWidget(ui->page_message);
     }
 
-  getKeyhoteeWindow()->refreshDeleteContactOption();
-  getKeyhoteeWindow()->refreshEditMenu();
+  getKeyhoteeWindow()->refreshMenuOptions();
   }
+
 
 void ContactsTable::onDeleteContact()
   {
@@ -305,5 +305,18 @@ void ContactsTable::copy()
   {
     QClipboard *clip = QApplication::clipboard();
     clip->setText (strContact);
+  }
+}
+
+
+void ContactsTable::getSelectedContacts (QList<const Contact*>& contacts)
+{
+  QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
+  QModelIndexList      indexes = selection_model->selectedRows();
+
+  for (auto idx : indexes)
+  {
+    QModelIndex mapped_index = _sorted_addressbook_model->mapToSource(idx);
+    contacts.push_back( &_addressbook_model->getContact(mapped_index) );
   }
 }

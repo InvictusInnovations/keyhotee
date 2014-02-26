@@ -179,7 +179,7 @@ ContactView::ContactView(QWidget* parent)
 void ContactView::onEdit()
 {
   setAddingNewContact(false);   //editing  
-  doDataExchange (false);
+  ToDialog();
   contactEditable(true);   //and set focus on the first field
   ui->contact_pages->setCurrentIndex(info);
   ui->info_stack->setCurrentWidget(ui->info_edit);
@@ -196,7 +196,7 @@ void ContactView::setAddingNewContact(bool addNew)
 
 void ContactView::addNewContact ()
 {  
-  doDataExchange (false);
+  ToDialog();
   contactEditable(true);
 }
 
@@ -209,7 +209,7 @@ void ContactView::onSave()
 {
   try
   {
-    if (doDataExchange (true))
+    if (FromDialog())
     {
       if (_current_record)
       {
@@ -254,7 +254,7 @@ void ContactView::onSave()
 void ContactView::onCancel()
 {
   setModified(false);
-  doDataExchange (false);
+  ToDialog();
   contactEditable(false);
   if (isAddingNewContact())
   {
@@ -302,6 +302,7 @@ void ContactView::onRequestContact()
   else
     request->setPublicKey(ui->khid_pubkey->getPublicKeyText());
   request->enableAddContact(false);
+  request->setAddressBook(_address_book);
   request->show();
 }
 
@@ -312,7 +313,7 @@ void ContactView::setContact(const Contact& current_contact)
 {
     _current_contact = current_contact;
     ui->khid_pubkey->setContact(_current_contact);
-    doDataExchange (false);
+    ToDialog();
 }
 
 Contact ContactView::getContact() const
@@ -337,11 +338,14 @@ void ContactView::checkSendMailButton()
 
     auto idents = profile->identities();
     send_mail->setEnabled(idents.size() > 0);
+
+    request_contact->setEnabled(idents.size() > 0 && !_current_contact.isOwn() && !isEditing());
 }
 
 void ContactView::setAddressBook(AddressBookModel* addressbook)
 {
   _address_book = addressbook;
+  ui->khid_pubkey->setAddressBook(addressbook);
 }
 
 AddressBookModel* ContactView::getAddressBook() const
@@ -393,10 +397,8 @@ void ContactView::contactEditable(bool enable)
   send_mail->setEnabled(!enable);
   chat_contact->setEnabled(!enable);
   edit_contact->setEnabled(!enable);
-  share_contact->setEnabled(false);
-  request_contact->setEnabled(!enable);
   share_contact->setEnabled(!enable);
-  request_contact->setEnabled(!enable);
+  request_contact->setEnabled(!enable && !is_owner);
 
   ui->contact_pages->setTabEnabled(chat, !enable);
 
@@ -470,65 +472,64 @@ void ContactView::onIconSearch()
   }
 }
 
-
-bool ContactView::doDataExchange (bool valid)
+void ContactView::ToDialog()
 {
-  if (! valid)
+  if (isAddingNewContact ()) 
   {
-    if (isAddingNewContact ()) 
-    {
-      setValid(false);
-      ui->firstname->setText("");
-      ui->lastname->setText("");
-      ui->khid_pubkey->setKeyhoteeID("");
-      ui->icon_view->setIcon( QIcon(":/images/user.png") );
-      ui->notes->setPlainText("");
-      ui->email->setText("");
-      ui->phone->setText("");
-      ui->khid_pubkey->setPublicKey("");
-      ui->privacy_comboBox->setCurrentIndex (0);
-      ui->contact_pages->setCurrentIndex(info);
-    }
-    else 
-    {
-      setValid(true);
-      /** TODO... restore this kind of check
-      if( _current_contact.bit_id_public_key != _current_contact.public_key  )
-      {
-        ui->id_status->setText(
-                   tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
-      }
-      */
-      ui->firstname->setText( _current_contact.first_name.c_str() );
-      ui->lastname->setText( _current_contact.last_name.c_str() );
-
-      //set public key from contact record initially
-      std::string public_key_string = public_key_address( _current_contact.public_key );
-      ui->khid_pubkey->setPublicKey( public_key_string.c_str() );
-      //set keyhoteeID from contact record, this may override public key from contact record
-      //if mining is enabled and ID is registered in blockchain
-      ui->khid_pubkey->setKeyhoteeID(_current_contact.dac_id_string.c_str());
-
-      ui->icon_view->setIcon( _current_contact.getIcon() );
-      ui->notes->setPlainText( _current_contact.notes.c_str() );
-      //ui->email->setText( _current_contact.email_address );
-      //ui->phone->setText( _current_contact.phone_number );
-      //privacy_comboBox
-      //DLNFIX TODO: add check to see if we are synced on blockchain. If not synched,
-      //             display "Keyhotee ledger not accessible"
-      checkKeyhoteeIdStatus();
-      bool is_owner = _current_contact.isOwn();
-      ui->keyhoteeID_status->setVisible(!_editing && is_owner);
-      ui->authorization_status->setVisible(!_editing && !is_owner);
-      ui->mining_effort->setVisible(is_owner);
-      ui->mining_effort_slider->setVisible(is_owner);
-      ui->mining_effort_slider->setDisabled(!_editing);
-      ui->mining_effort_label->setVisible(is_owner);
-      ui->mining_effort_label_2->setVisible(is_owner);
-    }
+    setValid(false);
+    ui->firstname->setText("");
+    ui->lastname->setText("");
+    ui->khid_pubkey->setKeyhoteeID("");
+    ui->icon_view->setIcon( QIcon(":/images/user.png") );
+    ui->notes->setPlainText("");
+    ui->email->setText("");
+    ui->phone->setText("");
+    ui->khid_pubkey->setPublicKey("");
+    ui->privacy_comboBox->setCurrentIndex (0);
+    ui->contact_pages->setCurrentIndex(info);
   }
-  else
+  else 
   {
+    setValid(true);
+    /** TODO... restore this kind of check
+    if( _current_contact.bit_id_public_key != _current_contact.public_key  )
+    {
+      ui->id_status->setText(
+                  tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
+    }
+    */
+    ui->firstname->setText( _current_contact.first_name.c_str() );
+    ui->lastname->setText( _current_contact.last_name.c_str() );
+
+    //set public key from contact record initially
+    std::string public_key_string = public_key_address( _current_contact.public_key );
+    ui->khid_pubkey->setPublicKey( public_key_string.c_str() );
+    //set keyhoteeID from contact record, this may override public key from contact record
+    //if mining is enabled and ID is registered in blockchain
+    ui->khid_pubkey->setKeyhoteeID(_current_contact.dac_id_string.c_str());
+
+    ui->icon_view->setIcon( _current_contact.getIcon() );
+    ui->notes->setPlainText( _current_contact.notes.c_str() );
+    //ui->email->setText( _current_contact.email_address );
+    //ui->phone->setText( _current_contact.phone_number );
+    //privacy_comboBox
+    //DLNFIX TODO: add check to see if we are synced on blockchain. If not synched,
+    //             display "Keyhotee ledger not accessible"
+    checkKeyhoteeIdStatus();
+    bool is_owner = _current_contact.isOwn();
+    ui->keyhoteeID_status->setVisible(!_editing && is_owner);
+    ui->authorization_status->setVisible(!_editing && !is_owner);
+    ui->mining_effort->setVisible(is_owner);
+    ui->mining_effort_slider->setVisible(is_owner);
+    ui->mining_effort_slider->setDisabled(!_editing);
+    ui->mining_effort_label->setVisible(is_owner);
+    ui->mining_effort_label_2->setVisible(is_owner);
+  }
+  setEnabledSaveContact();
+}
+
+bool ContactView::FromDialog()
+{
     _current_contact.first_name     = ui->firstname->text().toUtf8().constData();
     _current_contact.last_name      = ui->lastname->text().toUtf8().constData();
     _current_contact.dac_id_string  = ui->khid_pubkey->getKeyhoteeID().toUtf8().constData();
@@ -537,9 +538,8 @@ bool ContactView::doDataExchange (bool valid)
     //_current_contact.email_address = ui->email->text().toStdString();
     //_current_contact.phone_number = ui->phone->text().toStdString();
     //privacy_comboBox
-  }
-  setEnabledSaveContact ();
-  return true;
+    setEnabledSaveContact();
+    return true; //currently no way to have bad data, but original coding allowed it, so I've left this for now
 }
 
 void ContactView::checkKeyhoteeIdStatus()

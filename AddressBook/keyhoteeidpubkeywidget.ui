@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>681</width>
-    <height>71</height>
+    <height>78</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@
     <widget class="QLineEdit" name="keyhotee_id">
      <property name="font">
       <font>
-       <pointsize>13</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
     </widget>
@@ -60,7 +60,7 @@
     <widget class="QLineEdit" name="public_key">
      <property name="font">
       <font>
-       <pointsize>13</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
     </widget>

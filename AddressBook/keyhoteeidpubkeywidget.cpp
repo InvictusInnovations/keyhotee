@@ -11,6 +11,33 @@
 
 extern bool gMiningIsPossible;
 
+bool isOwnedPublicKey(fc::ecc::public_key public_key)
+  {
+  bts::application_ptr app = bts::application::instance();
+  bts::profile_ptr     currentProfile = app->get_profile();
+  bts::keychain        keyChain = currentProfile->get_keychain();
+
+  typedef std::set<fc::ecc::public_key_data> TPublicKeyIndex;
+  try
+    {
+    //put all public keys owned by profile into a set
+    TPublicKeyIndex myPublicKeys;
+    for (const auto& id : currentProfile->identities())
+      {
+      auto myPublicKey = keyChain.get_identity_key(id.dac_id_string).get_public_key();
+      fc::ecc::public_key_data keyData = myPublicKey;
+      myPublicKeys.insert(keyData);
+      }
+    //check if we have a public key in our set matching the contact's public key
+    return myPublicKeys.find(public_key) != myPublicKeys.end();
+    }
+  catch (const fc::exception&)
+    {
+    return false;
+    }
+  }
+
+
 KeyhoteeIDPubKeyWidget::KeyhoteeIDPubKeyWidget(QWidget *parent) :
   QWidget(parent),
   ui(new Ui::KeyhoteeIDPubKeyWidget)
@@ -44,11 +71,11 @@ void KeyhoteeIDPubKeyWidget::setPublicKey(const QString& public_key_string)
   publicKeyEdited(public_key_string);
 }
 
-void KeyhoteeIDPubKeyWidget::keyhoteeIdChanged(const QString& /*name*/)
+void KeyhoteeIDPubKeyWidget::keyhoteeIdChanged(const QString& /*keyhotee_id*/)
 {
 }
 
-void KeyhoteeIDPubKeyWidget::publicKeyChanged(const QString& name)
+void KeyhoteeIDPubKeyWidget::publicKeyChanged(const QString& public_key_string)
 {
 }
 
@@ -62,13 +89,15 @@ void KeyhoteeIDPubKeyWidget::publicKeyChanged(const QString& name)
 
    Some choices in Display Status for id not found on block chain: Available, Unable to find, Not registered
 
- *** When creating new wallet_identity (this is for later implementation and some details may change):
+ *** When creating new wallet_identity:
 
-   Note: Public key field is not editable (only keyhotee-generated public keys are allowed as they must be tied to wallet)
+   Note: Public key field is not editable 
+   (only keyhotee-generated public keys are allowed as they must be tied to wallet)
 
    If gMiningPossible,
    Display Mining Effort combo box:
-    options: Let Expire, Renew Quarterly, Renew Monthly, Renew Weekly, Renew Daily, Max Effort
+    options for later?: Let Expire, Renew Quarterly, Renew Monthly, Renew Weekly, Renew Daily, Max Effort
+    for now, use 0-100% slider
 
    If keyhoteeId changed, lookup id and report status
     Display status: Not Available (red), Available (black), Registered To Me (green), Registering (yellow)
@@ -80,10 +109,9 @@ void KeyhoteeIDPubKeyWidget::publicKeyChanged(const QString& name)
 
 
    If not gMiningPossible,
-   Hide Mining Effort combo box:
-
-   If keyhoteeId changed, just keep it
-    Generate new public key based on keyhoteeId change and display it
+     Grey out Mining Effort combo box:
+     If keyhoteeId changed, just keep it
+       Generate new public key based on keyhoteeId change and display it
 
  *** When adding a contact:
 
@@ -108,7 +136,7 @@ void KeyhoteeIDPubKeyWidget::publicKeyChanged(const QString& name)
 
    If gMiningPossible,
    Public key is not editable
-   if keyhotee set, set as not editable
+   if keyhoteeId set, set as not editable
    If keyhoteeId blank, lookup id and report status
     Display status: Matches (green)
                     Mismatch (red)
@@ -141,6 +169,7 @@ bool is_registered_public_key_(std::string public_key_string)
   return false;  //(public_key_string == "invictus");
 }
 
+//TODO decide whether this code and keyhoteeIdEdited can be moved to Changed versions instead
 void KeyhoteeIDPubKeyWidget::publicKeyEdited(const QString& public_key_string)
 {
   ui->keyhotee_id->clear();  //clear keyhotee id field
@@ -185,41 +214,51 @@ void KeyhoteeIDPubKeyWidget::publicKeyEdited(const QString& public_key_string)
       ui->id_status->setStyleSheet("QLabel { color : red; }");
     }
   }
+
 }
 
 void KeyhoteeIDPubKeyWidget::lookupId()
 {
   try
   {
-    std::string current_id = fc::trim(ui->keyhotee_id->text().toUtf8().constData());
-    emit currentState(InvalidData);
-    if (current_id.empty() )
-    {
-      ui->id_status->setText(QString() );
-      emit currentState(InvalidData);
-      return;
+    bool isOwn = _current_contact.isOwn();
+    if (isOwn)
+    { //if own identity, we don't change the public key!
+      //DLN add some code here to show status (once status shows in GUI)
     }
-    _current_record = bts::application::instance()->lookup_name(current_id);
-    if (_current_record)
-    {
-      ui->id_status->setStyleSheet("QLabel { color : green; }");
-      ui->id_status->setText(tr("Registered") );
-      std::string public_key_string = public_key_address(_current_record->active_key);
-      ui->public_key->setText(public_key_string.c_str() );
-      if (_address_book != nullptr)
+    else //regular contact (not identity)
+    { //all this code needs double checking and rethinking, but first lets get UI
+      //correct (right now id_status is replicated in ContactView as keyhoteeID_status!)
+      std::string current_id = fc::trim(ui->keyhotee_id->text().toUtf8().constData());
+      emit currentState(InvalidData);
+      if (current_id.empty() )
       {
-        if (! existContactWithPublicKey (public_key_string))
+        ui->id_status->setText(QString() );
+        emit currentState(InvalidData);
+        return;
+      }
+      _current_record = bts::application::instance()->lookup_name(current_id);
+      if (_current_record)
+      {
+        ui->id_status->setStyleSheet("QLabel { color : green; }");
+        ui->id_status->setText(tr("Registered") );
+        std::string public_key_string = public_key_address(_current_record->active_key);
+        ui->public_key->setText(public_key_string.c_str() );
+        if (_address_book != nullptr)
         {
-          emit currentState(OkKeyhoteeID);
+          if (! existContactWithPublicKey (public_key_string))
+          {
+            emit currentState(OkKeyhoteeID);
+          }
         }
       }
-    }
-    else
-    {
-      ui->id_status->setStyleSheet("QLabel { color : red; }");
-      ui->id_status->setText(tr("Unable to find ID") );
-      ui->public_key->setText(QString());
-      emit currentState(InvalidData);
+      else
+      {
+        ui->id_status->setStyleSheet("QLabel { color : red; }");
+        ui->id_status->setText(tr("Unregistered") );
+        ui->public_key->setText(QString());
+        emit currentState(InvalidData);
+      }
     }
   }
   catch (const fc::exception& e)
@@ -248,6 +287,12 @@ void KeyhoteeIDPubKeyWidget::setAddressBook(AddressBookModel* address_book)
 void KeyhoteeIDPubKeyWidget::setContact(const Contact& current_contact)
 {
     _current_contact = current_contact;
+    bool isOwner = _current_contact.isOwn();
+    //public key of identity is not directly editable
+    ui->keyhotee_id->setText( _current_contact.dac_id_string.c_str() );
+    std::string public_key_string = public_key_address(_current_contact.public_key.serialize());
+    ui->public_key->setText(public_key_string.c_str());
+    ui->public_key->setEnabled( !isOwner );
 }
 
 void KeyhoteeIDPubKeyWidget::onPublicKeyToClipboard()
@@ -276,7 +321,7 @@ bool KeyhoteeIDPubKeyWidget::existContactWithPublicKey (const std::string& publi
             ui->id_status->setStyleSheet("QLabel { color : red; }");
             return true;
           case ModeWidget::RequestAuthorization:
-            ui->id_status->setText( tr("This contact is already added to the list") );
+            ui->id_status->setText( tr("Public Key Only Mode: valid key") ); //tr("This contact is already added to the list") );
             ui->id_status->setStyleSheet("QLabel { color : green; }");
             emit currentState(IsStored);
             return true;
@@ -313,7 +358,7 @@ void KeyhoteeIDPubKeyWidget::setEditable(bool editable)
       ui->id_status->setVisible(editable);
       break;
     case ModeWidget::RequestAuthorization:
-      ui->keyhotee_id->setEnabled(true);
+      ui->keyhotee_id->setEnabled(editable && gMiningIsPossible);
       ui->keyhotee_id->setReadOnly(!editable);
       ui->public_key->setReadOnly(!editable);
       break;

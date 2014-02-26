@@ -144,6 +144,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   setEnabledAttachmentSaveOption(false);
   setEnabledDeleteOption(false);
   setEnabledMailActions(false);
+  setEnabledShareContactOption(false);
 
   QString settings_file = "keyhotee_";
   settings_file.append(profileName);
@@ -217,6 +218,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   connect(ui->actionSet_Icon, &QAction::triggered, this, &KeyhoteeMainWindow::onSetIcon);
   connect(ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts);
   connect(ui->actionRequest_authorization, &QAction::triggered, this, &KeyhoteeMainWindow::onRequestAuthorization);
+  connect(ui->actionShare_contact, &QAction::triggered, this, &KeyhoteeMainWindow::onShareContact);
   // Help
   connect(ui->actionDiagnostic, &QAction::triggered, this, &KeyhoteeMainWindow::onDiagnostic);
   connect(ui->actionAbout, &QAction::triggered, this, &KeyhoteeMainWindow::onAbout);
@@ -296,7 +298,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   wlog("idents: ${idents}", ("idents", idents) );
 
   if(isIdentityPresent() == false )
+  {
       ui->actionNew_Message->setEnabled(false);
+      ui->actionRequest_authorization->setEnabled(false);
+  }
 
   for (size_t i = 0; i < idents.size(); ++i)
   {
@@ -481,6 +486,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     setEnabledDeleteOption (false);
     setEnabledAttachmentSaveOption(false);
     setEnabledMailActions(false);
+    setEnabledShareContactOption(false);
     _currentMailbox = nullptr;
     ui->actionShow_details->setEnabled(true);
 
@@ -498,7 +504,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);
 
-      refreshDeleteContactOption ();
+      refreshMenuOptions();
     }
     else if (selectedItem->type() == IdentityItem)
     {
@@ -514,7 +520,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);      
 
-      refreshDeleteContactOption ();
+      refreshMenuOptions();
     }
     else if(selectedItem == _requests_root)
     {
@@ -669,6 +675,7 @@ void KeyhoteeMainWindow::enableNewMessageIcon()
 {
     if(isIdentityPresent() == true ) {
          ui->actionNew_Message->setEnabled(true);
+         ui->actionRequest_authorization->setEnabled(true);
          emit checkSendMailSignal();
          if(nullptr != _currentMailbox)
            _currentMailbox->checksendmailbuttons();
@@ -697,6 +704,7 @@ void KeyhoteeMainWindow::onSetIcon()
 void KeyhoteeMainWindow::onRequestAuthorization()
 {
   RequestAuthorization *request = new RequestAuthorization(this);
+  request->setAddressBook(_addressbook_model);
   request->show();
 }
 
@@ -1046,8 +1054,6 @@ void KeyhoteeMainWindow::setupStatusBar()
 
 void KeyhoteeMainWindow::received_text(const bts::bitchat::decrypted_message& msg)
 {
-  // received_request(msg);   // for testing 
-
   auto opt_contact = _addressbook->get_contact_by_public_key(*(msg.from_key) );
   if (!opt_contact)
   {
@@ -1073,6 +1079,7 @@ void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& m
 
 void KeyhoteeMainWindow::received_request( const bts::bitchat::decrypted_message& msg)
 {
+  //bts::get_profile()->get_request_db()->store_message(msg, nullptr);
   createAuthorizationItem(msg);
 }
 
@@ -1173,6 +1180,7 @@ void KeyhoteeMainWindow::enableMenu(bool enable)
   ui->actionNew_Contact->setEnabled (enable);
   ui->actionShow_Contacts->setEnabled (enable);
   _search_edit->setEnabled (enable);  
+  setEnabledShareContactOption(enable);
 }
 
 void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
@@ -1217,8 +1225,13 @@ void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable ) const
   ui->actionDelete->setEnabled (enable);
   }
 
-void KeyhoteeMainWindow::refreshDeleteContactOption() const
+void KeyhoteeMainWindow::setEnabledShareContactOption( bool enable ) const
   {
+  ui->actionShare_contact->setEnabled (enable);
+  }
+
+void KeyhoteeMainWindow::refreshMenuOptions() const
+{
   bool isContactTableSelected = ui->contacts_page->isSelection();
   bool isContactTreeItemSelected = false;
 
@@ -1228,14 +1241,12 @@ void KeyhoteeMainWindow::refreshDeleteContactOption() const
     isContactTreeItemSelected =  (selectedItem->type() == ContactItem);
   }
 
-  setEnabledDeleteOption( isContactTableSelected || isContactTreeItemSelected );
-  }
+  bool enabled = isContactTableSelected || isContactTreeItemSelected;
 
-void KeyhoteeMainWindow::refreshEditMenu() const
-{
-  bool isContactTableSelected = ui->contacts_page->isSelection();
-  ui->actionCopy->setEnabled (isContactTableSelected);  
+  ui->actionCopy->setEnabled (enabled);  
   ui->actionCut->setEnabled (false);  
+  setEnabledDeleteOption(enabled);
+  setEnabledShareContactOption(enabled);
 }
 
 void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
@@ -1269,9 +1280,10 @@ void KeyhoteeMainWindow::onRemoveContact()
   else
     ui->contacts_page->onDeleteContact();
 
-  refreshDeleteContactOption ();
+  refreshMenuOptions();
   if(isIdentityPresent() == false ){
        ui->actionNew_Message->setEnabled(false);
+       ui->actionRequest_authorization->setEnabled(false);
        if(nullptr != _currentMailbox)
          _currentMailbox->checksendmailbuttons();
        emit checkSendMailSignal();
@@ -1320,4 +1332,12 @@ void KeyhoteeMainWindow::onFocusChanged(QWidget *old, QWidget *now)
 ContactsTable* KeyhoteeMainWindow::getContactsPage()
 {
     return ui->contacts_page;
+}
+
+void KeyhoteeMainWindow::onShareContact()
+{
+  QList<const Contact*> contacts;
+  ui->contacts_page->getSelectedContacts(contacts);
+  assert(contacts.size());
+  shareContact(contacts);
 }
