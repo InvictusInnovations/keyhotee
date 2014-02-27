@@ -697,7 +697,7 @@
      <normaloff>:/images/128x128/contact_share.png</normaloff>:/images/128x128/contact_share.png</iconset>
    </property>
    <property name="text">
-    <string>Share contact</string>
+    <string>Share contact...</string>
    </property>
   </action>
  </widget>

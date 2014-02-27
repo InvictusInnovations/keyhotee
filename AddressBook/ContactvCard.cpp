@@ -1,4 +1,5 @@
 #include "ContactvCard.hpp"
+#include "Contact.hpp"
 #include "public_key_address.hpp"
 
 ContactvCard::ContactvCard()
@@ -13,52 +14,62 @@ ContactvCard::ContactvCard(const QByteArray& vCardData)
   _vcard = cards.takeFirst();
 }
 
- void ContactvCard::getvCardData(const Contact* contact, QByteArray* vCardData)
+void ContactvCard::getvCardData(const Contact& contact, QByteArray* vCardData)
 { 
   vCard vcard;
-  vCardProperty name_prop = vCardProperty::createName(contact->first_name.c_str(), 
-                                                      contact->last_name.c_str()); 
+  vCardProperty name_prop = vCardProperty::createName(contact.first_name.c_str(), 
+                                                      contact.last_name.c_str()); 
   vcard.addProperty(name_prop);
 
-  QString formattedName = contact->first_name.c_str() + QString(" ") + contact->last_name.c_str();
+  QString formattedName = contact.first_name.c_str() + QString(" ") + contact.last_name.c_str();
   name_prop = vCardProperty::createdFormattedName(formattedName); 
   vcard.addProperty(name_prop);
 
-  name_prop = vCardProperty::createKHID(contact->dac_id_string.c_str());
+  name_prop = vCardProperty::createKHID(contact.dac_id_string.c_str());
   vcard.addProperty(name_prop);
 
-  std::string public_key_string = public_key_address(contact->public_key);
+  std::string public_key_string = public_key_address(contact.public_key);
   name_prop = vCardProperty::createPublicKey(public_key_string.c_str());
+  vcard.addProperty(name_prop);
+
+  name_prop = vCardProperty::createNotes(contact.getNotes());
   vcard.addProperty(name_prop);
 
   *vCardData = vcard.toByteArray();  
     
 }
 
-QString ContactvCard::getFirstName()
+QString ContactvCard::getFirstName() const
 {
   vCardProperty name_prop = _vcard.property(VC_NAME);
   QStringList values = name_prop.values();
   return values.at(vCardProperty::Firstname);  
 }
 
-QString ContactvCard::getLastName()
+QString ContactvCard::getLastName() const
 {
   vCardProperty name_prop = _vcard.property(VC_NAME);
   QStringList values = name_prop.values();
   return values.at(vCardProperty::Lastname);  
 }
 
-QString ContactvCard::getKHID()
+QString ContactvCard::getKHID() const
 {
   vCardProperty name_prop = _vcard.property(VC_KHID);
   QString value = name_prop.value();
   return value;
 }
 
-QString ContactvCard::getPublicKey()
+QString ContactvCard::getPublicKey() const
 {
   vCardProperty name_prop = _vcard.property(VC_KH_PUBLIC_KEY);
+  QString value = name_prop.value();
+  return value;
+}
+
+QString ContactvCard::getNotes() const
+{
+  vCardProperty name_prop = _vcard.property(VC_NOTE);
   QString value = name_prop.value();
   return value;
 }

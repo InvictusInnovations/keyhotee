@@ -91,11 +91,6 @@ public:
         Longitude
     };
 
-protected:
-    QString m_name;
-    QStringList m_values;
-    vCardParamList m_params;
-
 public:
     vCardProperty();
     vCardProperty(const QString& name, const QString& value, const vCardParamList& params = vCardParamList());
@@ -126,6 +121,12 @@ public:
     static vCardProperty createOrganization(const QString& name, const QStringList& levels = QStringList(), const vCardParamList& params = vCardParamList());
     static vCardProperty createKHID(const QString& khID, const vCardParamList& params = vCardParamList());
     static vCardProperty createPublicKey(const QString& publicKey, const vCardParamList& params = vCardParamList());
+    static vCardProperty createNotes(const QString& name);
+
+protected:
+    QString m_name;
+    QStringList m_values;
+    vCardParamList m_params;
 };
 
 typedef QList<vCardProperty> vCardPropertyList;

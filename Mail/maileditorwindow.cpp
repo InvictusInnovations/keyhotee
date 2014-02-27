@@ -747,7 +747,7 @@ void MailEditorMainWindow::onAddAttachments(QStringList files)
   FileAttachment->addFiles( files );
 }
 
-void MailEditorMainWindow::addContactCard (const Contact* contact)
+void MailEditorMainWindow::addContactCard (const Contact& contact)
 {
   FileAttachment->addContactCard(contact);
   ui->fileAttachementToolBar->setVisible(true);

@@ -1,7 +1,10 @@
 #include "fileattachmentwidget.hpp"
 #include "KeyhoteeMainWindow.hpp"
+
 #include "qtreusable/TImage.hpp"
+
 #include "AddressBook/ContactvCard.hpp"
+#include "AddressBook/Contact.hpp"
 
 #include "ui_fileattachmentwidget.h"
 
@@ -933,11 +936,11 @@ void TFileAttachmentWidget::onDropEvent(QStringList files)
   addFiles( files );
 }
 
-void TFileAttachmentWidget::addContactCard(const Contact* contact)
+void TFileAttachmentWidget::addContactCard(const Contact& contact)
 {
   bool sortEnabled = FreezeAttachmentTable();
 
-  QString displayName = contact->get_display_name().c_str() + QString(".vcf");
+  QString displayName = contact.get_display_name().c_str() + QString(".vcf");
   //replace illegal characters in the file
   displayName.replace("<", "(");
   displayName.replace(">", ")");
@@ -945,7 +948,7 @@ void TFileAttachmentWidget::addContactCard(const Contact* contact)
   //delete object in the TFileAttachmentItem destructor
   QByteArray* vCardData = new QByteArray();
   ContactvCard converter;
-  converter.getvCardData(contact, vCardData);
+  converter.getvCardData(contact/*in*/, vCardData/*out*/);
 
   AttachmentIndex.push_back(fileInfo);
 
@@ -979,7 +982,8 @@ void TFileAttachmentWidget::onAddContactTriggered()
   ContactvCard converter(contactData);
 
   getKeyhoteeWindow()->addContactfromvCard(converter.getFirstName(), converter.getLastName(), 
-                                           converter.getKHID(), converter.getPublicKey());
+                                           converter.getKHID(), converter.getPublicKey(),
+                                           converter.getNotes());
   getKeyhoteeWindow()->activateMainWindow();
 }
 
