@@ -241,3 +241,10 @@ vCardProperty vCardProperty::createOrganization(const QString& name, const QStri
     return vCardProperty(VC_ORGANIZATION, values, params);
 }
 
+vCardProperty vCardProperty::createNotes(const QString& notes)
+{
+    QStringList values;
+    values.append(notes);
+
+    return vCardProperty(VC_NOTE, values);
+}

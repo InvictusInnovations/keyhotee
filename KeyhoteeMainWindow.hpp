@@ -93,8 +93,11 @@ public:
   void newMailMessageTo(const Contact& contact);
   void addContact();
   void addToContacts(const bts::addressbook::wallet_contact& wallet_contact);
+  /** Show window "Add new contact" and fill contact fields
+  */
   void addContactfromvCard(const QString& firstName, const QString& lastName, 
-                           const QString& khid, const QString& public_key_string);
+                           const QString& khid, const QString& public_key_string,
+                           const QString& notes);
   void onSidebarSelectionChanged();
   void onSidebarDoubleClicked();
   void selectContactItem(QTreeWidgetItem* item);
@@ -110,8 +113,8 @@ public:
 
   void displayDiagnosticLog();
   void setEnabledAttachmentSaveOption(bool enable);
-  void setEnabledDeleteOption( bool enable ) const;
-  void setEnabledShareContactOption( bool enable ) const;
+  void setEnabledDeleteOption( bool enable );
+  void setEnabledShareContactOption( bool enable );
   void refreshMenuOptions() const;
   void setEnabledMailActions(bool enable);
   void setMailSettings (MailSettings& mailSettings);  

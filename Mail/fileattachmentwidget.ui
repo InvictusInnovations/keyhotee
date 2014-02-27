@@ -271,7 +271,7 @@
      <normaloff>:/images/add_user.png</normaloff>:/images/add_user.png</iconset>
    </property>
    <property name="text">
-    <string>Add contact</string>
+    <string>Add contact...</string>
    </property>
    <property name="toolTip">
     <string>Allows to add this contact to the contact list</string>

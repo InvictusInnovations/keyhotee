@@ -397,11 +397,13 @@ void KeyhoteeMainWindow::addToContacts(const bts::addressbook::wallet_contact& w
 }
 
 void KeyhoteeMainWindow::addContactfromvCard(const QString& firstName, const QString& lastName, 
-                                             const QString& khid, const QString& public_key_string)
+                                             const QString& khid, const QString& public_key_string,
+                                             const QString& notes)
 {
   addContact();
   ui->new_contact->setFirstName (firstName);
   ui->new_contact->setLastName (lastName);
+  ui->new_contact->setNotes (notes);
   ui->new_contact->setKHID_or_PublicKey (khid, public_key_string);
   //stored key and calculated key should be the same
   //assert (public_key_string == ui->new_contact->getPublicKey());
@@ -790,7 +792,7 @@ void KeyhoteeMainWindow::shareContact(QList<const Contact*>& contacts)
 
   for(const Contact* contact : contacts)
   {
-    mailWindow->addContactCard (contact);
+    mailWindow->addContactCard (*contact);
   }
 
   mailWindow->show();
@@ -1220,12 +1222,12 @@ void KeyhoteeMainWindow::setEnabledAttachmentSaveOption( bool enable )
   ui->actionSave_attachement->setEnabled (enable);
   }
 
-void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable ) const
+void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable )
   {
   ui->actionDelete->setEnabled (enable);
   }
 
-void KeyhoteeMainWindow::setEnabledShareContactOption( bool enable ) const
+void KeyhoteeMainWindow::setEnabledShareContactOption( bool enable )
   {
   ui->actionShare_contact->setEnabled (enable);
   }
@@ -1245,8 +1247,8 @@ void KeyhoteeMainWindow::refreshMenuOptions() const
 
   ui->actionCopy->setEnabled (enabled);  
   ui->actionCut->setEnabled (false);  
-  setEnabledDeleteOption(enabled);
-  setEnabledShareContactOption(enabled);
+  ui->actionDelete->setEnabled (enabled);
+  ui->actionShare_contact->setEnabled (enabled);
 }
 
 void KeyhoteeMainWindow::setEnabledMailActions(bool enable)

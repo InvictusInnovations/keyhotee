@@ -659,6 +659,12 @@ void ContactView::setLastName(const QString& name)
   setModified();
 }
 
+void ContactView::setNotes(const QString& name)
+{
+  ui->notes->setPlainText(name);
+  setModified();
+}
+
 void ContactView::setKHID_or_PublicKey(const QString& khid, const QString& publicKey)
 {
   if(!ui->khid_pubkey->getKeyhoteeID().isEmpty() && gMiningIsPossible && !khid.isEmpty())
