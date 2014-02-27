@@ -219,6 +219,7 @@ private:
   QTreeWidgetItem* findExistSenderItem(AuthorizationItem::TPublicKey from_key, bool &to_root);
   void showAuthorizationItem(AuthorizationItem *item);
   void deleteAuthorizationItem(AuthorizationItem *item);
+  void processResponse(const bts::bitchat::decrypted_message& msg);
 
   /// Class attributes:
 

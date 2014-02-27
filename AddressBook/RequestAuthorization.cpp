@@ -90,9 +90,9 @@ void RequestAuthorization::addAsNewContact()
   if(ui->add_contact->isEnabled() && ui->add_contact->isChecked())
   {
     Contact new_conntact;
-    new_conntact.first_name       = ui->first_name->text().toUtf8().constData();
-    new_conntact.last_name        = ui->last_name->text().toUtf8().constData();
-    new_conntact.dac_id_string    = ui->keyhoteeidpubkey->getKeyhoteeID().toUtf8().constData();
+    new_conntact.first_name       = ui->first_name->text().toStdString();
+    new_conntact.last_name        = ui->last_name->text().toStdString();
+    new_conntact.dac_id_string    = ui->keyhoteeidpubkey->getKeyhoteeID().toStdString();
     new_conntact.public_key       = ui->keyhoteeidpubkey->getPublicKey();
     new_conntact.privacy_setting  = bts::addressbook::secret_contact;
     new_conntact.setIcon(QIcon(":/images/user.png"));
@@ -140,17 +140,19 @@ void RequestAuthorization::onSend()
     request_msg.from_first_name = idents[identity].first_name;
     request_msg.from_last_name = idents[identity].last_name;
     request_msg.from_keyhotee_id = idents[identity].dac_id_string;
-    request_msg.greeting_message = ui->message->toPlainText().toUtf8().constData();
+    request_msg.greeting_message = ui->message->toPlainText().toStdString();
     request_msg.from_channel = bts::network::channel_id(1);
     
     uint16_t request_param = ui->check_box_chat->isChecked();
     request_param |= ui->check_box_mail->isChecked() << 1;
     request_param |= ui->extend_public_key->isChecked() << 8;
     request_msg.request_param = request_param;
+    request_msg.status = bts::bitchat::authorization_status::request;
+    request_msg.recipient = ui->keyhoteeidpubkey->getPublicKey();
 
     genExtendedPubKey(request_msg.extended_pub_key);
 
-    fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(idents[0].dac_id_string);
+    fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(idents[identity].dac_id_string);
     app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
   }
 }

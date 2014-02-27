@@ -16,13 +16,20 @@ class Authorization : public QWidget
   Q_OBJECT
 
 public:
+  typedef bts::bitchat::decrypted_message                 TDecryptedMessage;
+  typedef bts::bitchat::private_contact_request_message   TRequestMessage;
+  typedef fc::ecc::public_key                             TPublicKey;
+  typedef bts::extended_public_key                        TExtendPubKey;
+  typedef bts::bitchat::authorization_status              TAuthoriztionStatus;
+
   explicit Authorization(QWidget *parent = 0);
-  ~Authorization();
+  virtual ~Authorization();
 
   void setAddressBook(AddressBookModel* addressbook);
 
-  void setMsg(const bts::bitchat::decrypted_message& msg);
+  void setMsg(const TDecryptedMessage& msg);
   void setOwnerItem(AuthorizationItem* item);
+  void processResponse();
 
 Q_SIGNALS:
   void itemAcceptRequest (AuthorizationItem* item);
@@ -41,16 +48,17 @@ private slots:
 private:
   void addAsNewContact();
   void acceptExtendedPubKey();
+  void genExtendedPubKey(std::string dac_id, TExtendPubKey &extended_pub_key);
+  void sendReply(TAuthoriztionStatus status);
 
-  typedef bts::bitchat::decrypted_message               TDecryptedMessage;
-  typedef bts::bitchat::private_contact_request_message TRequestMessage;
-  typedef fc::ecc::public_key                           TPublicKey;
-  typedef bts::extended_public_key                      TExtendPubKey;
-
+private:
   Ui::Authorization *ui;
 
-  TDecryptedMessage     _msg;
-  TExtendPubKey         _extend_pub_key;
+  //TDecryptedMessage     _msg;
+  TRequestMessage       _reqmsg;
+  TPublicKey            _from_pub_key;
+//  TExtendPubKey         _extend_pub_key;
+//  TPublicKey            _my_pub_key;
   QToolBar*             _toolbar;
   QAction*              _accept;
   QAction*              _deny;

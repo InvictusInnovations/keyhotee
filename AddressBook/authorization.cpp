@@ -1,10 +1,12 @@
 #include "authorization.hpp"
 #include "ui_authorization.h"
 
-#include <fc/reflect/variant.hpp>
-#include "public_key_address.hpp"
 #include "AddressBookModel.hpp"
 #include "Contact.hpp"
+#include "public_key_address.hpp"
+#include "utils.hpp"
+
+#include <fc/reflect/variant.hpp>
 
 #include <QMessageBox>
 #include <QToolBar>
@@ -68,24 +70,21 @@ void Authorization::setAddressBook(AddressBookModel* addressbook)
 
 void Authorization::setMsg(const TDecryptedMessage& msg)
 {
-  _msg = msg;
-  TRequestMessage  reqmsg = msg.as<TRequestMessage>();
+  _from_pub_key = *msg.from_key;
+  _reqmsg = msg.as<TRequestMessage>();
 
-  TPublicKey public_key = *_msg.from_key;
-  std::string public_key_string = public_key_address(public_key.serialize());
+  std::string public_key_string = public_key_address(_from_pub_key.serialize());
   ui->keyhoteeidpubkey->setPublicKey(public_key_string.c_str());
-  ui->keyhoteeidpubkey->setKeyhoteeID(reqmsg.from_keyhotee_id.c_str());
+  ui->keyhoteeidpubkey->setKeyhoteeID(_reqmsg.from_keyhotee_id.c_str());
 
-  ui->first_name->setText( reqmsg.from_first_name.c_str() );
-  ui->last_name->setText(reqmsg.from_last_name.c_str() );
+  ui->first_name->setText(_reqmsg.from_first_name.c_str() );
+  ui->last_name->setText(_reqmsg.from_last_name.c_str() );
   
-  ui->check_box_chat->setChecked(reqmsg.request_param & 0x01);
-  ui->check_box_mail->setChecked(reqmsg.request_param>>1 & 0x01);
-  ui->extend_public_key->setChecked(reqmsg.request_param>>8 & 0x01);
+  ui->check_box_chat->setChecked(_reqmsg.request_param & 0x01);
+  ui->check_box_mail->setChecked(_reqmsg.request_param>>1 & 0x01);
+  ui->extend_public_key->setChecked(_reqmsg.request_param>>8 & 0x01);
 
-  ui->message->setText(reqmsg.greeting_message.c_str());
-
-  _extend_pub_key = reqmsg.extended_pub_key;
+  ui->message->setText(_reqmsg.greeting_message.c_str());
 }
 
 void Authorization::setOwnerItem(AuthorizationItem* item)
@@ -93,23 +92,33 @@ void Authorization::setOwnerItem(AuthorizationItem* item)
   _owner_item = item;
 }
 
+void Authorization::processResponse()
+{
+  if(_reqmsg.status == TAuthoriztionStatus::accept)
+    acceptExtendedPubKey();
+
+  // set authorization state
+}
 
 void Authorization::onAccept()
 {
   addAsNewContact();
   acceptExtendedPubKey();
+  sendReply(TAuthoriztionStatus::accept);
   close();
   emit itemAcceptRequest(_owner_item);
 }
 
 void Authorization::onDeny()
 {
+  sendReply(TAuthoriztionStatus::deny);
   close();
   emit itemDenyRequest(_owner_item);
 }
 
 void Authorization::onBlock()
 {
+  sendReply(TAuthoriztionStatus::block);
   close();
   emit itemBlockRequest(_owner_item);
 }
@@ -119,10 +128,10 @@ void Authorization::addAsNewContact()
   if(ui->add_contact->isEnabled() && ui->add_contact->isChecked())
   {
     Contact new_conntact;
-    new_conntact.first_name       = ui->first_name->text().toUtf8().constData();
-    new_conntact.last_name        = ui->last_name->text().toUtf8().constData();
-    new_conntact.dac_id_string    = ui->keyhoteeidpubkey->getKeyhoteeID().toUtf8().constData();     // can better directly from the message?
-    new_conntact.public_key       = *_msg.from_key;
+    new_conntact.first_name       = ui->first_name->text().toStdString();
+    new_conntact.last_name        = ui->last_name->text().toStdString();
+    new_conntact.dac_id_string    = ui->keyhoteeidpubkey->getKeyhoteeID().toStdString();     // can better directly from the message?
+    new_conntact.public_key       = _from_pub_key;
     new_conntact.privacy_setting  = bts::addressbook::secret_contact;
     new_conntact.setIcon(QIcon(":/images/user.png"));
 
@@ -138,11 +147,54 @@ void Authorization::acceptExtendedPubKey()
     auto profile = app->get_profile();
     auto addressbook = profile->get_addressbook();
     auto contact = addressbook->get_contact_by_public_key( ui->keyhoteeidpubkey->getPublicKey() );
-    contact->send_trx_address = _extend_pub_key;
+    contact->send_trx_address = _reqmsg.extended_pub_key;
     addressbook->store_contact(*contact);
-
-    // send the key to the sender *******************************
   }
+}
+
+void Authorization::genExtendedPubKey(std::string dac_id, TExtendPubKey &extended_pub_key)
+{
+  if(ui->extend_public_key->isChecked())
+  {
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+    auto addressbook = profile->get_addressbook();
+    auto contact = addressbook->get_contact_by_public_key( ui->keyhoteeidpubkey->getPublicKey() );
+
+    extended_pub_key = profile->get_keychain().get_public_account(dac_id, contact->wallet_index);
+  }
+}
+
+void Authorization::sendReply(TAuthoriztionStatus status)
+{
+  bts::addressbook::wallet_contact contact;
+  if(!Utils::matchContact(_reqmsg.recipient, &contact))
+    return;
+
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+  bts::bitchat::private_contact_request_message request_msg;
+
+  request_msg.from_first_name = contact.first_name;
+  request_msg.from_last_name = contact.last_name;
+  request_msg.from_keyhotee_id = contact.dac_id_string;
+  request_msg.greeting_message = "";
+  request_msg.from_channel = bts::network::channel_id(1);
+    
+  uint16_t request_param = ui->check_box_chat->isChecked();
+  request_param |= ui->check_box_mail->isChecked() << 1;
+  request_param |= ui->extend_public_key->isChecked() << 8;
+  request_msg.request_param = request_param;
+  
+  request_msg.status = status;
+  request_msg.recipient = ui->keyhoteeidpubkey->getPublicKey();
+
+  if(status == TAuthoriztionStatus::accept)
+    if(ui->extend_public_key->isChecked())
+      genExtendedPubKey(contact.dac_id_string, request_msg.extended_pub_key);
+
+  fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(contact.dac_id_string);
+  app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
 }
 
 void Authorization::onAddAsNewContact(bool checked)

@@ -978,6 +978,13 @@ void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
     _requests_root->setHidden(true);
 }
 
+void KeyhoteeMainWindow::processResponse(const bts::bitchat::decrypted_message& msg)
+{
+  Authorization *view = new Authorization(ui->widget_stack);
+  view->setMsg(msg);
+  view->processResponse();
+}
+
 void KeyhoteeMainWindow::onItemAcceptRequest(AuthorizationItem *item)
 {
   deleteAuthorizationItem(item);
@@ -1080,7 +1087,11 @@ void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& m
 void KeyhoteeMainWindow::received_request( const bts::bitchat::decrypted_message& msg)
 {
   //bts::get_profile()->get_request_db()->store_message(msg, nullptr);
-  createAuthorizationItem(msg);
+  auto reqmsg = msg.as<bts::bitchat::private_contact_request_message>();
+  if(reqmsg.status == bts::bitchat::authorization_status::request)
+    createAuthorizationItem(msg);
+  else
+    processResponse(msg);
 }
 
 void KeyhoteeMainWindow::OnMessageSaving()
