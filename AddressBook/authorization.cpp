@@ -6,6 +6,7 @@
 #include "AddressBookModel.hpp"
 #include "Contact.hpp"
 
+#include <QMessageBox>
 #include <QToolBar>
 
 Authorization::Authorization(QWidget *parent) :
@@ -46,7 +47,7 @@ Authorization::Authorization(QWidget *parent) :
   connect(_accept, &QAction::triggered, this, &Authorization::onAccept);
   connect(_deny, &QAction::triggered, this, &Authorization::onDeny);
   connect(_block, &QAction::triggered, this, &Authorization::onBlock);
-
+  connect(ui->add_contact , &QGroupBox::toggled, this, &Authorization::onAddAsNewContact);
   connect(ui->keyhoteeidpubkey, &KeyhoteeIDPubKeyWidget::currentState, this, &Authorization::onStateWidget);
 
   // setting the background color of the frame so that the window looked like a window "create new contact"
@@ -83,6 +84,8 @@ void Authorization::setMsg(const TDecryptedMessage& msg)
   ui->extend_public_key->setChecked(reqmsg.request_param>>8 & 0x01);
 
   ui->message->setText(reqmsg.greeting_message.c_str());
+
+  _extend_pub_key = reqmsg.extended_pub_key;
 }
 
 void Authorization::setOwnerItem(AuthorizationItem* item)
@@ -94,6 +97,7 @@ void Authorization::setOwnerItem(AuthorizationItem* item)
 void Authorization::onAccept()
 {
   addAsNewContact();
+  acceptExtendedPubKey();
   close();
   emit itemAcceptRequest(_owner_item);
 }
@@ -123,6 +127,31 @@ void Authorization::addAsNewContact()
     new_conntact.setIcon(QIcon(":/images/user.png"));
 
     _address_book->storeContact(new_conntact);
+  }
+}
+
+void Authorization::acceptExtendedPubKey()
+{
+  if(ui->extend_public_key->isChecked())
+  {
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+    auto addressbook = profile->get_addressbook();
+    auto contact = addressbook->get_contact_by_public_key( ui->keyhoteeidpubkey->getPublicKey() );
+    contact->send_trx_address = _extend_pub_key;
+    addressbook->store_contact(*contact);
+
+    // send the key to the sender *******************************
+  }
+}
+
+void Authorization::onAddAsNewContact(bool checked)
+{
+  if(ui->extend_public_key->isChecked() &&
+      ui->add_contact->isEnabled() && !ui->add_contact->isChecked())
+  {
+    QMessageBox::information(this, tr("Information"), tr("To accept the Extended Public Key is necessary to add a new contact."));
+    ui->add_contact->setChecked(true);
   }
 }
 

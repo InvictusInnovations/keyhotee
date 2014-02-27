@@ -34,18 +34,23 @@ public:
   void onDeny();
   void onBlock();
 
+private slots:
+  void onAddAsNewContact(bool checked);
+  void onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state);
+
 private:
   void addAsNewContact();
-
-  void onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state);
+  void acceptExtendedPubKey();
 
   typedef bts::bitchat::decrypted_message               TDecryptedMessage;
   typedef bts::bitchat::private_contact_request_message TRequestMessage;
   typedef fc::ecc::public_key                           TPublicKey;
+  typedef bts::extended_public_key                      TExtendPubKey;
 
   Ui::Authorization *ui;
 
   TDecryptedMessage     _msg;
+  TExtendPubKey         _extend_pub_key;
   QToolBar*             _toolbar;
   QAction*              _accept;
   QAction*              _deny;

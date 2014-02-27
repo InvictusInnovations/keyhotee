@@ -23,6 +23,9 @@
     <height>250</height>
    </size>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::TabFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -398,6 +401,9 @@
                  <height>72</height>
                 </size>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
+               </property>
               </widget>
              </item>
              <item>
@@ -748,10 +754,15 @@ Enter</string>
   <tabstop>icon_view</tabstop>
   <tabstop>firstname</tabstop>
   <tabstop>lastname</tabstop>
+  <tabstop>khid_pubkey</tabstop>
   <tabstop>privacy_comboBox</tabstop>
   <tabstop>email</tabstop>
   <tabstop>phone</tabstop>
+  <tabstop>mining_effort_slider</tabstop>
   <tabstop>notes</tabstop>
+  <tabstop>chat_conversation</tabstop>
+  <tabstop>chat_input</tabstop>
+  <tabstop>sendButton</tabstop>
  </tabstops>
  <resources>
   <include location="../Keyhotee.qrc"/>

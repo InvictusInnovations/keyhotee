@@ -26,8 +26,13 @@ private:
   AddressBookModel*         _address_book;
 
   void fillSelectIdentities();
-
-  void onSend();
+  void checkAddAsNewContact();
   void addAsNewContact();
+  void genExtendedPubKey(bts::extended_public_key &extended_pub_key);
+
+private slots:
+  void onExtendPubKey(bool checked);
+  void onAddAsNewContact(bool checked);
+  void onSend();
   void onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state);
 };

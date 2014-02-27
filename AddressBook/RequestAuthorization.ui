@@ -184,7 +184,6 @@
        <height>72</height>
       </size>
      </property>
-     <zorder>identity_select</zorder>
     </widget>
    </item>
    <item row="10" column="0" colspan="4">
@@ -284,6 +283,18 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>check_box_chat</tabstop>
+  <tabstop>check_box_mail</tabstop>
+  <tabstop>extend_public_key</tabstop>
+  <tabstop>add_contact</tabstop>
+  <tabstop>first_name</tabstop>
+  <tabstop>last_name</tabstop>
+  <tabstop>message</tabstop>
+  <tabstop>button_send</tabstop>
+  <tabstop>button_cancel</tabstop>
+  <tabstop>identity_select</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

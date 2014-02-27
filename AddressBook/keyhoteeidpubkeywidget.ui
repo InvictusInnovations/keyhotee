@@ -10,6 +10,9 @@
     <height>78</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::TabFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>KeyhoteeIDPubKeyWidget</string>
   </property>
