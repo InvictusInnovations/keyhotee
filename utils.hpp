@@ -9,6 +9,7 @@
 #include <QDateTime>
 #include <QString>
 
+#include <string>
 #include <vector>
 
 namespace bts
@@ -51,10 +52,19 @@ enum TContactTextFormatting
                 \see TContactTextFormatting definition for details.
     \param matchingContact - optional, output parameter. Can be null. Will point to found contact
                 info or if contact is unknown will be just filled with input public key.
+    \param isKnownContact - optional, output parameter. Will be filled with explicit info if given
+                public key has been matched to any known contact (incl. identities).
 */
 QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFormatting,
-  bts::addressbook::contact* matchingContact = nullptr);
+  bts::addressbook::contact* matchingContact = nullptr, bool* isKnownContact = nullptr);
 
+/** Allows to find contact using specified public key.
+    \param pk - the key to look contact for,
+    \param matchedContact - output, cannot be nullptr. Will be filled with found contact or just
+                input public key if contact was not found.
+
+    Returns true if contact has been found, false otherwise.
+*/
 bool matchContact(const fc::ecc::public_key& pk, bts::addressbook::wallet_contact* matchedContact);
 
 /** Allows to convert list of keys into textual form, separated by given character.
@@ -65,6 +75,11 @@ QString makeContactListString(const std::vector<fc::ecc::public_key>& key_list, 
 /* ltrim of QString
 */
 QString lTrim(QString const &str);
+
+/** Allows to convert input string into ASCII based one - all nonASCII characters will be replaced
+    with their unicode codes
+*/
+void convertToASCII(const std::string& input, std::string* buffer);
 
 } ///namespace Utils
 

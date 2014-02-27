@@ -6,6 +6,7 @@
 #include "AddressBook/ContactView.hpp"
 #include "KeyhoteeMainWindow.hpp"
 
+#include <QClipboard>
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
 #include <QMessageBox>

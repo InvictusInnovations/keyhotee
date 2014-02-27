@@ -4,6 +4,8 @@
 
 #include <fc/exception/exception.hpp>
 
+#include "utils.hpp"
+
 struct public_key_address
   {
   fc::ecc::public_key_data key;
@@ -20,11 +22,17 @@ struct public_key_address
 
       Returns true if given key is ok, false otherwise.
    */
-  static bool is_valid(const std::string& keyStr, bool* keySemanticallyValid = nullptr)
+  static bool is_valid(const std::string& inputKeyStr, bool* keySemanticallyValid = nullptr)
     {
+    /// \warning public key checker/decoder asserts if input string contains national characters
+    std::string keyStr;
+
+    Utils::convertToASCII(inputKeyStr, &keyStr);
+
     bool status = false;
-    if (keySemanticallyValid)
+    if(keySemanticallyValid != nullptr)
       *keySemanticallyValid = false;
+
     try
       {
       std::vector<char> bin = fc::from_base58(keyStr);
@@ -41,7 +49,7 @@ struct public_key_address
         if (checker.valid() && keySemanticallyValid)
         {
           std::string public_key_string_check = public_key_address(rawData);
-          if (public_key_string_check == keyStr)
+          if (public_key_string_check == inputKeyStr)
           {
             *keySemanticallyValid = true;
           }

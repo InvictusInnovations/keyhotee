@@ -1,25 +1,28 @@
-#include "ui_NewIdentityDialog.h"
-#include "public_key_address.hpp"
-#include <bts/application.hpp>
 #include "NewIdentityDialog.hpp"
-#include <QPushButton>
-#include <bts/addressbook/contact.hpp>
-#include <fc/log/logger.hpp>
-#include <fc/thread/thread.hpp>
 
+#include "ui_NewIdentityDialog.h"
+
+#include "public_key_address.hpp"
+
+#include "AddressBookModel.hpp"
+#include "Contact.hpp"
 #include "KeyhoteeApplication.hpp"
 #include "KeyhoteeMainWindow.hpp"
-#include "AddressBookModel.hpp"
 
-#include <iostream>
+#include <QPushButton>
+
 #include <bts/application.hpp>
+#include <bts/addressbook/contact.hpp>
+
 #include <fc/filesystem.hpp>
+#include <fc/interprocess/signals.hpp>
 #include <fc/io/json.hpp>
-#include <fc/log/logger.hpp>
 #include <fc/io/fstream.hpp>
+#include <fc/log/logger.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/rpc/json_connection.hpp>
-#include <fc/interprocess/signals.hpp>
+#include <fc/thread/thread.hpp>
+
 #include <iostream>
 
 
