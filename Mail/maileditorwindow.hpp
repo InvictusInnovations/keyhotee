@@ -97,9 +97,17 @@ class MailEditorMainWindow : public ATopLevelWindow
     virtual void closeEvent(QCloseEvent* e) override;
     
   /// Other helper methods:
+    /** Dedicated to check if editor contents should be saved before closing. All checks against
+        save conditions should be rather done here instead of onSave method, even there is good
+        resoning for that (like message size checking).
+    */
     bool maybeSave();
     void setupEditorCommands();
-    bool isMsgSizeOK(const TPhysicalMailMessage& srcMsg);
+    /** Allows to check given message size against limit set by application. 
+        Returns true on success, false when limit has been exceeded - also reports a warning message
+        in this case.
+    */
+    bool checkMsgSize(const TPhysicalMailMessage& srcMsg);
     /// Updates UI status regarding to chosen alignment.
     void alignmentChanged(Qt::Alignment a);
     void fontChanged(const QFont& f);
