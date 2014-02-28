@@ -134,7 +134,7 @@ message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
 IF( APPLE )
     SET(KH_STATIC_QT 0)
 
-    SET(CMAKE_CXX_FLAGS "-std=c++11")
+    SET(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
 
     SET_SOURCE_FILES_PROPERTIES(
                                 "images/keyhotee.icns"
