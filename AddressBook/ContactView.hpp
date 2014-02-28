@@ -1,10 +1,11 @@
 #pragma once
-#include <QWidget>
-#include <memory>
+
 #include "Contact.hpp"
-#include <fc/time.hpp>
-#include <bts/application.hpp>
 #include "keyhoteeidpubkeywidget.hpp"
+
+#include <bts/application.hpp>
+
+#include <QWidget>
 
 namespace Ui { class ContactView; }
 class AddressBookModel;
@@ -16,7 +17,7 @@ class ContactView : public QWidget
 public:
   enum ContactDisplay { info, chat};
   ContactView(QWidget* parent = nullptr);
-  ~ContactView();
+  virtual ~ContactView();
 
   void setAddressBook(AddressBookModel* address_book);
   AddressBookModel* getAddressBook() const;
@@ -80,11 +81,10 @@ private:
   bool FromDialog();
   void setEnabledSaveContact();
 
-  fc::time_point                          _last_validate;
   Contact                                 _current_contact;
   fc::optional<bts::bitname::name_record> _current_record;
   AddressBookModel*                       _address_book;
-  std::unique_ptr<Ui::ContactView>        ui;
+  Ui::ContactView*                        ui;
   QToolBar*                               message_tools;
   QAction*                                send_mail;
   QAction*                                chat_contact;

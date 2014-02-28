@@ -72,6 +72,11 @@ bool matchContact(const fc::ecc::public_key& pk, bts::addressbook::wallet_contac
 */
 QString makeContactListString(const std::vector<fc::ecc::public_key>& key_list, char separator = ',',
   TContactTextFormatting contactFormatting = TContactTextFormatting::KEYHOTEE_IDENTIFIER);
+
+/** Returns true if given key points to any of our own identities.
+*/
+bool isOwnedPublicKey(const fc::ecc::public_key& publicKey);
+
 /* ltrim of QString
 */
 QString lTrim(QString const &str);

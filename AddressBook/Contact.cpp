@@ -1,5 +1,7 @@
 #include "Contact.hpp"
 
+#include "utils.hpp"
+
 #include <bts/application.hpp>
 
 #include <fc/reflect/variant.hpp>
@@ -7,8 +9,6 @@
 
 /// QT headers
 #include <QBuffer>
-
-bool isOwnedPublicKey(fc::ecc::public_key public_key);
 
 const QIcon& Contact::getIcon() const
   {
@@ -113,7 +113,7 @@ QString Contact::getLabel() const
 
 bool Contact::isOwn() const
   {
-  return isOwnedPublicKey(public_key);
+  return Utils::isOwnedPublicKey(public_key);
   }
 
 int Contact::getAge() const
