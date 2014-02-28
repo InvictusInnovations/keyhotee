@@ -1,6 +1,7 @@
 #ifndef FILEATTACHMENTWIDGET_H
 #define FILEATTACHMENTWIDGET_H
 
+//#include <bts/addressbook/contact.hpp>
 #include <bts/application.hpp>
 
 #include <QFileInfo>
@@ -29,7 +30,8 @@ class TFileAttachmentWidget : public QWidget
     TFileAttachmentWidget(QWidget* parent, bool editMode = false);
     virtual ~TFileAttachmentWidget();
 
-    /** Allows to load set of files attached to already existing email message (ie in Draft).
+    /** Allows to load set of files (or contacts files with extension *.vcf) 
+        attached to already existing email message (ie in Draft).
     */
     void LoadAttachedFiles(const TAttachmentContainer& attachedFiles);
 
@@ -97,7 +99,13 @@ class TFileAttachmentWidget : public QWidget
     bool SaveAttachmentItem(const AAttachmentItem* iten, const QFileInfo& targetPath,
       bool checkForOverwrite);
     void RetrieveSelection(TSelection* storage) const;   
-    static bool isValidContactvCard(QString fileName, const AAttachmentItem* item, QByteArray& contactData);
+    /** Check validation of contact vCard format.
+        Returns false if vCard format is not valid
+        \param fileName - path to vCard data file
+        \param item - current selected item on the attachment table
+        \param contactData - returns contact vCard data
+    */
+    static bool isValidContactvCard(QString fileName, const AAttachmentItem& item, QByteArray* contactData);
 
   private slots:
     void onAddTriggered();
@@ -108,6 +116,7 @@ class TFileAttachmentWidget : public QWidget
     void onAttachementTableSelectionChanged();
     void onPasteTriggered();
     void onAddContactTriggered();
+    void onFindContactTriggered();
     void onClipboardChanged();    
     void onDropEvent(QStringList files);
 
@@ -115,18 +124,20 @@ class TFileAttachmentWidget : public QWidget
   private:
     typedef std::list<AAttachmentItem*> TFileAttachmentList;
 
-    Ui::TFileAttachmentWidget* ui;
-    QStringList                SelectedFiles;
+    Ui::TFileAttachmentWidget*        ui;
+    QStringList                       SelectedFiles;
     /// Used to perform checks related to redundant files.
-    TFileInfoList              AttachmentIndex;
+    TFileInfoList                     AttachmentIndex;
     /** Stores attachment info (file-name items stored in table widget) in order they were added
         to table.
     */
-    TFileAttachmentList        AttachmentList;
+    TFileAttachmentList               AttachmentList;
     /// Total size of all file attachments.
-    unsigned long long         TotalAttachmentSize;
+    unsigned long long                TotalAttachmentSize;
     /// Simple flag determining which features can be available.
-    bool                       EditMode;
+    bool                              EditMode;
+    /// Holds data about contact which has been right clicked
+    bts::addressbook::wallet_contact  _clickedContact;
   };
 
 #endif // FILEATTACHMENTWIDGET_H
