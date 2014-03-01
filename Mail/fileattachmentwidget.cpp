@@ -1,5 +1,6 @@
 #include "fileattachmentwidget.hpp"
 #include "KeyhoteeMainWindow.hpp"
+#include "public_key_address.hpp"
 
 #include "qtreusable/TImage.hpp"
 
@@ -295,7 +296,7 @@ class TFileAttachmentWidget::TFileAttachmentItem : public AAttachmentItem
     virtual TSaveStatus Save(QFile& target) const
     {
       QByteArray contactData;
-      if (TFileAttachmentWidget::isValidContactvCard(target.fileName(), this, contactData))
+      if (TFileAttachmentWidget::isValidContactvCard(target.fileName(), *this, &contactData))
       {
         bool success = target.open(QFile::WriteOnly);
         if(success == false)
@@ -556,6 +557,7 @@ void TFileAttachmentWidget::ConfigureContextMenu()
   if (EditMode == false)
   {
     ui->attachmentTable->addAction(ui->actionAddContact);
+    ui->attachmentTable->addAction(ui->actionFindContact);
     sep = new QAction(this);
     sep->setSeparator(true);
     ui->attachmentTable->addAction(sep);
@@ -856,19 +858,34 @@ void TFileAttachmentWidget::onAttachementTableSelectionChanged()
   ui->actionSave->setEnabled(anySelection);  
 
   bool vCardVaild = false;
+  bool existContact = false;
   if (singleSelection)
   {
     AAttachmentItem* item = selection.front();
     QString fileName = item->GetDisplayedFileName();
 
     QByteArray contactData;
-    if (TFileAttachmentWidget::isValidContactvCard(fileName, item, contactData))
+    if (TFileAttachmentWidget::isValidContactvCard(fileName, *item, &contactData))
     {
       vCardVaild = true;
+
+      ContactvCard converter(contactData);
+      std::string publicKeyString = converter.getPublicKey().toStdString();
+      bool publicKeySemanticallyValid = false;
+      if (public_key_address::is_valid(publicKeyString, &publicKeySemanticallyValid) && publicKeySemanticallyValid)
+      {
+        public_key_address key_address(publicKeyString);
+        fc::ecc::public_key parsedKey = key_address.key;
+        if(Utils::matchContact(parsedKey, &_clickedContact))
+        {
+          existContact = true;
+        }
+      }
     }    
   }
 
-  ui->actionAddContact->setEnabled(!EditMode && vCardVaild);
+  ui->actionAddContact->setEnabled(singleSelection && !EditMode && vCardVaild && !existContact);
+  ui->actionFindContact->setEnabled(singleSelection && !EditMode && vCardVaild && existContact);
   ui->actionRename->setEnabled(singleSelection && EditMode && !vCardVaild);
 }
 
@@ -987,13 +1004,19 @@ void TFileAttachmentWidget::onAddContactTriggered()
   getKeyhoteeWindow()->activateMainWindow();
 }
 
-bool TFileAttachmentWidget::isValidContactvCard(QString fileName, const AAttachmentItem* item, QByteArray& contactData)
+void TFileAttachmentWidget::onFindContactTriggered()
+{
+  getKeyhoteeWindow()->openContactGui(_clickedContact.wallet_index);
+  getKeyhoteeWindow()->activateMainWindow();  
+}
+
+bool TFileAttachmentWidget::isValidContactvCard(QString fileName, const AAttachmentItem& item, QByteArray* contactData)
 {
   QString extFile = ".vcf";
   if (fileName.contains(extFile))
   {
-    item->getContactData(contactData);
-    if (contactData.size() && ContactvCard::isValid(contactData))
+    item.getContactData(*contactData);
+    if (contactData->size() && ContactvCard::isValid(*contactData))
     {
       return true;
     }
