@@ -11,8 +11,8 @@
 #include "ch/ModificationsChecker.hpp"
 #include "ATopLevelWindowsContainer.hpp"
 
-#include <qtreewidget.h>
 #include <QList>
+#include <QTreeWidget>
 
 namespace Ui { class KeyhoteeMainWindow; }
 
@@ -59,26 +59,28 @@ private:
 };
 
 /**
- *  GUI widgets for request for authorization.
+ *  Navigation tree item representing incoming GUI entrypoint for an authorization request.
  */
 class AuthorizationItem : public QTreeWidgetItem
 {
-  friend KeyhoteeMainWindow;
-
-private:
+public:
   typedef fc::ecc::public_key TPublicKey;
 
-  Authorization*    _view;
-  TPublicKey        _from_key;
-
-public:
-  AuthorizationItem() {}
-  AuthorizationItem( Authorization* view, QTreeWidgetItem *parent, int type = 0)
+  AuthorizationItem(Authorization* view, QTreeWidgetItem *parent, int type = 0)
     : QTreeWidgetItem(parent, type), _view(view) {}
-  ~AuthorizationItem();
+  virtual ~AuthorizationItem();
 
   void setFromKey(TPublicKey from_key) {_from_key = from_key;}
-  bool isEqual(TPublicKey from_key);
+  bool isEqual(TPublicKey from_key) const;
+  Authorization* getView() const
+    {
+    return _view;
+    }
+
+/// Class attributes:
+private:
+  Authorization* _view;
+  TPublicKey     _from_key;
 };
 
 class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
@@ -121,21 +123,25 @@ public:
   ContactsTable* getContactsPage();
   void shareContact(QList<const Contact*>& contacts);
 
-  AddressBookModel* getAddressBookModel() { return _addressbook_model; }
+  AddressBookModel* getAddressBookModel() const { return _addressbook_model; }
 
 signals:
   void checkSendMailSignal();
 protected:
-  virtual void closeEvent(QCloseEvent *);
-  virtual void keyPressEvent(QKeyEvent *);
+  virtual void closeEvent(QCloseEvent *) override;
+  virtual void keyPressEvent(QKeyEvent *) override;
 
 private:
-  /// application_delegate interface implementation
-  virtual void received_text(const bts::bitchat::decrypted_message& msg);
-  virtual void received_email(const bts::bitchat::decrypted_message& msg);
-  virtual void received_request( const bts::bitchat::decrypted_message& msg);
+/// application_delegate interface implementation
+  virtual void connection_count_changed(unsigned int count) override;
+  virtual bool receiving_mail_message() override;
+  virtual void received_text(const bts::bitchat::decrypted_message& msg) override;
+  virtual void received_email(const bts::bitchat::decrypted_message& msg) override;
+  virtual void received_request( const bts::bitchat::decrypted_message& msg) override;
+  virtual void message_transmission_failure() override;
 
 private:
+/// IMessageProcessor::IUpdateSink interface description:
   /// \see IMessageProcessor::IUpdateSink interface description.
   virtual void OnMessageSaving() override;
   /// \see IMessageProcessor::IUpdateSink interface description.
@@ -216,6 +222,10 @@ private:
   void setupStatusBar();
   void notSupported();
   void enableMenu(bool enable);
+  /** Allows to stop mail transmission if any before quit.
+      Returns true if quit operation can be continued.
+  */
+  bool stopMailTransmission();
   bool checkSaving() const;
   void showContacts() const;
   void createAuthorizationItem(const bts::bitchat::decrypted_message& msg);
@@ -226,7 +236,6 @@ private:
 
   /// Class attributes:
 
-  //QCompleter*                             _contact_completer;
   QTreeWidgetItem*                        _identities_root;
   QTreeWidgetItem*                        _mailboxes_root;
   QTreeWidgetItem*                        _wallets_root;
@@ -255,6 +264,10 @@ private:
   TMailProcessor                          MailProcessor;
   Mailbox*                                _currentMailbox;
   MenuEditControl*                        menuEdit;
+  /// Set to true between calls: receiving_mail_message <=> received_message
+  bool                                    _receivingMail;
+  /// Set to true when close event processing is in progress (it wasn't yet accepted nor ignored)
+  bool                                    _isClosing;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();

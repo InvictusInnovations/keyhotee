@@ -39,9 +39,15 @@ class TMailProcessor::TOutboxQueue
     /// Returns length of the queue.
     unsigned int GetLength() const;
 
-    void Release()
+    bool isTransmissionLoopActive() const
       {
-      bool transferActive = TransferLoopComplete.valid() && TransferLoopComplete.ready() == false;
+      return TransferLoopComplete.valid() && TransferLoopComplete.ready() == false;
+      }
+
+    /// Method dedicated to cancel any transmission ie just before quiting the app.
+    void StopTransmission()
+      {
+      bool transferActive = isTransmissionLoopActive();
       bool connectionActive = ConnectionCheckComplete.valid() &&
         ConnectionCheckComplete.ready() == false;
       
@@ -50,11 +56,22 @@ class TMailProcessor::TOutboxQueue
         CancelPromise->set_value();
 
         if(ConnectionCheckComplete.valid())
-         ConnectionCheckComplete.wait();
+          {
+          ConnectionCheckComplete.cancel();
+          ConnectionCheckComplete.wait();
+          }
 
         if(TransferLoopComplete.valid())
-         TransferLoopComplete.wait();
+          {
+          TransferLoopComplete.cancel();
+          TransferLoopComplete.wait();
+          }
         }
+      }
+
+    void Release()
+      {
+      StopTransmission();
 
       assert(AnyOperationsPending() == false);
       delete this;
@@ -64,11 +81,13 @@ class TMailProcessor::TOutboxQueue
     virtual ~TOutboxQueue() {}
 
     void transmissionLoop();
+    
     bool isConnected() const
       {
       auto network = App->get_network();
       return static_cast<unsigned int>(network->get_connections().size()) > 0;
       }
+
     bool isMailConnected() const
       {
       return App->is_mail_connected();
@@ -85,6 +104,11 @@ class TMailProcessor::TOutboxQueue
       {
       if(ConnectionCheckComplete.valid() == false || ConnectionCheckComplete.ready())
         ConnectionCheckComplete = fc::async([=]{ connectionCheckingLoop(); });
+      }
+
+    bool isCancelled() const
+      {
+      return CancelPromise->ready();
       }
 
     bool fetchNextMessage(TStoredMailMessage* storedMsg, TPhysicalMailMessage* storage);
@@ -132,9 +156,9 @@ void TMailProcessor::TOutboxQueue::AddPendingMessage(const TIdentity& senderId,
 
 bool TMailProcessor::TOutboxQueue::AnyOperationsPending() const
   {
-  bool transferLoopCompleted = TransferLoopComplete.valid() == false || TransferLoopComplete.ready();
+  bool transferLoopActive = isTransmissionLoopActive();
   std::lock_guard<std::mutex> guard(OutboxDbLock);
-  return transferLoopCompleted ? false : Outbox->fetch_headers(TPhysicalMailMessage::type).empty();
+  return transferLoopActive ? Outbox->fetch_headers(TPhysicalMailMessage::type).empty() : false;
   }
 
 unsigned int TMailProcessor::TOutboxQueue::GetLength() const
@@ -151,7 +175,7 @@ void TMailProcessor::TOutboxQueue::transmissionLoop()
   TPhysicalMailMessage msg;
   TStoredMailMessage   storedMsg;
 
-  while(CancelPromise->ready() == false && fetchNextMessage(&storedMsg, &msg))
+  while(isCancelled() == false && fetchNextMessage(&storedMsg, &msg))
     {
     if(notificationSent == false)
       {
@@ -162,6 +186,9 @@ void TMailProcessor::TOutboxQueue::transmissionLoop()
     if(transferMessage(storedMsg.from_key, msg))
       moveMsgToSentDB(storedMsg, msg);
     else
+      break;
+
+    if(isCancelled())
       break;
 
     fc::usleep(fc::milliseconds(250));
@@ -232,13 +259,25 @@ bool TMailProcessor::TOutboxQueue::transferMessage(const TRecipientPublicKey& se
       size_t totalRecipientCount = msgToSend.to_list.size() + msgToSend.cc_list.size() + bccList.size();
 
       for(const auto& public_key : msgToSend.to_list)
+        {
+        if(isCancelled())
+          return false;
         sendMail(msgToSend, public_key, senderPrivKey);
+        }
 
       for(const auto& public_key : msgToSend.cc_list)
+        {
+        if(isCancelled())
+          return false;
         sendMail(msgToSend, public_key, senderPrivKey);
+        }
 
       for(const auto& public_key : bccList)
+        {
+        if(isCancelled())
+          return false;
         sendMail(msgToSend, public_key, senderPrivKey);
+        }
 
       sendStatus = true;
       }
@@ -408,9 +447,19 @@ TMailProcessor::Save(const TIdentity& senderId, const TPhysicalMailMessage& sour
   return savedMsg;
   }
 
+bool TMailProcessor::CanQuit() const
+  {
+  return OutboxQueue->isTransmissionLoopActive() == false &&
+    OutboxQueue->AnyOperationsPending() == false;
+  }
+
+void TMailProcessor::CancelTransmission()
+  {
+  OutboxQueue->StopTransmission();
+  }
+
 void TMailProcessor::PrepareStorableMessage(const TIdentity& senderId,
-                                            const TPhysicalMailMessage& sourceMsg, 
-                                            TStorableMessage* storableMsg)
+  const TPhysicalMailMessage& sourceMsg, TStorableMessage* storableMsg)
   {
   /** It looks for me like another bug in backend. Even decrypted message object can be constructed
       directly by using interface of this class it is not sufficient to successfully store it in
