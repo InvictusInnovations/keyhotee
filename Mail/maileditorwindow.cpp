@@ -352,12 +352,14 @@ void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessag
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
   {
   if(maybeSave())
-  {
+    {
     e->accept();
     ATopLevelWindow::closeEvent(e);
-  }
+    }
   else
+    {
     e->ignore();
+    }
   }
 
 bool MailEditorMainWindow::maybeSave()

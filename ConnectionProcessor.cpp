@@ -1,0 +1,987 @@
+#include "ConnectionProcessor.hpp"
+
+#include "ch/GuiUpdateSink.hpp"
+
+#include <bts/application.hpp>
+#include <bts/bitchat/bitchat_private_message.hpp>
+
+#include <fc/log/logger.hpp>
+#include <fc/reflect/variant.hpp>
+#include <fc/thread/thread.hpp>
+
+#include <QObject>
+
+#include <atomic>
+#include <mutex>
+
+namespace
+{
+/// Helper class to be base for all notification implementations holding theirs specific data.
+class ANotification
+  {
+  public:
+    /// Sends a notification to the actual sink and destroys current object.
+    virtual void Notify() = 0;
+
+  protected:
+    ANotification(IGuiUpdateSink& sink) : Sink(sink) {}
+    virtual ~ANotification() {}
+
+  /// Class attributes:
+  protected:
+    IGuiUpdateSink& Sink;
+  };
+
+/// The object receiving a signal sent by TThreadSafeGuiNotifier
+class TReceiver : public QObject
+  {
+  Q_OBJECT
+  public:
+    virtual ~TReceiver() {}
+
+  public slots:
+    void notificationReceived(ANotification* notification)
+      {
+      notification->Notify();
+      }
+  };
+
+} /// namespace anonymous
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///                     TConnectionProcessor::TThreadSafeGuiNotifier                            ///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Helper GUI update sink implementation sending notifications to the actual sink object after
+    switching to the GUI thread.
+    To do it utilizes QT signal/slot mechanism.
+*/
+class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
+                                                     public IGuiUpdateSink
+  {
+  Q_OBJECT
+
+  public:
+    explicit TThreadSafeGuiNotifier(IGuiUpdateSink& actualUpdateSink) :
+      Sink(actualUpdateSink)
+      {
+      /// Leave it as autoconnction to decide by QT engine how signal transmission should be done
+      connect(this, SIGNAL(notificationSent(ANotification*)), &Receiver,
+        SLOT(notificationReceived(ANotification*)));
+      }
+
+    virtual ~TThreadSafeGuiNotifier() {}
+
+  /// IGuiUpdateSink interface implementation:
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnReceivedChatMessage(const TContact& sender, const TChatMessage& msg,
+      const TTime& timeSent) override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnReceivedAuthorizationMessage(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
+      const TTime& timeSent) override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnMessageSaving() override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnMessageSaved(const TStoredMailMessage& msg,
+      const TStoredMailMessage* overwrittenOne) override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnMessageGroupPending(unsigned int count) override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnMessagePending(const TStoredMailMessage& msg,
+      const TStoredMailMessage* savedDraftMsg) override;
+/// \see IGuiUpdateSink interface description.
+    virtual void OnMessageGroupPendingEnd() override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnMessageSendingStart() override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnMessageSent(const TStoredMailMessage& pendingMsg,
+      const TStoredMailMessage& sentMsg) override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnMessageSendingEnd() override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
+      const TPhysicalMailMessage& msg) override;
+
+  private:
+    class TReceivedChatMsg : public ANotification
+      {
+      public:
+        static ANotification* Create(const TContact& sender, const TChatMessage& msg, const TTime& timeSent,
+          IGuiUpdateSink& sink)
+          {
+          return new TReceivedChatMsg(sender, msg, timeSent, sink);
+          }
+
+      /// ANotification class reimplementation:
+        virtual void Notify()
+          {
+          Sink.OnReceivedChatMessage(Sender, Msg, TimeSent);
+          delete this;
+          }
+
+      private:
+        TReceivedChatMsg(const TContact& sender, const TChatMessage& msg, const TTime& timeSent,
+          IGuiUpdateSink& sink) : ANotification(sink), Sender(sender), Msg(msg), TimeSent(timeSent) {}
+        virtual ~TReceivedChatMsg() {}
+
+      private:
+        TContact     Sender;
+        TChatMessage Msg;
+        TTime        TimeSent;
+      };
+
+    class TReceivedAuthorizationMsg : public ANotification
+      {
+      public:
+        static ANotification* Create(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
+          const TTime& timeSent, IGuiUpdateSink& sink)
+          {
+          return new TReceivedAuthorizationMsg(sender, msg, timeSent, sink);
+          }
+
+      /// ANotification class reimplementation:
+        virtual void Notify()
+          {
+          Sink.OnReceivedAuthorizationMessage(Sender, Msg, TimeSent);
+          delete this;
+          }
+
+      private:
+        TReceivedAuthorizationMsg(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
+          const TTime& timeSent, IGuiUpdateSink& sink) : ANotification(sink), Sender(sender), Msg(msg),
+          TimeSent(timeSent) {}
+        virtual ~TReceivedAuthorizationMsg() {}
+
+      private:
+        TRecipientPublicKey   Sender;
+        TAuthorizationMessage Msg;
+        TTime                 TimeSent;
+      };
+
+    class TReceivedMailMsg : public ANotification
+      {
+      public:
+        static ANotification* Create(const TStoredMailMessage& msg, IGuiUpdateSink& sink)
+          {
+          return new TReceivedMailMsg(msg, sink);
+          }
+
+      /// ANotification class reimplementation:
+        virtual void Notify()
+          {
+          Sink.OnReceivedMailMessage(Msg);
+          delete this;
+          }
+
+      private:
+        TReceivedMailMsg(const TStoredMailMessage& msg, IGuiUpdateSink& sink) :
+          ANotification(sink), Msg(msg) {}
+        virtual ~TReceivedMailMsg() {}
+
+      private:
+        TStoredMailMessage Msg;
+      };
+
+    class TNoDataNotification : public ANotification
+      {
+      public:
+        typedef std::function<void()> TOperation;
+
+        static ANotification* Create(const TOperation& op, IGuiUpdateSink& sink)
+          {
+          return new TNoDataNotification(op, sink);
+          }
+
+      /// ANotification class reimplementation:
+        virtual void Notify()
+          {
+          Op();
+          delete this;
+          }
+
+      private:
+        TNoDataNotification(const TOperation& op, IGuiUpdateSink& sink) :
+          ANotification(sink), Op(op) {}
+        virtual ~TNoDataNotification() {}
+
+      private:
+        TOperation Op;
+      };
+
+    class TPendingOrSavedMailMessage : public ANotification
+      {
+      public:
+        static ANotification* Create(const TStoredMailMessage& msg,
+          const TStoredMailMessage* overwrittenOne, bool saved, IGuiUpdateSink& sink)
+          {
+          return new TPendingOrSavedMailMessage(msg, overwrittenOne, saved, sink);
+          }
+
+      /// ANotification class reimplementation:
+        virtual void Notify()
+          {
+          if(Saved)
+            Sink.OnMessageSaved(Msg, OverwrittenOnePtr);
+          else
+            Sink.OnMessagePending(Msg, OverwrittenOnePtr);
+
+          delete this;
+          }
+
+      private:
+        TPendingOrSavedMailMessage(const TStoredMailMessage& msg,
+          const TStoredMailMessage* overwrittenOne, bool saved, IGuiUpdateSink& sink) :
+          ANotification(sink),
+          Msg(msg),
+          OverwrittenOnePtr(nullptr),
+          Saved(saved)
+          {
+          if(overwrittenOne != nullptr)
+            {
+            OverwrittenOne = *overwrittenOne;
+            OverwrittenOnePtr = &OverwrittenOne;
+            }
+          }
+
+        virtual ~TPendingOrSavedMailMessage() {}
+
+      /// Class attributes:
+      private:
+        TStoredMailMessage        Msg;
+        TStoredMailMessage        OverwrittenOne;
+        const TStoredMailMessage* OverwrittenOnePtr;
+        bool                      Saved;
+      };
+
+    class TPendingMessageGroup : public ANotification
+      {
+      public:
+        static ANotification* Create(unsigned int count, IGuiUpdateSink& sink)
+          {
+          return new TPendingMessageGroup(count, sink);
+          }
+
+      /// ANotification class reimplementation:
+        virtual void Notify()
+          {
+          Sink.OnMessageGroupPending(Count);
+          delete this;
+          }
+
+      private:
+        TPendingMessageGroup(unsigned int count, IGuiUpdateSink& sink) : ANotification(sink),
+          Count(count) {}
+        virtual ~TPendingMessageGroup() {}
+
+      /// Class attributes:
+      private:
+        unsigned int Count;
+      };
+
+    class TSentMailMessage : public ANotification
+      {
+      public:
+        static ANotification* Create(const TStoredMailMessage& pendingMsg,
+          const TStoredMailMessage& sentMsg, IGuiUpdateSink& sink)
+          {
+          return new TSentMailMessage(pendingMsg, sentMsg, sink);
+          }
+
+      /// ANotification class reimplementation:
+        virtual void Notify()
+          {
+          Sink.OnMessageSent(PendingMsg, SentMsg);
+          delete this;
+          }
+
+      private:
+        TSentMailMessage(const TStoredMailMessage& pendingMsg, const TStoredMailMessage& sentMsg,
+          IGuiUpdateSink& sink) : ANotification(sink),
+          PendingMsg(pendingMsg),
+          SentMsg(sentMsg) {}
+
+        virtual ~TSentMailMessage() {}
+
+      /// Class attributes:
+      private:
+        TStoredMailMessage PendingMsg;
+        TStoredMailMessage SentMsg;
+      };
+
+    class TMissingSenderIdentity : public ANotification
+      {
+      public:
+        static ANotification* Create(const TRecipientPublicKey& senderId,
+          const TPhysicalMailMessage& msg, IGuiUpdateSink& sink)
+          {
+          return new TMissingSenderIdentity(senderId, msg, sink);
+          }
+
+      /// ANotification class reimplementation:
+        virtual void Notify()
+          {
+          Sink.OnMissingSenderIdentity(SenderId, Msg);
+          delete this;
+          }
+
+      private:
+        TMissingSenderIdentity(const TRecipientPublicKey& senderId, const TPhysicalMailMessage& msg,
+          IGuiUpdateSink& sink) : ANotification(sink),
+          SenderId(senderId),
+          Msg(msg) {}
+
+        virtual ~TMissingSenderIdentity() {}
+
+      /// Class attributes:
+      private:
+      TRecipientPublicKey  SenderId;
+      TPhysicalMailMessage Msg;
+      };
+
+    Q_SIGNALS:
+      /// Emmitted when some GUI notification should be propagated across threads.
+      void notificationSent(ANotification* notification);
+
+  private:
+    IGuiUpdateSink& Sink;
+    TReceiver       Receiver;
+  };
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnReceivedChatMessage(const TContact& sender,
+  const TChatMessage& msg, const TTime& timeSent)
+  {
+  ANotification* n = TReceivedChatMsg::Create(sender, msg, timeSent, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnReceivedAuthorizationMessage(
+  const TRecipientPublicKey& sender, const TAuthorizationMessage& msg, const TTime& timeSent)
+  {
+  ANotification* n = TReceivedAuthorizationMsg::Create(sender, msg, timeSent, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnReceivedMailMessage(const TStoredMailMessage& msg)
+  {
+  ANotification* n = TReceivedMailMsg::Create(msg, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageSaving()
+  {
+  ANotification* n = TNoDataNotification::Create([=]() {Sink.OnMessageSaving();}, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageSaved(const TStoredMailMessage& msg,
+  const TStoredMailMessage* overwrittenOne)
+  {
+  ANotification* n = TPendingOrSavedMailMessage::Create(msg, overwrittenOne, true, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageGroupPending(unsigned int count)
+  {
+  ANotification* n = TPendingMessageGroup::Create(count, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessagePending(const TStoredMailMessage& msg,
+  const TStoredMailMessage* savedDraftMsg)
+  {
+  ANotification* n = TPendingOrSavedMailMessage::Create(msg, savedDraftMsg, false, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageGroupPendingEnd()
+  {
+  ANotification* n = TNoDataNotification::Create([=]() {Sink.OnMessageGroupPendingEnd();}, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageSendingStart()
+  {
+  ANotification* n = TNoDataNotification::Create([=]() {Sink.OnMessageSendingStart();}, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageSent(const TStoredMailMessage& pendingMsg,
+  const TStoredMailMessage& sentMsg)
+  {
+  ANotification* n = TSentMailMessage::Create(pendingMsg, sentMsg, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageSendingEnd()
+  {
+  ANotification* n = TNoDataNotification::Create([=]() {Sink.OnMessageSendingEnd();}, Sink);
+  emit notificationSent(n);
+  }
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnMissingSenderIdentity(
+  const TRecipientPublicKey& senderId, const TPhysicalMailMessage& msg)
+  {
+  ANotification* n = TMissingSenderIdentity::Create(senderId, msg, Sink);
+  emit notificationSent(n);
+  }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///                             TConnectionProcessor::TOutboxQueue                              ///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+class TConnectionProcessor::TOutboxQueue
+  {
+  public:
+    TOutboxQueue(TConnectionProcessor& processor, const bts::profile_ptr& profile) :
+      Processor(processor)
+      {
+      Profile = profile;
+      App = bts::application::instance();
+
+      Outbox = profile->get_pending_db();
+      Sent = profile->get_sent_db();
+      CancelPromise = new fc::promise<void>;
+
+      checkForAvailableConnection();
+      }
+
+    /** Allows to add new pending message to the sending queue.
+        \param senderId      - identity chosen to be specified as mail sender,
+        \param msg           - mail message to be sent,
+        \param savedDraftMsg - optional, can be nullptr. If not null, it means that previously saved
+                               draft message is about to send (it should be removed from Draft
+                               folder).
+    */
+    void AddPendingMessage(const TIdentity& senderId, const TPhysicalMailMessage& msg,
+      const TStoredMailMessage* savedDraftMsg);
+
+    bool AnyOperationsPending() const;
+
+    /// Returns length of the queue.
+    unsigned int GetLength() const;
+
+    bool isTransmissionLoopActive() const
+      {
+      return TransferLoopComplete.valid() && TransferLoopComplete.ready() == false;
+      }
+
+    /// Method dedicated to cancel any transmission ie just before quiting the app.
+    void StopTransmission()
+      {
+      bool transferActive = isTransmissionLoopActive();
+      bool connectionActive = ConnectionCheckComplete.valid() &&
+        ConnectionCheckComplete.ready() == false;
+      
+      if(transferActive || connectionActive)
+        {
+        CancelPromise->set_value();
+
+        if(ConnectionCheckComplete.valid())
+          {
+          ConnectionCheckComplete.cancel();
+          ConnectionCheckComplete.wait();
+          }
+
+        if(TransferLoopComplete.valid())
+          {
+          TransferLoopComplete.cancel();
+          TransferLoopComplete.wait();
+          }
+        }
+      }
+
+    void Release()
+      {
+      StopTransmission();
+
+      assert(AnyOperationsPending() == false);
+      delete this;
+      }
+
+  private:
+    virtual ~TOutboxQueue() {}
+
+    void transmissionLoop();
+    
+    bool isConnected() const
+      {
+      auto network = App->get_network();
+      return static_cast<unsigned int>(network->get_connections().size()) > 0;
+      }
+
+    bool isMailConnected() const
+      {
+      return App->is_mail_connected();
+      }
+
+    void connectionCheckingLoop();
+    void startTransmission()
+      {
+      if(TransferLoopComplete.valid() == false || TransferLoopComplete.ready())
+        TransferLoopComplete = fc::async([=]{ transmissionLoop(); });
+      }
+
+    void checkForAvailableConnection()
+      {
+      if(ConnectionCheckComplete.valid() == false || ConnectionCheckComplete.ready())
+        ConnectionCheckComplete = fc::async([=]{ connectionCheckingLoop(); });
+      }
+
+    bool isCancelled() const
+      {
+      return CancelPromise->ready();
+      }
+
+    bool fetchNextMessage(TStoredMailMessage* storedMsg, TPhysicalMailMessage* storage);
+    bool transferMessage(const TRecipientPublicKey& senderId, const TPhysicalMailMessage& msg);
+    void sendMail(const TPhysicalMailMessage& email, const TRecipientPublicKey& to,
+      const fc::ecc::private_key& from);
+
+    /** Allows to get identity associated to given public key. Returns false if there is no
+        associated identity to given public key.
+    */
+    bool findIdentity(const TRecipientPublicKey& senderId, TIdentity* identity) const;
+    /** Allows to get private key associated to given public key (held by one of defined identities).
+        Returns false if there is no associated identity to given public key.
+    */
+    bool findIdentityPrivateKey(const TRecipientPublicKey& senderId,
+      bts::extended_private_key* key) const;
+    /// Allows to move already sent message from Outbox DB into Sent DB.
+    void moveMsgToSentDB(const TStoredMailMessage& storedMsg, const TPhysicalMailMessage& sentMsg);
+
+  private:
+    TConnectionProcessor&        Processor;
+    bts::profile_ptr       Profile;
+    bts::application_ptr   App;
+    TMessageDB             Outbox;
+    TMessageDB             Sent;
+    fc::future<void>       TransferLoopComplete;
+    fc::future<void>       ConnectionCheckComplete;
+    fc::promise<void>::ptr CancelPromise;
+    mutable std::mutex     OutboxDbLock;
+  };
+
+void TConnectionProcessor::TOutboxQueue::AddPendingMessage(const TIdentity& senderId,
+  const TPhysicalMailMessage& msg, const TStoredMailMessage* savedDraftMsg)
+  {
+  std::lock_guard<std::mutex> guard(OutboxDbLock);
+
+  TStorableMessage storableMsg;
+  Processor.PrepareStorableMessage(senderId, msg, &storableMsg);
+  TStoredMailMessage storedMsg = Outbox->store_message(storableMsg, nullptr);
+  Processor.Sink->OnMessagePending(storedMsg, savedDraftMsg);
+
+  /// Try to start thread checking connection and next potential transmission
+  checkForAvailableConnection();
+  }
+
+bool TConnectionProcessor::TOutboxQueue::AnyOperationsPending() const
+  {
+  bool transferLoopActive = isTransmissionLoopActive();
+  std::lock_guard<std::mutex> guard(OutboxDbLock);
+  return transferLoopActive ? Outbox->fetch_headers(TPhysicalMailMessage::type).empty() : false;
+  }
+
+unsigned int TConnectionProcessor::TOutboxQueue::GetLength() const
+  {
+  bool transferLoopCompleted = TransferLoopComplete.valid() == false || TransferLoopComplete.ready();
+  std::lock_guard<std::mutex> guard(OutboxDbLock);
+  return transferLoopCompleted ? 0 : Outbox->fetch_headers(TPhysicalMailMessage::type).size();
+  }
+
+void TConnectionProcessor::TOutboxQueue::transmissionLoop()
+  {
+  bool notificationSent = false;
+
+  TPhysicalMailMessage msg;
+  TStoredMailMessage   storedMsg;
+
+  while(isCancelled() == false && fetchNextMessage(&storedMsg, &msg))
+    {
+    if(notificationSent == false)
+      {
+      Processor.Sink->OnMessageSendingStart();
+      notificationSent = true;
+      }
+
+    if(transferMessage(storedMsg.from_key, msg))
+      moveMsgToSentDB(storedMsg, msg);
+    else
+      break;
+
+    if(isCancelled())
+      break;
+
+    fc::usleep(fc::milliseconds(250));
+    }
+
+  if(notificationSent)
+    Processor.Sink->OnMessageSendingEnd();
+  }
+
+void TConnectionProcessor::TOutboxQueue::connectionCheckingLoop()
+  {
+  do
+    {
+    if(isMailConnected())
+      {
+      startTransmission();
+      break;
+      }
+
+    fc::usleep(fc::milliseconds(250));
+    }
+  while(CancelPromise->ready() == false);
+  }
+
+bool TConnectionProcessor::TOutboxQueue::fetchNextMessage(TStoredMailMessage* storedMsg,
+  TPhysicalMailMessage* storage)
+  {
+  assert(storedMsg != nullptr);
+  assert(storage != nullptr);
+
+  std::lock_guard<std::mutex> guard(OutboxDbLock);
+
+  try
+    {
+    /// FIXME - message_db interface is terrible - there should be a way to query just for 1 object
+    auto pendingMsgHeaders = Outbox->fetch_headers(TPhysicalMailMessage::type);
+    if(pendingMsgHeaders.empty())
+      return false;
+
+    *storedMsg = pendingMsgHeaders.front();
+    auto rawData = Outbox->fetch_data(storedMsg->digest);
+    *storage = fc::raw::unpack<TPhysicalMailMessage>(rawData);
+
+    return true;
+    }
+  catch(const fc::exception& e)
+    {
+    elog("${e}", ("e", e.to_detail_string()));
+    return false;
+    }
+  }
+
+bool TConnectionProcessor::TOutboxQueue::transferMessage(const TRecipientPublicKey& senderId,
+  const TPhysicalMailMessage& msg)
+  {
+  bool sendStatus = false;
+
+  try
+    {
+    bts::extended_private_key senderPrivKey;
+    if(findIdentityPrivateKey(senderId, &senderPrivKey))
+      {
+      TPhysicalMailMessage msgToSend(msg);
+      TRecipientPublicKeys bccList(msg.bcc_list);
+      /// \warning Message to be sent must have cleared bcc list.
+      msgToSend.bcc_list.clear();
+
+      size_t totalRecipientCount = msgToSend.to_list.size() + msgToSend.cc_list.size() + bccList.size();
+
+      for(const auto& public_key : msgToSend.to_list)
+        {
+        if(isCancelled())
+          return false;
+        sendMail(msgToSend, public_key, senderPrivKey);
+        }
+
+      for(const auto& public_key : msgToSend.cc_list)
+        {
+        if(isCancelled())
+          return false;
+        sendMail(msgToSend, public_key, senderPrivKey);
+        }
+
+      for(const auto& public_key : bccList)
+        {
+        if(isCancelled())
+          return false;
+        sendMail(msgToSend, public_key, senderPrivKey);
+        }
+
+      sendStatus = true;
+      }
+    else
+      {
+      Processor.Sink->OnMissingSenderIdentity(senderId, msg);
+      sendStatus = false;
+      }
+    }
+  catch(const fc::exception& e)
+    {
+    sendStatus = false;
+    elog("${e}", ("e", e.to_detail_string()));
+    /// Probably connection related error, try to start it again
+    checkForAvailableConnection();
+    }
+
+  return sendStatus;
+  }
+
+inline
+void TConnectionProcessor::TOutboxQueue::sendMail(const TPhysicalMailMessage& email,
+  const TRecipientPublicKey& to, const fc::ecc::private_key& from)
+  {
+  if(isMailConnected())
+    {
+    App->send_email(email, to, from);
+    return;
+    }
+
+  FC_THROW("No connection to execute send_email"); 
+  }
+
+inline
+bool TConnectionProcessor::TOutboxQueue::findIdentity(const TRecipientPublicKey& senderId,
+  TIdentity* identity) const
+  {
+  *identity = TIdentity();
+
+  for(const TIdentity& id : Profile->identities())
+    {
+    if(id.public_key == senderId)
+      {
+      *identity = id;
+      return true;
+      }
+    }
+
+  return false;
+  }
+
+inline
+bool TConnectionProcessor::TOutboxQueue::findIdentityPrivateKey(const TRecipientPublicKey& senderId,
+  bts::extended_private_key* key) const
+  {
+  *key = bts::extended_private_key();
+
+  TIdentity id;
+  if(findIdentity(senderId, &id))
+    {
+    *key = Profile->get_keychain().get_identity_key(id.dac_id_string);
+    return true;
+    }
+
+  return false;
+  }
+
+void TConnectionProcessor::TOutboxQueue::moveMsgToSentDB(const TStoredMailMessage& pendingMsg,
+  const TPhysicalMailMessage& sentMsg)
+  {
+  try
+    {
+    TIdentity id;
+    bool result = findIdentity(pendingMsg.from_key, &id);
+    assert(result);
+
+    TStorableMessage storableMsg;
+    Processor.PrepareStorableMessage(id, sentMsg, &storableMsg);
+
+    TStoredMailMessage savedMsg = Sent->store_message(storableMsg, nullptr);
+    Processor.Sink->OnMessageSent(pendingMsg, savedMsg);
+
+    std::lock_guard<std::mutex> guard(OutboxDbLock);
+
+    Outbox->remove_message(pendingMsg);
+    }
+  catch(const fc::exception& e)
+    {
+    elog("${e}", ("e", e.to_detail_string()));
+    }
+  }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///                                    TConnectionProcessor                                     ///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+TConnectionProcessor::TConnectionProcessor(IGuiUpdateSink& updateSink,
+  const bts::profile_ptr& loadedProfile) :
+  Profile(loadedProfile),
+  TransmissionCancelled(false),
+  ReceivingMail(false)
+  {
+  Sink = new TThreadSafeGuiNotifier(updateSink);
+
+  App = bts::application::instance();
+  
+  App->set_application_delegate(this);
+
+  Drafts = Profile->get_draft_db();
+  OutboxQueue = new TOutboxQueue(*this, Profile);
+  }
+
+TConnectionProcessor::~TConnectionProcessor()
+  {
+  App->set_application_delegate(nullptr);
+  delete Sink;
+  Sink = nullptr;
+  OutboxQueue->Release();
+  OutboxQueue = nullptr;
+  }
+
+void TConnectionProcessor::Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
+  const TStoredMailMessage* savedDraftMsg)
+  {
+  OutboxQueue->AddPendingMessage(senderId, msg, savedDraftMsg);
+  }
+
+IMailProcessor::TStoredMailMessage 
+TConnectionProcessor::Save(const TIdentity& senderId, const TPhysicalMailMessage& sourceMsg,
+  const TStoredMailMessage* msgBeingReplaced)
+  {
+  Sink->OnMessageSaving();
+
+  TStorableMessage storableMsg;
+  PrepareStorableMessage(senderId, sourceMsg, &storableMsg);
+  //Modify digest by updating signature time for the draft email.
+  //Note that signature time is not true signature time of send, but
+  //time when this version of draft email is being saved.
+  storableMsg.sig_time = fc::time_point::now();
+  TStoredMailMessage savedMsg = Drafts->store_message(storableMsg,msgBeingReplaced);
+  Sink->OnMessageSaved(savedMsg, msgBeingReplaced);
+  return savedMsg;
+  }
+
+unsigned int TConnectionProcessor::GetPeerConnectionCount() const
+  {
+  return static_cast<unsigned int>(App->get_network()->get_connections().size());
+  }
+
+bool TConnectionProcessor::IsMailConnected() const
+  {
+  return App->is_mail_connected();
+  }
+
+bool TConnectionProcessor::CanQuit(bool* canBreak /*= nullptr*/) const
+  {
+  if(canBreak != nullptr)
+    *canBreak = ReceivingMail == false; /// Incoming mail transmission is not breakable
+
+  return OutboxQueue->isTransmissionLoopActive() == false && ReceivingMail == false &&
+    OutboxQueue->AnyOperationsPending() == false;
+  }
+
+void TConnectionProcessor::CancelTransmission()
+  {
+  assert(ReceivingMail == false);
+
+  OutboxQueue->StopTransmission();
+  }
+
+void TConnectionProcessor::connection_count_changed(unsigned int count)
+  {
+  /// Looks like this notification is not yet sent - then do nothing right now even could be useful
+  }
+
+bool TConnectionProcessor::receiving_mail_message()
+  {
+  ReceivingMail = true;
+  return TransmissionCancelled == false;
+  }
+
+void TConnectionProcessor::received_text(const bts::bitchat::decrypted_message& msg)
+  {
+  try
+    {
+    auto aBook = Profile->get_addressbook();
+    fc::optional<bts::addressbook::wallet_contact> optContact;
+    
+    if(msg.from_key)
+      optContact = aBook->get_contact_by_public_key(*msg.from_key);
+
+    if (optContact)
+      {
+      wlog("Received text from known contact!");
+      Profile->get_chat_db()->store_message(msg,nullptr);
+      auto chatMsg = msg.as<bts::bitchat::private_text_message>();
+      Sink->OnReceivedChatMessage(*optContact, chatMsg, msg.sig_time);
+      }
+    else
+      {
+      elog("Received chat message from unknown contact/missing sender - ignoring");
+      }
+    }
+  catch(const fc::exception& e)
+    {
+    elog("${e}", ("e", e.to_detail_string()));
+    }
+  }
+
+void TConnectionProcessor::received_email(const bts::bitchat::decrypted_message& msg)
+  {
+  try
+    {
+    ReceivingMail = false;
+    auto header = Profile->get_inbox_db()->store_message(msg,nullptr);
+    Sink->OnReceivedMailMessage(header);
+    }
+  catch(const fc::exception& e)
+    {
+    elog("${e}", ("e", e.to_detail_string()));
+    }
+  }
+
+void TConnectionProcessor::received_request(const bts::bitchat::decrypted_message& msg)
+  {
+  try
+    {
+    if(msg.from_key)
+      {
+      //Profile->get_request_db()->store_message(msg, nullptr);
+      auto reqMsg = msg.as<bts::bitchat::private_contact_request_message>();
+      Sink->OnReceivedAuthorizationMessage(*msg.from_key, reqMsg, msg.sig_time);
+      }
+    else
+      {
+      elog("Received auth. message with missing sender key - ignoring");
+      }
+    }
+  catch(const fc::exception& e)
+    {
+    elog("${e}", ("e", e.to_detail_string()));
+    }
+  }
+
+void TConnectionProcessor::message_transmission_finished(bool success)
+  {
+  ReceivingMail = false;
+  }
+
+void TConnectionProcessor::PrepareStorableMessage(const TIdentity& senderId,
+  const TPhysicalMailMessage& sourceMsg, TStorableMessage* storableMsg)
+  {
+  /** It looks for me like another bug in backend. Even decrypted message object can be constructed
+      directly by using interface of this class it is not sufficient to successfully store it in
+      message_db. All operations performed while sending/receiving email must be performed (except
+      transmission of course). So it must be first encrypted and next decrypted to properly fill
+      actual decrypted message.
+  */
+  //DLN Since we're saving message in unencrypted format in dbases, I think it would be better to
+  //work with decrypted_message (TStorableMessage) and eliminate most references to TPhysicalMailMesage
+  //at GUI level. The only time TPhysicalMailMessage is necessary is when actually sending. So I think
+  //it would be better to extract fields from GUI forms to TStorableMessage, then have a function to convert
+  //TStorableMessage to TPhysicalMailMessage for sending (opposite of how it is now I think). There's
+  //no need to do a full sign/encrypt to save TStorableMessage in database, it just needs to have a unique
+  //sig_time (so that the mapping to the message contents is unique even when two email messages have
+  //same contents). 
+  // For draft messages, this can be achieved by simply setting sig_time
+  //"draft save time". I added a line to set the sig_time in the Save function,
+  // even though this PrepareStorableMessage currently sets it, 
+  // with the idea that we could then eliminate PrepareStorableMessage.
+  // Also, we should change the "Date Sent" column in draft mailbox view to "Date Saved".
+  // 
+  bts::bitchat::decrypted_message msg(sourceMsg);
+
+  auto senderPrivKey = Profile->get_keychain().get_identity_key(senderId.dac_id_string);
+  msg.sign(senderPrivKey);
+  auto encMsg = msg.encrypt(senderId.public_key);
+  encMsg.timestamp = fc::time_point::now();
+
+  encMsg.decrypt(senderPrivKey, *storableMsg);
+  }
+
+#include "ConnectionProcessor.moc"
+

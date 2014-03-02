@@ -465,4 +465,5 @@ void Mailbox::previewImages (QTextEdit* textEdit)
       textEdit->append(attachmentFileName +  "<center><img src='" + imageName + "'></center>");
     }
   }
+
 }

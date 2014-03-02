@@ -4,12 +4,13 @@
 #include <bts/addressbook/addressbook.hpp>
 #include <bts/application.hpp>
 
-#include "qtreusable/selfsizingmainwindow.h"
-
-#include "dataaccessimpl.h"
-#include "mailprocessorimpl.hpp"
-#include "ch/ModificationsChecker.hpp"
 #include "ATopLevelWindowsContainer.hpp"
+#include "ConnectionProcessor.hpp"
+
+#include "ch/GuiUpdateSink.hpp"
+#include "ch/ModificationsChecker.hpp"
+
+#include "qtreusable/selfsizingmainwindow.h"
 
 #include <QList>
 #include <QTreeWidget>
@@ -66,7 +67,7 @@ class AuthorizationItem : public QTreeWidgetItem
 public:
   typedef fc::ecc::public_key TPublicKey;
 
-  AuthorizationItem(Authorization* view, QTreeWidgetItem *parent, int type = 0)
+  AuthorizationItem(Authorization* view, QTreeWidgetItem* parent, int type = 0)
     : QTreeWidgetItem(parent, type), _view(view) {}
   virtual ~AuthorizationItem();
 
@@ -84,8 +85,7 @@ private:
 };
 
 class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
-                            protected bts::application_delegate,
-                            protected IMailProcessor::IUpdateSink,
+                            protected IGuiUpdateSink,
                             public IModificationsChecker
 {
   Q_OBJECT
@@ -132,36 +132,35 @@ protected:
   virtual void keyPressEvent(QKeyEvent *) override;
 
 private:
-/// application_delegate interface implementation
-  virtual void connection_count_changed(unsigned int count) override;
-  virtual bool receiving_mail_message() override;
-  virtual void received_text(const bts::bitchat::decrypted_message& msg) override;
-  virtual void received_email(const bts::bitchat::decrypted_message& msg) override;
-  virtual void received_request( const bts::bitchat::decrypted_message& msg) override;
-  virtual void message_transmission_failure() override;
-
-private:
-/// IMessageProcessor::IUpdateSink interface description:
-  /// \see IMessageProcessor::IUpdateSink interface description.
+/// IGuiUpdateSink interface description:
+  /// \see IGuiUpdateSink interface description.
+  virtual void OnReceivedChatMessage(const TContact& sender, const TChatMessage& msg,
+    const TTime& timeSent) override;
+  /// \see IGuiUpdateSink interface description.
+  virtual void OnReceivedAuthorizationMessage(const TRecipientPublicKey& sender,
+    const TAuthorizationMessage& msg, const TTime& timeSent) override;
+  /// \see IGuiUpdateSink interface description.
+  virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) override;
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSaving() override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSaved(const TStoredMailMessage& msg,
     const TStoredMailMessage* overwrittenOne) override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageGroupPending(unsigned int count) override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessagePending(const TStoredMailMessage& msg,
     const TStoredMailMessage* savedDraftMsg) override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageGroupPendingEnd() override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSendingStart() override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSent(const TStoredMailMessage& pendingMsg,
     const TStoredMailMessage& sentMsg) override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSendingEnd() override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
     const TPhysicalMailMessage& msg) override;
 
@@ -228,11 +227,13 @@ private:
   bool stopMailTransmission();
   bool checkSaving() const;
   void showContacts() const;
-  void createAuthorizationItem(const bts::bitchat::decrypted_message& msg);
+  void createAuthorizationItem(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
+    const TTime& timeSent);
   QTreeWidgetItem* findExistSenderItem(AuthorizationItem::TPublicKey from_key, bool &to_root);
   void showAuthorizationItem(AuthorizationItem *item);
   void deleteAuthorizationItem(AuthorizationItem *item);
-  void processResponse(const bts::bitchat::decrypted_message& msg);
+  void processResponse(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
+    const TTime& timeSent);
 
   /// Class attributes:
 
@@ -260,12 +261,9 @@ private:
 
   QLineEdit*                              _search_edit;
   Ui::KeyhoteeMainWindow*                 ui;
-  TConnectionStatusDS                     ConnectionStatusDS;
-  TMailProcessor                          MailProcessor;
+  TConnectionProcessor                    _connectionProcessor;
   Mailbox*                                _currentMailbox;
   MenuEditControl*                        menuEdit;
-  /// Set to true between calls: receiving_mail_message <=> received_message
-  bool                                    _receivingMail;
   /// Set to true when close event processing is in progress (it wasn't yet accepted nor ignored)
   bool                                    _isClosing;
 }; //KeyhoteeMainWindow
