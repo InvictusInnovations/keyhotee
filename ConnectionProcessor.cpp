@@ -91,7 +91,7 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
     /// \see IGuiUpdateSink interface description.
     virtual void OnMessagePending(const TStoredMailMessage& msg,
       const TStoredMailMessage* savedDraftMsg) override;
-/// \see IGuiUpdateSink interface description.
+    /// \see IGuiUpdateSink interface description.
     virtual void OnMessageGroupPendingEnd() override;
     /// \see IGuiUpdateSink interface description.
     virtual void OnMessageSendingStart() override;
