@@ -352,12 +352,14 @@ void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessag
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
   {
   if(maybeSave())
-  {
+    {
     e->accept();
     ATopLevelWindow::closeEvent(e);
-  }
+    }
   else
+    {
     e->ignore();
+    }
   }
 
 bool MailEditorMainWindow::maybeSave()
@@ -370,7 +372,20 @@ bool MailEditorMainWindow::maybeSave()
     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
   
   if(ret == QMessageBox::Save)
+    {
+    auto idents = bts::get_profile()->identities();
+
+    if(idents.empty())
+      {
+      QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Keyhotee"),
+        tr("Cannot save this draft. No Identity is present.\nPlease create an Identity to save this draft"),
+        QMessageBox::Ok);
+
+      return false;
+      }
+
     return onSave();
+    }
   else
   if(ret == QMessageBox::Cancel)
     return false;
@@ -401,14 +416,16 @@ void MailEditorMainWindow::setupEditorCommands()
   FontSize->setCurrentIndex(FontSize->findText(QString::number(QApplication::font().pointSize())));
   }
 
-bool MailEditorMainWindow::isMsgSizeOK(const TPhysicalMailMessage& srcMsg)
+bool MailEditorMainWindow::checkMsgSize(const TPhysicalMailMessage& srcMsg)
 {
-  int msg_size = srcMsg.subject.size() + srcMsg.body.size();
-  for(int i=0; i<srcMsg.attachments.size(); i++)
+  size_t msg_size = srcMsg.subject.size() + srcMsg.body.size();
+  for(size_t i=0; i<srcMsg.attachments.size(); ++i)
     msg_size += srcMsg.attachments[i].body.size();
+
   if(msg_size > 1024*1024)
   {
-    QMessageBox::warning(this, tr("Warning"), tr("Message size limit exceeded.\nMessage with attachments can not be larger than 1 MB."));
+    QMessageBox::warning(this, tr("Warning"),
+      tr("Message size limit exceeded.\nMessage with attachments can not be larger than 1 MB."));
     return false;
   }
   return true;
@@ -556,32 +573,21 @@ void MailEditorMainWindow::toggleReadOnlyMode()
 
 bool MailEditorMainWindow::onSave()
   {
-  ui->messageEdit->document()->setModified(false);
   TPhysicalMailMessage msg;
   if(prepareMailMessage(&msg))
     {
-      if(!isMsgSizeOK(msg))
-      {
-        ui->messageEdit->document()->setModified(true);
-        return false;
-      }
+    if(checkMsgSize(msg) == false)
+      return false;
+
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
 
-    auto app = bts::application::instance();
-    auto profile = app->get_profile();
-    auto idents = profile->identities();
-
-    if(0 == idents.size())
-      {
-      QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Keyhotee"),
-      tr("Cannot save this draft. No Identity is present.\nPlease create an Identity to save this draft"),
-      QMessageBox::Ok);
-      return false;
-      }
     //DLN we should probably add get_pointer implementation to fc::optional to avoid code like this
     TStoredMailMessage* oldMessage = DraftMessage.valid() ? &(*DraftMessage) : nullptr;
     DraftMessage = MailProcessor.Save(senderId, msg, oldMessage);
     }
+
+  ui->messageEdit->document()->setModified(false);
+
   return true;
   }
 
@@ -711,8 +717,9 @@ void MailEditorMainWindow::on_actionSend_triggered()
   TPhysicalMailMessage msg;
   if(prepareMailMessage(&msg))
     {
-      if(!isMsgSizeOK(msg))
-        return;
+    if(checkMsgSize(msg) == false)
+      return;
+
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
     MailProcessor.Send(senderId, msg, DraftMessage.valid() ? &(*DraftMessage) : nullptr);
     /// Clear potential modified flag to avoid asking for saving changes.

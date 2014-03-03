@@ -11,33 +11,6 @@
 
 extern bool gMiningIsPossible;
 
-bool isOwnedPublicKey(fc::ecc::public_key public_key)
-  {
-  bts::application_ptr app = bts::application::instance();
-  bts::profile_ptr     currentProfile = app->get_profile();
-  bts::keychain        keyChain = currentProfile->get_keychain();
-
-  typedef std::set<fc::ecc::public_key_data> TPublicKeyIndex;
-  try
-    {
-    //put all public keys owned by profile into a set
-    TPublicKeyIndex myPublicKeys;
-    for (const auto& id : currentProfile->identities())
-      {
-      auto myPublicKey = keyChain.get_identity_key(id.dac_id_string).get_public_key();
-      fc::ecc::public_key_data keyData = myPublicKey;
-      myPublicKeys.insert(keyData);
-      }
-    //check if we have a public key in our set matching the contact's public key
-    return myPublicKeys.find(public_key) != myPublicKeys.end();
-    }
-  catch (const fc::exception&)
-    {
-    return false;
-    }
-  }
-
-
 KeyhoteeIDPubKeyWidget::KeyhoteeIDPubKeyWidget(QWidget *parent) :
   QWidget(parent),
   ui(new Ui::KeyhoteeIDPubKeyWidget)
@@ -55,9 +28,11 @@ KeyhoteeIDPubKeyWidget::KeyhoteeIDPubKeyWidget(QWidget *parent) :
 }
 
 KeyhoteeIDPubKeyWidget::~KeyhoteeIDPubKeyWidget()
-{
-    delete ui;
-}
+  {
+  cancelLookupThread();
+
+  delete ui;
+  }
 
 void KeyhoteeIDPubKeyWidget::setKeyhoteeID(const QString& keyhotee_id)
 {
@@ -152,14 +127,9 @@ void KeyhoteeIDPubKeyWidget::keyhoteeIdEdited(const QString& keyhotee_id)
 {
   if (gMiningIsPossible)
   {
-    _last_validate = fc::time_point::now();
-    ui->id_status->setText(tr("Looking up id...") );
-    fc::async( [ = ](){
-        fc::usleep(fc::microseconds(500 * 1000) );
-        if (fc::time_point::now() > (_last_validate + fc::microseconds(500 * 1000)))
-          lookupId();
-      }
-      );
+  cancelLookupThread();
+  ui->id_status->setText(tr("Looking up id...") );
+  _lookupThreadState = fc::async([=]() {lookupId();});
   }
 }
 
@@ -229,7 +199,7 @@ void KeyhoteeIDPubKeyWidget::lookupId()
     else //regular contact (not identity)
     { //all this code needs double checking and rethinking, but first lets get UI
       //correct (right now id_status is replicated in ContactView as keyhoteeID_status!)
-      std::string current_id = fc::trim(ui->keyhotee_id->text().toUtf8().constData());
+      std::string current_id = fc::trim(ui->keyhotee_id->text().toStdString());
       emit currentState(InvalidData);
       if (current_id.empty() )
       {
@@ -300,6 +270,21 @@ void KeyhoteeIDPubKeyWidget::onPublicKeyToClipboard()
   QClipboard *clip = QApplication::clipboard();
   clip->setText(ui->public_key->text());
 }
+
+inline
+bool KeyhoteeIDPubKeyWidget::isLookupThreadActive() const
+  {
+  return (_lookupThreadState.valid() && _lookupThreadState.ready() == false);
+  }
+
+void KeyhoteeIDPubKeyWidget::cancelLookupThread()
+  {
+  if(isLookupThreadActive())
+    {
+    _lookupThreadState.cancel();
+    _lookupThreadState.wait();
+    }
+  }
 
 bool KeyhoteeIDPubKeyWidget::existContactWithPublicKey (const std::string& public_key_string)
 {

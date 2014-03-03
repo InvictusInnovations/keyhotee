@@ -17,7 +17,7 @@
    <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Information collected by this form is meant to strengthen your brain wallet with unique yet easily remembered information. This information is never sent to any other party.  </string>
+      <string>Information collected by this form is meant to strengthen your brain wallet with unique yet easily remembered information. This information is never sent to any other party. It is important to note that this text is case-sensitive.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -87,63 +87,12 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Date of Birth</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QDateEdit" name="birthdate">
-       <property name="displayFormat">
-        <string>yyyy-MM-dd</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Passport #</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="passport">
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="placeholderText">
-        <string>Passport or Social Security Number</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>License #</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="license">
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item row="2" column="1">
     <widget class="QLabel" name="label_7">
      <property name="text">
-      <string>You will need to remember the values you provide here any time you wish to recover your profile from memory alone.  Your profile gives you access to your identies and money within Keyhotee.</string>
+      <string>You will need to remember the values you provide here any time you wish to recover your profile from memory alone.  Your profile gives you access to your identities and money within Keyhotee.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -181,7 +130,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="brainkey_warning">
         <property name="text">
-         <string>Your brain key must have at least 32 characters</string>
+         <string>Your brain key must have at least 32 characters.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

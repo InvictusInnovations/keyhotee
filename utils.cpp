@@ -2,6 +2,7 @@
 
 #include "public_key_address.hpp"
 
+#include <bts/application.hpp>
 #include <bts/profile.hpp>
 #include <bts/addressbook/addressbook.hpp>
 #include <bts/addressbook/contact.hpp>
@@ -57,11 +58,11 @@ QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFo
         switch(contactFormatting)
           {
           case KEYHOTEE_IDENTIFIER:
-            return QString(identity.dac_id_string.c_str());
+            return QString::fromStdString(identity.dac_id_string);
           case CONTACT_ALIAS_FULL_NAME:
-            return QString(std::string(identity.first_name + " " + identity.last_name).c_str());
+            return QString::fromStdString(std::string(identity.first_name + " " + identity.last_name));
           case FULL_CONTACT_DETAILS:
-            return QString(identity.get_display_name().c_str());
+            return QString::fromStdString(identity.get_display_name());
           default:
             assert(false);
             return QString();
@@ -79,10 +80,8 @@ QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFo
     if(isKnownContact != nullptr)
       *isKnownContact = false;
 
-
     /// If code reached this point the publick key is unknown - lets display it as base58
-    std::string public_key_string = public_key_address(pk);
-    return QString(public_key_string.c_str());
+    return QString::fromStdString(pk.to_base58());
     }
   }
 
@@ -125,23 +124,50 @@ makeContactListString(const std::vector<fc::ecc::public_key>& key_list, char sep
   return to_list.join(separator);
   }
 
+bool isOwnedPublicKey(const fc::ecc::public_key& public_key)
+  {
+  bts::application_ptr app = bts::application::instance();
+  bts::profile_ptr     currentProfile = app->get_profile();
+  bts::keychain        keyChain = currentProfile->get_keychain();
+
+  typedef std::set<fc::ecc::public_key_data> TPublicKeyIndex;
+  try
+    {
+    //put all public keys owned by profile into a set
+    TPublicKeyIndex myPublicKeys;
+    for (const auto& id : currentProfile->identities())
+      {
+      auto myPublicKey = keyChain.get_identity_key(id.dac_id_string).get_public_key();
+      fc::ecc::public_key_data keyData = myPublicKey;
+      myPublicKeys.insert(keyData);
+      }
+    //check if we have a public key in our set matching the contact's public key
+    return myPublicKeys.find(public_key) != myPublicKeys.end();
+    }
+  catch (const fc::exception&)
+    {
+    return false;
+    }
+  }
+
 QString lTrim(QString const& str)
   {
-    if (str.size() == 0)
-        return str;
-    const QChar *s = (const QChar*)str.data();
-    if (!s->isSpace() )
-        return str;
-    int start = 0;
-    int end = str.size() - 1;
-    while (start<=end && s[start].isSpace())  // skip white space from start
-        start++;
-    int l = end - start + 1;
-    if (l <= 0) {
-        QStringDataPtr empty = { QString::Data::allocate(0) };
-        return QString(empty);
-    }
-    return QString(s + start, l);
+  if (str.isEmpty())
+    return str;
+
+  const QChar *s = (const QChar*)str.data();
+  if (!s->isSpace() )
+      return str;
+  int start = 0;
+  int end = str.size() - 1;
+  while (start<=end && s[start].isSpace())  // skip white space from start
+    start++;
+  int l = end - start + 1;
+  if (l <= 0) {
+    QStringDataPtr empty = { QString::Data::allocate(0) };
+    return QString(empty);
+  }
+  return QString(s + start, l);
 }
 
 void convertToASCII(const std::string& input, std::string* buffer)

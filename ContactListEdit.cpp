@@ -401,13 +401,47 @@ void ContactListEdit::onTextChanged()
   */
   QString text = textUnderCursor(&_activeCursor);
 
-  if(_skipCompletion == false && _completer != nullptr && isReadOnly() == false)
+  if(_skipCompletion == false && _completer != nullptr && isReadOnly() == false &&
+     text.isEmpty() == false)
     {
     TAutoSkipCompletion asc(this);
 
     std::string textKey = text.toStdString();
 
+    bts::addressbook::wallet_contact matchedContact;
+
+    bool contactFound = false;
+    try
+      {
+      auto aBook = bts::get_profile()->get_addressbook();
+
+      auto contact = aBook->get_contact_by_display_name(textKey);
+      contactFound = contact;
+      if(contactFound == false)
+        contact = aBook->get_contact_by_dac_id(textKey);
+
+      if(contact)
+        {
+        contactFound = true;
+        matchedContact = *contact;
+        }
+      }
+    catch(const fc::exception& e)
+      {
+      wlog( "${e}", ("e",e.to_detail_string()) );
+      }
+
     bool semanticallyValidKey = false;
+    if(contactFound)
+      {
+      /// Delete previously entered text - will be replaced with image control holding contact info
+      deleteEnteredText();
+      /// Update PK-like text with displayed form
+      text = QString::fromStdString(matchedContact.get_display_name());
+      /// If text already points to some found contact, just add it
+      addContactEntry(text, matchedContact, false);
+      }
+    else
     if(public_key_address::is_valid(textKey, &semanticallyValidKey) && semanticallyValidKey)
       {
       /// Delete previously entered text - will be replaced with image control holding contact info
@@ -416,7 +450,6 @@ void ContactListEdit::onTextChanged()
       public_key_address converter(textKey);
       fc::ecc::public_key parsedKey = converter.key;
       
-      bts::addressbook::wallet_contact matchedContact;
       if(Utils::matchContact(parsedKey, &matchedContact))
         {
         QString displayText = _completerModel->getDisplayText(Contact(matchedContact));
@@ -434,7 +467,6 @@ void ContactListEdit::onTextChanged()
         }
       }
     else
-    if(text.isEmpty() == false)
       {
       QTextCharFormat fmt;
       fmt.setFontWeight(QFont::Bold);

@@ -307,7 +307,9 @@ void ContactView::onRequestContact()
 }
 
 ContactView::~ContactView()
-{}
+{
+  delete ui;
+}
 
 void ContactView::setContact(const Contact& current_contact)
 {

@@ -8,7 +8,7 @@ if( UNIX AND NOT APPLE )
   set(rt_library rt )
 endif()
 if( APPLE )
-    SET(CMAKE_CXX_FLAGS "-std=c++11")
+    SET(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
 endif()
 
 SET (CMAKE_FIND_LIBRARY_SUFFIXES ${MINER_ORIGINAL_LIB_SUFFIXES})

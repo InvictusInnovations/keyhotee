@@ -15,7 +15,7 @@ class KeyhoteeIDPubKeyWidget : public QWidget
 
 public:
   explicit KeyhoteeIDPubKeyWidget(QWidget *parent = 0);
-  ~KeyhoteeIDPubKeyWidget();
+  virtual ~KeyhoteeIDPubKeyWidget();
 
   enum CurrentState{
     InvalidData,
@@ -48,15 +48,18 @@ public:
   QString getKeyhoteeID();
 
 private:
+  bool isLookupThreadActive() const;
+  void cancelLookupThread();
+
   Ui::KeyhoteeIDPubKeyWidget *ui;
 
   bool existContactWithPublicKey (const std::string& public_key_string);
 
-  fc::time_point                          _last_validate;
   Contact                                 _current_contact;
   fc::optional<bts::bitname::name_record> _current_record;
   AddressBookModel*                       _address_book;
   ModeWidget                              _my_mode;
+  fc::future<void>                        _lookupThreadState;
 
 Q_SIGNALS:
   void currentState(CurrentState state);
