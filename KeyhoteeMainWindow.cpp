@@ -396,17 +396,31 @@ void KeyhoteeMainWindow::addToContacts(const bts::addressbook::wallet_contact& w
   ui->new_contact->setPublicKey(public_key_string.c_str());
 }
 
-void KeyhoteeMainWindow::addContactfromvCard(const QString& firstName, const QString& lastName, 
-                                             const QString& khid, const QString& public_key_string,
-                                             const QString& notes)
+void KeyhoteeMainWindow::addToContacts(bool silent, std::list<Contact> &contacts)
 {
-  addContact();
-  ui->new_contact->setFirstName (firstName);
-  ui->new_contact->setLastName (lastName);
-  ui->new_contact->setNotes (notes);
-  ui->new_contact->setKHID_or_PublicKey (khid, public_key_string);
-  //stored key and calculated key should be the same
-  //assert (public_key_string == ui->new_contact->getPublicKey());
+  if (silent)
+  {
+    for (const auto& contact : contacts)
+    {
+      _addressbook_model->storeContact(contact);
+      showContacts();
+    }
+  }
+  else
+  {
+    //only 1 contact on !silent mode
+    assert(contacts.size() == 1);
+    addContact();
+    const Contact &contact = contacts.front();
+    ui->new_contact->setFirstName (contact.first_name.c_str());
+    ui->new_contact->setLastName (contact.last_name.c_str());
+    ui->new_contact->setNotes (contact.notes.c_str());
+    std::string public_key_string = public_key_address(contact.public_key);
+    ui->new_contact->setPublicKey(public_key_string.c_str());
+    ui->new_contact->setKHID(contact.dac_id_string.c_str());
+    //stored key and calculated key should be the same
+    //assert (public_key_string == ui->new_contact->getPublicKey());
+  }
 }
 
 void KeyhoteeMainWindow::sideBarSplitterMoved(int pos, int index)

@@ -116,6 +116,7 @@ class TFileAttachmentWidget : public QWidget
     void onAttachementTableSelectionChanged();
     void onPasteTriggered();
     void onAddContactTriggered();
+    void onImportContactTriggered();
     void onFindContactTriggered();
     void onClipboardChanged();    
     void onDropEvent(QStringList files);

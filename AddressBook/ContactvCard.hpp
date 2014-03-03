@@ -10,13 +10,25 @@ class Contact;
 class ContactvCard
 {
 public:
-  ContactvCard();
+  /// Enum to return convert status
+  enum ConvertStatus : int
+    {
+    PUBLIC_KEY_INVALID  = 1,
+    SUCCESS
+    };
+
   ContactvCard(const QByteArray& vCardData);
+
   /** Convert Contact fields to the vCard standard
       \param contact - (in)
       \param vCardData - (out)
   */
-  void getvCardData(const Contact& contact, QByteArray* vCardData);
+  static void convert(const Contact& contact, QByteArray* vCardData);
+
+  /// Convert vCard data to Contact class
+  ConvertStatus convert(Contact* contact);
+
+  /// Check vCard format validation
   static bool isValid(const QByteArray& card);
 
   QString getFirstName() const;

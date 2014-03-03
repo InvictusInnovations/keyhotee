@@ -279,10 +279,15 @@
   </action>
   <action name="actionFindContact">
    <property name="text">
-    <string>FindContact</string>
+    <string>Find contact</string>
    </property>
    <property name="toolTip">
     <string>Allows to find this contact on the contact list</string>
+   </property>
+  </action>
+  <action name="actionImportContact">
+   <property name="text">
+    <string>Import contact(s)</string>
    </property>
   </action>
   <zorder>delButton</zorder>
@@ -461,6 +466,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionImportContact</sender>
+   <signal>triggered()</signal>
+   <receiver>TFileAttachmentWidget</receiver>
+   <slot>onImportContactTriggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>attachmentListChanged()</signal>
@@ -473,5 +494,6 @@
   <slot>onPasteTriggered()</slot>
   <slot>onAddContactTriggered()</slot>
   <slot>onFindContactTriggered()</slot>
+  <slot>onImportContactTriggered()</slot>
  </slots>
 </ui>

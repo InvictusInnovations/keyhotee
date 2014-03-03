@@ -46,7 +46,7 @@ public:
   void setFirstName(const QString& name);
   void setLastName(const QString& name);
   void setNotes(const QString& name);
-  void setKHID_or_PublicKey(const QString& khid, const QString& publicKey);
+  void setKHID(const QString& khid);
 
 Q_SIGNALS:
   void canceledNewContact();

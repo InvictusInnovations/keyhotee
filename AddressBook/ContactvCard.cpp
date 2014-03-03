@@ -2,10 +2,6 @@
 #include "Contact.hpp"
 #include "public_key_address.hpp"
 
-ContactvCard::ContactvCard()
-{  
-}
-
 ContactvCard::ContactvCard(const QByteArray& vCardData)
 {  
   vCardList cards = vCard::fromByteArray(vCardData);
@@ -14,7 +10,7 @@ ContactvCard::ContactvCard(const QByteArray& vCardData)
   _vcard = cards.takeFirst();
 }
 
-void ContactvCard::getvCardData(const Contact& contact, QByteArray* vCardData)
+void ContactvCard::convert(const Contact& contact, QByteArray* vCardData)
 { 
   vCard vcard;
   vCardProperty name_prop = vCardProperty::createName(contact.first_name.c_str(), 
@@ -35,8 +31,20 @@ void ContactvCard::getvCardData(const Contact& contact, QByteArray* vCardData)
   name_prop = vCardProperty::createNotes(contact.getNotes());
   vcard.addProperty(name_prop);
 
-  *vCardData = vcard.toByteArray();  
-    
+  *vCardData = vcard.toByteArray();     
+}
+
+ContactvCard::ConvertStatus ContactvCard::convert(Contact* contact)
+{ 
+  contact->first_name       = getFirstName().toStdString();
+  contact->last_name        = getLastName().toStdString();
+  contact->dac_id_string    = getKHID().toStdString();  
+  contact->privacy_setting  = bts::addressbook::secret_contact;
+  contact->setIcon(QIcon(":/images/user.png"));
+  if (public_key_address::convert(getPublicKey().toStdString(), &contact->public_key) == false)
+    return ConvertStatus::PUBLIC_KEY_INVALID;
+
+  return ConvertStatus::SUCCESS;
 }
 
 QString ContactvCard::getFirstName() const
