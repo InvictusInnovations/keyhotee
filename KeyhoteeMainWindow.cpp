@@ -835,7 +835,8 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
   // by yuvaraj that should be replaced eventually once we get a proper
   // signal emitted when registration occurs for a displayed KeyhoteeId.
   contact_gui->_view->checkKeyhoteeIdStatus();
-
+  
+  contact_gui->_view->checkAuthorizationStatus();
   contact_gui->_view->checkSendMailButton();
   if(nullptr != _currentMailbox)
     _currentMailbox->checksendmailbuttons();
@@ -907,7 +908,10 @@ void KeyhoteeMainWindow::createAuthorizationItem(const bts::bitchat::decrypted_m
 
     authorization_root_item->setIcon(0, QIcon(":/images/request_authorization.png") );
     authorization_root_item->setFromKey(*(msg.from_key));
-    authorization_root_item->setText(0, "Full Name");
+    auto reqmsg = msg.as<bts::bitchat::private_contact_request_message>();
+    QString full_name = QString::fromStdString(reqmsg.from_first_name);
+    full_name += " " + QString::fromStdString(reqmsg.from_last_name);
+    authorization_root_item->setText(0, full_name);
     authorization_root_item->setHidden(false);
     view_root->setOwnerItem(authorization_root_item);
 
@@ -1094,6 +1098,8 @@ void KeyhoteeMainWindow::received_request( const bts::bitchat::decrypted_message
     createAuthorizationItem(msg);
   else
     processResponse(msg);
+
+
 }
 
 void KeyhoteeMainWindow::OnMessageSaving()

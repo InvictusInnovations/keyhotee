@@ -94,31 +94,34 @@ void Authorization::setOwnerItem(AuthorizationItem* item)
 
 void Authorization::processResponse()
 {
-  if(_reqmsg.status == TAuthoriztionStatus::accept)
+  if(_reqmsg.status == TAuthorizationStatus::accept)
     acceptExtendedPubKey();
 
-  // set authorization state
+  setAuthorizationStatus(_reqmsg.status);
 }
 
 void Authorization::onAccept()
 {
   addAsNewContact();
   acceptExtendedPubKey();
-  sendReply(TAuthoriztionStatus::accept);
+  sendReply(TAuthorizationStatus::accept);
+  setAuthorizationStatus(TAuthorizationStatus::accept);
   close();
   emit itemAcceptRequest(_owner_item);
 }
 
 void Authorization::onDeny()
 {
-  sendReply(TAuthoriztionStatus::deny);
+  sendReply(TAuthorizationStatus::deny);
+  setAuthorizationStatus(TAuthorizationStatus::deny);
   close();
   emit itemDenyRequest(_owner_item);
 }
 
 void Authorization::onBlock()
 {
-  sendReply(TAuthoriztionStatus::block);
+  sendReply(TAuthorizationStatus::block);
+  setAuthorizationStatus(TAuthorizationStatus::block);
   close();
   emit itemBlockRequest(_owner_item);
 }
@@ -143,41 +146,41 @@ void Authorization::acceptExtendedPubKey()
 {
   if(ui->extend_public_key->isChecked())
   {
-    auto app = bts::application::instance();
-    auto profile = app->get_profile();
-    auto addressbook = profile->get_addressbook();
-    auto contact = addressbook->get_contact_by_public_key( ui->keyhoteeidpubkey->getPublicKey() );
-    contact->send_trx_address = _reqmsg.extended_pub_key;
-    addressbook->store_contact(*contact);
+    auto addressbook = bts::get_profile()->get_addressbook();
+    TWalletContact contact;
+    if(!Utils::matchContact(_from_pub_key, &contact))
+      return;
+    contact.send_trx_address = _reqmsg.extended_pub_key;
+    addressbook->store_contact(contact);
   }
 }
 
-void Authorization::genExtendedPubKey(std::string dac_id, TExtendPubKey &extended_pub_key)
+void Authorization::genExtendedPubKey(std::string identity_dac_id, TExtendPubKey &extended_pub_key)
 {
   if(ui->extend_public_key->isChecked())
   {
-    auto app = bts::application::instance();
-    auto profile = app->get_profile();
-    auto addressbook = profile->get_addressbook();
-    auto contact = addressbook->get_contact_by_public_key( ui->keyhoteeidpubkey->getPublicKey() );
+    auto profile = bts::get_profile();
+    TWalletContact contact;
+    if(!Utils::matchContact(_from_pub_key, &contact))
+      return;
 
-    extended_pub_key = profile->get_keychain().get_public_account(dac_id, contact->wallet_index);
+    extended_pub_key = profile->get_keychain().get_public_account(identity_dac_id, contact.wallet_index);
   }
 }
 
-void Authorization::sendReply(TAuthoriztionStatus status)
+void Authorization::sendReply(TAuthorizationStatus status)
 {
-  bts::addressbook::wallet_contact contact;
-  if(!Utils::matchContact(_reqmsg.recipient, &contact))
+  TWalletContact my_identity;
+  if(!Utils::matchContact(_reqmsg.recipient, &my_identity))
     return;
 
   auto app = bts::application::instance();
   auto profile = app->get_profile();
   bts::bitchat::private_contact_request_message request_msg;
 
-  request_msg.from_first_name = contact.first_name;
-  request_msg.from_last_name = contact.last_name;
-  request_msg.from_keyhotee_id = contact.dac_id_string;
+  request_msg.from_first_name = my_identity.first_name;
+  request_msg.from_last_name = my_identity.last_name;
+  request_msg.from_keyhotee_id = my_identity.dac_id_string;
   request_msg.greeting_message = "";
   request_msg.from_channel = bts::network::channel_id(1);
     
@@ -187,14 +190,39 @@ void Authorization::sendReply(TAuthoriztionStatus status)
   request_msg.request_param = request_param;
   
   request_msg.status = status;
-  request_msg.recipient = ui->keyhoteeidpubkey->getPublicKey();
+  request_msg.recipient = _from_pub_key;
 
-  if(status == TAuthoriztionStatus::accept)
+  if(status == TAuthorizationStatus::accept)
     if(ui->extend_public_key->isChecked())
-      genExtendedPubKey(contact.dac_id_string, request_msg.extended_pub_key);
+      genExtendedPubKey(my_identity.dac_id_string, request_msg.extended_pub_key);
 
-  fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(contact.dac_id_string);
+  fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(my_identity.dac_id_string);
   app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
+}
+
+void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
+{
+  auto addressbook = bts::get_profile()->get_addressbook();
+  TWalletContact contact;
+  if(!Utils::matchContact(_from_pub_key, &contact))
+    return;
+
+  switch(status)
+  {
+    case TAuthorizationStatus::accept:
+      contact.authorization_status = TContAuthoStatus::accepted;
+      break;
+    case TAuthorizationStatus::block:
+      contact.authorization_status = TContAuthoStatus::blocked;
+      break;
+    case TAuthorizationStatus::deny:
+      contact.authorization_status = TContAuthoStatus::denied;
+      break;
+    default:
+      contact.authorization_status = TContAuthoStatus::unauthorized;
+      assert(false);
+  }
+  addressbook->store_contact(contact);
 }
 
 void Authorization::onAddAsNewContact(bool checked)

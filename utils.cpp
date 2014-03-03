@@ -91,19 +91,27 @@ bool matchContact(const fc::ecc::public_key& pk, bts::addressbook::wallet_contac
   assert(pk.valid());
 
   auto address_book = bts::get_profile()->get_addressbook();
-  auto c = address_book->get_contact_by_public_key(pk);
-  if (c)
+  try
   {
-    *matchedContact = *c;
-    return true;
+    auto c = address_book->get_contact_by_public_key(pk);
+    if(c)
+    {
+      *matchedContact = *c;
+      return true;
+    }
+    else
+    {
+      *matchedContact = bts::addressbook::wallet_contact();
+      matchedContact->public_key = pk;
+      return false;
+    }
   }
-  else
+  catch (const fc::exception&)
   {
     *matchedContact = bts::addressbook::wallet_contact();
     matchedContact->public_key = pk;
+    return false;
   }
-
-  return false;
 }
 
 QString 
