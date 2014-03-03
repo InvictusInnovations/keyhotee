@@ -752,7 +752,7 @@ void TFileAttachmentWidget::onAddTriggered()
 
 void TFileAttachmentWidget::addFiles(const QStringList& files)
   {
-  if (files.size() == 0)
+  if (files.isEmpty())
     return;
 
   bool sortEnabled = FreezeAttachmentTable();

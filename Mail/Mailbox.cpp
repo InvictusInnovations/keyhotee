@@ -437,11 +437,11 @@ void Mailbox::previewImages (QTextEdit* textEdit)
   if (getSelectedMessageData (&encodedMsg, &decodedMsg) == false)
     return;
 
-  QTextDocument *doc = new QTextDocument();
+  QTextDocument *doc = textEdit->document();//new QTextDocument();
   //Don't eat multiple whitespaces
-  doc->setDefaultStyleSheet("p, li { white-space: pre-wrap; }");
-  doc->setHtml( decodedMsg.body.c_str() );
-  textEdit->setDocument (doc);
+  //doc->setDefaultStyleSheet("p, li { white-space: pre-wrap; }");
+  textEdit->setHtml(QString::fromStdString(decodedMsg.body));
+  //textEdit->setDocument (doc);
   
   QImage  image;
   uchar  *imageData;

@@ -1,5 +1,3 @@
-#pragma once
-
 #include "MimeDataChecker.hpp"
 
 #include <QFileInfo>
@@ -8,7 +6,7 @@
 
 MimeDataChecker::MimeDataChecker(const QMimeData* mimeData)
 {
-	_mimeData = mimeData;
+  _mimeData = mimeData;
 }
 
 bool MimeDataChecker::containsFiles() const

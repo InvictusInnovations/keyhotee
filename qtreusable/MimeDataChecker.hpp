@@ -12,7 +12,6 @@ public:
   bool containsFiles() const;
 
 private:
-	const QMimeData* _mimeData;
-	
+  const QMimeData* _mimeData;
 };
 

@@ -307,7 +307,11 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QTextBrowser" name="message_content"/>
+    <widget class="QTextBrowser" name="message_content">
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
