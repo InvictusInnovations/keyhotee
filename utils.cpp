@@ -58,11 +58,11 @@ QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFo
         switch(contactFormatting)
           {
           case KEYHOTEE_IDENTIFIER:
-            return QString(identity.dac_id_string.c_str());
+            return QString::fromStdString(identity.dac_id_string);
           case CONTACT_ALIAS_FULL_NAME:
-            return QString(std::string(identity.first_name + " " + identity.last_name).c_str());
+            return QString::fromStdString(std::string(identity.first_name + " " + identity.last_name));
           case FULL_CONTACT_DETAILS:
-            return QString(identity.get_display_name().c_str());
+            return QString::fromStdString(identity.get_display_name());
           default:
             assert(false);
             return QString();
@@ -80,10 +80,8 @@ QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFo
     if(isKnownContact != nullptr)
       *isKnownContact = false;
 
-
     /// If code reached this point the publick key is unknown - lets display it as base58
-    std::string public_key_string = public_key_address(pk);
-    return QString(public_key_string.c_str());
+    return QString::fromStdString(pk.to_base58());
     }
   }
 
