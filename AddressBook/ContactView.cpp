@@ -684,7 +684,7 @@ void ContactView::checkAuthorizationStatus()
   try
   {
     auto contact = bts::get_profile()->get_addressbook()->get_contact_by_public_key(_current_contact.public_key);
-    status = contact->authorization_status;
+    status = contact->auth_status;
   }
   catch (const fc::exception&)
   {

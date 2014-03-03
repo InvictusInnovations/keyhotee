@@ -123,7 +123,7 @@ void RequestAuthorization::setAuthorizationStatus()
   if(!Utils::matchContact(ui->keyhoteeidpubkey->getPublicKey(), &contact))
     return;
 
-  contact.authorization_status = bts::addressbook::authorization_status::sent_request;
+  contact.auth_status = bts::addressbook::authorization_status::sent_request;
   addressbook->store_contact(contact);
 }
 

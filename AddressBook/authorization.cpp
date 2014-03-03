@@ -210,16 +210,16 @@ void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
   switch(status)
   {
     case TAuthorizationStatus::accept:
-      contact.authorization_status = TContAuthoStatus::accepted;
+      contact.auth_status = TContAuthoStatus::accepted;
       break;
     case TAuthorizationStatus::block:
-      contact.authorization_status = TContAuthoStatus::blocked;
+      contact.auth_status = TContAuthoStatus::blocked;
       break;
     case TAuthorizationStatus::deny:
-      contact.authorization_status = TContAuthoStatus::denied;
+      contact.auth_status = TContAuthoStatus::denied;
       break;
     default:
-      contact.authorization_status = TContAuthoStatus::unauthorized;
+      contact.auth_status = TContAuthoStatus::unauthorized;
       assert(false);
   }
   addressbook->store_contact(contact);
