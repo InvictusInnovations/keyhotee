@@ -22,17 +22,19 @@ public:
   void enableAddContact(bool active);
 
 private:
-  Ui::RequestAuthorization *ui;
-  AddressBookModel*         _address_book;
-
   void fillSelectIdentities();
   void checkAddAsNewContact();
   void addAsNewContact();
   void genExtendedPubKey(bts::extended_public_key &extended_pub_key);
+  void setAuthorizationStatus();
 
 private slots:
   void onExtendPubKey(bool checked);
   void onAddAsNewContact(bool checked);
   void onSend();
   void onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state);
+
+private:
+  Ui::RequestAuthorization *ui;
+  AddressBookModel*         _address_book;
 };

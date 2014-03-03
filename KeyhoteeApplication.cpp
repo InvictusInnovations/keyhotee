@@ -28,7 +28,22 @@
 
 #include <assert.h>
 
-#ifndef WIN32
+#ifdef WIN32
+  #include <Windows.h>
+  #include <wincon.h>
+
+Q_GUI_EXPORT HICON qt_pixmapToWinHICON(const QPixmap &p);
+
+BOOL WINAPI SetConsoleIcon(HICON hIcon) {
+  typedef BOOL (WINAPI *PSetConsoleIcon)(HICON);
+  static PSetConsoleIcon pSetConsoleIcon = NULL;
+  if(pSetConsoleIcon == NULL)
+    pSetConsoleIcon = (PSetConsoleIcon)GetProcAddress(GetModuleHandle("kernel32"), "SetConsoleIcon");
+  if(pSetConsoleIcon == NULL)
+    return FALSE;
+  return pSetConsoleIcon(hIcon);
+}
+#else
   #include <signal.h>
 #endif
 
@@ -91,12 +106,32 @@ int TKeyhoteeApplication::run(int& argc, char** argv)
 {
   ConfigureLoggingToTemporaryFile();
   TKeyhoteeApplication app(argc, argv);
-  if (argc > 1)
-  {
-    app._loaded_profile_name = app.arguments().at(1);
-  }
 
-  return app.run();
+#ifdef WIN32
+  bool console_ok = AllocConsole();
+  QPixmap px(":/images/keyhotee.png");
+  HICON hIcon = qt_pixmapToWinHICON(px);
+  SetConsoleIcon(hIcon);
+
+  freopen("CONOUT$", "wb", stdout);
+  freopen("CONOUT$", "wb", stderr);
+  //freopen( "console.txt", "wb", stdout);
+  //freopen( "console.txt", "wb", stderr);
+  printf("testing stdout\n");
+  fprintf(stderr, "testing stderr\n");
+#endif
+
+  if (argc > 1)
+    app._loaded_profile_name = app.arguments().at(1);
+
+  int ec = app.run();
+
+#ifdef WIN32
+  fclose(stdout);
+  FreeConsole();
+#endif
+
+  return ec;
 }
 
 void TKeyhoteeApplication::displayMainWindow()
@@ -129,6 +164,14 @@ TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv)
 {
   assert(s_Instance == nullptr && "Only one instance allowed at time");
   s_Instance = this;
+
+  /// Configure the application object
+#ifdef Q_OS_MAC
+  QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
+  QApplication::setWindowIcon(QIcon(":/images/keyhotee.icns") );
+#else
+  QApplication::setWindowIcon(QIcon(":/images/keyhotee.png") );
+#endif
 
   _backend_app = bts::application::instance();
 

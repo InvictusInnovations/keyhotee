@@ -18,18 +18,8 @@
 #include "BitShares/GitSHA2.h"
 #include "BitShares/fc/GitSHA3.h"
 
-#include <bts/bitchat/bitchat_private_message.hpp>
-
 #include "Mail/MailboxModel.hpp"
 #include "Mail/maileditorwindow.hpp"
-
-#include <QPlainTextEdit>
-#include <QTableView>
-#include <QTextBrowser>
-
-#ifdef Q_OS_MAC
-//#include <qmacnativetoolbar.h>
-#endif
 
 #include <fc/reflect/variant.hpp>
 #include <fc/log/logger.hpp>
@@ -39,6 +29,10 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+
+#ifdef Q_OS_MAC
+//#include <qmacnativetoolbar.h>
+#endif
 
 extern bool        gMiningIsPossible;
 
@@ -97,46 +91,19 @@ AuthorizationItem::~AuthorizationItem()
 {
 }
 
-bool AuthorizationItem::isEqual(TPublicKey from_key)
+bool AuthorizationItem::isEqual(TPublicKey from_key) const
 {
-  if(_from_key == from_key)
-    return true;
-  else
-    return false;
-}
-
-QAbstractItemModel* modelFromFile(const QString& fileName, QCompleter* completer)
-{
-  QFile file(fileName);
-  if (!file.open(QFile::ReadOnly))
-    return new QStringListModel(completer);
-
-#ifndef QT_NO_CURSOR
-  QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-#endif
-  QStringList words;
-
-  while (!file.atEnd())
-  {
-    QByteArray line = file.readLine();
-    if (!line.isEmpty())
-      words << line.trimmed();
-  }
-
-#ifndef QT_NO_CURSOR
-  QApplication::restoreOverrideCursor();
-#endif
-  return new QStringListModel(words, completer);
+  return _from_key == from_key;
 }
 
 KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
-  ATopLevelWindowsContainer(),
-  MailProcessor(*this, bts::application::instance()->get_profile()),
-  _currentMailbox(nullptr)
+  _identities_root(nullptr),
+  _connectionProcessor(*this, bts::application::instance()->get_profile()),
+  _currentMailbox(nullptr),
+  _isClosing(false)
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);
-  setWindowIcon(QIcon(":/images/keyhotee.png") );
 
   QString profileName = mainApp.getLoadedProfileName();
 
@@ -158,12 +125,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
 #ifdef Q_OS_MAC
   //QMacNativeToolBar* native_toolbar = QtMacExtras::setNativeToolBar(ui->toolbar, true);
-  QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
   ui->side_bar->setAttribute(Qt::WA_MacShowFocusRect, 0);
-  QApplication::setWindowIcon(QIcon(":/images/keyhotee.icns") );
-#else
-  QApplication::setWindowIcon(QIcon(":/images/keyhotee.png") );
-#endif
+#endif /// Q_OS_MAC
 
   setupStatusBar();
 
@@ -265,7 +228,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _litecoin_root = _wallets_root->child(Litecoin);
 
   auto app = bts::application::instance();
-  app->set_application_delegate(this);
   auto profile = app->get_profile();
   auto idents = profile->identities();
 
@@ -283,10 +245,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->contacts_page->setAddressBook(_addressbook_model);
   ui->new_contact->setAddressBook(_addressbook_model);
 
-  ui->inbox_page->initial(MailProcessor, _inbox_model, Mailbox::Inbox, this);
-  ui->draft_box_page->initial(MailProcessor, _draft_model, Mailbox::Drafts, this);
-  ui->out_box_page->initial(MailProcessor, _pending_model, Mailbox::Outbox, this);
-  ui->sent_box_page->initial(MailProcessor, _sent_model, Mailbox::Sent, this);
+  ui->inbox_page->initial(_connectionProcessor, _inbox_model, Mailbox::Inbox, this);
+  ui->draft_box_page->initial(_connectionProcessor, _draft_model, Mailbox::Drafts, this);
+  ui->out_box_page->initial(_connectionProcessor, _pending_model, Mailbox::Outbox, this);
+  ui->sent_box_page->initial(_connectionProcessor, _sent_model, Mailbox::Sent, this);
 
   ui->widget_stack->setCurrentWidget(ui->inbox_page);
   ui->actionDelete->setShortcut(QKeySequence::Delete);
@@ -782,14 +744,14 @@ void KeyhoteeMainWindow::showContacts() const
 void KeyhoteeMainWindow::newMailMessage()
 {
   MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
-    MailProcessor, true);
+    _connectionProcessor, true);
   mailWindow->show();
 }
 
 void KeyhoteeMainWindow::newMailMessageTo(const Contact& contact)
 {
   MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
-    MailProcessor, true);
+    _connectionProcessor, true);
 
   IMailProcessor::TRecipientPublicKeys toList, emptyList;
   toList.push_back(contact.public_key);
@@ -802,7 +764,7 @@ void KeyhoteeMainWindow::shareContact(QList<const Contact*>& contacts)
   assert (contacts.size());
 
   MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
-    MailProcessor, true);
+    _connectionProcessor, true);
 
   for(const Contact* contact : contacts)
   {
@@ -850,6 +812,7 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
   // signal emitted when registration occurs for a displayed KeyhoteeId.
   contact_gui->_view->checkKeyhoteeIdStatus();
 
+  contact_gui->_view->checkAuthorizationStatus();
   contact_gui->_view->checkSendMailButton();
   if(nullptr != _currentMailbox)
     _currentMailbox->checksendmailbuttons();
@@ -903,14 +866,15 @@ void KeyhoteeMainWindow::deleteContactGui(int contact_id)
   assert(_contact_guis.find(contact_id) == _contact_guis.end());
 }
 
-void KeyhoteeMainWindow::createAuthorizationItem(const bts::bitchat::decrypted_message& msg)
+void KeyhoteeMainWindow::createAuthorizationItem(const TRecipientPublicKey& sender,
+  const TAuthorizationMessage& msg, const TTime& timeSent)
 {
   Authorization *view = new Authorization(ui->widget_stack);
   view->setAddressBook(_addressbook_model);
 
   bool add_to_root = false;
   QTreeWidgetItem *item = nullptr;
-  item = findExistSenderItem(*(msg.from_key), add_to_root);
+  item = findExistSenderItem(sender, add_to_root);
 
   if(add_to_root)
   {
@@ -920,8 +884,12 @@ void KeyhoteeMainWindow::createAuthorizationItem(const bts::bitchat::decrypted_m
       item, (QTreeWidgetItem::ItemType)RequestItem);
 
     authorization_root_item->setIcon(0, QIcon(":/images/request_authorization.png") );
-    authorization_root_item->setFromKey(*(msg.from_key));
-    authorization_root_item->setText(0, "Full Name");
+    authorization_root_item->setFromKey(sender);
+
+    QString full_name = QString::fromStdString(msg.from_first_name);
+    full_name += " " + QString::fromStdString(msg.from_last_name);
+    authorization_root_item->setText(0, full_name);
+    
     authorization_root_item->setHidden(false);
     view_root->setOwnerItem(authorization_root_item);
 
@@ -936,9 +904,9 @@ void KeyhoteeMainWindow::createAuthorizationItem(const bts::bitchat::decrypted_m
     item, (QTreeWidgetItem::ItemType)RequestItem);
 
   authorization_item->setIcon(0, QIcon(":/images/request_authorization.png") );
-  authorization_item->setFromKey(*(msg.from_key));
+  authorization_item->setFromKey(sender);
   QDateTime dateTime;
-  dateTime.setTime_t(msg.sig_time.sec_since_epoch());
+  dateTime.setTime_t(timeSent.sec_since_epoch());
   authorization_item->setText(0, dateTime.toString(Qt::SystemLocaleShortDate));
   authorization_item->setHidden(false);
   view->setOwnerItem(authorization_item);
@@ -947,7 +915,7 @@ void KeyhoteeMainWindow::createAuthorizationItem(const bts::bitchat::decrypted_m
   connect(view, &Authorization::itemDenyRequest, this, &KeyhoteeMainWindow::onItemDenyRequest);
   connect(view, &Authorization::itemBlockRequest, this, &KeyhoteeMainWindow::onItemBlockRequest);
 
-  view->setMsg(msg);
+  view->setMsg(sender, msg);
 
   ui->widget_stack->addWidget(view);
 
@@ -956,8 +924,8 @@ void KeyhoteeMainWindow::createAuthorizationItem(const bts::bitchat::decrypted_m
     item->setExpanded(true);
 }
 
-QTreeWidgetItem* KeyhoteeMainWindow::
-  findExistSenderItem(AuthorizationItem::TPublicKey from_key, bool &to_root)
+QTreeWidgetItem* 
+KeyhoteeMainWindow::findExistSenderItem(AuthorizationItem::TPublicKey from_key, bool &to_root)
 {
   if(_requests_root->childCount() > 0)
   {
@@ -975,15 +943,15 @@ QTreeWidgetItem* KeyhoteeMainWindow::
 
 void KeyhoteeMainWindow::showAuthorizationItem(AuthorizationItem *item)
 {
-  if(item->childCount() >0)
-    ui->widget_stack->setCurrentWidget(static_cast<AuthorizationItem*>(item->child(0))->_view);
+  if(item->childCount() > 0)
+    ui->widget_stack->setCurrentWidget(static_cast<AuthorizationItem*>(item->child(0))->getView());
   else
-    ui->widget_stack->setCurrentWidget(item->_view);
+    ui->widget_stack->setCurrentWidget(item->getView());
 }
 
 void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
 {
-  ui->widget_stack->removeWidget(item->_view);
+  ui->widget_stack->removeWidget(item->getView());
   QTreeWidgetItem* item_parent = item->parent();
   item_parent->removeChild(item);
 
@@ -994,10 +962,11 @@ void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
     _requests_root->setHidden(true);
 }
 
-void KeyhoteeMainWindow::processResponse(const bts::bitchat::decrypted_message& msg)
+void KeyhoteeMainWindow::processResponse(const TRecipientPublicKey& sender,
+  const TAuthorizationMessage& msg, const TTime& timeSent)
 {
   Authorization *view = new Authorization(ui->widget_stack);
-  view->setMsg(msg);
+  view->setMsg(sender, msg);
   view->processResponse();
 }
 
@@ -1021,10 +990,10 @@ void KeyhoteeMainWindow::onItemContextAcceptRequest(QTreeWidgetItem *item)
   if(item->childCount() > 0)
   {
     while(item->child(0))
-      static_cast<AuthorizationItem*>(item->child(0))->_view->onAccept();
+      static_cast<AuthorizationItem*>(item->child(0))->getView()->onAccept();
   }
   else
-    static_cast<AuthorizationItem*>(item)->_view->onAccept();
+    static_cast<AuthorizationItem*>(item)->getView()->onAccept();
 
 //  deleteAuthorizationItem(static_cast<AuthorizationItem*>(item));
 }
@@ -1037,24 +1006,29 @@ void KeyhoteeMainWindow::onItemContextDenyRequest(QTreeWidgetItem *item)
   if(item->childCount() > 0)
   {
     while(item->child(0))
-      static_cast<AuthorizationItem*>(item->child(0))->_view->onDeny();
+      static_cast<AuthorizationItem*>(item->child(0))->getView()->onDeny();
   }
   else
-    static_cast<AuthorizationItem*>(item)->_view->onDeny();
+  {
+    static_cast<AuthorizationItem*>(item)->getView()->onDeny();
+  }
 }
 
 void KeyhoteeMainWindow::onItemContextBlockRequest(QTreeWidgetItem *item)
 {
-  if(QMessageBox::question(this, tr("Block request"), tr("Are you sure you want to block selected request(s) for authorization?")) == QMessageBox::Button::No)
+  if(QMessageBox::question(this, tr("Block request"),
+     tr("Are you sure you want to block selected request(s) for authorization?")) == QMessageBox::Button::No)
     return;
 
   if(item->childCount() > 0)
   {
     while(item->child(0))
-      static_cast<AuthorizationItem*>(item->child(0))->_view->onBlock();
+      static_cast<AuthorizationItem*>(item->child(0))->getView()->onBlock();
   }
   else
-    static_cast<AuthorizationItem*>(item)->_view->onBlock();
+  {
+    static_cast<AuthorizationItem*>(item)->getView()->onBlock();
+  }
 }
 
 void KeyhoteeMainWindow::onDeleteAuthorizationItem()
@@ -1071,71 +1045,61 @@ void KeyhoteeMainWindow::onDeleteAuthorizationItem()
 void KeyhoteeMainWindow::setupStatusBar()
 {
   QStatusBar*             sb = statusBar();
-  TConnectionStatusFrame* cs = new TConnectionStatusFrame(ConnectionStatusDS);
+  TConnectionStatusFrame* cs = new TConnectionStatusFrame(_connectionProcessor);
   sb->addPermanentWidget(cs);
 }
 
-void KeyhoteeMainWindow::received_text(const bts::bitchat::decrypted_message& msg)
-{
-  auto opt_contact = _addressbook->get_contact_by_public_key(*(msg.from_key) );
-  if (!opt_contact)
+void KeyhoteeMainWindow::OnReceivedChatMessage(const TContact& sender, const TChatMessage& msg,
+  const TTime& timeSent)
   {
-    elog("Received text from unknown contact!");
+  QDateTime dateTime;
+  dateTime.setTime_t(timeSent.sec_since_epoch());
+  QString fromLabel = QString::fromStdString(sender.get_display_name());
+  QString msgBody = QString::fromStdString(msg.msg);
+  auto contact_gui = createContactGuiIfNecessary(sender.wallet_index);
+  contact_gui->receiveChatMessage(fromLabel, msgBody, dateTime);
   }
-  else
+
+void KeyhoteeMainWindow::OnReceivedAuthorizationMessage(const TRecipientPublicKey& sender,
+  const TAuthorizationMessage& msg, const TTime& timeSent)
   {
-    wlog("Received text from known contact!");
-    auto      contact_gui = createContactGuiIfNecessary(opt_contact->wallet_index);
-    auto      text = msg.as<bts::bitchat::private_text_message>();
-    QDateTime dateTime;
-    dateTime.setTime_t(msg.sig_time.sec_since_epoch());
-    bts::get_profile()->get_chat_db()->store_message(msg,nullptr);
-    contact_gui->receiveChatMessage(opt_contact->dac_id_string.c_str(), text.msg.c_str(), dateTime);
-  }
-}
-
-void KeyhoteeMainWindow::received_email(const bts::bitchat::decrypted_message& msg)
-{
-  auto header = bts::get_profile()->get_inbox_db()->store_message(msg,nullptr);
-  _inbox_model->addMailHeader(header);
-}
-
-void KeyhoteeMainWindow::received_request( const bts::bitchat::decrypted_message& msg)
-{
-  //bts::get_profile()->get_request_db()->store_message(msg, nullptr);
-  auto reqmsg = msg.as<bts::bitchat::private_contact_request_message>();
-  if(reqmsg.status == bts::bitchat::authorization_status::request)
-    createAuthorizationItem(msg);
+  if(msg.status == bts::bitchat::authorization_status::request)
+    createAuthorizationItem(sender, msg, timeSent);
   else
-    processResponse(msg);
-}
+    processResponse(sender, msg, timeSent);
+  }
+
+void KeyhoteeMainWindow::OnReceivedMailMessage(const TStoredMailMessage& msg)
+  {
+  _inbox_model->addMailHeader(msg);
+  }
 
 void KeyhoteeMainWindow::OnMessageSaving()
 {
-  /// FIXME - add some status bar messaging
+  statusBar()->showMessage(tr("Saving a mail message into Draft folder..."), 1000);
 }
 
 void KeyhoteeMainWindow::OnMessageSaved(const TStoredMailMessage& msg,
-                                        const TStoredMailMessage* overwrittenOne) 
+                                        const TStoredMailMessage* overwrittenOne)
 {
-  /// FIXME - add some status bar messaging
   if(overwrittenOne != nullptr)
     _draft_model->replaceMessage(*overwrittenOne, msg);
   else
     _draft_model->addMailHeader(msg);
 
   ui->draft_box_page->refreshMessageViewer();
+
+  statusBar()->showMessage(tr("Mail message has been saved into Draft folder."), 3000);
 }
 
 void KeyhoteeMainWindow::OnMessageGroupPending(unsigned int count)
 {
-  /// FIXME - add some status bar messaging
+  /// Probably nothing to do here until we would like also display some notification
 }
 
 void KeyhoteeMainWindow::OnMessagePending(const TStoredMailMessage& msg,
   const TStoredMailMessage* savedDraftMsg)
 {
-  /// FIXME - add some status bar messaging
   if(savedDraftMsg != nullptr)
     ui->draft_box_page->removeMessage(*savedDraftMsg);
   else
@@ -1147,19 +1111,17 @@ void KeyhoteeMainWindow::OnMessagePending(const TStoredMailMessage& msg,
 
 void KeyhoteeMainWindow::OnMessageGroupPendingEnd()
 {
-  /// FIXME - add some status bar messaging
+  /// Probably nothing to do here until we would like also display some notification
 }
 
 void KeyhoteeMainWindow::OnMessageSendingStart()
 {
-  /// FIXME - add some status bar messaging
-  statusBar()->showMessage(tr("Starting mail trasmission..."), 1000);
+  statusBar()->showMessage(tr("Starting mail transmission..."), 1000);
 }
 
 void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
   const TStoredMailMessage& sentMsg)
 {
-  /// FIXME - add some status bar messaging
   ui->out_box_page->removeMessage(pendingMsg);
   ui->out_box_page->refreshMessageViewer();
   _sent_model->addMailHeader(sentMsg);
@@ -1168,8 +1130,7 @@ void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
 
 void KeyhoteeMainWindow::OnMessageSendingEnd()
 {
-  /// FIXME - add some status bar messaging
-  statusBar()->showMessage(tr("All mail messages sent."), 1000);
+  statusBar()->showMessage(tr("All mail messages sent."), 3000);
 }
 
 void KeyhoteeMainWindow::OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
@@ -1212,8 +1173,10 @@ void KeyhoteeMainWindow::enableMenu(bool enable)
 
 void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
 {
-  if (checkSaving())
+  if (checkSaving() && stopMailTransmission())
     {
+    _isClosing = true;
+
     writeSettings ();
     closeEvent->accept();
     ATopLevelWindowsContainer::closeEvent(closeEvent);
@@ -1223,6 +1186,36 @@ void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
     closeEvent->ignore();
     }
 }
+
+bool KeyhoteeMainWindow::stopMailTransmission()
+  {
+  bool canBreak = false;
+
+  bool transferringMail = _connectionProcessor.CanQuit(&canBreak) == false;
+  if(transferringMail == false)
+    return true;
+
+  if(canBreak)
+    {
+    QMessageBox::StandardButton ret = QMessageBox::question(this, tr("Application"),
+      tr("Sending email messages is in progress.\nDo you want to stop it and quit the application ?"),
+        QMessageBox::Yes | QMessageBox::No);
+
+    if(ret == QMessageBox::Yes)
+      {
+      _connectionProcessor.CancelTransmission();
+      return true;
+      }
+    }
+  else
+    {
+    QMessageBox::about(this, tr("Application"),
+      tr("Receiving email message(s) is in progress.\nPlease wait until transmission finishes."));
+    return false;
+    }
+
+  return false;
+  }
 
 bool KeyhoteeMainWindow::checkSaving() const
 {

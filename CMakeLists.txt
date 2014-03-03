@@ -298,10 +298,8 @@ set( sources
 
         public_key_address.hpp
 
-        dataaccessimpl.h
-        dataaccessimpl.cpp
-        mailprocessorimpl.hpp
-        mailprocessorimpl.cpp
+        ConnectionProcessor.hpp
+        ConnectionProcessor.cpp
 
         ch/connectionstatusds.h
         ch/mailprocessor.hpp

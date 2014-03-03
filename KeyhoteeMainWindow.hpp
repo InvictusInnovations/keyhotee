@@ -4,15 +4,16 @@
 #include <bts/addressbook/addressbook.hpp>
 #include <bts/application.hpp>
 
+#include "ATopLevelWindowsContainer.hpp"
+#include "ConnectionProcessor.hpp"
+
+#include "ch/GuiUpdateSink.hpp"
+#include "ch/ModificationsChecker.hpp"
+
 #include "qtreusable/selfsizingmainwindow.h"
 
-#include "dataaccessimpl.h"
-#include "mailprocessorimpl.hpp"
-#include "ch/ModificationsChecker.hpp"
-#include "ATopLevelWindowsContainer.hpp"
-
-#include <qtreewidget.h>
 #include <QList>
+#include <QTreeWidget>
 
 namespace Ui { class KeyhoteeMainWindow; }
 
@@ -59,32 +60,33 @@ private:
 };
 
 /**
- *  GUI widgets for request for authorization.
+ *  Navigation tree item representing incoming GUI entrypoint for an authorization request.
  */
 class AuthorizationItem : public QTreeWidgetItem
 {
-  friend KeyhoteeMainWindow;
-
-private:
+public:
   typedef fc::ecc::public_key TPublicKey;
 
-  Authorization*    _view;
-  TPublicKey        _from_key;
-
-public:
-  AuthorizationItem() {}
-  AuthorizationItem( Authorization* view, QTreeWidgetItem *parent, int type = 0)
+  AuthorizationItem(Authorization* view, QTreeWidgetItem* parent, int type = 0)
     : QTreeWidgetItem(parent, type), _view(view) {}
-  ~AuthorizationItem();
+  virtual ~AuthorizationItem();
 
   void setFromKey(TPublicKey from_key) {_from_key = from_key;}
-  bool isEqual(TPublicKey from_key);
+  bool isEqual(TPublicKey from_key) const;
+  Authorization* getView() const
+    {
+    return _view;
+    }
+
+/// Class attributes:
+private:
+  Authorization* _view;
+  TPublicKey     _from_key;
 };
 
 class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
-                            protected bts::application_delegate,
-                            protected IMailProcessor::IUpdateSink,
-                            protected IModificationsChecker
+                            protected IModificationsChecker,
+                            protected IGuiUpdateSink
 {
   Q_OBJECT
 public:
@@ -117,41 +119,44 @@ public:
   ContactsTable* getContactsPage();
   void shareContact(QList<const Contact*>& contacts);
 
-  AddressBookModel* getAddressBookModel() { return _addressbook_model; }
+  AddressBookModel* getAddressBookModel() const { return _addressbook_model; }
 
 signals:
   void checkSendMailSignal();
 protected:
-  virtual void closeEvent(QCloseEvent *);
-  virtual void keyPressEvent(QKeyEvent *);
+  virtual void closeEvent(QCloseEvent *) override;
+  virtual void keyPressEvent(QKeyEvent *) override;
 
 private:
-  /// application_delegate interface implementation
-  virtual void received_text(const bts::bitchat::decrypted_message& msg);
-  virtual void received_email(const bts::bitchat::decrypted_message& msg);
-  virtual void received_request( const bts::bitchat::decrypted_message& msg);
-
-private:
-  /// \see IMessageProcessor::IUpdateSink interface description.
+/// IGuiUpdateSink interface description:
+  /// \see IGuiUpdateSink interface description.
+  virtual void OnReceivedChatMessage(const TContact& sender, const TChatMessage& msg,
+    const TTime& timeSent) override;
+  /// \see IGuiUpdateSink interface description.
+  virtual void OnReceivedAuthorizationMessage(const TRecipientPublicKey& sender,
+    const TAuthorizationMessage& msg, const TTime& timeSent) override;
+  /// \see IGuiUpdateSink interface description.
+  virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) override;
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSaving() override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSaved(const TStoredMailMessage& msg,
     const TStoredMailMessage* overwrittenOne) override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageGroupPending(unsigned int count) override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessagePending(const TStoredMailMessage& msg,
     const TStoredMailMessage* savedDraftMsg) override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageGroupPendingEnd() override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSendingStart() override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSent(const TStoredMailMessage& pendingMsg,
     const TStoredMailMessage& sentMsg) override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSendingEnd() override;
-  /// \see IMessageProcessor::IUpdateSink interface description.
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
     const TPhysicalMailMessage& msg) override;
 
@@ -217,18 +222,23 @@ private:
   void setupStatusBar();
   void notSupported();
   void enableMenu(bool enable);
+  /** Allows to stop mail transmission if any before quit.
+      Returns true if quit operation can be continued.
+  */
+  bool stopMailTransmission();
   bool checkSaving() const;
   void showContacts() const;
-  void createAuthorizationItem(const bts::bitchat::decrypted_message& msg);
+  void createAuthorizationItem(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
+    const TTime& timeSent);
   QTreeWidgetItem* findExistSenderItem(AuthorizationItem::TPublicKey from_key, bool &to_root);
   void showAuthorizationItem(AuthorizationItem *item);
   void deleteAuthorizationItem(AuthorizationItem *item);
-  void processResponse(const bts::bitchat::decrypted_message& msg);
   void addContact();
+  void processResponse(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
+    const TTime& timeSent);
 
   /// Class attributes:
 
-  //QCompleter*                             _contact_completer;
   QTreeWidgetItem*                        _identities_root;
   QTreeWidgetItem*                        _mailboxes_root;
   QTreeWidgetItem*                        _wallets_root;
@@ -253,10 +263,11 @@ private:
 
   QLineEdit*                              _search_edit;
   Ui::KeyhoteeMainWindow*                 ui;
-  TConnectionStatusDS                     ConnectionStatusDS;
-  TMailProcessor                          MailProcessor;
+  TConnectionProcessor                    _connectionProcessor;
   Mailbox*                                _currentMailbox;
   MenuEditControl*                        menuEdit;
+  /// Set to true when close event processing is in progress (it wasn't yet accepted nor ignored)
+  bool                                    _isClosing;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();
