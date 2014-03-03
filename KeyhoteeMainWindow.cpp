@@ -798,6 +798,7 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
   // signal emitted when registration occurs for a displayed KeyhoteeId.
   contact_gui->_view->checkKeyhoteeIdStatus();
 
+  contact_gui->_view->checkAuthorizationStatus();
   contact_gui->_view->checkSendMailButton();
   if(nullptr != _currentMailbox)
     _currentMailbox->checksendmailbuttons();
@@ -870,7 +871,11 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TRecipientPublicKey& send
 
     authorization_root_item->setIcon(0, QIcon(":/images/request_authorization.png") );
     authorization_root_item->setFromKey(sender);
-    authorization_root_item->setText(0, tr("Full Name"));
+
+    QString full_name = QString::fromStdString(msg.from_first_name);
+    full_name += " " + QString::fromStdString(msg.from_last_name);
+    authorization_root_item->setText(0, full_name);
+    
     authorization_root_item->setHidden(false);
     view_root->setOwnerItem(authorization_root_item);
 
@@ -896,7 +901,7 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TRecipientPublicKey& send
   connect(view, &Authorization::itemDenyRequest, this, &KeyhoteeMainWindow::onItemDenyRequest);
   connect(view, &Authorization::itemBlockRequest, this, &KeyhoteeMainWindow::onItemBlockRequest);
 
-  view->setMsg(msg);
+  view->setMsg(sender, msg);
 
   ui->widget_stack->addWidget(view);
 
@@ -947,7 +952,7 @@ void KeyhoteeMainWindow::processResponse(const TRecipientPublicKey& sender,
   const TAuthorizationMessage& msg, const TTime& timeSent)
 {
   Authorization *view = new Authorization(ui->widget_stack);
-  view->setMsg(msg);
+  view->setMsg(sender, msg);
   view->processResponse();
 }
 

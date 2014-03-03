@@ -16,7 +16,6 @@ class Authorization : public QWidget
   Q_OBJECT
 
 public:
-  typedef bts::bitchat::decrypted_message                 TDecryptedMessage;
   typedef bts::bitchat::private_contact_request_message   TRequestMessage;
   typedef fc::ecc::public_key                             TPublicKey;
   typedef bts::extended_public_key                        TExtendPubKey;
@@ -29,7 +28,7 @@ public:
 
   void setAddressBook(AddressBookModel* addressbook);
 
-  void setMsg(const TDecryptedMessage& msg);
+  void setMsg(const TPublicKey& sender, const TRequestMessage& msg);
   void setOwnerItem(AuthorizationItem* item);
   void processResponse();
 

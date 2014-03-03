@@ -68,10 +68,10 @@ void Authorization::setAddressBook(AddressBookModel* addressbook)
   _address_book = addressbook;
 }
 
-void Authorization::setMsg(const TDecryptedMessage& msg)
+void Authorization::setMsg(const TPublicKey& sender, const TRequestMessage& msg)
 {
-  _from_pub_key = *msg.from_key;
-  _reqmsg = msg.as<TRequestMessage>();
+  _from_pub_key = sender;
+  _reqmsg = msg;
 
   std::string public_key_string = public_key_address(_from_pub_key.serialize());
   ui->keyhoteeidpubkey->setPublicKey(public_key_string.c_str());
