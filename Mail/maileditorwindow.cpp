@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QMimeData>
 #include <QTextDocumentFragment>
+#include <QTextEdit>
 #include <QToolBar>
 #include <QToolButton>
 
@@ -340,13 +341,7 @@ void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessag
     }
   
   ui->messageEdit->moveCursor(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor);
-  onFileAttachementTriggered( FileAttachment->hasAttachment() );
-  
-  if ( !EditMode && FileAttachment->hasAttachment())
-    {
-    mailbox->previewImages(ui->messageEdit);
-    ui->messageEdit->document()->setModified(false);
-    }
+  onFileAttachementTriggered( FileAttachment->hasAttachment() ); 
   }
 
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
@@ -506,7 +501,7 @@ void MailEditorMainWindow::loadContents(const TRecipientPublicKey& senderId,
   {
   MailFields->LoadContents(senderId, srcMsg);
   FileAttachment->LoadAttachedFiles(srcMsg.attachments);
-  ui->messageEdit->setText(QString(srcMsg.body.c_str()));
+  ui->messageEdit->loadContents(srcMsg.body.c_str(), srcMsg.attachments);
   }
 
 void MailEditorMainWindow::transformRecipientList(const TRecipientPublicKey& senderId,
