@@ -667,12 +667,46 @@ void ContactView::setNotes(const QString& name)
   setModified();
 }
 
-void ContactView::setKHID_or_PublicKey(const QString& khid, const QString& publicKey)
+void ContactView::setKHID(const QString& khid)
 {
-  if(!ui->khid_pubkey->getKeyhoteeID().isEmpty() && gMiningIsPossible && !khid.isEmpty())
+  if(!khid.isEmpty())
     ui->khid_pubkey->setKeyhoteeID(khid);
-  else
-    ui->khid_pubkey->setPublicKey(publicKey);
   
   setModified();
+}
+
+void ContactView::checkAuthorizationStatus()
+{
+  bts::addressbook::authorization_status status;
+
+  try
+  {
+    auto contact = bts::get_profile()->get_addressbook()->get_contact_by_public_key(_current_contact.public_key);
+    status = contact->auth_status;
+  }
+  catch (const fc::exception&)
+  {
+    status = bts::addressbook::authorization_status::unauthorized;
+  }
+
+  if(status == bts::addressbook::authorization_status::sent_request)
+  {
+    ui->authorization_status->setText( tr("Request sent") );
+  }
+  else if(status == bts::addressbook::authorization_status::accepted)
+  {
+    ui->authorization_status->setText( tr("Authorized") );
+  }
+  else if(status == bts::addressbook::authorization_status::denied)
+  {
+    ui->authorization_status->setText( tr("Denied") );
+  }
+  else if(status == bts::addressbook::authorization_status::blocked)
+  {
+    ui->authorization_status->setText( tr("Blocked") );
+  }
+  else
+  {
+    ui->authorization_status->setText( tr("Unauthorized") );
+  }
 }

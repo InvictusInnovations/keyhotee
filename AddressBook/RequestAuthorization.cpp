@@ -53,8 +53,7 @@ void RequestAuthorization::enableAddContact(bool active)
 
 void RequestAuthorization::fillSelectIdentities()
 {
-  auto profile = bts::application::instance()->get_profile();
-  std::vector<bts::addressbook::wallet_identity> identities = profile->identities();
+  std::vector<bts::addressbook::wallet_identity> identities = bts::get_profile()->identities();
 
   if(identities.size() < 2)
   {
@@ -105,15 +104,27 @@ void RequestAuthorization::genExtendedPubKey(bts::extended_public_key &extended_
 {
   if(ui->extend_public_key->isChecked())
   {
-    auto app = bts::application::instance();
-    auto profile = app->get_profile();
+    auto profile = bts::get_profile();
     auto idents = profile->identities();
     int  identity = ui->identity_select->currentIndex();
     auto addressbook = profile->get_addressbook();
-    auto contact = addressbook->get_contact_by_public_key( ui->keyhoteeidpubkey->getPublicKey() );
+    bts::addressbook::wallet_contact contact;
+    if(!Utils::matchContact(ui->keyhoteeidpubkey->getPublicKey(), &contact))
+      return;
 
-    extended_pub_key = profile->get_keychain().get_public_account(idents[identity].dac_id_string, contact->wallet_index);
+    extended_pub_key = profile->get_keychain().get_public_account(idents[identity].dac_id_string, contact.wallet_index);
   }
+}
+
+void RequestAuthorization::setAuthorizationStatus()
+{
+  auto addressbook = bts::get_profile()->get_addressbook();
+  bts::addressbook::wallet_contact contact;
+  if(!Utils::matchContact(ui->keyhoteeidpubkey->getPublicKey(), &contact))
+    return;
+
+  contact.auth_status = bts::addressbook::authorization_status::sent_request;
+  addressbook->store_contact(contact);
 }
 
 void RequestAuthorization::onExtendPubKey(bool checked)
@@ -131,7 +142,7 @@ void RequestAuthorization::onSend()
   addAsNewContact();
 
   auto                                          app = bts::application::instance();
-  auto                                          profile = app->get_profile();
+  auto                                          profile = bts::get_profile();
   auto                                          idents = profile->identities();
   bts::bitchat::private_contact_request_message request_msg;
   if (idents.size() )
@@ -154,6 +165,8 @@ void RequestAuthorization::onSend()
 
     fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(idents[identity].dac_id_string);
     app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
+
+    setAuthorizationStatus();
   }
 }
 

@@ -307,11 +307,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QTextBrowser" name="message_content">
-     <property name="openExternalLinks">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <widget class="TMessageEdit" name="message_content"/>
    </item>
   </layout>
  </widget>
@@ -323,6 +319,11 @@ p, li { white-space: pre-wrap; }
    <slots>
     <slot>onCompleterRequest()</slot>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>TMessageEdit</class>
+   <extends>QTextBrowser</extends>
+   <header>Mail/TMessageEdit.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

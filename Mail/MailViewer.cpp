@@ -19,8 +19,9 @@ MailViewer::MailViewer(QWidget* parent)
   grid_layout->setContentsMargins(0, 0, 0, 0);
   grid_layout->setSpacing(0);
   ui->toolbar_container->setLayout(grid_layout);
-  grid_layout->addWidget(message_tools, 0, 0);
-  ui->message_content->setOpenExternalLinks (true);
+  grid_layout->addWidget(message_tools, 0, 0);  
+  //PFIX ui->message_content->setOpenExternalLinks (true);
+  ui->message_content->setReadOnly(true);
   }
 
 MailViewer::~MailViewer()
@@ -74,7 +75,7 @@ void MailViewer::displayMailMessage(Mailbox* mailbox, const QModelIndex& index, 
   //TODO: add to and cc lists
   ui->subject_label->setText(msg.subject);
 
-  mailbox->previewImages(ui->message_content);
-  ui->message_content->moveCursor (QTextCursor::Start);
+  ui->message_content->loadContents (msg.body, msg.attachments);
+  ui->message_content->moveCursor (QTextCursor::Start);  
   }
 

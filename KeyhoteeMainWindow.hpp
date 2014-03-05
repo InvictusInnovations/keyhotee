@@ -85,23 +85,21 @@ private:
 };
 
 class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
-                            protected IGuiUpdateSink,
-                            public IModificationsChecker
+                            protected IModificationsChecker,
+                            protected IGuiUpdateSink
 {
   Q_OBJECT
 public:
 
   void newMailMessage();
   void newMailMessageTo(const Contact& contact);
-  void addContact();
   void addToContacts(const bts::addressbook::wallet_contact& wallet_contact);
-  /** Show window "Add new contact" and fill contact fields
+  /** Allows to add new contact(s) to address book
+      \param silent - false: show window "Add new contact" and fill contact fields,
+                      true:  add directly all contacts to the address book 
+                             without showing preview window
   */
-  void addContactfromvCard(const QString& firstName, const QString& lastName, 
-                           const QString& khid, const QString& public_key_string,
-                           const QString& notes);
-  void onSidebarSelectionChanged();
-  void onSidebarDoubleClicked();
+  void addToContacts(bool silent, std::list<Contact> &contacts);
   void selectContactItem(QTreeWidgetItem* item);
   void selectIdentityItem(QTreeWidgetItem* item);
   void sideBarSplitterMoved(int pos, int index);
@@ -109,9 +107,7 @@ public:
   void openContactGui(int contact_id);
   ContactGui* getContactGui(int contact_id);
   ContactGui* createContactGuiIfNecessary(int contact_id);
-  bool isSelectedContactGui(ContactGui* contactGui);
-
-  virtual bool canContinue() const;
+  bool isSelectedContactGui(ContactGui* contactGui);  
 
   void displayDiagnosticLog();
   void setEnabledAttachmentSaveOption(bool enable);
@@ -171,6 +167,9 @@ private:
   /// Helper method to simplify onSidebarSelectionChanged code.
   void activateMailboxPage(Mailbox* mailBox);
 
+  /// \see IModificationsChecker interface description.
+  virtual bool canContinue() const override;
+
 private slots:
   // ---------- MenuBar
   // File
@@ -208,6 +207,8 @@ private slots:
   void onItemDenyRequest(AuthorizationItem *item);
   void onItemBlockRequest(AuthorizationItem *item);
 
+  void onSidebarSelectionChanged();
+  void onSidebarDoubleClicked();
 
 private:
   bool isIdentityPresent();
@@ -232,6 +233,7 @@ private:
   QTreeWidgetItem* findExistSenderItem(AuthorizationItem::TPublicKey from_key, bool &to_root);
   void showAuthorizationItem(AuthorizationItem *item);
   void deleteAuthorizationItem(AuthorizationItem *item);
+  void addContact();
   void processResponse(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
     const TTime& timeSent);
 

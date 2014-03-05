@@ -557,6 +557,7 @@ void TFileAttachmentWidget::ConfigureContextMenu()
   if (EditMode == false)
   {
     ui->attachmentTable->addAction(ui->actionAddContact);
+    ui->attachmentTable->addAction(ui->actionImportContact);
     ui->attachmentTable->addAction(ui->actionFindContact);
     sep = new QAction(this);
     sep->setSeparator(true);
@@ -859,7 +860,7 @@ void TFileAttachmentWidget::onAttachementTableSelectionChanged()
 
   bool vCardVaild = false;
   bool existContact = false;
-  if (singleSelection)
+  if (anySelection)
   {
     AAttachmentItem* item = selection.front();
     QString fileName = item->GetDisplayedFileName();
@@ -871,22 +872,36 @@ void TFileAttachmentWidget::onAttachementTableSelectionChanged()
 
       ContactvCard converter(contactData);
       std::string publicKeyString = converter.getPublicKey().toStdString();
-      bool publicKeySemanticallyValid = false;
-      if (public_key_address::is_valid(publicKeyString, &publicKeySemanticallyValid) && publicKeySemanticallyValid)
+
+      fc::ecc::public_key parsedKey;
+      if (public_key_address::convert(publicKeyString, &parsedKey))
       {
-        public_key_address key_address(publicKeyString);
-        fc::ecc::public_key parsedKey = key_address.key;
         if(Utils::matchContact(parsedKey, &_clickedContact))
         {
           existContact = true;
         }
       }
+      //else
+      //Warning: public key can be invalid but enable option "AddContact".
+      //User can correct public key
     }    
   }
 
   ui->actionAddContact->setEnabled(singleSelection && !EditMode && vCardVaild && !existContact);
   ui->actionFindContact->setEnabled(singleSelection && !EditMode && vCardVaild && existContact);
   ui->actionRename->setEnabled(singleSelection && EditMode && !vCardVaild);
+  if (singleSelection)
+  {
+    //disable Import contact when contact already exist
+    ui->actionImportContact->setEnabled(!EditMode && vCardVaild && !existContact);
+  }
+  else
+  {
+    //Don't check existContact flag when there are selected more contacts.
+    //If some contact already exist there will be displayed message with containing list of ignored .vcf files
+    ui->actionImportContact->setEnabled(anySelection && !EditMode && vCardVaild);
+  }
+  
 }
 
 void TFileAttachmentWidget::selectAllFiles()
@@ -964,8 +979,7 @@ void TFileAttachmentWidget::addContactCard(const Contact& contact)
   QFileInfo fileInfo(displayName);
   //delete object in the TFileAttachmentItem destructor
   QByteArray* vCardData = new QByteArray();
-  ContactvCard converter;
-  converter.getvCardData(contact/*in*/, vCardData/*out*/);
+  ContactvCard::convert(contact/*in*/, vCardData/*out*/);
 
   AttachmentIndex.push_back(fileInfo);
 
@@ -994,14 +1008,98 @@ void TFileAttachmentWidget::onAddContactTriggered()
 
   QByteArray contactData;
   item->getContactData(contactData);
-  assert (contactData.size() > 0);
+  assert (contactData.size() > 0);  
 
-  ContactvCard converter(contactData);
+  std::list<Contact> contacts;
+  Contact contact;
+  ContactvCard vCard(contactData);
+  // Public key can be invalid, but user can correct key in the "Add contact" dialog
+  vCard.convert(&contact);
+  contacts.push_back(contact);
 
-  getKeyhoteeWindow()->addContactfromvCard(converter.getFirstName(), converter.getLastName(), 
-                                           converter.getKHID(), converter.getPublicKey(),
-                                           converter.getNotes());
+  getKeyhoteeWindow()->addToContacts(false, contacts);
   getKeyhoteeWindow()->activateMainWindow();
+}
+
+void TFileAttachmentWidget::onImportContactTriggered()
+{
+  TSelection selection;
+  RetrieveSelection(&selection);
+
+  QStringList         contactsDuplicated;
+  QStringList         contactsPublicKeyInvalid;
+  QByteArray          contactData;
+  std::list<Contact>  contacts;
+  Contact             contact;
+  QString             fileName;  
+  fc::ecc::public_key parsedKey;
+  for (AAttachmentItem* item : selection)
+  {    
+    item->getContactData(contactData);
+    fileName = item->GetDisplayedFileName();
+    //check validation file name
+    if (TFileAttachmentWidget::isValidContactvCard(fileName, *item, &contactData))
+    {
+      ContactvCard vCard(contactData);
+      assert (contactData.size() > 0);
+      std::string publicKeyString = vCard.getPublicKey().toStdString();
+    
+      //check validation public key
+      if (public_key_address::convert(publicKeyString, &parsedKey))
+      {
+        if(Utils::matchContact(parsedKey, &_clickedContact))
+        {
+          contactsDuplicated.push_back(fileName);
+        }
+        else
+        {
+          // Must be success because validation is checked in the above
+          assert (vCard.convert(&contact) == ContactvCard::ConvertStatus::SUCCESS);
+          contacts.push_back(contact);
+        }
+      }
+      else
+        contactsPublicKeyInvalid.push_back(fileName);
+    }
+  }
+
+  QWidget *parentWidget;
+  if (contacts.size())
+  {
+    getKeyhoteeWindow()->addToContacts(true/*silent*/, contacts);
+    getKeyhoteeWindow()->activateMainWindow();
+    parentWidget = getKeyhoteeWindow();
+  }
+  else
+    parentWidget = this;
+
+  QString msg = "";
+  if (contactsDuplicated.size())
+  {
+    /// Report a message about contacts duplicated
+    msg += (tr("Following contacts were not imported because they already exist in your contact list:<br/>"));
+    for(auto name : contactsDuplicated)
+    {
+      msg += name + tr("<br/>");
+    }
+  }
+  if (contactsPublicKeyInvalid.size())
+  {
+    //set empty line if contactsDuplicated exist
+    if (contactsDuplicated.size())
+      msg += tr("<br/>");
+    /// Report a message about contacts with invalid public key
+    msg += (tr("Following contacts were not imported because they have invalid public key:<br/>"));
+    for(auto name : contactsPublicKeyInvalid)
+    {
+      msg += name + tr("<br/>");
+    }
+  }
+
+  if (contactsDuplicated.size() || contactsPublicKeyInvalid.size())
+  {    
+    QMessageBox::information(parentWidget, tr("Import contact(s)"), msg);
+  }
 }
 
 void TFileAttachmentWidget::onFindContactTriggered()

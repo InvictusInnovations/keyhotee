@@ -15,7 +15,7 @@ class ContactView;
 class Contact;
 
 class ContactsTable  : public QWidget,
-                       public IModificationsChecker
+                       protected IModificationsChecker
 {
   Q_OBJECT
 public:
@@ -32,8 +32,7 @@ public:
   bool checkSaving() const;
   void selectRow(int index);
   void selectChat();
-  void contactRemoved ();
-  virtual bool canContinue() const;
+  void contactRemoved ();  
   bool isSelection () const;
   bool hasFocusContacts() const;
   void selectAll ();
@@ -43,9 +42,12 @@ public:
   void getSelectedContacts (QList<const Contact*>& contacts);
 
 private:
+  /// \see IModificationsChecker interface description.
+  virtual bool canContinue() const override;
+
   ContactView* getCurrentView() const;
   void showContactsTable (bool visible) const;
-  void selectNextRow(int idx, int deletedRowCount) const;
+  void selectNextRow(int idx, int deletedRowCount) const;  
 
 Q_SIGNALS:
   void contactOpened(int contact_id);

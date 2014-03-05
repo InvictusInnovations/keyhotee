@@ -1,7 +1,11 @@
 #ifndef TMESSAGEEDIT_HPP
 #define TMESSAGEEDIT_HPP
 
+#include <bts/bitchat/bitchat_private_message.hpp>
+
 #include <QTextBrowser>
+
+#include <vector>
 
 /** QTextBrowser subclass dedicated to notify client code about pasting/dropping some file attachment
     items into document body. Then attachmentAdded is emitted, pasted contents is ignored and client
@@ -11,16 +15,27 @@ class TMessageEdit : public QTextBrowser
 {
 Q_OBJECT
 public:
+  typedef std::vector<bts::bitchat::attachment> TAttachmentContainer;
+
   TMessageEdit(QWidget *parent = 0);
   virtual ~TMessageEdit() {}
 
+  /** Loads mail message and images
+      \param body        - mail message body
+      \param attachments - checks attachments and if it contains images displays it by inlining
+                           them at the end of document.
+  */
+  void loadContents (const QString& body, const TAttachmentContainer& attachments);
+
 signals:
-  /// Signal emitted when some attachement item is pasted into document.
+  /// Signal emitted when some attachement item is pasted/dropped into document.
   void attachmentAdded(const QStringList& attachementItems);
 
 protected:
+/// QTextBrowser class reimplementation.
   /// Reimplemented to support attachment item pasting. Then attachmentAdded signal is emitted.
   virtual void insertFromMimeData(const QMimeData *source) override;
+  /// Reimplemented to support inline images/http links loading to improve security.
   virtual QVariant loadResource(int type, const QUrl& url) override;
 };
 

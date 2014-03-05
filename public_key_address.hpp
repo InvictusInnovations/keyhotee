@@ -66,6 +66,21 @@ struct public_key_address
     return status;
     }
 
+  /** Convert public key string to public key data
+      Returns false if publicKeyString is not valid
+   */
+  static bool convert(const std::string& publicKeyString/*in*/, fc::ecc::public_key* publicKeyData/*out*/)
+  {
+    bool publicKeySemanticallyValid;
+    if (is_valid(publicKeyString, &publicKeySemanticallyValid) && publicKeySemanticallyValid)
+    {
+        public_key_address key_address(publicKeyString);
+        *publicKeyData = key_address.key;
+        return true;
+    }
+    return false;
+  }
+
   /** Allows to construct object of this class from PREVIOUSLY successfully validated key string.
       \see is_valid method for details.
    */
@@ -84,5 +99,5 @@ struct public_key_address
     memcpy( (char*)&data, (char*)&key, 33);
     memcpy( ((char*)&data) + 33, (char*)&check, 4);
     return fc::to_base58( (char*)&data, 37);
-    }
+    }  
   };
