@@ -8,8 +8,10 @@
 #include <vector>
 
 /** QTextBrowser subclass dedicated to notify client code about pasting/dropping some file attachment
-    items into document body. Then attachmentAdded is emitted, pasted contents is ignored and client
-    can decide save pasted content to.
+    items into document body. Then attachmentAdded signal is emitted, pasted contents is ignored and
+    client can decide where save received content to.
+    This class also will suppport feature controlling automatic image loading pointed by external
+    urls to increase security.
 */
 class TMessageEdit : public QTextBrowser
 {
@@ -27,6 +29,9 @@ public:
   */
   void loadContents (const QString& body, const TAttachmentContainer& attachments);
 
+  /// Allows to load blocked images (if any).
+  void loadBlockedImages();
+
 signals:
   /// Signal emitted when some attachement item is pasted/dropped into document.
   void attachmentAdded(const QStringList& attachementItems);
@@ -35,8 +40,13 @@ protected:
 /// QTextBrowser class reimplementation.
   /// Reimplemented to support attachment item pasting. Then attachmentAdded signal is emitted.
   virtual void insertFromMimeData(const QMimeData *source) override;
-  /// Reimplemented to support inline images/http links loading to improve security.
+  /// Reimplemented to support control over inline images/http links loading to improve security.
   virtual QVariant loadResource(int type, const QUrl& url) override;
+
+/// Class attributes:
+private:
+  bool _imageLoadAllowed;
+  bool _anyBlockedImage;
 };
 
 #endif // TMESSAGEEDIT_HPP

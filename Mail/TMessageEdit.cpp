@@ -4,7 +4,10 @@
 
 #include <QUrl>
 
-TMessageEdit::TMessageEdit(QWidget *parent) : QTextBrowser(parent) {}
+TMessageEdit::TMessageEdit(QWidget *parent) :
+  QTextBrowser(parent),
+ _imageLoadAllowed(false),
+ _anyBlockedImage(false) {}
 
 void TMessageEdit::insertFromMimeData(const QMimeData *source)
 {
@@ -18,19 +21,26 @@ void TMessageEdit::insertFromMimeData(const QMimeData *source)
 
 QVariant TMessageEdit::loadResource(int type, const QUrl& url)
 {
-//if(type == QTextDocument::ImageResource && url.isLocalFile() == false)
-//  return QVariant(QPixmap(":/qt-project.org/styles/commonstyle/images/filecontents-32.png"));
+  if(_imageLoadAllowed == false && type == QTextDocument::ImageResource && url.isLocalFile() == false)
+  {
+    _anyBlockedImage = true;
+    return QVariant(QPixmap(":/qt-project.org/styles/commonstyle/images/filecontents-32.png"));
+  }
 
-return QTextBrowser::loadResource(type, url);
+  return QTextBrowser::loadResource(type, url);
 }
 
 void TMessageEdit::loadContents (const QString& body, const TAttachmentContainer& attachments)
 {
   QTextDocument *doc = document();
   doc->clear();
+
   doc->setHtml( body );
 
   unsigned int i = 0;
+  bool imageLoadAllowed = _imageLoadAllowed;
+  _imageLoadAllowed = true;
+
   for (const auto& attachment : attachments)
   {
     // image ID for resource
@@ -39,21 +49,37 @@ void TMessageEdit::loadContents (const QString& body, const TAttachmentContainer
     const uchar* imageData = (const uchar*)attachment.body.data();
     size_t imageSize = attachment.body.size();
 
-    //QImageReader::supportedImageFormats()
     QImage image;
     bool loadOk = image.loadFromData(imageData, imageSize);
     if (loadOk)
     {
+      /// FIXME Why QTextDocument API is not used here to create an image entry ?
       doc->addResource( QTextDocument::ImageResource, QUrl( imageName ), image);
       QString attachmentFileName = "<br/><hr/><font color=""grey"">" + 
                                     QString(attachment.filename.c_str()) + 
                                     "</font><br/>";
-      this->append(attachmentFileName +  "<center><img src='" + imageName + "'></center>");
+      append(attachmentFileName +  "<center><img src='" + imageName + "'></center>");
     }
     ++i;
   }
 
+  _imageLoadAllowed = imageLoadAllowed;
+
   //no set modified flag when is loading contents
   doc->setModified(false);
 }
+
+void TMessageEdit::loadBlockedImages()
+  {
+    if(_anyBlockedImage)
+    {
+      _anyBlockedImage = false;
+
+      _imageLoadAllowed = true;
+      QTextDocument* sourceDoc = document();
+      QTextDocument* copy = sourceDoc->clone(this);
+      setDocument(copy);
+      delete sourceDoc;
+    }
+  }
 
