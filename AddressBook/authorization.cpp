@@ -11,9 +11,71 @@
 #include <QMessageBox>
 #include <QToolBar>
 
-Authorization::Authorization(QWidget *parent) :
+
+Authorization::Authorization(const TRequestMessage& msg, const THeaderStoredMsg& header)
+{
+  _reqmsg = msg;
+  _header = header;
+}
+
+Authorization::~Authorization()
+{
+}
+
+void Authorization::processResponse()
+{
+  if(_reqmsg.status == TAuthorizationStatus::accept)
+    acceptExtendedPubKey();
+
+  setAuthorizationStatus(_reqmsg.status);
+}
+
+void Authorization::acceptExtendedPubKey() const
+{
+  if(_reqmsg.request_param>>8 & 0x01)   // if Exchange of extended public keys
+  {
+    auto addressbook = bts::get_profile()->get_addressbook();
+    TWalletContact contact;
+    if(!Utils::matchContact(_header.from_key, &contact))
+      return;
+    contact.send_trx_address = _reqmsg.extended_pub_key;
+    addressbook->store_contact(contact);
+  }
+}
+
+void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
+{
+  auto addressbook = bts::get_profile()->get_addressbook();
+  TWalletContact contact;
+  if(!Utils::matchContact(_header.from_key, &contact))
+    return;
+
+  switch(status)
+  {
+    case TAuthorizationStatus::accept:
+      contact.auth_status = TContAuthoStatus::accepted;
+      break;
+    case TAuthorizationStatus::block:
+      contact.auth_status = TContAuthoStatus::blocked;
+      break;
+    case TAuthorizationStatus::deny:
+      contact.auth_status = TContAuthoStatus::denied;
+      break;
+    default:
+      contact.auth_status = TContAuthoStatus::unauthorized;
+      assert(false);
+  }
+  addressbook->store_contact(contact);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///                                    AuthorizationView                                        ///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+AuthorizationView::AuthorizationView(const TRequestMessage& msg, const THeaderStoredMsg& header, QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::Authorization)
+  Authorization(msg, header),
+  ui(new Ui::AuthorizationView)
 {
   ui->setupUi(this);
 
@@ -46,32 +108,18 @@ Authorization::Authorization(QWidget *parent) :
   font.setPointSize (16);
   label->setFont (font);
 
-  connect(_accept, &QAction::triggered, this, &Authorization::onAccept);
-  connect(_deny, &QAction::triggered, this, &Authorization::onDeny);
-  connect(_block, &QAction::triggered, this, &Authorization::onBlock);
-  connect(ui->add_contact , &QGroupBox::toggled, this, &Authorization::onAddAsNewContact);
-  connect(ui->keyhoteeidpubkey, &KeyhoteeIDPubKeyWidget::currentState, this, &Authorization::onStateWidget);
+  connect(_accept, &QAction::triggered, this, &AuthorizationView::onAccept);
+  connect(_deny, &QAction::triggered, this, &AuthorizationView::onDeny);
+  connect(_block, &QAction::triggered, this, &AuthorizationView::onBlock);
+  connect(ui->add_contact , &QGroupBox::toggled, this, &AuthorizationView::onAddAsNewContact);
+  connect(ui->keyhoteeidpubkey, &KeyhoteeIDPubKeyWidget::currentState, this, &AuthorizationView::onStateWidget);
 
   // setting the background color of the frame so that the window looked like a window "create new contact"
   QPalette palette = ui->frame->palette();
   palette.setColor(backgroundRole(), QGuiApplication::palette().base().color());
   ui->frame->setPalette(palette);
-}
 
-Authorization::~Authorization()
-{
-  delete ui;
-}
-
-void Authorization::setAddressBook(AddressBookModel* addressbook)
-{
-  _address_book = addressbook;
-}
-
-void Authorization::setMsg(const TPublicKey& sender, const TRequestMessage& msg)
-{
-  _from_pub_key = sender;
-  _reqmsg = msg;
+  _from_pub_key = header.from_key;
 
   std::string public_key_string = public_key_address(_from_pub_key.serialize());
   ui->keyhoteeidpubkey->setPublicKey(public_key_string.c_str());
@@ -87,20 +135,22 @@ void Authorization::setMsg(const TPublicKey& sender, const TRequestMessage& msg)
   ui->message->setText(_reqmsg.greeting_message.c_str());
 }
 
-void Authorization::setOwnerItem(AuthorizationItem* item)
+AuthorizationView::~AuthorizationView()
+{
+  delete ui;
+}
+
+void AuthorizationView::setAddressBook(AddressBookModel* addressbook)
+{
+  _address_book = addressbook;
+}
+
+void AuthorizationView::setOwnerItem(AuthorizationItem* item)
 {
   _owner_item = item;
 }
 
-void Authorization::processResponse()
-{
-  if(_reqmsg.status == TAuthorizationStatus::accept)
-    acceptExtendedPubKey();
-
-  setAuthorizationStatus(_reqmsg.status);
-}
-
-void Authorization::onAccept()
+void AuthorizationView::onAccept()
 {
   addAsNewContact();
   acceptExtendedPubKey();
@@ -110,7 +160,7 @@ void Authorization::onAccept()
   emit itemAcceptRequest(_owner_item);
 }
 
-void Authorization::onDeny()
+void AuthorizationView::onDeny()
 {
   sendReply(TAuthorizationStatus::deny);
   setAuthorizationStatus(TAuthorizationStatus::deny);
@@ -118,7 +168,7 @@ void Authorization::onDeny()
   emit itemDenyRequest(_owner_item);
 }
 
-void Authorization::onBlock()
+void AuthorizationView::onBlock()
 {
   sendReply(TAuthorizationStatus::block);
   setAuthorizationStatus(TAuthorizationStatus::block);
@@ -126,7 +176,7 @@ void Authorization::onBlock()
   emit itemBlockRequest(_owner_item);
 }
 
-void Authorization::addAsNewContact()
+void AuthorizationView::addAsNewContact()
 {
   if(ui->add_contact->isEnabled() && ui->add_contact->isChecked())
   {
@@ -142,20 +192,7 @@ void Authorization::addAsNewContact()
   }
 }
 
-void Authorization::acceptExtendedPubKey()
-{
-  if(ui->extend_public_key->isChecked())
-  {
-    auto addressbook = bts::get_profile()->get_addressbook();
-    TWalletContact contact;
-    if(!Utils::matchContact(_from_pub_key, &contact))
-      return;
-    contact.send_trx_address = _reqmsg.extended_pub_key;
-    addressbook->store_contact(contact);
-  }
-}
-
-void Authorization::genExtendedPubKey(std::string identity_dac_id, TExtendPubKey &extended_pub_key)
+void AuthorizationView::genExtendedPubKey(std::string identity_dac_id, TExtendPubKey &extended_pub_key)
 {
   if(ui->extend_public_key->isChecked())
   {
@@ -168,7 +205,7 @@ void Authorization::genExtendedPubKey(std::string identity_dac_id, TExtendPubKey
   }
 }
 
-void Authorization::sendReply(TAuthorizationStatus status)
+void AuthorizationView::sendReply(TAuthorizationStatus status)
 {
   TWalletContact my_identity;
   if(!Utils::matchContact(_reqmsg.recipient, &my_identity))
@@ -200,32 +237,7 @@ void Authorization::sendReply(TAuthorizationStatus status)
   app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
 }
 
-void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
-{
-  auto addressbook = bts::get_profile()->get_addressbook();
-  TWalletContact contact;
-  if(!Utils::matchContact(_from_pub_key, &contact))
-    return;
-
-  switch(status)
-  {
-    case TAuthorizationStatus::accept:
-      contact.auth_status = TContAuthoStatus::accepted;
-      break;
-    case TAuthorizationStatus::block:
-      contact.auth_status = TContAuthoStatus::blocked;
-      break;
-    case TAuthorizationStatus::deny:
-      contact.auth_status = TContAuthoStatus::denied;
-      break;
-    default:
-      contact.auth_status = TContAuthoStatus::unauthorized;
-      assert(false);
-  }
-  addressbook->store_contact(contact);
-}
-
-void Authorization::onAddAsNewContact(bool checked)
+void AuthorizationView::onAddAsNewContact(bool checked)
 {
   if(ui->extend_public_key->isChecked() &&
       ui->add_contact->isEnabled() && !ui->add_contact->isChecked())
@@ -235,7 +247,7 @@ void Authorization::onAddAsNewContact(bool checked)
   }
 }
 
-void Authorization::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)
+void AuthorizationView::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)
 {
   switch(state)
   {
@@ -251,4 +263,3 @@ void Authorization::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)
       assert(false);
   }
 }
-

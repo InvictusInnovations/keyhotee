@@ -32,7 +32,7 @@ class Mailbox;
 class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
-class Authorization;
+class AuthorizationView;
 
 /**
  *  GUI widgets and GUI state for a contact.
@@ -67,21 +67,21 @@ class AuthorizationItem : public QTreeWidgetItem
 public:
   typedef fc::ecc::public_key TPublicKey;
 
-  AuthorizationItem(Authorization* view, QTreeWidgetItem* parent, int type = 0)
+  AuthorizationItem(AuthorizationView* view, QTreeWidgetItem* parent, int type = 0)
     : QTreeWidgetItem(parent, type), _view(view) {}
   virtual ~AuthorizationItem();
 
   void setFromKey(TPublicKey from_key) {_from_key = from_key;}
   bool isEqual(TPublicKey from_key) const;
-  Authorization* getView() const
+  AuthorizationView* getView() const
     {
     return _view;
     }
 
 /// Class attributes:
 private:
-  Authorization* _view;
-  TPublicKey     _from_key;
+  AuthorizationView*  _view;
+  TPublicKey          _from_key;
 };
 
 class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
@@ -133,8 +133,8 @@ private:
   virtual void OnReceivedChatMessage(const TContact& sender, const TChatMessage& msg,
     const TTime& timeSent) override;
   /// \see IGuiUpdateSink interface description.
-  virtual void OnReceivedAuthorizationMessage(const TRecipientPublicKey& sender,
-    const TAuthorizationMessage& msg, const TTime& timeSent) override;
+  virtual void OnReceivedAuthorizationMessage(const TAuthorizationMessage& msg,
+    const TStoredMailMessage& header) override;
   /// \see IGuiUpdateSink interface description.
   virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) override;
   /// \see IGuiUpdateSink interface description.
@@ -228,14 +228,13 @@ private:
   bool stopMailTransmission();
   bool checkSaving() const;
   void showContacts() const;
-  void createAuthorizationItem(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
-    const TTime& timeSent);
+  void createAuthorizationItem(const TAuthorizationMessage& msg, const TStoredMailMessage& header);
   QTreeWidgetItem* findExistSenderItem(AuthorizationItem::TPublicKey from_key, bool &to_root);
   void showAuthorizationItem(AuthorizationItem *item);
   void deleteAuthorizationItem(AuthorizationItem *item);
   void addContact();
-  void processResponse(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
-    const TTime& timeSent);
+  void processResponse(const TAuthorizationMessage& msg, const TStoredMailMessage& header);
+  void loadStoredRequests(bts::bitchat::message_db_ptr request_db);
 
   /// Class attributes:
 

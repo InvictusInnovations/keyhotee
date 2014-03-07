@@ -77,8 +77,8 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
     virtual void OnReceivedChatMessage(const TContact& sender, const TChatMessage& msg,
       const TTime& timeSent) override;
     /// \see IGuiUpdateSink interface description.
-    virtual void OnReceivedAuthorizationMessage(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
-      const TTime& timeSent) override;
+    virtual void OnReceivedAuthorizationMessage(const TAuthorizationMessage& msg,
+      const TStoredMailMessage& header) override;
     /// \see IGuiUpdateSink interface description.
     virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) override;
     /// \see IGuiUpdateSink interface description.
@@ -135,29 +135,27 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
     class TReceivedAuthorizationMsg : public ANotification
       {
       public:
-        static ANotification* Create(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
-          const TTime& timeSent, IGuiUpdateSink& sink)
+        static ANotification* Create(const TAuthorizationMessage& msg, const TStoredMailMessage& header,
+          IGuiUpdateSink& sink)
           {
-          return new TReceivedAuthorizationMsg(sender, msg, timeSent, sink);
+          return new TReceivedAuthorizationMsg(msg, header, sink);
           }
 
       /// ANotification class reimplementation:
         virtual void Notify()
           {
-          Sink.OnReceivedAuthorizationMessage(Sender, Msg, TimeSent);
+          Sink.OnReceivedAuthorizationMessage(Msg, Header);
           delete this;
           }
 
       private:
-        TReceivedAuthorizationMsg(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
-          const TTime& timeSent, IGuiUpdateSink& sink) : ANotification(sink), Sender(sender), Msg(msg),
-          TimeSent(timeSent) {}
+        TReceivedAuthorizationMsg(const TAuthorizationMessage& msg, const TStoredMailMessage& header,
+          IGuiUpdateSink& sink) : ANotification(sink), Msg(msg), Header(header) {}
         virtual ~TReceivedAuthorizationMsg() {}
 
       private:
-        TRecipientPublicKey   Sender;
         TAuthorizationMessage Msg;
-        TTime                 TimeSent;
+        TStoredMailMessage Header;
       };
 
     class TReceivedMailMsg : public ANotification
@@ -357,9 +355,9 @@ void TConnectionProcessor::TThreadSafeGuiNotifier::OnReceivedChatMessage(const T
   }
 
 void TConnectionProcessor::TThreadSafeGuiNotifier::OnReceivedAuthorizationMessage(
-  const TRecipientPublicKey& sender, const TAuthorizationMessage& msg, const TTime& timeSent)
+  const TAuthorizationMessage& msg, const TStoredMailMessage& header)
   {
-  ANotification* n = TReceivedAuthorizationMsg::Create(sender, msg, timeSent, Sink);
+  ANotification* n = TReceivedAuthorizationMsg::Create(msg, header, Sink);
   emit notificationSent(n);
   }
 
@@ -930,9 +928,9 @@ void TConnectionProcessor::received_request(const bts::bitchat::decrypted_messag
     {
     if(msg.from_key)
       {
-      //Profile->get_request_db()->store_message(msg, nullptr);
-      auto reqMsg = msg.as<bts::bitchat::private_contact_request_message>();
-      Sink->OnReceivedAuthorizationMessage(*msg.from_key, reqMsg, msg.sig_time);
+      auto header = Profile->get_request_db()->store_message(msg, nullptr);
+      auto req_msg = msg.as<bts::bitchat::private_contact_request_message>();
+      Sink->OnReceivedAuthorizationMessage(req_msg, header);
       }
     else
       {

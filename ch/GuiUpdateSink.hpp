@@ -45,8 +45,7 @@ class IGuiUpdateSink
       const TTime& timeSent) = 0;
 
   /// Receiving authorization messages:
-    virtual void OnReceivedAuthorizationMessage(const TRecipientPublicKey& sender, const TAuthorizationMessage& msg,
-      const TTime& timeSent) = 0;
+    virtual void OnReceivedAuthorizationMessage(const TAuthorizationMessage& msg, const TStoredMailMessage& header) = 0;
 
   /// Receiving mail messages:
     /// Notifies about received mail message.

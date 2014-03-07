@@ -5,32 +5,50 @@
 #include "keyhoteeidpubkeywidget.hpp"
 
 namespace Ui {
-class Authorization;
+class AuthorizationView;
 }
 class QToolBar;
 class AuthorizationItem;
 class AddressBookModel;
 
-class Authorization : public QWidget
+class Authorization
+{
+public:
+  typedef bts::bitchat::private_contact_request_message TRequestMessage;
+  typedef bts::bitchat::message_header                  THeaderStoredMsg;
+  typedef bts::bitchat::authorization_status            TAuthorizationStatus;
+  typedef bts::addressbook::wallet_contact              TWalletContact;
+  typedef bts::addressbook::authorization_status        TContAuthoStatus;
+
+  Authorization(const TRequestMessage& msg, const THeaderStoredMsg& header);
+  ~Authorization();
+
+  void processResponse();
+
+protected:
+  void acceptExtendedPubKey() const;
+  void setAuthorizationStatus(TAuthorizationStatus status);
+
+protected:
+  TRequestMessage       _reqmsg;
+  THeaderStoredMsg      _header;
+};
+
+class AuthorizationView : public QWidget,
+                          public Authorization
 {
   Q_OBJECT
 
 public:
-  typedef bts::bitchat::private_contact_request_message   TRequestMessage;
   typedef fc::ecc::public_key                             TPublicKey;
   typedef bts::extended_public_key                        TExtendPubKey;
-  typedef bts::bitchat::authorization_status              TAuthorizationStatus;
-  typedef bts::addressbook::authorization_status          TContAuthoStatus;
-  typedef bts::addressbook::wallet_contact                TWalletContact;
 
-  explicit Authorization(QWidget *parent = 0);
-  virtual ~Authorization();
+  explicit AuthorizationView(const TRequestMessage& msg, const THeaderStoredMsg& header, QWidget *parent = 0);
+  virtual ~AuthorizationView();
 
   void setAddressBook(AddressBookModel* addressbook);
 
-  void setMsg(const TPublicKey& sender, const TRequestMessage& msg);
   void setOwnerItem(AuthorizationItem* item);
-  void processResponse();
 
 Q_SIGNALS:
   void itemAcceptRequest (AuthorizationItem* item);
@@ -48,15 +66,12 @@ private slots:
 
 private:
   void addAsNewContact();
-  void acceptExtendedPubKey();
   void genExtendedPubKey(std::string identity_dac_id, TExtendPubKey &extended_pub_key);
   void sendReply(TAuthorizationStatus status);
-  void setAuthorizationStatus(TAuthorizationStatus status);
 
 private:
-  Ui::Authorization *ui;
+  Ui::AuthorizationView *ui;
 
-  TRequestMessage       _reqmsg;
   TPublicKey            _from_pub_key;
   QToolBar*             _toolbar;
   QAction*              _accept;

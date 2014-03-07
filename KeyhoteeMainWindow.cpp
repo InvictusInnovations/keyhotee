@@ -239,6 +239,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model, false);
   _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, false);
 
+  loadStoredRequests(profile->get_request_db());
+
   connect(_addressbook_model, &QAbstractItemModel::dataChanged, this,
     &KeyhoteeMainWindow::addressBookDataChanged);
 
@@ -866,25 +868,25 @@ void KeyhoteeMainWindow::deleteContactGui(int contact_id)
   assert(_contact_guis.find(contact_id) == _contact_guis.end());
 }
 
-void KeyhoteeMainWindow::createAuthorizationItem(const TRecipientPublicKey& sender,
-  const TAuthorizationMessage& msg, const TTime& timeSent)
+void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& msg,
+                                                 const TStoredMailMessage& header)
 {
-  Authorization *view = new Authorization(ui->widget_stack);
+  AuthorizationView *view = new AuthorizationView(msg, header);
   view->setAddressBook(_addressbook_model);
 
   bool add_to_root = false;
   QTreeWidgetItem *item = nullptr;
-  item = findExistSenderItem(sender, add_to_root);
+  item = findExistSenderItem(header.from_key, add_to_root);
 
   if(add_to_root)
   {
-    Authorization *view_root = new Authorization();
+    AuthorizationView *view_root = new AuthorizationView(msg, header);
 
     AuthorizationItem *authorization_root_item = new AuthorizationItem(view_root,
       item, (QTreeWidgetItem::ItemType)RequestItem);
 
     authorization_root_item->setIcon(0, QIcon(":/images/request_authorization.png") );
-    authorization_root_item->setFromKey(sender);
+    authorization_root_item->setFromKey(header.from_key);
 
     QString full_name = QString::fromStdString(msg.from_first_name);
     full_name += " " + QString::fromStdString(msg.from_last_name);
@@ -893,9 +895,9 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TRecipientPublicKey& send
     authorization_root_item->setHidden(false);
     view_root->setOwnerItem(authorization_root_item);
 
-    connect(view_root, &Authorization::itemAcceptRequest, this, &KeyhoteeMainWindow::onItemAcceptRequest);
-    connect(view_root, &Authorization::itemDenyRequest, this, &KeyhoteeMainWindow::onItemDenyRequest);
-    connect(view_root, &Authorization::itemBlockRequest, this, &KeyhoteeMainWindow::onItemBlockRequest);
+    connect(view_root, &AuthorizationView::itemAcceptRequest, this, &KeyhoteeMainWindow::onItemAcceptRequest);
+    connect(view_root, &AuthorizationView::itemDenyRequest, this, &KeyhoteeMainWindow::onItemDenyRequest);
+    connect(view_root, &AuthorizationView::itemBlockRequest, this, &KeyhoteeMainWindow::onItemBlockRequest);
 
     item = authorization_root_item;
   }
@@ -904,18 +906,16 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TRecipientPublicKey& send
     item, (QTreeWidgetItem::ItemType)RequestItem);
 
   authorization_item->setIcon(0, QIcon(":/images/request_authorization.png") );
-  authorization_item->setFromKey(sender);
+  authorization_item->setFromKey(header.from_key);
   QDateTime dateTime;
-  dateTime.setTime_t(timeSent.sec_since_epoch());
+  dateTime.setTime_t(header.from_sig_time.sec_since_epoch());
   authorization_item->setText(0, dateTime.toString(Qt::SystemLocaleShortDate));
   authorization_item->setHidden(false);
   view->setOwnerItem(authorization_item);
 
-  connect(view, &Authorization::itemAcceptRequest, this, &KeyhoteeMainWindow::onItemAcceptRequest);
-  connect(view, &Authorization::itemDenyRequest, this, &KeyhoteeMainWindow::onItemDenyRequest);
-  connect(view, &Authorization::itemBlockRequest, this, &KeyhoteeMainWindow::onItemBlockRequest);
-
-  view->setMsg(sender, msg);
+  connect(view, &AuthorizationView::itemAcceptRequest, this, &KeyhoteeMainWindow::onItemAcceptRequest);
+  connect(view, &AuthorizationView::itemDenyRequest, this, &KeyhoteeMainWindow::onItemDenyRequest);
+  connect(view, &AuthorizationView::itemBlockRequest, this, &KeyhoteeMainWindow::onItemBlockRequest);
 
   ui->widget_stack->addWidget(view);
 
@@ -962,12 +962,23 @@ void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
     _requests_root->setHidden(true);
 }
 
-void KeyhoteeMainWindow::processResponse(const TRecipientPublicKey& sender,
-  const TAuthorizationMessage& msg, const TTime& timeSent)
+void KeyhoteeMainWindow::processResponse(const TAuthorizationMessage& msg,
+                                         const TStoredMailMessage& header)
 {
-  Authorization *view = new Authorization(ui->widget_stack);
-  view->setMsg(sender, msg);
-  view->processResponse();
+  Authorization *authorization = new Authorization(msg, header);
+  authorization->processResponse();
+}
+
+void KeyhoteeMainWindow::loadStoredRequests(bts::bitchat::message_db_ptr request_db)
+{
+  auto headers = request_db->fetch_headers(bts::bitchat::private_contact_request_message::type);
+  for(uint32_t i = 0; i < headers.size(); ++i)
+  {
+    auto header = headers[i];
+    auto raw_data = request_db->fetch_data(header.digest);
+    auto msg = fc::raw::unpack<bts::bitchat::private_contact_request_message>(raw_data);
+    OnReceivedAuthorizationMessage(msg, header);
+  }
 }
 
 void KeyhoteeMainWindow::onItemAcceptRequest(AuthorizationItem *item)
@@ -1060,13 +1071,13 @@ void KeyhoteeMainWindow::OnReceivedChatMessage(const TContact& sender, const TCh
   contact_gui->receiveChatMessage(fromLabel, msgBody, dateTime);
   }
 
-void KeyhoteeMainWindow::OnReceivedAuthorizationMessage(const TRecipientPublicKey& sender,
-  const TAuthorizationMessage& msg, const TTime& timeSent)
+void KeyhoteeMainWindow::OnReceivedAuthorizationMessage(const TAuthorizationMessage& msg,
+                                                        const TStoredMailMessage& header)
   {
   if(msg.status == bts::bitchat::authorization_status::request)
-    createAuthorizationItem(sender, msg, timeSent);
+    createAuthorizationItem(msg, header);
   else
-    processResponse(sender, msg, timeSent);
+    processResponse(msg, header);
   }
 
 void KeyhoteeMainWindow::OnReceivedMailMessage(const TStoredMailMessage& msg)
