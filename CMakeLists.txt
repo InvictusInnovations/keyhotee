@@ -6,6 +6,10 @@
 # libreadline-dev
 # libdb++-dev
 
+#Set just these 2 configs to always produce release build with debug info enabled
+# Warning: it must appear before starting project definition
+SET (CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebinfo" CACHE STRING "" FORCE)
+
 project( keyhotee )
 cmake_minimum_required( VERSION 2.8.12.1 )
 
@@ -15,13 +19,6 @@ add_subdirectory(miner)
 macro(FillQtDependentLibraries)
   GET_TARGET_PROPERTY(QT_LIB_DIR Qt5::Core LOCATION)
   GET_FILENAME_COMPONENT(QT_LIB_DIR "${QT_LIB_DIR}" PATH)
-
-  SET (DEBUG_SUFFIX "")
-
-  IF(WIN32)
-    # On windows platform release & debug libraries have different names
-    SET (DEBUG_SUFFIX "D")
-  ENDIF(WIN32)
   
   # Warning this lib doesn't have an associated .cmake :-(
   find_library(Qt5Platform_LIBRARIES_RELEASE Qt5PlatformSupport HINTS "${QT_LIB_DIR}" "${QT_LIB_DIR}/../lib")
@@ -93,8 +90,40 @@ SET(ICU_LIBS_PREFIX "")
 
 SET (ORIGINAL_LIB_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
+SET (DEBUG_SUFFIX "")
+
+MESSAGE (STATUS "Config types: ${CMAKE_CONFIGURATION_TYPES}")
+
+#This variable will be filled just for Win32 platform
+SET (CrashRpt_LIBRARIES "")
+
+SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
+
+IF("${INVICTUS_ROOT}" STREQUAL "")
+  SET(INVICTUS_ROOT "./")
+ENDIF("${INVICTUS_ROOT}" STREQUAL "")
+
+message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
+
+# Let's configure binaries output directory (by default invictus-root/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
+
 IF( WIN32 )
   MESSAGE(STATUS "Configuring Kehotee on WIN32")
+  # On windows platform release & debug libraries have different names
+  SET (DEBUG_SUFFIX "D")
+
+  # Warning this lib doesn't have an associated .cmake :-(
+  find_library(CrashRpt_LIBRARIES_RELEASE CrashRpt1400 HINTS "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/lib")
+  find_library(CrashRpt_LIBRARIES_DEBUG CrashRpt1400${DEBUG_SUFFIX} HINTS "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/lib")
+
+  LIST(APPEND CrashRpt_LIBRARIES optimized ${CrashRpt_LIBRARIES_RELEASE})
+  LIST(APPEND CrashRpt_LIBRARIES debug ${CrashRpt_LIBRARIES_DEBUG})
+
+  MESSAGE(STATUS "Found CrashRpt libraries: ${CrashRpt_LIBRARIES}")
 
   IF(KH_STATIC_QT EQUAL 1)
     # Use dedicated prefix to find static versions of libraries 
@@ -103,7 +132,6 @@ IF( WIN32 )
 
   #Set to allow xp compatibility
   set(CMAKE_GENERATOR_TOOLSET "v110_xp" CACHE INTERNAL "XP-compatible VS 11")
-  #You need to set OPENSSL_ROOT environment variable for your system on WIN32
 ELSE()
   IF(KH_STATIC_QT EQUAL 1)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
@@ -122,14 +150,6 @@ find_package( Qt5Widgets )
 #Note: bitshares repo should be checked out under keyhotee dir or path here should be changed
 set(BITSHARES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BitShares)
 message(STATUS ${BITSHARES_DIR})
-
-SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
-
-IF("${INVICTUS_ROOT}" STREQUAL "")
-  SET(INVICTUS_ROOT "./")
-ENDIF("${INVICTUS_ROOT}" STREQUAL "")
-
-message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
 
 IF( APPLE )
     SET(KH_STATIC_QT 0)
@@ -361,14 +381,19 @@ IF(NOT WIN32)
   set(MINIUPNP_LIB  miniupnpc)
 ENDIF(NOT WIN32)
 
-# Let's configure binaries output directory (by default invictus-root/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
-
 # Configure dependencies of keyhotee main application module
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} ${resources} )
 add_dependencies (Keyhotee translations_target)
+
+IF(WIN32)
+  FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/*.*" _copySrc)
+  FILE(TO_NATIVE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" _copyDst)
+
+  ADD_CUSTOM_COMMAND(TARGET Keyhotee POST_BUILD
+    COMMAND copy /Y "${_copySrc}" "${_copyDst}"
+    COMMENT "copying CrashRpt binaries into KH output directory."
+  )
+ENDIF()
 
 target_include_directories(Keyhotee
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
@@ -386,6 +411,7 @@ ENDIF()
 # Let's configure different target names for release and debug builds.
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_DEBUG KeyhoteeD )
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
+set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELWITHDEBINFO Keyhotee )
 
 # Use the Widgets module from Qt 5.
 qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport)
@@ -396,6 +422,7 @@ set(CMAKE_STATIC_TYPE true)
 IF (KH_STATIC_QT EQUAL 1)
   target_link_libraries( Keyhotee
     ${Qt5Gui_PLUGINS} 
+    ${CrashRpt_LIBRARIES}
     debug ${Qt5Platform_LIBRARIES_DEBUG} optimized ${Qt5Platform_LIBRARIES_RELEASE}
     debug ${Qt5SvgIcon_LIBRARIES_DEBUG} optimized ${Qt5SvgIcon_LIBRARIES_RELEASE} 
     Qt5::Svg Qt5::Widgets Qt5::Gui Qt5::PrintSupport
@@ -409,6 +436,7 @@ IF (KH_STATIC_QT EQUAL 1)
 ELSE (KH_STATIC_QT EQUAL 1)
   target_link_libraries( Keyhotee
     Qt5::Svg Qt5::Widgets Qt5::Gui Qt5::PrintSupport
+    ${CrashRpt_LIBRARIES}
     bshare 
     ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES}
     ${APPKIT_LIBRARY} ${CMAKE_DL_LIBS} 

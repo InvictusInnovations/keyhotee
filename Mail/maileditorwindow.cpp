@@ -201,7 +201,7 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
   ATopLevelWindow(parent),
   ui(new Ui::MailEditorWindow()),
   ABModel(abModel),
-  MailProcessor(mailProcessor),
+  MailProcessor(mailProcessor), 
   FontCombo(nullptr),
   EditMode(editMode)
   {

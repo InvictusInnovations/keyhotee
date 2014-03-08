@@ -530,7 +530,7 @@
  <customwidgets>
   <customwidget>
    <class>TMessageEdit</class>
-   <extends>QTextEdit</extends>
+   <extends>QTextBrowser</extends>
    <header>Mail/TMessageEdit.hpp</header>
   </customwidget>
  </customwidgets>
