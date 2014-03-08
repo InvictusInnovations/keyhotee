@@ -30,8 +30,6 @@
   #include <Windows.h>
   #include <wincon.h>
 
-  #include "CrashRpt/include/CrashRpt.h"
-
   Q_GUI_EXPORT HICON qt_pixmapToWinHICON(const QPixmap &p);
 
   BOOL WINAPI SetConsoleIcon(HICON hIcon)
@@ -48,6 +46,15 @@
   #define APP_TRY /*try*/
   #define APP_CATCH /*Nothing*/
 
+# ifdef NDEBUG // enable crashrpt win32 release only
+#  include "CrashRpt/include/CrashRpt.h"
+
+  /* forwards SEH caught by fc's async tasks to CrashRpt */
+  int unhandled_exception_filter(unsigned code, _EXCEPTION_POINTERS* info)
+  {
+    return crExceptionFilter(code, info);
+  }
+
   void installCrashRptHandler(const char* appName, const char* appVersion, const QFile& logFilePath)
   {
     // Define CrashRpt configuration parameters
@@ -62,8 +69,10 @@
     info.uPriorities[CR_SMTP] = 2;  // Second try send report over SMTP  
     info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
     // Install all available exception handlers
-    info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS|CR_INST_CRT_EXCEPTION_HANDLERS;
-    info.dwFlags |= CR_INST_SEND_QUEUED_REPORTS; 
+    info.dwFlags = CR_INST_ALL_POSSIBLE_HANDLERS | 
+                   CR_INST_CRT_EXCEPTION_HANDLERS |
+                   CR_INST_AUTO_THREAD_HANDLERS |
+                   CR_INST_SEND_QUEUED_REPORTS; 
     // Define the Privacy Policy URL 
     info.pszPrivacyPolicyURL = "http://invictus.syncad.com/crash_privacy.html"; 
   
@@ -89,14 +98,16 @@
 
     // We want the screenshot of the entire desktop is to be added on crash
     crAddScreenshot2(CR_AS_PROCESS_WINDOWS|CR_AS_USE_JPEG_FORMAT, 0);
+
+    fc::set_unhandled_structured_exception_filter(&unhandled_exception_filter);
   }
 
   void uninstallCrashRptHandler()
   {
     crUninstall();
   }
-
-#else
+# endif // NDEBUG
+#else // WIN32
   #include <signal.h>
 
   #define APP_TRY try
@@ -109,7 +120,9 @@
   {\
     onUnknownExceptionCaught();\
   }
+#endif
 
+#if !defined(WIN32) || !defined(NDEBUG)
   void installCrashRptHandler(const char* appName, const char* appVersion, const QFile& logFilePath)
   {
   /// Nothing to do here since no crash report support available
@@ -119,7 +132,6 @@
   {
   /// Nothing to do here since no crash report support available
   }
-
 #endif
 
 #ifdef __STATIC_QT

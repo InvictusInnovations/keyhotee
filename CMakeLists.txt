@@ -13,6 +13,15 @@ SET (CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebinfo" CACHE STRING "" FORCE)
 project( keyhotee )
 cmake_minimum_required( VERSION 2.8.12.1 )
 
+IF(WIN32)
+   # Build all windows projects with /EHsc, which will prevent the compiler from 
+   # translating structured exceptions into C++ exceptions (which would make
+   # our crash reporter less useful)
+   IF (NOT CMAKE_CXX_FLAGS MATCHES "/EHsc")
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")    
+   ENDIF()
+ENDIF(WIN32)
+
 add_subdirectory(BitShares)
 add_subdirectory(miner)
 
@@ -117,11 +126,9 @@ IF( WIN32 )
   SET (DEBUG_SUFFIX "D")
 
   # Warning this lib doesn't have an associated .cmake :-(
-  find_library(CrashRpt_LIBRARIES_RELEASE CrashRpt1400 HINTS "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/lib")
-  find_library(CrashRpt_LIBRARIES_DEBUG CrashRpt1400${DEBUG_SUFFIX} HINTS "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/lib")
+  find_library(CrashRpt_LIBRARIES_RELEASE CrashRpt1402 HINTS "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/lib")
 
   LIST(APPEND CrashRpt_LIBRARIES optimized ${CrashRpt_LIBRARIES_RELEASE})
-  LIST(APPEND CrashRpt_LIBRARIES debug ${CrashRpt_LIBRARIES_DEBUG})
 
   MESSAGE(STATUS "Found CrashRpt libraries: ${CrashRpt_LIBRARIES}")
 

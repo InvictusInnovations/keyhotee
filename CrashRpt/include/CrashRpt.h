@@ -1,6 +1,6 @@
 /************************************************************************************* 
 This file is a part of CrashRpt library.
-Copyright (c) 2003-2012 The CrashRpt project authors. All Rights Reserved.
+Copyright (c) 2003-2013 The CrashRpt project authors. All Rights Reserved.
 
 Use of this source code is governed by a BSD-style license
 that can be found in the License.txt file in the root of the source
@@ -10,9 +10,9 @@ be found in the Authors.txt file in the root of the source tree.
 
 /*! \file   CrashRpt.h
 *  \brief  Defines the interface for the CrashRpt.DLL.
-*  \date   2003-2011
+*  \date   2003
 *  \author Michael Carruth 
-*  \author zeXspectrum 
+*  \author Oleg Krivtsov (zeXspectrum) 
 */
 
 #ifndef _CRASHRPT_H_
@@ -44,7 +44,7 @@ be found in the Authors.txt file in the root of the source tree.
 #define CRASHRPTAPI(rettype) CRASHRPT_EXTERNC rettype WINAPI
 
 //! Current CrashRpt version
-#define CRASHRPT_VER 1400
+#define CRASHRPT_VER 1402
 
 /*! \defgroup CrashRptAPI CrashRpt Functions */
 /*! \defgroup DeprecatedAPI Obsolete Functions */
@@ -383,7 +383,6 @@ typedef CR_CRASH_CALLBACK_INFOA CR_CRASH_CALLBACK_INFO;
 typedef int (CALLBACK *PFNCRASHCALLBACKW) (CR_CRASH_CALLBACK_INFOW* pInfo);
 
 /*! \ingroup CrashRptAPI
-*  \brief Client crash callback function prototype (multi-byte version).
 *  \copydoc PFNCRASHCALLBACKW()
 */
 typedef int (CALLBACK *PFNCRASHCALLBACKA) (CR_CRASH_CALLBACK_INFOA* pInfo);
@@ -482,6 +481,7 @@ crSetCrashCallbackA(
 #define CR_INST_SEND_MANDATORY				 0x100000 //!< This flag removes the "Close" and "Other actions" buttons from Error Report dialog, thus making the sending procedure mandatory for user.
 #define CR_INST_SHOW_ADDITIONAL_INFO_FIELDS	 0x200000 //!< Makes "Your E-mail" and "Describe what you were doing when the problem occurred" fields of Error Report dialog always visible.
 #define CR_INST_ALLOW_ATTACH_MORE_FILES		 0x400000 //!< Adds an ability for user to attach more files to crash report by clicking "Attach More File(s)" item from context menu of Error Report Details dialog.
+#define CR_INST_AUTO_THREAD_HANDLERS         0x800000 //!< If this flag is set, installs exception handlers for newly created threads automatically.
 
 /*! \ingroup CrashRptStructs
 *  \struct CR_INSTALL_INFOW()
@@ -618,6 +618,11 @@ crSetCrashCallbackA(
 *    <tr><td> \ref CR_INST_ALLOW_ATTACH_MORE_FILES     
 *        <td> <b>Available since v.1.3.1</b> Adds an ability for user to attach more files to crash report by choosing 
 *             "Attach More File(s)" item from context menu of Error Report Details dialog. By default this feature is disabled.
+*
+*    <tr><td> \ref CR_INST_AUTO_THREAD_HANDLERS     
+*        <td> <b>Available since v.1.4.2</b> Specifying this flag results in automatic installation of all available exception handlers to
+*             all threads that will be created in the future. This flag only works if CrashRpt is compiled as a DLL, it does 
+*             not work if you compile CrashRpt as static library.
 *   </table>
 *
 *   \b pszPrivacyPolicyURL [in, optional] 
@@ -732,7 +737,6 @@ typedef CR_INSTALL_INFOW* PCR_INSTALL_INFOW;
 
 /*! \ingroup CrashRptStructs
 *  \struct CR_INSTALL_INFOA
-*  \brief This structure defines the general information used by crInstallA() function.
 *  \copydoc CR_INSTALL_INFOW
 */
 
@@ -968,7 +972,7 @@ crUninstallFromCurrentThread();
 * 
 *  \return This function returns zero if succeeded.
 *
-*  \param[in] pszFile     Absolute path to the file to add, required.
+*  \param[in] pszFile     Absolute path to the file (or file search pattern) to add to crash report, required.
 *  \param[in] pszDestFile Destination file name, optional.
 *  \param[in] pszDesc     File description (used in Error Report Details dialog), optional.
 *  \param[in] dwFlags     Flags, optional.
@@ -978,24 +982,27 @@ crUninstallFromCurrentThread();
 *  
 *    When this function is called, the file is marked to be added to the error report, 
 *    then the function returns control to the caller.
-*    When crash occurs, all marked files are added to the report by the \b CrashSender.exe process. 
-*    If a file is locked by someone for exclusive access, the file won't be included. Inside of \ref PFNCRASHCALLBACK() crash callback, 
+*    When a crash occurs, all marked files are added to the report by the \b CrashSender.exe process. 
+*    If a file is locked by someone for exclusive access, the file won't be included. 
+*    Inside of \ref PFNCRASHCALLBACK() crash callback, 
 *    close open file handles and ensure files to be included are acessible for reading.
 *
-*    \a pszFile should be a valid absolute path of a file to add to crash report. 
+*    \a pszFile should be either a valid absolute path to the file or a file search 
+*    pattern (e.g. "*.log") to be added to crash report. 
 *
 *    \a pszDestFile should be the name of destination file. This parameter can be used
 *    to specify different file name for the file in ZIP archive. If this parameter is NULL, the pszFile
-*    file name is used as destination file name.
+*    file name is used as destination file name. If \a pszFile is a search pattern, this argument
+*    is ignored.
 *
-*    \a pszDesc is a literal description of a file. It can be NULL.
+*    \a pszDesc is a short description of the file. It can be NULL.
 *
 *    \a dwFlags parameter defines the behavior of the function. This can be a combination of the following flags:
-*       - \ref CR_AF_TAKE_ORIGINAL_FILE  On crash, the \b CrashSender.exe will try to locate the file from its original location. This behavior is the default one.
-*       - \ref CR_AF_MAKE_FILE_COPY      On crash, the \b CrashSender.exe will make a copy of the file and save it to the error report folder.  
+*       - \ref CR_AF_TAKE_ORIGINAL_FILE  On crash, the \b CrashSender.exe process will try to locate the file from its original location. This behavior is the default one.
+*       - \ref CR_AF_MAKE_FILE_COPY      On crash, the \b CrashSender.exe process will make a copy of the file and save it to the error report folder.  
 *
 *       - \ref CR_AF_FILE_MUST_EXIST     The function will fail if file doesn't exist at the moment of function call (the default behavior). 
-*       - \ref CR_AF_MISSING_FILE_OK     Do not fail if file is missing (assume it will be created later).
+*       - \ref CR_AF_MISSING_FILE_OK     The function will not fail if file is missing (assume it will be created later).
 *
 *       - \ref CR_AF_ALLOW_DELETE        If this flag is specified, the user will be able to delete the file from error report using context menu of Error Report Details dialog.
 *
@@ -1003,6 +1010,8 @@ crUninstallFromCurrentThread();
 *    (if you specify \ref CR_INST_SEND_QUEUED_REPORTS flag) 
 *    you must also specify the \ref CR_AF_MAKE_FILE_COPY as \a dwFlags parameter value. This will
 *    guarantee that a snapshot of your file at the moment of crash is taken and saved to the error report folder.
+*    The error report folder is a folder where files included into the crash report are stored
+*    until they are sent to recipient.
 *
 *    This function fails if \a pszFile doesn't exist at the moment of function call, 
 *    unless you specify \ref CR_AF_MISSING_FILE_OK flag. 
@@ -1011,6 +1020,32 @@ crUninstallFromCurrentThread();
 *    versions of crAddFile2() function. The crAddFile2() macro defines character set
 *    independent mapping.
 *
+*  Usage example:
+*
+*  \code
+*
+*  // Add the error.log file to crash report. At the moment of crash, 
+*  // the file will be copied to crash report folder. The end user 
+*  // will be able to delete the file using CrashRpt GUI.
+*  int nResult = crAddFile2(
+*             _T("C:\\Program Files (x86)\MyApp\\error.log"), 
+*             _T("error.log"), 
+*             _T("Log file"), 
+*             CR_AF_MAKE_FILE_COPY|CR_AF_ALLOW_DELETE);
+*  if(nResult!=0)
+*  {
+*    // Get the status message
+*    TCHAR szErrorMsg[256];
+*    crGetLastErrorMsg(szErrorMsg, 256);
+*  }
+*
+*  // Add all *.txt files found in the folder. At the moment of crash, 
+*  // the file(s) will be copied to crash report folder. The end user 
+*  // won't be able to delete the file(s).
+*  crAddFile2(_T("C:\\Program Files (x86)\MyApp\\*.txt"), 
+*      NULL, _T("TXT file"), CR_AF_MAKE_FILE_COPY);
+*
+*  \endcode
 *
 *  \sa crAddFile2W(), crAddFile2A(), crAddFile2()
 */
@@ -1051,6 +1086,7 @@ crAddFile2A(
 #define CR_AS_PROCESS_WINDOWS 2  //!< Take a screenshot of all visible process windows.
 #define CR_AS_GRAYSCALE_IMAGE 4  //!< Make a grayscale image instead of a full-color one.
 #define CR_AS_USE_JPEG_FORMAT 8  //!< Store screenshots as JPG files.
+#define CR_AS_ALLOW_DELETE   16  //!< If this flag is specified, the file will be deletable from context menu of Error Report Details dialog.
 
 /*! \ingroup DeprecatedAPI  
 *  \brief Adds a screenshot to the crash report.
@@ -1073,6 +1109,8 @@ crAddFile2A(
 *  When crash occurs, screenshot is made by the \b CrashSender.exe process and added to the report. 
 * 
 *  \b dwFlags 
+*
+*    - \ref CR_AS_ALLOW_DELETE        If this flag is specified, the user will be able to delete the file from error report using context menu of Error Report Details dialog.
 *
 *    Use one of the following constants to specify what part of virtual screen to capture:
 *    - \ref CR_AS_VIRTUAL_SCREEN  Use this to take a screenshot of the whole desktop (virtual screen).
@@ -1171,6 +1209,7 @@ crAddScreenshot2(
 #define CR_AV_QUALITY_GOOD    4  //!< Good encoding quality, larger file size.
 #define CR_AV_QUALITY_BEST    8  //!< The best encoding quality, the largest file size.
 #define CR_AV_NO_GUI         16  //!< Do not display the notification dialog.
+#define CR_AV_ALLOW_DELETE   32  //!< If this flag is specified, the file will be deletable from context menu of Error Report Details dialog.
 
 /*! \ingroup CrashRptAPI  
 *  \brief Allows to record what happened before crash to a video file and include the file to crash report.
@@ -1198,6 +1237,8 @@ crAddScreenshot2(
 *    - \ref CR_AV_QUALITY_LOW     Low-quality video encoding. This is the default.
 *    - \ref CR_AV_QUALITY_GOOD    Good encoding quality, larger file.
 *    - \ref CR_AV_QUALITY_BEST    The best encoding quality, the largest file.
+*
+*   - use the \ref CR_AV_ALLOW_DELETE to allow the user to delete the recorded video file from error report using context menu of Error Report Details dialog.
 *
 *  The main application window is a window that has a caption (\b WS_CAPTION), system menu (\b WS_SYSMENU) and
 *  the \b WS_EX_APPWINDOW extended style. If CrashRpt doesn't find such a window, it considers the first found process window as
@@ -1307,11 +1348,12 @@ crAddVideo(
 *  User-added properties are listed under \<CustomProps\> tag of the XML file.
 *  In the XML file properties are ordered by names in alphabetic order.
 *
-*  The following example shows how to add information about the amount of free disk space to the crash
-*  description XML file:
+*  The following example shows how to add information about the amount of free disk space 
+*  to the crash description XML file:
+*
 *  \code
-*  // It is assumed that you already calculated the amount of free disk space, converted it to text
-*  // and store it as szFreeSpace string.
+*  // It is assumed that you already calculated the amount of free disk space, 
+*  // converted it to text and stored it as szFreeSpace string.
 *  LPCTSTR szFreeSpace = _T("0 Kb");
 *  crAddProperty(_T("FreeDiskSpace"), szFreeSpace);
 *
@@ -1346,6 +1388,9 @@ crAddPropertyA(
 #define crAddProperty crAddPropertyA
 #endif //UNICODE
 
+// Flags that can be passed to crAddRegKey() function
+#define CR_AR_ALLOW_DELETE   0x1  //!< If this flag is specified, the file will be deletable from context menu of Error Report Details dialog.
+
 /*! \ingroup CrashRptAPI  
 *  \brief Adds a registry key dump to the crash report.
 * 
@@ -1367,9 +1412,11 @@ crAddPropertyA(
 *  format and included into the error report as \a pszDstFileName destination file. You can dump multiple registry keys
 *  to the same destination file.
 *
-*  The \a dwFlags parameter is reserved for future use and should be set to zero.
+*  The \a dwFlags parameter can be either set to zero (no flags) or with the following constant:
+* 
+*  - \ref CR_AR_ALLOW_DELETE allows the user to delete the file from error report using context menu of Error Report Details dialog.
 *
-*  The following example shows how to dump two registry keys to \b regkey.xml file:
+*  The following example shows how to dump two registry keys to a single \a regkey.xml file:
 *
 *  \code
 *  
@@ -1457,6 +1504,49 @@ CRASHRPTAPI(int)
 crGenerateErrorReport(   
                       __in_opt CR_EXCEPTION_INFO* pExceptionInfo
                       );
+
+/*! \ingroup CrashRptAPI
+*  \brief Can be used as a SEH exception filter.
+*
+*  \return This function returns \c EXCEPTION_EXECUTE_HANDLER if succeeds; otherwise \c EXCEPTION_CONTINUE_SEARCH.
+*
+*  \param[in] code Exception code.
+*  \param[in] ep   Exception pointers.
+*
+*  \remarks
+*
+*     This function can be called instead of a SEH exception filter
+*     inside of __try{}__except(Expression){} construction. The function generates an error report
+*     and returns control to the exception handler block.
+*
+*     The exception code is usually retrieved with \b GetExceptionCode() intrinsic function
+*     and the exception pointers are retrieved with \b GetExceptionInformation() intrinsic 
+*     function.
+*
+*     If an error occurs, this function returns \c EXCEPTION_CONTINUE_SEARCH.
+*     Use crGetLastErrorMsg() to retrieve the error message on fail.
+*
+*     The following example shows how to use crExceptionFilter().
+*    
+*     \code
+*     int* p = NULL;   // pointer to NULL
+*     __try
+*     {
+*        *p = 13; // causes an access violation exception;
+*     }
+*     __except(crExceptionFilter(GetExceptionCode(), GetExceptionInformation()))
+*     {   
+*       // Terminate program
+*       ExitProcess(1);
+*     }
+*
+*     \endcode 
+*/
+
+CRASHRPTAPI(int)
+crExceptionFilter(
+                  unsigned int code, 
+                  __in_opt struct _EXCEPTION_POINTERS* ep);
 
 
 // Flags used by crEmulateCrash() function
