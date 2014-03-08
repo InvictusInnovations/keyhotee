@@ -292,7 +292,7 @@ void Mailbox::onDeleteMail()
   if (QMessageBox::question(this, tr("Delete Mail"), tr("Are you sure you want to delete selected email(s)?")) == QMessageBox::Button::No)
     return;
   QModelIndexList indexes;
-  foreach(QModelIndex sortFilterIndex, sortFilterIndexes)
+  for(const QModelIndex& sortFilterIndex : sortFilterIndexes)
     indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
   auto sourceModel = model->sourceModel();

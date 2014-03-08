@@ -38,7 +38,8 @@ ContactvCard::ConvertStatus ContactvCard::convert(Contact* contact)
 { 
   contact->first_name       = getFirstName().toStdString();
   contact->last_name        = getLastName().toStdString();
-  contact->dac_id_string    = getKHID().toStdString();  
+  contact->dac_id_string    = getKHID().toStdString();
+  contact->notes            = getNotes().toStdString();
   contact->privacy_setting  = bts::addressbook::secret_contact;
   contact->setIcon(QIcon(":/images/user.png"));
   if (public_key_address::convert(getPublicKey().toStdString(), &contact->public_key) == false)
@@ -79,6 +80,8 @@ QString ContactvCard::getNotes() const
 {
   vCardProperty name_prop = _vcard.property(VC_NOTE);
   QString value = name_prop.value();
+  // "\n" is new line in the vCard standard.
+  value.replace("\\n", "\n");
   return value;
 }
 
