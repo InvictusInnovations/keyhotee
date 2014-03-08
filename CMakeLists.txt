@@ -123,10 +123,6 @@ IF( WIN32 )
   LIST(APPEND CrashRpt_LIBRARIES optimized ${CrashRpt_LIBRARIES_RELEASE})
   LIST(APPEND CrashRpt_LIBRARIES debug ${CrashRpt_LIBRARIES_DEBUG})
 
-  ADD_CUSTOM_COMMAND( TARGET Keyhotee POST_BUILD COMMAND copy "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/*.*"
-    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/" COMMENT "copying CrashRpt binaries into KH output directory."
-  )
-
   MESSAGE(STATUS "Found CrashRpt libraries: ${CrashRpt_LIBRARIES}")
 
   IF(KH_STATIC_QT EQUAL 1)
@@ -388,6 +384,16 @@ ENDIF(NOT WIN32)
 # Configure dependencies of keyhotee main application module
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} ${resources} )
 add_dependencies (Keyhotee translations_target)
+
+IF(WIN32)
+  FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/*.*" _copySrc)
+  FILE(TO_NATIVE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" _copyDst)
+
+  ADD_CUSTOM_COMMAND(TARGET Keyhotee POST_BUILD
+    COMMAND copy /Y "${_copySrc}" "${_copyDst}"
+    COMMENT "copying CrashRpt binaries into KH output directory."
+  )
+ENDIF()
 
 target_include_directories(Keyhotee
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
