@@ -745,6 +745,7 @@ void KeyhoteeMainWindow::newMailMessage()
 {
   MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
     _connectionProcessor, true);
+
   mailWindow->show();
 }
 
