@@ -60,7 +60,7 @@ void vCard::addProperty(const vCardProperty& property)
 
 void vCard::addProperties(const vCardPropertyList& properties)
 {
-    foreach (vCardProperty property, properties)
+    for (const vCardProperty& property : properties)
         this->addProperty(property);
 }
 
@@ -87,7 +87,7 @@ vCardProperty vCard::property(const QString& name, const vCardParamList& params,
 
             else
             {
-                foreach (vCardParam param, params)
+                for (const vCardParam& param : params)
                     if (!current_params.contains(param))
                         continue;
             }
@@ -118,7 +118,7 @@ bool vCard::contains(const QString& name, const vCardParamList& params, bool str
 
         else
         {
-            foreach (vCardParam param, params)
+            for (const vCardParam& param : params)
                 if (!current_params.contains(param))
                     continue;
         }
@@ -139,7 +139,7 @@ bool vCard::isValid() const
     if (m_properties.isEmpty())
         return false;
 
-    foreach (vCardProperty prop, m_properties)
+    for (const vCardProperty& prop : m_properties)
         if (!prop.isValid())
             return false;
 
@@ -171,7 +171,7 @@ QByteArray vCard::toByteArray(vCardVersion version) const
             return QByteArray();
     }
 
-    foreach (vCardProperty property, this->properties())
+    for (const vCardProperty& property : this->properties())
         lines.append(property.toByteArray(version));
    
     lines.append(VC_END_TOKEN);

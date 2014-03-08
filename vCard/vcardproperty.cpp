@@ -88,7 +88,7 @@ bool vCardProperty::isValid() const
     if (m_values.isEmpty())
         return false;
 
-    foreach (vCardParam param, m_params)
+    for (const vCardParam& param : m_params)
         if (!param.isValid())
             return false;
 
@@ -140,7 +140,7 @@ QList<vCardProperty> vCardProperty::fromByteArray(const QByteArray& data)
     QList<vCardProperty> properties;
 
     QStringList lines = QString::fromUtf8(data).split(VC_END_LINE_TOKEN);
-    foreach (QString line, lines)
+    for (const QString& line : lines)
     {
         if (line == VC_BEGIN_TOKEN || line == VC_END_TOKEN)
             break;
@@ -243,8 +243,15 @@ vCardProperty vCardProperty::createOrganization(const QString& name, const QStri
 
 vCardProperty vCardProperty::createNotes(const QString& notes)
 {
-    QStringList values;
-    values.append(notes);
+  /** \warning Multiline notes don't work properly on Windows 7
+      "Windows system contact" application doesn't split multilines text.      
+      It looks like it is a problem on the "Windows system contact" side
+   */  
+  QString notesTmp = notes;
+  // "\n" is new line in the vCard standard.
+  notesTmp.replace("\n", "\\n");
+  QStringList values;
+  values.append(notesTmp);
 
-    return vCardProperty(VC_NOTE, values);
+  return vCardProperty(VC_NOTE, values);
 }

@@ -134,7 +134,7 @@ QByteArray vCardParam::toByteArray(QList<vCardParam> params, vCardVersion versio
         case VC_VER_2_1:
         {
             QStringList ps;
-            foreach (vCardParam param, params)
+            for (const vCardParam& param : params)
                 ps.append(param.toByteArray(VC_VER_2_1));
             buffer.append(ps.join(QString(VC_SEPARATOR_TOKEN)));
         }
@@ -146,7 +146,7 @@ QByteArray vCardParam::toByteArray(QList<vCardParam> params, vCardVersion versio
             QStringList encodings;
             QStringList charsets;
             QStringList unknowns;
-            foreach (vCardParam param, params)
+            for (const vCardParam& param : params)
             {
                 QByteArray param_str = param.toByteArray(VC_VER_2_1);
                 switch (param.group())
@@ -191,11 +191,11 @@ QList<vCardParam> vCardParam::fromByteArray(const QByteArray& data)
     QList<vCardParam> params;
 
     QStringList tokens = QString::fromUtf8(data).simplified().split(VC_SEPARATOR_TOKEN);
-    foreach (QString token, tokens)
+    for (const QString token : tokens)
     {
-	int token_size = token.count();
+	    int token_size = token.count();
         if (token.startsWith(VC_TYPE_TOKEN))
-            foreach (QString type, token.right(token_size-5).split(VC_TYPE_SEP_TOKEN))
+            for (const QString& type : token.right(token_size-5).split(VC_TYPE_SEP_TOKEN))
                 params.append(vCardParam(type, vCardParam::Type));
 
         else if (token.startsWith(VC_ENCODING_TOKEN))

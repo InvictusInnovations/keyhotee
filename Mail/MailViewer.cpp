@@ -20,7 +20,7 @@ MailViewer::MailViewer(QWidget* parent)
   grid_layout->setSpacing(0);
   ui->toolbar_container->setLayout(grid_layout);
   grid_layout->addWidget(message_tools, 0, 0);  
-  //PFIX ui->message_content->setOpenExternalLinks (true);
+  ui->message_content->setOpenExternalLinks (true);
   ui->message_content->setReadOnly(true);
   }
 
