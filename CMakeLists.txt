@@ -245,6 +245,8 @@ set( sources
         AddressBook/authorization.cpp
         AddressBook/ContactvCard.hpp
         AddressBook/ContactvCard.cpp
+        AddressBook/ContactGui.hpp
+        AddressBook/ContactGui.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp

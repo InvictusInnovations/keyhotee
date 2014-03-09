@@ -3,6 +3,7 @@
 
 #include "AddressBookModel.hpp"
 #include "Contact.hpp"
+#include "ContactGui.hpp"
 #include "KeyhoteeMainWindow.hpp"
 #include "public_key_address.hpp"
 #include "RequestAuthorization.hpp"
@@ -146,7 +147,6 @@ ContactView::ContactView(QWidget* parent)
 
   ui->khid_pubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::ShowContact);
 
-  //ui->chat_conversation->setHtml( "<html><head></head><body>Hello World<br/></body></html>" );
   connect(save_contact, &QAction::triggered, this, &ContactView::onSave);
   connect(cancel_edit_contact, &QAction::triggered, this, &ContactView::onCancel);
   connect(edit_contact, &QAction::triggered, this, &ContactView::onEdit);
