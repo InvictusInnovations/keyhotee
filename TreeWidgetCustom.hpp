@@ -37,6 +37,7 @@ public:
 
 protected:
   virtual bool viewportEvent(QEvent *event) override;
+  virtual void keyPressEvent(QKeyEvent *event) override;
   void showContextMenu(QTreeWidgetItem* item, const QPoint& globalPos);
 
 private slots:
