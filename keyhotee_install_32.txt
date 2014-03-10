@@ -5,6 +5,10 @@ c:\lib\boost\stage\lib\BOOST_DATE_TIME-VC110-MT-1_53.DLL
 c:\lib\boost\stage\lib\BOOST_FILESYSTEM-VC110-MT-1_53.DLL
 c:\lib\boost\stage\lib\BOOST_SYSTEM-VC110-MT-1_53.DLL
 c:\lib\boost\stage\lib\BOOST_THREAD-VC110-MT-1_53.DLL
+c:\gh\bin\dbghelp.dll
+c:\gh\bin\crashrpt_lang.ini
+c:\gh\bin\Crashrpt1402.dll
+c:\gh\bin\CrashSender1402.exe
 c:\openssl\bin\LIBEAY32.DLL
 c:\gh\msvc32\msvcp110.dll
 c:\gh\msvc32\msvcr110.dll
