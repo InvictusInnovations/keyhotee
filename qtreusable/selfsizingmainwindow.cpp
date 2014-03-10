@@ -30,7 +30,7 @@ void SelfSizingMainWindow::readSettings()
 
 void SelfSizingMainWindow::writeSettings()
   {
-  getKeyhoteeWindow()->getMailBoxSettings (&mailSettings);
+  getKeyhoteeWindow()->getMailBoxSettings (&_mailSettings);
 
   QSettings settings("Invictus Innovations", _settings_file);
   settings.beginGroup(windowTitle());
