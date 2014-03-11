@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <bts/addressbook/addressbook.hpp>
 #include <bts/application.hpp>
+#include "AddressBook/ContactGui.hpp"
 
 #include "ATopLevelWindowsContainer.hpp"
 #include "ConnectionProcessor.hpp"
