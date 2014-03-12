@@ -13,6 +13,31 @@ SET (CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebinfo" CACHE STRING "" FORCE)
 project( keyhotee )
 cmake_minimum_required( VERSION 2.8.12.1 )
 
+set(VERSION_MAJOR "0")
+set(VERSION_MINOR "6")
+set(VERSION_PATCH "0")
+
+
+SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
+
+IF("${INVICTUS_ROOT}" STREQUAL "")
+  SET(INVICTUS_ROOT "./")
+ENDIF("${INVICTUS_ROOT}" STREQUAL "")
+
+GET_FILENAME_COMPONENT(INVICTUS_ROOT ${INVICTUS_ROOT} REALPATH) # remove ugliness
+
+message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
+
+# Let's configure binaries output directory (by default invictus-root/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${INVICTUS_ROOT}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX "${INVICTUS_ROOT}/install" CACHE PATH "Keyhotee install prefix" FORCE)
+endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
 IF(WIN32)
    # Build all windows projects with /EHsc, which will prevent the compiler from 
    # translating structured exceptions into C++ exceptions (which would make
@@ -106,20 +131,6 @@ MESSAGE (STATUS "Config types: ${CMAKE_CONFIGURATION_TYPES}")
 #This variable will be filled just for Win32 platform
 SET (CrashRpt_LIBRARIES "")
 
-SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
-
-IF("${INVICTUS_ROOT}" STREQUAL "")
-  SET(INVICTUS_ROOT "./")
-ENDIF("${INVICTUS_ROOT}" STREQUAL "")
-
-message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
-
-# Let's configure binaries output directory (by default invictus-root/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
-
 IF( WIN32 )
   MESSAGE(STATUS "Configuring Kehotee on WIN32")
   # On windows platform release & debug libraries have different names
@@ -131,6 +142,11 @@ IF( WIN32 )
   LIST(APPEND CrashRpt_LIBRARIES optimized ${CrashRpt_LIBRARIES_RELEASE})
 
   MESSAGE(STATUS "Found CrashRpt libraries: ${CrashRpt_LIBRARIES}")
+  set(CRASHRPT_BINARIES_TO_INSTALL "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/crashrpt_lang.ini"
+                                   "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/CrashRpt1402.dll"
+                                   "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/CrashSender1402.exe"
+                                   "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/dbghelp.dll")
+
 
   IF(KH_STATIC_QT EQUAL 1)
     # Use dedicated prefix to find static versions of libraries 
@@ -171,11 +187,11 @@ IF( APPLE )
     SET( MACOSX_BUNDLE_BUNDLE_NAME "Keyhotee" )
     SET( MACOSX_BUNDLE_GUI_IDENTIFIER "com.invictus-innovations.Keyhotee" ) 
     set( MACOSX_BUNDLE_ICON_FILE keyhotee.icns )
-    SET( MACOSX_BUNDLE_INFO_STRING "Keyhotee - version 1.0" ) 
-    SET( MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0" ) 
-    SET( MACOSX_BUNDLE_LONG_VERSION_STRING "1.0.0" ) 
-    SET( MACOSX_BUNDLE_BUNDLE_VERSION "1.0" ) 
-    SET( MACOSX_BUNDLE_COPYRIGHT "(C) 2013 Invictus Innovations" ) 
+    SET( MACOSX_BUNDLE_INFO_STRING "Keyhotee - version ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ) 
+    SET( MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ) 
+    SET( MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ) 
+    SET( MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ) 
+    SET( MACOSX_BUNDLE_COPYRIGHT "(C) 2014 Invictus Innovations" ) 
   
 ENDIF( APPLE )
 
@@ -387,6 +403,11 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BIN
 list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.h)
 list(APPEND sources ${headers})
 
+if(WIN32)
+  # add an icon to the win32 executable
+  list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/Keyhotee.rc)
+endif(WIN32)
+
 # Some unknown diff between windows and unix, this is quick fix, leave for DanL to clean-up
 IF(NOT WIN32)
   #apparently this is needed for Ubuntu (see commit from jefferylee), but it causes problems for windows (lib is brought in via upnpc-static on windows at least)
@@ -398,12 +419,17 @@ add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} ${resources} )
 add_dependencies (Keyhotee translations_target)
 
 IF(WIN32)
-  FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/*.*" _copySrc)
-  FILE(TO_NATIVE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" _copyDst)
+  #FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/*.*" _copySrc)
+  #FILE(TO_NATIVE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" _copyDst)
+
+  set(CRASHRPT_POST_BUILD_COPY_COMMANDS)
+  foreach(binary ${CRASHRPT_BINARIES_TO_INSTALL})
+    set(CRASHRPT_POST_BUILD_COPY_COMMANDS ${CRASHRPT_POST_BUILD_COPY_COMMANDS} COMMAND ${CMAKE_COMMAND} -E copy_if_different ${binary} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+  endforeach()
 
   ADD_CUSTOM_COMMAND(TARGET Keyhotee POST_BUILD
-    COMMAND copy /Y "${_copySrc}" "${_copyDst}"
-    COMMENT "copying CrashRpt binaries into KH output directory."
+    ${CRASHRPT_POST_BUILD_COPY_COMMANDS}
+    COMMENT "copying CrashRpt binaries into Keyhotee output directory."
   )
 ENDIF()
 
@@ -461,3 +487,55 @@ if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
 endif(MSVC)
 
+INSTALL(TARGETS Keyhotee RUNTIME DESTINATION .)
+get_target_property(FC_SHARED_LIBRARIES_DEBUG fc SHARED_LIBRARIES_DEBUG)
+get_target_property(FC_SHARED_LIBRARIES_RELEASE fc SHARED_LIBRARIES_RELEASE)
+INSTALL(FILES ${FC_SHARED_LIBRARIES_RELEASE} DESTINATION . CONFIGURATIONS RelWithDebinfo)
+INSTALL(FILES ${FC_SHARED_LIBRARIES_DEBUG} DESTINATION . CONFIGURATIONS Debug)
+
+IF(WIN32)
+  INSTALL(FILES ${CRASHRPT_BINARIES_TO_INSTALL} DESTINATION . CONFIGURATIONS RelWithDebinfo)
+
+  INSTALL(FILES ${INVICTUS_ROOT}/bin/platforms/qminimal.dll
+                ${INVICTUS_ROOT}/bin/platforms/qoffscreen.dll
+                ${INVICTUS_ROOT}/bin/platforms/qwindows.dll
+          DESTINATION platforms)
+ENDIF()
+
+SET(CPACK_PACKAGE_DIRECTORY "${INVICTUS_ROOT}/packages")
+set(CPACK_PACKAGE_NAME "keyhotee")
+set(CPACK_PACKAGE_VENDOR "Invictus Innovations, Inc.")
+set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+set(CPACK_PACKAGE_DESCRIPTION "A secure digital messaging platform and electronic wallet")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A secure digital messaging platform")
+set(CPACK_PACKAGE_EXECUTABLES "Keyhotee;Keyhotee")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/LICENSE.md")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "Keyhotee ${CPACK_PACKAGE_VERSION}")
+
+if(WIN32)
+ SET(CPACK_GENERATOR "ZIP;NSIS")
+ set(CPACK_PACKAGE_NAME "Keyhotee") # override above
+ set(CPACK_NSIS_CONTACT "contact.us@invictus-innovations.com")
+ set(CPACK_NSIS_EXECUTABLES_DIRECTORY .)
+ set(CPACK_NSIS_PACKAGE_NAME "Keyhotee v${CPACK_PACKAGE_VERSION}")
+ set(CPACK_NSIS_DISPLAY_NAME "${CPACK_NSIS_PACKAGE_NAME}")
+ set(CPACK_NSIS_URL_INFO_ABOUT "http://invictus.io")
+ set(CPACK_NSIS_HELP_LINK "https://bitsharestalk.org/index.php?board=2.0")
+ set(CPACK_NSIS_MENU_LINKS
+     "https://bitsharestalk.org/index.php?board=2.0" "Keyhotee Development Forum"
+     "http://invictus.io" "Invictus Innovations Website")
+ set(CPACK_NSIS_DEFINES "  !define MUI_STARTMENUPAGE_DEFAULTFOLDER \\\"Keyhotee\\\"")
+ # it seems like windows zip files usually don't have a single directory inside them, unix tgz frequently do
+ SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
+
+
+
+ include(CPack)
+else(WIN32)
+ # Linux gets a .tgz
+ SET(CPACK_GENERATOR "TGZ")
+ SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 1)
+endif(WIN32)
