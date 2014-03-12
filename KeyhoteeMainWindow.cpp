@@ -1163,8 +1163,8 @@ bool KeyhoteeMainWindow::stopMailTransmission()
   {
   bool canBreak = false;
 
-  bool transferringMail = _connectionProcessor.CanQuit(&canBreak) == false;
-  if(transferringMail == false)
+  bool transferringMail = !_connectionProcessor.CanQuit(&canBreak);
+  if(!transferringMail)
     return true;
 
   if(canBreak)
