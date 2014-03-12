@@ -113,6 +113,31 @@ bool matchContact(const fc::ecc::public_key& pk, bts::addressbook::wallet_contac
   }
 }
 
+bool matchIdentity(const fc::ecc::public_key& pk, bts::addressbook::wallet_identity0* matched_identity)
+{
+  try
+  {
+    auto identities = bts::get_profile()->identities();
+
+    for(auto &it : identities)
+    {
+      if (pk == it.public_key)
+      {
+        *matched_identity = it;
+        return true;
+      }
+    }
+
+    *matched_identity = bts::addressbook::wallet_identity();
+    return false;
+  }
+  catch (const fc::exception&)
+  {
+    *matched_identity = bts::addressbook::wallet_identity();
+    return false;
+  }
+}
+
 QString 
 makeContactListString(const std::vector<fc::ecc::public_key>& key_list, char separator /*= ','*/,
   TContactTextFormatting contactFormatting /* = KEYHOTEE_IDENTIFIER*/)

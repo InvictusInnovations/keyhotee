@@ -1,8 +1,11 @@
 #ifndef AUTHORIZATION_H
 #define AUTHORIZATION_H
 
-#include <QWidget>
+#include "ch/authprocessor.hpp"
+
 #include "keyhoteeidpubkeywidget.hpp"
+
+#include <QWidget>
 
 namespace Ui {
 class AuthorizationView;
@@ -18,9 +21,10 @@ public:
   typedef bts::bitchat::message_header                  THeaderStoredMsg;
   typedef bts::bitchat::authorization_status            TAuthorizationStatus;
   typedef bts::addressbook::wallet_contact              TWalletContact;
+  typedef bts::addressbook::wallet_identity             TWalletIdentity;
   typedef bts::addressbook::authorization_status        TContAuthoStatus;
 
-  Authorization(const TRequestMessage& msg, const THeaderStoredMsg& header);
+  Authorization(IAuthProcessor& auth_processor, const TRequestMessage& msg, const THeaderStoredMsg& header);
   ~Authorization();
 
   void processResponse();
@@ -30,6 +34,7 @@ protected:
   void setAuthorizationStatus(TAuthorizationStatus status);
 
 protected:
+  IAuthProcessor&       _auth_processor;
   TRequestMessage       _reqmsg;
   THeaderStoredMsg      _header;
 };
@@ -43,7 +48,8 @@ public:
   typedef fc::ecc::public_key                             TPublicKey;
   typedef bts::extended_public_key                        TExtendPubKey;
 
-  explicit AuthorizationView(const TRequestMessage& msg, const THeaderStoredMsg& header, QWidget *parent = 0);
+  explicit AuthorizationView(IAuthProcessor& auth_processor, const TRequestMessage& msg,
+    const THeaderStoredMsg& header, QWidget *parent = 0);
   virtual ~AuthorizationView();
 
   void setAddressBook(AddressBookModel* addressbook);

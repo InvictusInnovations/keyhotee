@@ -7,6 +7,8 @@
 #include "ATopLevelWindowsContainer.hpp"
 #include "ConnectionProcessor.hpp"
 
+#include "AddressBook/AuthorizationItem.hpp"
+
 #include "ch/GuiUpdateSink.hpp"
 #include "ch/ModificationsChecker.hpp"
 
@@ -22,6 +24,7 @@ class QLineEdit;
 class QCompleter;
 
 class AddressBookModel;
+class AuthorizationView;
 class Contact;
 class ContactView;
 class ContactsTable;
@@ -32,7 +35,6 @@ class Mailbox;
 class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
-class AuthorizationView;
 
 /**
  *  GUI widgets and GUI state for a contact.
@@ -57,31 +59,6 @@ public:
   bool isChatVisible();
   void receiveChatMessage(const QString& from, const QString& msg, const QDateTime& dateTime);
 private:
-};
-
-/**
- *  Navigation tree item representing incoming GUI entrypoint for an authorization request.
- */
-class AuthorizationItem : public QTreeWidgetItem
-{
-public:
-  typedef fc::ecc::public_key TPublicKey;
-
-  AuthorizationItem(AuthorizationView* view, QTreeWidgetItem* parent, int type = 0)
-    : QTreeWidgetItem(parent, type), _view(view) {}
-  virtual ~AuthorizationItem();
-
-  void setFromKey(TPublicKey from_key) {_from_key = from_key;}
-  bool isEqual(TPublicKey from_key) const;
-  AuthorizationView* getView() const
-    {
-    return _view;
-    }
-
-/// Class attributes:
-private:
-  AuthorizationView*  _view;
-  TPublicKey          _from_key;
 };
 
 class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,

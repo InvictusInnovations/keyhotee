@@ -18,6 +18,7 @@ namespace addressbook
 {
 struct contact;
 struct wallet_contact;
+struct wallet_identity0;
 } ///namespace addressbook
 } /// namespace bts
 
@@ -66,6 +67,15 @@ QString toString(const fc::ecc::public_key& pk, TContactTextFormatting contactFo
     Returns true if contact has been found, false otherwise.
 */
 bool matchContact(const fc::ecc::public_key& pk, bts::addressbook::wallet_contact* matchedContact);
+
+/** Allows to find identity using specified public key.
+    \param pk - the key to look identity for,
+    \param matched_identity - output, cannot be nullptr. Will be filled with found identity or
+                cleared if identity was not found.
+
+    Returns true if identity has been found, false otherwise.
+*/
+bool matchIdentity(const fc::ecc::public_key& pk, bts::addressbook::wallet_identity0* matched_identity);
 
 /** Allows to convert list of keys into textual form, separated by given character.
     \see above toString description to single key conversion details.

@@ -87,15 +87,6 @@ void ContactGui::updateTreeItemDisplay()
   _tree_item->setHidden (false);
   }
 
-AuthorizationItem::~AuthorizationItem()
-{
-}
-
-bool AuthorizationItem::isEqual(TPublicKey from_key) const
-{
-  return _from_key == from_key;
-}
-
 KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _identities_root(nullptr),
   _connectionProcessor(*this, bts::application::instance()->get_profile()),
@@ -871,7 +862,7 @@ void KeyhoteeMainWindow::deleteContactGui(int contact_id)
 void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& msg,
                                                  const TStoredMailMessage& header)
 {
-  AuthorizationView *view = new AuthorizationView(msg, header);
+  AuthorizationView *view = new AuthorizationView(_connectionProcessor, msg, header);
   view->setAddressBook(_addressbook_model);
 
   bool add_to_root = false;
@@ -880,7 +871,7 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& ms
 
   if(add_to_root)
   {
-    AuthorizationView *view_root = new AuthorizationView(msg, header);
+    AuthorizationView *view_root = new AuthorizationView(_connectionProcessor, msg, header);
 
     AuthorizationItem *authorization_root_item = new AuthorizationItem(view_root,
       item, (QTreeWidgetItem::ItemType)RequestItem);
@@ -893,6 +884,7 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& ms
     authorization_root_item->setText(0, full_name);
     
     authorization_root_item->setHidden(false);
+    authorization_root_item->setData(0, Qt::UserRole, false);   // 1 child, information for contextmenu
     view_root->setOwnerItem(authorization_root_item);
 
     connect(view_root, &AuthorizationView::itemAcceptRequest, this, &KeyhoteeMainWindow::onItemAcceptRequest);
@@ -921,7 +913,10 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& ms
 
   _requests_root->setHidden(false);
   if(!add_to_root)
+  {
     item->setExpanded(true);
+    item->setData(0, Qt::UserRole, true);   // multi children, information for contextmenu
+  }
 }
 
 QTreeWidgetItem* 
@@ -943,10 +938,7 @@ KeyhoteeMainWindow::findExistSenderItem(AuthorizationItem::TPublicKey from_key, 
 
 void KeyhoteeMainWindow::showAuthorizationItem(AuthorizationItem *item)
 {
-  if(item->childCount() > 0)
-    ui->widget_stack->setCurrentWidget(static_cast<AuthorizationItem*>(item->child(0))->getView());
-  else
-    ui->widget_stack->setCurrentWidget(item->getView());
+  ui->widget_stack->setCurrentWidget(item->getView());
 }
 
 void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
@@ -965,19 +957,26 @@ void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
 void KeyhoteeMainWindow::processResponse(const TAuthorizationMessage& msg,
                                          const TStoredMailMessage& header)
 {
-  Authorization *authorization = new Authorization(msg, header);
+  Authorization *authorization = new Authorization(_connectionProcessor, msg, header);
   authorization->processResponse();
 }
 
 void KeyhoteeMainWindow::loadStoredRequests(bts::bitchat::message_db_ptr request_db)
 {
-  auto headers = request_db->fetch_headers(bts::bitchat::private_contact_request_message::type);
-  for(uint32_t i = 0; i < headers.size(); ++i)
+  try
   {
-    auto header = headers[i];
-    auto raw_data = request_db->fetch_data(header.digest);
-    auto msg = fc::raw::unpack<bts::bitchat::private_contact_request_message>(raw_data);
-    OnReceivedAuthorizationMessage(msg, header);
+    auto headers = request_db->fetch_headers(bts::bitchat::private_contact_request_message::type);
+    for(uint32_t i = 0; i < headers.size(); ++i)
+    {
+      auto header = headers[i];
+      auto raw_data = request_db->fetch_data(header.digest);
+      auto msg = fc::raw::unpack<bts::bitchat::private_contact_request_message>(raw_data);
+      OnReceivedAuthorizationMessage(msg, header);
+    }
+  }
+  catch(const fc::exception& e)
+  {
+    elog("${e}", ("e", e.to_detail_string()));
   }
 }
 
@@ -1001,7 +1000,7 @@ void KeyhoteeMainWindow::onItemContextAcceptRequest(QTreeWidgetItem *item)
   if(item->childCount() > 0)
   {
     while(item->child(0))
-      static_cast<AuthorizationItem*>(item->child(0))->getView()->onAccept();
+      static_cast<AuthorizationItem*>(item)->getView()->onAccept();
   }
   else
     static_cast<AuthorizationItem*>(item)->getView()->onAccept();
@@ -1017,7 +1016,7 @@ void KeyhoteeMainWindow::onItemContextDenyRequest(QTreeWidgetItem *item)
   if(item->childCount() > 0)
   {
     while(item->child(0))
-      static_cast<AuthorizationItem*>(item->child(0))->getView()->onDeny();
+      static_cast<AuthorizationItem*>(item)->getView()->onDeny();
   }
   else
   {
@@ -1034,7 +1033,7 @@ void KeyhoteeMainWindow::onItemContextBlockRequest(QTreeWidgetItem *item)
   if(item->childCount() > 0)
   {
     while(item->child(0))
-      static_cast<AuthorizationItem*>(item->child(0))->getView()->onBlock();
+      static_cast<AuthorizationItem*>(item)->getView()->onBlock();
   }
   else
   {

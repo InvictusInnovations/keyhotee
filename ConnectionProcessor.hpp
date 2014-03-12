@@ -1,6 +1,7 @@
 #ifndef __CONNECTIONPROCESSOR_HPP
 #define __CONNECTIONPROCESSOR_HPP
 
+#include "ch/authprocessor.hpp"
 #include "ch/connectionstatusds.h"
 #include "ch/mailprocessor.hpp"
 
@@ -19,6 +20,7 @@ class IGuiUpdateSink;
 */
 class TConnectionProcessor : public IMailProcessor,
                              public IConnectionStatusDataSource,
+                             public IAuthProcessor,
                              protected bts::application_delegate
 
   {
@@ -40,6 +42,11 @@ class TConnectionProcessor : public IMailProcessor,
     /// \see IConnectionStatusDataSource interface description.
     virtual bool IsMailConnected() const override;
 
+  /// IAuthProcessor interface implementation:
+    /// \see IAuthProcessor interface description.
+    virtual void storeAuthorization(const TCurrIdentity& senderId, const TRequestMessage& src_msg,
+      const TStoredMessage& msg_header) override;
+
   /// Other implementation helpers:
 
     /** If any message transmission is in progress asks user to stop it.
@@ -48,7 +55,7 @@ class TConnectionProcessor : public IMailProcessor,
         Returns true if application exit can be continued, false otherwise.
     */
     bool CanQuit(bool* canBreak = nullptr) const;
-    
+
     /** Allows to cancel current mail transmission, ie before quiting the app.
         \warning Can be used only when CanQuit returned true as canBreak parameter.
     */

@@ -7,12 +7,15 @@
 #include "utils.hpp"
 
 #include <fc/reflect/variant.hpp>
+#include <fc/log/logger.hpp>
 
 #include <QMessageBox>
 #include <QToolBar>
 
 
-Authorization::Authorization(const TRequestMessage& msg, const THeaderStoredMsg& header)
+Authorization::Authorization(IAuthProcessor& auth_processor,
+                             const TRequestMessage& msg, const THeaderStoredMsg& header) :
+_auth_processor(auth_processor)
 {
   _reqmsg = msg;
   _header = header;
@@ -28,6 +31,12 @@ void Authorization::processResponse()
     acceptExtendedPubKey();
 
   setAuthorizationStatus(_reqmsg.status);
+
+  TWalletIdentity my_identity;
+  if(!Utils::matchIdentity(_reqmsg.recipient, &my_identity))
+    return;
+
+  _auth_processor.storeAuthorization(my_identity, _reqmsg, _header);
 }
 
 void Authorization::acceptExtendedPubKey() const
@@ -72,9 +81,10 @@ void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
 ///                                    AuthorizationView                                        ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-AuthorizationView::AuthorizationView(const TRequestMessage& msg, const THeaderStoredMsg& header, QWidget *parent) :
+AuthorizationView::AuthorizationView(IAuthProcessor& auth_processor, const TRequestMessage& msg,
+                                     const THeaderStoredMsg& header, QWidget *parent) :
+  Authorization(auth_processor, msg, header),
   QWidget(parent),
-  Authorization(msg, header),
   ui(new Ui::AuthorizationView)
 {
   ui->setupUi(this);
@@ -207,8 +217,8 @@ void AuthorizationView::genExtendedPubKey(std::string identity_dac_id, TExtendPu
 
 void AuthorizationView::sendReply(TAuthorizationStatus status)
 {
-  TWalletContact my_identity;
-  if(!Utils::matchContact(_reqmsg.recipient, &my_identity))
+  TWalletIdentity my_identity;
+  if(!Utils::matchIdentity(_reqmsg.recipient, &my_identity))
     return;
 
   auto app = bts::application::instance();
@@ -235,6 +245,8 @@ void AuthorizationView::sendReply(TAuthorizationStatus status)
 
   fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(my_identity.dac_id_string);
   app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
+
+  _auth_processor.storeAuthorization(my_identity, _reqmsg, _header);
 }
 
 void AuthorizationView::onAddAsNewContact(bool checked)

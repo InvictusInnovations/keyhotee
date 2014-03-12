@@ -218,6 +218,8 @@ set( sources
         AddressBook/authorization.cpp
         AddressBook/ContactvCard.hpp
         AddressBook/ContactvCard.cpp
+        AddressBook/AuthorizationItem.hpp
+        AddressBook/AuthorizationItem.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp
@@ -301,6 +303,7 @@ set( sources
         ConnectionProcessor.hpp
         ConnectionProcessor.cpp
 
+        ch/authprocessor.hpp
         ch/connectionstatusds.h
         ch/mailprocessor.hpp
         ch/ModificationsChecker.hpp

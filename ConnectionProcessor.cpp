@@ -853,6 +853,28 @@ bool TConnectionProcessor::IsMailConnected() const
   return App->is_mail_connected();
   }
 
+void TConnectionProcessor::storeAuthorization(const TCurrIdentity& senderId, const TRequestMessage& src_msg,
+                                              const TStoredMessage& msg_header)
+{
+  try
+  {
+    auto request_db = Profile->get_request_db();
+    request_db->remove_message(msg_header);
+
+    auto privKey = Profile->get_keychain().get_identity_key(senderId.dac_id_string);
+    bts::bitchat::decrypted_message msg(src_msg);
+    msg.sign(privKey);
+    auto encMsg = msg.encrypt(senderId.public_key);
+    encMsg.timestamp = fc::time_point::now();
+    encMsg.decrypt(privKey, msg);
+    Profile->get_auth_db()->store_message(msg, nullptr);
+  }
+  catch(const fc::exception& e)
+  {
+    elog("${e}", ("e", e.to_detail_string()));
+  }
+}
+
 bool TConnectionProcessor::CanQuit(bool* canBreak /*= nullptr*/) const
   {
   if(canBreak != nullptr)
