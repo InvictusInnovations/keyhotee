@@ -307,6 +307,7 @@ void AddressBookModel::reloadContacts()
     my->_contacts.push_back(Contact(contact) );
 
   }
+  std::sort( my->_contacts.begin(), my->_contacts.end());
 }
 
 QModelIndex AddressBookModel::findModelIndex(const int wallet_index) const
