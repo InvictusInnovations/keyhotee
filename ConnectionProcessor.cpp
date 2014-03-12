@@ -878,10 +878,11 @@ void TConnectionProcessor::storeAuthorization(const TCurrIdentity& senderId, con
 bool TConnectionProcessor::CanQuit(bool* canBreak /*= nullptr*/) const
   {
   if(canBreak != nullptr)
-    *canBreak = ReceivingMail == false; /// Incoming mail transmission is not breakable
+    *canBreak = !ReceivingMail; /// Incoming mail transmission is not breakable
 
-  return OutboxQueue->isTransmissionLoopActive() == false && ReceivingMail == false &&
-    OutboxQueue->AnyOperationsPending() == false;
+  return !OutboxQueue->isTransmissionLoopActive() && 
+         !ReceivingMail &&
+         !OutboxQueue->AnyOperationsPending();
   }
 
 void TConnectionProcessor::CancelTransmission()
@@ -899,7 +900,7 @@ void TConnectionProcessor::connection_count_changed(unsigned int count)
 bool TConnectionProcessor::receiving_mail_message()
   {
   ReceivingMail = true;
-  return TransmissionCancelled == false;
+  return !TransmissionCancelled;
   }
 
 void TConnectionProcessor::received_text(const bts::bitchat::decrypted_message& msg)
