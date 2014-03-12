@@ -11,6 +11,7 @@
 
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/authorization.hpp"
+#include "AddressBook/ContactGui.hpp"
 #include "AddressBook/ContactView.hpp"
 #include "AddressBook/NewIdentityDialog.hpp"
 #include "AddressBook/RequestAuthorization.hpp"
@@ -57,35 +58,6 @@ enum TopLevelItemIndexes
   Requests
 };
 
-void ContactGui::setUnreadMsgCount(unsigned int count)
-{
-  _unread_msg_count = count;
-  updateTreeItemDisplay();
-}
-
-bool ContactGui::isChatVisible()
-{
-  return getKeyhoteeWindow()->isSelectedContactGui(this) && _view->isChatSelected();
-}
-
-void ContactGui::receiveChatMessage(const QString& from, const QString& msg, const QDateTime& dateTime)
-{
-  _view->appendChatMessage(from, msg, dateTime);
-  if (!isChatVisible())
-    setUnreadMsgCount(_unread_msg_count + 1);
-}
-
-void ContactGui::updateTreeItemDisplay()
-{
-  QString display_text;
-  QString name = _view->getContact().getLabel();
-  if (_unread_msg_count)
-    display_text = QString("%1 (%2)").arg(name).arg(_unread_msg_count);
-  else
-    display_text = name;
-  _tree_item->setText(0, display_text);
-  _tree_item->setHidden (false);
-  }
 
 KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _identities_root(nullptr),
@@ -231,7 +203,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, false);
 
   loadStoredRequests(profile->get_request_db());
-
   connect(_addressbook_model, &QAbstractItemModel::dataChanged, this,
     &KeyhoteeMainWindow::addressBookDataChanged);
 
@@ -738,6 +709,7 @@ void KeyhoteeMainWindow::newMailMessage()
 {
   MailEditorMainWindow* mailWindow = new MailEditorMainWindow(this, *_addressbook_model,
     _connectionProcessor, true);
+
   mailWindow->show();
 }
 
@@ -909,6 +881,7 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& ms
   connect(view, &AuthorizationView::itemDenyRequest, this, &KeyhoteeMainWindow::onItemDenyRequest);
   connect(view, &AuthorizationView::itemBlockRequest, this, &KeyhoteeMainWindow::onItemBlockRequest);
 
+
   ui->widget_stack->addWidget(view);
 
   _requests_root->setHidden(false);
@@ -938,7 +911,7 @@ KeyhoteeMainWindow::findExistSenderItem(AuthorizationItem::TPublicKey from_key, 
 
 void KeyhoteeMainWindow::showAuthorizationItem(AuthorizationItem *item)
 {
-  ui->widget_stack->setCurrentWidget(item->getView());
+    ui->widget_stack->setCurrentWidget(item->getView());
 }
 
 void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
@@ -960,7 +933,6 @@ void KeyhoteeMainWindow::processResponse(const TAuthorizationMessage& msg,
   Authorization *authorization = new Authorization(_connectionProcessor, msg, header);
   authorization->processResponse();
 }
-
 void KeyhoteeMainWindow::loadStoredRequests(bts::bitchat::message_db_ptr request_db)
 {
   try
@@ -1273,10 +1245,10 @@ void KeyhoteeMainWindow::refreshMenuOptions() const
 
   bool enabled = isContactTableSelected || isContactTreeItemSelected;
 
-  ui->actionCopy->setEnabled (enabled);  
-  ui->actionCut->setEnabled (false);  
+  ui->actionCopy->setEnabled (isContactTableSelected);  
+  ui->actionCut->setEnabled (false);    
+  ui->actionShare_contact->setEnabled (isContactTableSelected);
   ui->actionDelete->setEnabled (enabled);
-  ui->actionShare_contact->setEnabled (enabled);
 }
 
 void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
@@ -1320,16 +1292,16 @@ void KeyhoteeMainWindow::onRemoveContact()
   }
 }
 
-void KeyhoteeMainWindow::setMailSettings (MailSettings& mailSettings)
+void KeyhoteeMainWindow::getMailBoxSettings (MailSettings* mailSettings)
 {
-  mailSettings.sortColumnInbox = ui->inbox_page->getSortedColumn ();
-  mailSettings.sortOrderInbox = ui->inbox_page->getSortOrder ();
-  mailSettings.sortColumnSent = ui->sent_box_page->getSortedColumn ();
-  mailSettings.sortOrderSent = ui->sent_box_page->getSortOrder ();
-  mailSettings.sortColumnDraft = ui->draft_box_page->getSortedColumn ();
-  mailSettings.sortOrderDraft = ui->draft_box_page->getSortOrder ();
-  mailSettings.sortColumnOutbox = ui->out_box_page->getSortedColumn ();
-  mailSettings.sortOrderOutbox = ui->out_box_page->getSortOrder ();
+  mailSettings->sortColumnInbox = ui->inbox_page->getSortedColumn ();
+  mailSettings->sortOrderInbox = ui->inbox_page->getSortOrder ();
+  mailSettings->sortColumnSent = ui->sent_box_page->getSortedColumn ();
+  mailSettings->sortOrderSent = ui->sent_box_page->getSortOrder ();
+  mailSettings->sortColumnDraft = ui->draft_box_page->getSortedColumn ();
+  mailSettings->sortOrderDraft = ui->draft_box_page->getSortOrder ();
+  mailSettings->sortColumnOutbox = ui->out_box_page->getSortedColumn ();
+  mailSettings->sortOrderOutbox = ui->out_box_page->getSortOrder ();
 }
 
 void KeyhoteeMainWindow::keyPressEvent(QKeyEvent *key_event)

@@ -164,7 +164,8 @@ class MailEditorMainWindow : public ATopLevelWindow
     void onRecipientListChanged();
     /// Notification from attachment list widget about attachment list changes.
     void onAttachmentListChanged();
-    void onAddAttachments(QStringList files);
+    /// Notification sent when some file attachement item(s) will be pasted/dropeed onto document body.
+    void onFileAttachmentAdded(const QStringList& files);
 
   private:
     Ui::MailEditorWindow*    ui;

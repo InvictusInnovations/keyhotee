@@ -292,7 +292,7 @@ void Mailbox::onDeleteMail()
   if (QMessageBox::question(this, tr("Delete Mail"), tr("Are you sure you want to delete selected email(s)?")) == QMessageBox::Button::No)
     return;
   QModelIndexList indexes;
-  foreach(QModelIndex sortFilterIndex, sortFilterIndexes)
+  for(const QModelIndex& sortFilterIndex : sortFilterIndexes)
     indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
   auto sourceModel = model->sourceModel();
@@ -428,42 +428,4 @@ void Mailbox::selectAll ()
 {
   ui->inbox_table->selectAll();
   ui->inbox_table->setFocus();
-}
-
-void Mailbox::previewImages (QTextEdit* textEdit)
-{
-  IMailProcessor::TPhysicalMailMessage decodedMsg;
-  IMailProcessor::TStoredMailMessage encodedMsg;
-  if (getSelectedMessageData (&encodedMsg, &decodedMsg) == false)
-    return;
-
-  QTextDocument *doc = new QTextDocument();
-  //Don't eat multiple whitespaces
-  doc->setDefaultStyleSheet("p, li { white-space: pre-wrap; }");
-  doc->setHtml( decodedMsg.body.c_str() );
-  textEdit->setDocument (doc);
-  
-  QImage  image;
-  uchar  *imageData;
-  int     imageSize;
-  QString imageName;
-
-  for (uint32_t i = 0; i < decodedMsg.attachments.size(); i++)
-  {
-    imageName = QString("imageName.%1").arg(i);
-	  imageData = (uchar*)decodedMsg.attachments[i].body.data ();
-	  imageSize = decodedMsg.attachments[i].body.size();
-
-	  //QImageReader::supportedImageFormats()    
-	  bool loadOk = image.loadFromData(imageData, imageSize);
-    if (loadOk)
-    {
-      doc->addResource( QTextDocument::ImageResource, QUrl( imageName ), image);
-      QString attachmentFileName = "<br/><hr><font color=""grey"">" + 
-                                    QString(decodedMsg.attachments[i].filename.c_str()) + 
-                                    "</font><br/>";
-      textEdit->append(attachmentFileName +  "<center><img src='" + imageName + "'></center>");
-    }
-  }
-
 }

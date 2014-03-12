@@ -20,7 +20,7 @@ class ContactsTable  : public QWidget,
   Q_OBJECT
 public:
   ContactsTable(QWidget* parent = nullptr);
-  ~ContactsTable();
+  virtual ~ContactsTable();
 
   void setAddressBook(AddressBookModel* addressbook_model);
   void onSelectionChanged (const QItemSelection &selected, const QItemSelection &deselected);

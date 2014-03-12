@@ -108,7 +108,7 @@ void ContactsTable::onDeleteContact()
   if (QMessageBox::question(this, tr("Delete Contact"), tr("Are you sure you want to delete selected contact(s)?")) == QMessageBox::Button::No)
     return;
   QModelIndexList        indexes;
-  foreach(QModelIndex sortFilterIndex, sortFilterIndexes)
+  for(const QModelIndex& sortFilterIndex : sortFilterIndexes)
     indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
   auto sourceModel = model->sourceModel();

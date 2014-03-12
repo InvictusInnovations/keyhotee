@@ -13,6 +13,7 @@ public:
 
 protected:
   virtual bool viewportEvent(QEvent *event) override;
+  virtual void keyPressEvent(QKeyEvent *event) override;
   
 private:
   IModificationsChecker*    _modificationsChecker;

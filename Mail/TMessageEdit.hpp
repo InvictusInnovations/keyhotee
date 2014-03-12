@@ -1,21 +1,52 @@
 #ifndef TMESSAGEEDIT_HPP
 #define TMESSAGEEDIT_HPP
 
-#include <QTextEdit>
+#include <bts/bitchat/bitchat_private_message.hpp>
 
-class TMessageEdit : public QTextEdit
+#include <QTextBrowser>
+
+#include <vector>
+
+/** QTextBrowser subclass dedicated to notify client code about pasting/dropping some file attachment
+    items into document body. Then attachmentAdded signal is emitted, pasted contents is ignored and
+    client can decide where save received content to.
+    This class also will suppport feature controlling automatic image loading pointed by external
+    urls to increase security.
+*/
+class TMessageEdit : public QTextBrowser
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    explicit TMessageEdit(QWidget *parent = 0);
-protected:
-    virtual void insertFromMimeData(const QMimeData *source);
+  typedef std::vector<bts::bitchat::attachment> TAttachmentContainer;
+
+  TMessageEdit(QWidget *parent = 0);
+  virtual ~TMessageEdit() {}
+
+  /** Loads mail message and images
+      \param body        - mail message body
+      \param attachments - checks attachments and if it contains images displays it by inlining
+                           them at the end of document.
+  */
+  void loadContents (const QString& body, const TAttachmentContainer& attachments);
+
+  /// Allows to load blocked images (if any).
+  void loadBlockedImages();
 
 signals:
-  void addAttachments(QStringList);
+  /// Signal emitted when some attachement item is pasted/dropped into document.
+  void attachmentAdded(const QStringList& attachementItems);
 
-public slots:
+protected:
+/// QTextBrowser class reimplementation.
+  /// Reimplemented to support attachment item pasting. Then attachmentAdded signal is emitted.
+  virtual void insertFromMimeData(const QMimeData *source) override;
+  /// Reimplemented to support control over inline images/http links loading to improve security.
+  virtual QVariant loadResource(int type, const QUrl& url) override;
 
+/// Class attributes:
+private:
+  bool _imageLoadAllowed;
+  bool _anyBlockedImage;
 };
 
 #endif // TMESSAGEEDIT_HPP

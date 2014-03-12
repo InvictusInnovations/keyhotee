@@ -24,27 +24,114 @@
 #include <QTemporaryFile>
 #include <QTranslator>
 
-#include <boost/filesystem/path.hpp>
-
 #include <assert.h>
 
 #ifdef WIN32
   #include <Windows.h>
   #include <wincon.h>
 
-Q_GUI_EXPORT HICON qt_pixmapToWinHICON(const QPixmap &p);
+  Q_GUI_EXPORT HICON qt_pixmapToWinHICON(const QPixmap &p);
 
-BOOL WINAPI SetConsoleIcon(HICON hIcon) {
-  typedef BOOL (WINAPI *PSetConsoleIcon)(HICON);
-  static PSetConsoleIcon pSetConsoleIcon = NULL;
-  if(pSetConsoleIcon == NULL)
-    pSetConsoleIcon = (PSetConsoleIcon)GetProcAddress(GetModuleHandle("kernel32"), "SetConsoleIcon");
-  if(pSetConsoleIcon == NULL)
-    return FALSE;
-  return pSetConsoleIcon(hIcon);
-}
-#else
+  BOOL WINAPI SetConsoleIcon(HICON hIcon)
+  {
+    typedef BOOL (WINAPI *PSetConsoleIcon)(HICON);
+    static PSetConsoleIcon pSetConsoleIcon = NULL;
+    if(pSetConsoleIcon == NULL)
+      pSetConsoleIcon = (PSetConsoleIcon)GetProcAddress(GetModuleHandle("kernel32"), "SetConsoleIcon");
+    if(pSetConsoleIcon == NULL)
+      return FALSE;
+    return pSetConsoleIcon(hIcon);
+  }
+
+  #define APP_TRY /*try*/
+  #define APP_CATCH /*Nothing*/
+
+# ifdef NDEBUG // enable crashrpt win32 release only
+#  include "CrashRpt/include/CrashRpt.h"
+
+  /* forwards SEH caught by fc's async tasks to CrashRpt */
+  int unhandled_exception_filter(unsigned code, _EXCEPTION_POINTERS* info)
+  {
+    return crExceptionFilter(code, info);
+  }
+
+  void installCrashRptHandler(const char* appName, const char* appVersion, const QFile& logFilePath)
+  {
+    // Define CrashRpt configuration parameters
+    CR_INSTALL_INFO info = {0};
+    info.cb = sizeof(CR_INSTALL_INFO);
+    info.pszAppName = appName;
+    info.pszAppVersion = appVersion;
+    info.pszEmailSubject = nullptr;
+    info.pszEmailTo = "sales@syncad.com";
+    info.pszUrl = "http://invictus.syncad.com/crash_report.html";
+    info.uPriorities[CR_HTTP] = 3;  // First try send report over HTTP 
+    info.uPriorities[CR_SMTP] = 2;  // Second try send report over SMTP  
+    info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
+    // Install all available exception handlers
+    info.dwFlags = CR_INST_ALL_POSSIBLE_HANDLERS | 
+                   CR_INST_CRT_EXCEPTION_HANDLERS |
+                   CR_INST_AUTO_THREAD_HANDLERS |
+                   CR_INST_SEND_QUEUED_REPORTS; 
+    // Define the Privacy Policy URL 
+    info.pszPrivacyPolicyURL = "http://invictus.syncad.com/crash_privacy.html"; 
+  
+    // Install crash reporting
+    int nResult = crInstall(&info);
+    if(nResult!=0)
+    {
+      // Something goes wrong. Get error message.
+      char szErrorMsg[512] = {0};
+      crGetLastErrorMsg(szErrorMsg, 512);
+      elog("Cannot install CrsshRpt error handler: ${e}", ("e", szErrorMsg));
+      return;
+    }
+    else
+    {
+      wlog("CrashRpt handler installed successfully");
+    }
+
+    auto logPathString = logFilePath.fileName().toStdString();
+
+    // Add our log file to the error report
+    crAddFile2(logPathString.c_str(), NULL, "Log File", CR_AF_MAKE_FILE_COPY);
+
+    // We want the screenshot of the entire desktop is to be added on crash
+    crAddScreenshot2(CR_AS_PROCESS_WINDOWS|CR_AS_USE_JPEG_FORMAT, 0);
+
+    fc::set_unhandled_structured_exception_filter(&unhandled_exception_filter);
+  }
+
+  void uninstallCrashRptHandler()
+  {
+    crUninstall();
+  }
+# endif // NDEBUG
+#else // WIN32
   #include <signal.h>
+
+  #define APP_TRY try
+  #define APP_CATCH \
+  catch(const fc::exception& e) \
+  {\
+    onExceptionCaught(e);\
+  }\
+  catch(...)\
+  {\
+    onUnknownExceptionCaught();\
+  }
+#endif
+
+#if !defined(WIN32) || !defined(NDEBUG)
+  void installCrashRptHandler(const char* appName, const char* appVersion, const QFile& logFilePath)
+  {
+  /// Nothing to do here since no crash report support available
+  }
+
+  void uninstallCrashRptHandler()
+  {
+  /// Nothing to do here since no crash report support available
+  }
 #endif
 
 #ifdef __STATIC_QT
@@ -72,6 +159,8 @@ Q_IMPORT_PLUGIN(QOffscreenIntegrationPlugin)
 static TKeyhoteeApplication* s_Instance = nullptr;
 
 #define APP_NAME "Keyhotee"
+#define APP_VERSION "Alpha"
+
 #define DEF_PROFILE_NAME "default"
 
 QTemporaryFile gLogFile;
@@ -105,9 +194,12 @@ TKeyhoteeApplication* TKeyhoteeApplication::getInstance() { return s_Instance; }
 int TKeyhoteeApplication::run(int& argc, char** argv)
 {
   ConfigureLoggingToTemporaryFile();
+
+  installCrashRptHandler(APP_NAME, APP_VERSION, gLogFile);
+
   TKeyhoteeApplication app(argc, argv);
 
-#ifdef WIN32
+#if defined(WIN32) && defined(_DEBUG)
   bool console_ok = AllocConsole();
   QPixmap px(":/images/keyhotee.png");
   HICON hIcon = qt_pixmapToWinHICON(px);
@@ -126,10 +218,12 @@ int TKeyhoteeApplication::run(int& argc, char** argv)
 
   int ec = app.run();
 
-#ifdef WIN32
+#if defined(WIN32) && defined(_DEBUG)
   fclose(stdout);
   FreeConsole();
 #endif
+
+  uninstallCrashRptHandler();
 
   return ec;
 }
@@ -196,7 +290,7 @@ int TKeyhoteeApplication::run()
   signal(SIGSEGV, linuxSignalHandler);
 #endif ///WIN32
 
-  try
+  APP_TRY
   {
     setOrganizationDomain("invictus-innovations.com");
     setOrganizationName("Invictus Innovations, Inc");
@@ -241,15 +335,7 @@ int TKeyhoteeApplication::run()
     else
       _exit_status = TExitStatus::SUCCESS;
   }
-  catch(const fc::exception& e)
-  {
-    onExceptionCaught(e);
-  }
-
-  catch(...)
-  {
-    onUnknownExceptionCaught();
-  }
+  APP_CATCH
 
   return _exit_status;
 }
@@ -308,18 +394,11 @@ void TKeyhoteeApplication::displayFailureInfo(const std::string& detail)
 
 bool TKeyhoteeApplication::notify(QObject* receiver, QEvent* e)
 {
-  try
+  APP_TRY
   {
     return QApplication::notify(receiver, e);
   }
-  catch (const fc::exception& e)
-  {
-    onExceptionCaught(e);
-  }
-  catch(...)
-  {
-    onUnknownExceptionCaught();
-  }
+  APP_CATCH
 
   return true;
 }

@@ -1,6 +1,9 @@
 #include "TreeWidgetCustom.hpp"
+
 #include "ch/ModificationsChecker.hpp"
+
 #include <QEvent>
+#include <QKeyEvent>
 #include <QTreeWidgetItem>
 
 TreeWidgetCustom::TreeWidgetCustom(QWidget* parent)
@@ -39,10 +42,10 @@ bool TreeWidgetCustom::viewportEvent(QEvent *event)
   {
   if (_modificationsChecker)
     {
+    //Don't change selection if you can't continue (data invalid or modified)
     if (event->type() == QEvent::MouseButtonPress ||
         event->type() == QEvent::MouseButtonDblClick ||
-        event->type() == QEvent::KeyPress ||
-        event->type() == QEvent::MouseMove)
+        event->type() == QEvent::KeyPress)
       {
         if (_modificationsChecker->canContinue())
           return QTreeWidget::viewportEvent(event);
@@ -53,6 +56,24 @@ bool TreeWidgetCustom::viewportEvent(QEvent *event)
 
   return QTreeWidget::viewportEvent(event);
   }
+
+void TreeWidgetCustom::keyPressEvent(QKeyEvent *event)
+{
+  if (_modificationsChecker)
+  {
+    if (event->key() == Qt::Key_Down || event->key() == Qt::Key_Up ||
+        event->key() == Qt::Key_Right || event->key() == Qt::Key_Left ||
+        event->key() == Qt::Key_PageDown || event->key() == Qt::Key_PageUp ||
+        event->key() == Qt::Key_Home || event->key() == Qt::Key_End)
+    {
+      if (! _modificationsChecker->canContinue())
+        return;
+    }
+  }
+
+  // call the default implementation
+  QTreeWidget::keyPressEvent(event);
+}
 
 void TreeWidgetCustom::setModificationsChecker (IModificationsChecker* modificationsChecker)
   {

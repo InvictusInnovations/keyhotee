@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <bts/addressbook/addressbook.hpp>
 #include <bts/application.hpp>
+#include "AddressBook/ContactGui.hpp"
 
 #include "ATopLevelWindowsContainer.hpp"
 #include "ConnectionProcessor.hpp"
@@ -19,13 +20,10 @@
 
 namespace Ui { class KeyhoteeMainWindow; }
 
-class QTreeWidgetItem;
-class QLineEdit;
-class QCompleter;
-
 class AddressBookModel;
 class AuthorizationView;
 class Contact;
+class ContactGui;
 class ContactView;
 class ContactsTable;
 class InboxView;
@@ -36,30 +34,9 @@ class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
 
-/**
- *  GUI widgets and GUI state for a contact.
- *  Not all contacts have this, only contacts "active" in GUI.
- */
-class ContactGui
-{
-  friend KeyhoteeMainWindow;
-
-private:
-  unsigned int     _unread_msg_count;
-  QTreeWidgetItem* _tree_item;
-  ContactView*     _view;
-
-public:
-  ContactGui() {}
-  ContactGui(QTreeWidgetItem* tree_item, ContactView* view)
-    : _unread_msg_count(0), _tree_item(tree_item), _view(view) {}
-
-  void updateTreeItemDisplay();
-  void setUnreadMsgCount(unsigned int count);
-  bool isChatVisible();
-  void receiveChatMessage(const QString& from, const QString& msg, const QDateTime& dateTime);
-private:
-};
+class QCompleter;
+class QLineEdit;
+class QTreeWidgetItem;
 
 class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
                             protected IModificationsChecker,
@@ -92,7 +69,9 @@ public:
   void setEnabledShareContactOption( bool enable );
   void refreshMenuOptions() const;
   void setEnabledMailActions(bool enable);
-  void setMailSettings (MailSettings& mailSettings);  
+  /// Get mailbox settings like column sorted, column order
+  /// SelfSizingMainWindow::writeSettings() needs to write mailSettings to system registry
+  void getMailBoxSettings (MailSettings* mailSettings);  
   ContactsTable* getContactsPage();
   void shareContact(QList<const Contact*>& contacts);
 

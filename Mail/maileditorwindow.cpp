@@ -6,7 +6,6 @@
 #include "mailfieldswidget.hpp"
 #include "moneyattachementwidget.hpp"
 #include "utils.hpp"
-#include "Mailbox.hpp"
 
 #include <bts/profile.hpp>
 
@@ -202,7 +201,7 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
   ATopLevelWindow(parent),
   ui(new Ui::MailEditorWindow()),
   ABModel(abModel),
-  MailProcessor(mailProcessor),
+  MailProcessor(mailProcessor), 
   FontCombo(nullptr),
   EditMode(editMode)
   {
@@ -280,7 +279,8 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
     SLOT(setEnabled(bool)));
   connect(ui->messageEdit->document(), SIGNAL(modificationChanged(bool)), this,
     SLOT(setWindowModified(bool)));
-  connect(ui->messageEdit, SIGNAL(addAttachments(QStringList)), this, SLOT(onAddAttachments(QStringList)));
+  connect(ui->messageEdit, SIGNAL(attachmentAdded(const QStringList&)), this,
+    SLOT(onFileAttachmentAdded(const QStringList&)));
 
 #ifndef QT_NO_CLIPBOARD
   connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(onClipboardDataChanged()));
@@ -311,6 +311,9 @@ void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessag
   TRecipientPublicKeys sourceToList, sourceCCList;
   QString newSubject;
 
+  ui->messageEdit->setOpenExternalLinks(true);
+  ui->messageEdit->setOpenLinks(true);
+
   switch(loadForm)
     {
     case TLoadForm::Draft:
@@ -340,14 +343,8 @@ void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessag
     }
   
   ui->messageEdit->moveCursor(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor);
-  onFileAttachementTriggered( FileAttachment->hasAttachment() );
-  
-  if ( !EditMode && FileAttachment->hasAttachment())
-    {
-    mailbox->previewImages(ui->messageEdit);
-    ui->messageEdit->document()->setModified(false);
+  onFileAttachementTriggered( FileAttachment->hasAttachment() ); 
     }
-  }
 
 void MailEditorMainWindow::closeEvent(QCloseEvent *e)
   {
@@ -506,7 +503,7 @@ void MailEditorMainWindow::loadContents(const TRecipientPublicKey& senderId,
   {
   MailFields->LoadContents(senderId, srcMsg);
   FileAttachment->LoadAttachedFiles(srcMsg.attachments);
-  ui->messageEdit->setText(QString(srcMsg.body.c_str()));
+  ui->messageEdit->loadContents(srcMsg.body.c_str(), srcMsg.attachments);
   }
 
 void MailEditorMainWindow::transformRecipientList(const TRecipientPublicKey& senderId,
@@ -747,11 +744,13 @@ void MailEditorMainWindow::onAttachmentListChanged()
   ui->messageEdit->document()->setModified(true);
   }
 
-void MailEditorMainWindow::onAddAttachments(QStringList files)
+void MailEditorMainWindow::onFileAttachmentAdded(const QStringList& files)
 {
-  if (files.size())
+  if (files.isEmpty() == false)
+  {
     onFileAttachementTriggered( true );
-  FileAttachment->addFiles( files );
+    FileAttachment->addFiles( files );
+  }
 }
 
 void MailEditorMainWindow::addContactCard (const Contact& contact)

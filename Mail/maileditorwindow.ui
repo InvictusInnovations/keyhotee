@@ -25,7 +25,11 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="TMessageEdit" name="messageEdit"/>
+     <widget class="TMessageEdit" name="messageEdit">
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextEditorInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -526,7 +530,7 @@
  <customwidgets>
   <customwidget>
    <class>TMessageEdit</class>
-   <extends>QTextEdit</extends>
+   <extends>QTextBrowser</extends>
    <header>Mail/TMessageEdit.hpp</header>
   </customwidget>
  </customwidgets>
