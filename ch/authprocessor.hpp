@@ -17,6 +17,7 @@ class IAuthProcessor
 public:
   /// Type holding a message data which has been stored in the auth_db.
   typedef bts::bitchat::private_contact_request_message TRequestMessage;
+  /// Type holding a message data which has been stored in the request_db
   typedef bts::bitchat::message_header                  TStoredMessage;
   typedef bts::addressbook::wallet_identity             TCurrIdentity;
 

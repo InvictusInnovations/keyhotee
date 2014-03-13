@@ -920,8 +920,13 @@ void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
   QTreeWidgetItem* item_parent = item->parent();
   item_parent->removeChild(item);
 
-  if(item_parent != _requests_root && item_parent->childCount() == 0)
-    item_parent->parent()->removeChild(item_parent);
+  if(item_parent != _requests_root)
+  {
+    if(item_parent->childCount() == 0)
+      item_parent->parent()->removeChild(item_parent);
+    else if(item_parent->childCount() == 1)
+      item_parent->setData(0, Qt::UserRole, false);   // 1 child, information for contextmenu
+  }
 
   if(_requests_root->childCount() == 0)
     _requests_root->setHidden(true);

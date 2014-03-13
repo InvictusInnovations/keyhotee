@@ -34,6 +34,7 @@ RequestAuthorization::~RequestAuthorization()
 void RequestAuthorization::setAddressBook(AddressBookModel* address_book)
 {
   _address_book = address_book;
+  ui->keyhoteeidpubkey->setAddressBook(address_book);
 }
 
 void RequestAuthorization::setKeyhoteeID(const QString& keyhotee_id)

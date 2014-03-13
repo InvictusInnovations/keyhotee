@@ -83,9 +83,9 @@ void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
 
 AuthorizationView::AuthorizationView(IAuthProcessor& auth_processor, const TRequestMessage& msg,
                                      const THeaderStoredMsg& header, QWidget *parent) :
-  Authorization(auth_processor, msg, header),
   QWidget(parent),
-  ui(new Ui::AuthorizationView)
+  ui(new Ui::AuthorizationView),
+  Authorization(auth_processor, msg, header)
 {
   ui->setupUi(this);
 
@@ -153,6 +153,7 @@ AuthorizationView::~AuthorizationView()
 void AuthorizationView::setAddressBook(AddressBookModel* addressbook)
 {
   _address_book = addressbook;
+  ui->keyhoteeidpubkey->setAddressBook(addressbook);
 }
 
 void AuthorizationView::setOwnerItem(AuthorizationItem* item)
