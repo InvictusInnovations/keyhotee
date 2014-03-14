@@ -22,6 +22,7 @@ public:
   void setAddressBook(AddressBookModel* address_book);
   AddressBookModel* getAddressBook() const;
   void setContact(const Contact& current_contact);
+  void setContactFromvCard(const Contact& contact);
   Contact getContact() const;
 
   void onChat();
@@ -43,10 +44,6 @@ public:
   bool CheckSaving();
   void addNewContact ();
   void setPublicKey(const QString& public_key_string);
-  void setFirstName(const QString& name);
-  void setLastName(const QString& name);
-  void setNotes(const QString& name);
-  void setKHID(const QString& khid);
   void checkAuthorizationStatus();
 
 Q_SIGNALS:
@@ -81,6 +78,8 @@ private:
   void ToDialog();
   bool FromDialog();
   void setEnabledSaveContact();
+  /// refresh Contact view window from param data of contact
+  void refreshDialog(const Contact &contact);
 
   Contact                                 _current_contact;
   fc::optional<bts::bitname::name_record> _current_record;

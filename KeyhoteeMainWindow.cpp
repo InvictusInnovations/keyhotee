@@ -338,14 +338,7 @@ void KeyhoteeMainWindow::addToContacts(bool silent, std::list<Contact> &contacts
     assert(contacts.size() == 1);
     addContact();
     const Contact &contact = contacts.front();
-    ui->new_contact->setFirstName (contact.first_name.c_str());
-    ui->new_contact->setLastName (contact.last_name.c_str());
-    ui->new_contact->setNotes (contact.notes.c_str());
-    std::string public_key_string = public_key_address(contact.public_key);
-    ui->new_contact->setPublicKey(public_key_string.c_str());
-    ui->new_contact->setKHID(contact.dac_id_string.c_str());
-    //stored key and calculated key should be the same
-    //assert (public_key_string == ui->new_contact->getPublicKey());
+    ui->new_contact->setContactFromvCard(contact);
   }
 }
 

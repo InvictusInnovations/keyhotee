@@ -2,6 +2,11 @@
 #include "Contact.hpp"
 #include "public_key_address.hpp"
 
+#include <QByteArray>
+#include <QIcon>
+#include <QImage>
+#include <QPixmap>
+
 ContactvCard::ContactvCard(const QByteArray& vCardData)
 {  
   vCardList cards = vCard::fromByteArray(vCardData);
@@ -31,6 +36,9 @@ void ContactvCard::convert(const Contact& contact, QByteArray* vCardData)
   name_prop = vCardProperty::createNotes(contact.getNotes());
   vcard.addProperty(name_prop);
 
+  name_prop = vCardProperty::createAvatar(contact.icon_png);
+  vcard.addProperty(name_prop);
+
   *vCardData = vcard.toByteArray();     
 }
 
@@ -41,7 +49,13 @@ ContactvCard::ConvertStatus ContactvCard::convert(Contact* contact)
   contact->dac_id_string    = getKHID().toStdString();
   contact->notes            = getNotes().toStdString();
   contact->privacy_setting  = bts::addressbook::secret_contact;
-  contact->setIcon(QIcon(":/images/user.png"));
+  
+  //default icon
+  QIcon icon(":/images/user.png");
+  //get icon from vCard
+  getAvatar(&icon);
+  contact->setIcon(icon);
+
   if (public_key_address::convert(getPublicKey().toStdString(), &contact->public_key) == false)
     return ConvertStatus::PUBLIC_KEY_INVALID;
 
@@ -83,6 +97,28 @@ QString ContactvCard::getNotes() const
   // "\n" is new line in the vCard standard.
   value.replace("\\n", "\n");
   return value;
+}
+
+bool ContactvCard::getAvatar(QIcon* icon)
+{
+  vCardProperty name_prop = _vcard.property(VC_PHOTO);
+  QString value = name_prop.value();
+  if (value.isEmpty())
+  {
+    return false;
+  }
+  QByteArray byteArray, byteArrayBase64;
+  byteArray = value.toLatin1();
+  byteArrayBase64 = QByteArray::fromBase64(byteArray);
+  QImage image;
+  if (! image.loadFromData( byteArrayBase64 ) )
+  {
+    return false;
+  }
+
+  *icon = QIcon(QPixmap::fromImage(image) );
+
+  return true;
 }
 
 

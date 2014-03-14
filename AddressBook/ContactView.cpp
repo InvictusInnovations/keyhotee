@@ -493,31 +493,9 @@ void ContactView::ToDialog()
   else 
   {
     setValid(true);
-    /** TODO... restore this kind of check
-    if( _current_contact.bit_id_public_key != _current_contact.public_key  )
-    {
-      ui->id_status->setText(
-                  tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
-    }
-    */
-    ui->firstname->setText( _current_contact.first_name.c_str() );
-    ui->lastname->setText( _current_contact.last_name.c_str() );
 
-    //set public key from contact record initially
-    std::string public_key_string = public_key_address( _current_contact.public_key );
-    ui->khid_pubkey->setPublicKey( public_key_string.c_str() );
-    //set keyhoteeID from contact record, this may override public key from contact record
-    //if mining is enabled and ID is registered in blockchain
-    ui->khid_pubkey->setKeyhoteeID(_current_contact.dac_id_string.c_str());
+    refreshDialog(_current_contact);
 
-    ui->icon_view->setIcon( _current_contact.getIcon() );
-    ui->notes->setPlainText( _current_contact.notes.c_str() );
-    //ui->email->setText( _current_contact.email_address );
-    //ui->phone->setText( _current_contact.phone_number );
-    //privacy_comboBox
-    //DLNFIX TODO: add check to see if we are synced on blockchain. If not synched,
-    //             display "Keyhotee ledger not accessible"
-    checkKeyhoteeIdStatus();
     bool is_owner = _current_contact.isOwn();
     ui->keyhoteeID_status->setVisible(!_editing && is_owner);
     ui->authorization_status->setVisible(!_editing && !is_owner);
@@ -649,29 +627,10 @@ void ContactView::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)
   }
 }
 
-void ContactView::setFirstName(const QString& name)
+void ContactView::setContactFromvCard(const Contact &contact)
 {
-  ui->firstname->setText(name);
-  setModified();
-}
+  refreshDialog(contact);
 
-void ContactView::setLastName(const QString& name)
-{
-  ui->lastname->setText(name);
-  setModified();
-}
-
-void ContactView::setNotes(const QString& name)
-{
-  ui->notes->setPlainText(name);
-  setModified();
-}
-
-void ContactView::setKHID(const QString& khid)
-{
-  if(!khid.isEmpty())
-    ui->khid_pubkey->setKeyhoteeID(khid);
-  
   setModified();
 }
 
@@ -709,4 +668,33 @@ void ContactView::checkAuthorizationStatus()
   {
     ui->authorization_status->setText( tr("Unauthorized") );
   }
+}
+
+void ContactView::refreshDialog(const Contact &contact)
+{
+  /** TODO... restore this kind of check
+    if( _current_contact.bit_id_public_key != _current_contact.public_key  )
+    {
+      ui->id_status->setText(
+                  tr( "Warning! Keyhotee ID %1 no longer matches known public key!" ).arg(_current_contact.bit_id) );
+    }
+    */
+  ui->firstname->setText( contact.first_name.c_str() );
+  ui->lastname->setText( contact.last_name.c_str() );
+
+  //set public key from contact record initially
+  std::string public_key_string = public_key_address( contact.public_key );
+  ui->khid_pubkey->setPublicKey( public_key_string.c_str() );
+  //set keyhoteeID from contact record, this may override public key from contact record
+  //if mining is enabled and ID is registered in blockchain
+  ui->khid_pubkey->setKeyhoteeID(contact.dac_id_string.c_str());
+
+  ui->icon_view->setIcon( contact.getIcon() );
+  ui->notes->setPlainText( contact.notes.c_str() );
+  //ui->email->setText( _current_contact.email_address );
+  //ui->phone->setText( _current_contact.phone_number );
+  //privacy_comboBox
+  //DLNFIX TODO: add check to see if we are synced on blockchain. If not synched,
+  //             display "Keyhotee ledger not accessible"
+  checkKeyhoteeIdStatus();
 }
