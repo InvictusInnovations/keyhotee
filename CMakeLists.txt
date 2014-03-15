@@ -29,10 +29,19 @@ GET_FILENAME_COMPONENT(INVICTUS_ROOT ${INVICTUS_ROOT} REALPATH) # remove uglines
 message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
 
 # Let's configure binaries output directory (by default invictus-root/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
+if (APPLE)
+  # right now we have to put it in a weird location for osx because that's 
+  # where jenkins wants it to be for packaging.
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
+else(APPLE)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${INVICTUS_ROOT}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${INVICTUS_ROOT}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${INVICTUS_ROOT}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
+endif(APPLE)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "${INVICTUS_ROOT}/install" CACHE PATH "Keyhotee install prefix" FORCE)
@@ -487,10 +496,53 @@ if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
 endif(MSVC)
 
-INSTALL(TARGETS Keyhotee RUNTIME DESTINATION .)
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+        SET(dirlist ${dirlist} ${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
+
+IF(APPLE)
+  SET(plugin_dest_dir Keyhotee.app/Contents/MacOS)
+  SET(qtconf_dest_dir Keyhotee.app/Contents/Resources)
+  SET(APPS "\${CMAKE_INSTALL_PREFIX}/Keyhotee.app")
+ENDIF(APPLE)
+
+INSTALL(TARGETS Keyhotee
+        RUNTIME DESTINATION .
+        BUNDLE DESTINATION . COMPONENT Runtime)
+
+if(APPLE)
+  foreach(plugin ${Qt5Gui_PLUGINS})
+    get_target_property(_loc ${plugin} LOCATION)
+    get_filename_component(plugin_path ${_loc} DIRECTORY)
+    get_filename_component(plugin_classification ${plugin_path} NAME)
+    #message("Plugin ${plugin} is an ${plugin_classification} at location ${_loc}")
+    INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins/${plugin_classification} COMPONENT Runtime) 
+  endforeach()
+
+  INSTALL(CODE "
+      file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
+      " COMPONENT Runtime)
+
+  GET_TARGET_PROPERTY(DIRS Qt5::Core LOCATION)
+  #message("DIRS is ${DIRS}")
+
+  INSTALL(CODE "
+      file(GLOB_RECURSE QTPLUGINS
+       \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+      include(BundleUtilities)
+      fixup_bundle(\"${APPS}\" \"\${QTPLUGINS}\" \"/Users/syncad/Qt/\")
+      " COMPONENT Runtime)
+endif(APPLE)
+
 get_target_property(FC_SHARED_LIBRARIES_DEBUG fc SHARED_LIBRARIES_DEBUG)
 get_target_property(FC_SHARED_LIBRARIES_RELEASE fc SHARED_LIBRARIES_RELEASE)
-message("fc_release=${FC_SHARED_LIBRARIES_RELEASE}")
 INSTALL(FILES ${FC_SHARED_LIBRARIES_RELEASE} DESTINATION . CONFIGURATIONS RelWithDebinfo)
 INSTALL(FILES ${FC_SHARED_LIBRARIES_DEBUG} DESTINATION . CONFIGURATIONS Debug)
 
@@ -530,11 +582,19 @@ if(WIN32)
  # it seems like windows zip files usually don't have a single directory inside them, unix tgz frequently do
  SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
 
-
-
  include(CPack)
-else(WIN32)
- # Linux gets a .tgz
- SET(CPACK_GENERATOR "TGZ")
- SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 1)
 endif(WIN32)
+
+if(APPLE)
+  set(CPACK_GENERATOR "DragNDrop")
+  set(CPACK_PACKAGE_VENDOR "www.invictus.io")
+endif()
+
+if(LINUX)
+  # Linux gets a .tgz
+  SET(CPACK_GENERATOR "TGZ")
+  SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 1)
+endif(LINUX)
+
+
+
