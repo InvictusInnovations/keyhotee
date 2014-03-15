@@ -402,7 +402,7 @@
                 </size>
                </property>
                <property name="focusPolicy">
-                <enum>Qt::TabFocus</enum>
+                <enum>Qt::NoFocus</enum>
                </property>
               </widget>
              </item>
@@ -754,11 +754,11 @@ Enter</string>
   <tabstop>icon_view</tabstop>
   <tabstop>firstname</tabstop>
   <tabstop>lastname</tabstop>
+  <tabstop>mining_effort_slider</tabstop>
   <tabstop>khid_pubkey</tabstop>
   <tabstop>privacy_comboBox</tabstop>
   <tabstop>email</tabstop>
   <tabstop>phone</tabstop>
-  <tabstop>mining_effort_slider</tabstop>
   <tabstop>notes</tabstop>
   <tabstop>chat_conversation</tabstop>
   <tabstop>chat_input</tabstop>
