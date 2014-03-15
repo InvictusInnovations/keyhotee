@@ -15,7 +15,7 @@ cmake_minimum_required( VERSION 2.8.12.1 )
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "6")
-set(VERSION_PATCH "1")
+set(VERSION_PATCH "2")
 
 
 SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
@@ -132,7 +132,7 @@ MESSAGE (STATUS "Config types: ${CMAKE_CONFIGURATION_TYPES}")
 SET (CrashRpt_LIBRARIES "")
 
 IF( WIN32 )
-  MESSAGE(STATUS "Configuring Kehotee on WIN32")
+  MESSAGE(STATUS "Configuring Keyhotee on WIN32")
   # On windows platform release & debug libraries have different names
   SET (DEBUG_SUFFIX "D")
 
@@ -495,6 +495,9 @@ INSTALL(FILES ${FC_SHARED_LIBRARIES_RELEASE} DESTINATION . CONFIGURATIONS RelWit
 INSTALL(FILES ${FC_SHARED_LIBRARIES_DEBUG} DESTINATION . CONFIGURATIONS Debug)
 
 IF(WIN32)
+  #TODO figure out how to remove /bin copies this makes
+  include(InstallRequiredSystemLibraries)
+  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION . COMPONENT Libraries)
   INSTALL(FILES ${CRASHRPT_BINARIES_TO_INSTALL} DESTINATION . CONFIGURATIONS RelWithDebinfo)
 ENDIF()
 
