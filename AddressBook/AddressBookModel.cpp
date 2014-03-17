@@ -266,9 +266,13 @@ int AddressBookModel::storeContact(const Contact& contact_to_store)
 
 int AddressBookModel::getContactRow(const Contact& contact) const
 {
-  auto contact_iterator = std::lower_bound( my->_contacts.begin(), my->_contacts.end(), contact );
-  if (contact_iterator == my->_contacts.end())
-    FC_ASSERT(!"invalid contact id");
+  std::vector<Contact>::const_iterator contact_iterator = std::lower_bound(my->_contacts.begin(),
+    my->_contacts.end(), contact);
+
+  FC_ASSERT(contact_iterator != my->_contacts.end(), "invalid contact id");
+  FC_ASSERT(contact_iterator->wallet_index == contact.wallet_index,
+    "invalid contact id (wallet_index mismatch)");
+
   return contact_iterator - my->_contacts.begin();
 }
 
@@ -305,8 +309,8 @@ void AddressBookModel::reloadContacts()
     auto contact = itr->second;
     ilog("loading contacts...");
     my->_contacts.push_back(Contact(contact) );
-
   }
+  std::sort( my->_contacts.begin(), my->_contacts.end());
 }
 
 QModelIndex AddressBookModel::findModelIndex(const int wallet_index) const

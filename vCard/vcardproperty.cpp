@@ -255,3 +255,11 @@ vCardProperty vCardProperty::createNotes(const QString& notes)
 
   return vCardProperty(VC_NOTE, values);
 }
+
+vCardProperty vCardProperty::createAvatar(const std::vector<char>& iconData)
+{
+  QByteArray byteArray(iconData.data(), iconData.size());
+  QString iconBase64 = QString::fromLatin1(byteArray.toBase64().data());
+  QString propertuName = VC_PHOTO + QString(";PNG")/*icon format*/ + ";ENCODING=BASE64";
+  return vCardProperty(propertuName, iconBase64);
+}

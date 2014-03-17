@@ -17,6 +17,7 @@ RequestAuthorization::RequestAuthorization(QWidget *parent) :
   ui->keyhoteeidpubkey->setEditable(true);
   ui->button_send->setEnabled(false);
   ui->keyhoteeidpubkey->showCopyToClipboard(false);
+  ui->identity_select->setFocus();
 
   fillSelectIdentities();
 

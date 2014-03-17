@@ -1,8 +1,6 @@
 #pragma once
 #include "vCard/vcard.h"
 
-#include <QList>
-
 class Contact;
 
 /** Converter between Contacts data and vcard data.
@@ -36,6 +34,7 @@ public:
   QString getKHID() const;
   QString getPublicKey() const;
   QString getNotes() const;
+  bool getAvatar(QIcon* icon);
 
 private:
   vCard _vcard;

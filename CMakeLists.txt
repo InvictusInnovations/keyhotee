@@ -13,6 +13,40 @@ SET (CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebinfo" CACHE STRING "" FORCE)
 project( keyhotee )
 cmake_minimum_required( VERSION 2.8.12.1 )
 
+set(VERSION_MAJOR "0")
+set(VERSION_MINOR "6")
+set(VERSION_PATCH "2")
+
+
+SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
+
+IF("${INVICTUS_ROOT}" STREQUAL "")
+  SET(INVICTUS_ROOT "./")
+ENDIF("${INVICTUS_ROOT}" STREQUAL "")
+
+GET_FILENAME_COMPONENT(INVICTUS_ROOT ${INVICTUS_ROOT} REALPATH) # remove ugliness
+
+message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
+
+# Let's configure binaries output directory (by default invictus-root/bin)
+if (APPLE)
+  # right now we have to put it in a weird location for osx because that's 
+  # where jenkins wants it to be for packaging.
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
+else(APPLE)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${INVICTUS_ROOT}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${INVICTUS_ROOT}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${INVICTUS_ROOT}/bin)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
+endif(APPLE)
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX "${INVICTUS_ROOT}/install" CACHE PATH "Keyhotee install prefix" FORCE)
+endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
 IF(WIN32)
    # Build all windows projects with /EHsc, which will prevent the compiler from 
    # translating structured exceptions into C++ exceptions (which would make
@@ -106,22 +140,8 @@ MESSAGE (STATUS "Config types: ${CMAKE_CONFIGURATION_TYPES}")
 #This variable will be filled just for Win32 platform
 SET (CrashRpt_LIBRARIES "")
 
-SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
-
-IF("${INVICTUS_ROOT}" STREQUAL "")
-  SET(INVICTUS_ROOT "./")
-ENDIF("${INVICTUS_ROOT}" STREQUAL "")
-
-message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
-
-# Let's configure binaries output directory (by default invictus-root/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${INVICTUS_ROOT}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
-
 IF( WIN32 )
-  MESSAGE(STATUS "Configuring Kehotee on WIN32")
+  MESSAGE(STATUS "Configuring Keyhotee on WIN32")
   # On windows platform release & debug libraries have different names
   SET (DEBUG_SUFFIX "D")
 
@@ -131,6 +151,11 @@ IF( WIN32 )
   LIST(APPEND CrashRpt_LIBRARIES optimized ${CrashRpt_LIBRARIES_RELEASE})
 
   MESSAGE(STATUS "Found CrashRpt libraries: ${CrashRpt_LIBRARIES}")
+  set(CRASHRPT_BINARIES_TO_INSTALL "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/crashrpt_lang.ini"
+                                   "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/CrashRpt1402.dll"
+                                   "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/CrashSender1402.exe"
+                                   "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/dbghelp.dll")
+
 
   IF(KH_STATIC_QT EQUAL 1)
     # Use dedicated prefix to find static versions of libraries 
@@ -171,11 +196,11 @@ IF( APPLE )
     SET( MACOSX_BUNDLE_BUNDLE_NAME "Keyhotee" )
     SET( MACOSX_BUNDLE_GUI_IDENTIFIER "com.invictus-innovations.Keyhotee" ) 
     set( MACOSX_BUNDLE_ICON_FILE keyhotee.icns )
-    SET( MACOSX_BUNDLE_INFO_STRING "Keyhotee - version 1.0" ) 
-    SET( MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0" ) 
-    SET( MACOSX_BUNDLE_LONG_VERSION_STRING "1.0.0" ) 
-    SET( MACOSX_BUNDLE_BUNDLE_VERSION "1.0" ) 
-    SET( MACOSX_BUNDLE_COPYRIGHT "(C) 2013 Invictus Innovations" ) 
+    SET( MACOSX_BUNDLE_INFO_STRING "Keyhotee - version ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ) 
+    SET( MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ) 
+    SET( MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ) 
+    SET( MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ) 
+    SET( MACOSX_BUNDLE_COPYRIGHT "(C) 2014 Invictus Innovations" ) 
   
 ENDIF( APPLE )
 
@@ -387,6 +412,11 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BIN
 list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.h)
 list(APPEND sources ${headers})
 
+if(WIN32)
+  # add an icon to the win32 executable
+  list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/Keyhotee.rc)
+endif(WIN32)
+
 # Some unknown diff between windows and unix, this is quick fix, leave for DanL to clean-up
 IF(NOT WIN32)
   #apparently this is needed for Ubuntu (see commit from jefferylee), but it causes problems for windows (lib is brought in via upnpc-static on windows at least)
@@ -398,12 +428,17 @@ add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} ${resources} )
 add_dependencies (Keyhotee translations_target)
 
 IF(WIN32)
-  FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/*.*" _copySrc)
-  FILE(TO_NATIVE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" _copyDst)
+  #FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CrashRpt/bin/*.*" _copySrc)
+  #FILE(TO_NATIVE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" _copyDst)
+
+  set(CRASHRPT_POST_BUILD_COPY_COMMANDS)
+  foreach(binary ${CRASHRPT_BINARIES_TO_INSTALL})
+    set(CRASHRPT_POST_BUILD_COPY_COMMANDS ${CRASHRPT_POST_BUILD_COPY_COMMANDS} COMMAND ${CMAKE_COMMAND} -E copy_if_different ${binary} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+  endforeach()
 
   ADD_CUSTOM_COMMAND(TARGET Keyhotee POST_BUILD
-    COMMAND copy /Y "${_copySrc}" "${_copyDst}"
-    COMMENT "copying CrashRpt binaries into KH output directory."
+    ${CRASHRPT_POST_BUILD_COPY_COMMANDS}
+    COMMENT "copying CrashRpt binaries into Keyhotee output directory."
   )
 ENDIF()
 
@@ -460,4 +495,106 @@ if (MSVC)
 # Probably cmake has a bug and vcxproj generated for executable in Debug conf. has disabled debug info
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
 endif(MSVC)
+
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+        SET(dirlist ${dirlist} ${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
+
+IF(APPLE)
+  SET(plugin_dest_dir Keyhotee.app/Contents/MacOS)
+  SET(qtconf_dest_dir Keyhotee.app/Contents/Resources)
+  SET(APPS "\${CMAKE_INSTALL_PREFIX}/Keyhotee.app")
+ENDIF(APPLE)
+
+INSTALL(TARGETS Keyhotee
+        RUNTIME DESTINATION .
+        BUNDLE DESTINATION . COMPONENT Runtime)
+
+if(APPLE)
+  foreach(plugin ${Qt5Gui_PLUGINS})
+    get_target_property(_loc ${plugin} LOCATION)
+    get_filename_component(plugin_path ${_loc} DIRECTORY)
+    get_filename_component(plugin_classification ${plugin_path} NAME)
+    #message("Plugin ${plugin} is an ${plugin_classification} at location ${_loc}")
+    INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins/${plugin_classification} COMPONENT Runtime) 
+  endforeach()
+
+  INSTALL(CODE "
+      file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
+      " COMPONENT Runtime)
+
+  GET_TARGET_PROPERTY(DIRS Qt5::Core LOCATION)
+  #message("DIRS is ${DIRS}")
+
+  INSTALL(CODE "
+      file(GLOB_RECURSE QTPLUGINS
+       \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+      include(BundleUtilities)
+      fixup_bundle(\"${APPS}\" \"\${QTPLUGINS}\" \"/Users/syncad/Qt/\")
+      " COMPONENT Runtime)
+endif(APPLE)
+
+get_target_property(FC_SHARED_LIBRARIES_DEBUG fc SHARED_LIBRARIES_DEBUG)
+get_target_property(FC_SHARED_LIBRARIES_RELEASE fc SHARED_LIBRARIES_RELEASE)
+INSTALL(FILES ${FC_SHARED_LIBRARIES_RELEASE} DESTINATION . CONFIGURATIONS RelWithDebinfo)
+INSTALL(FILES ${FC_SHARED_LIBRARIES_DEBUG} DESTINATION . CONFIGURATIONS Debug)
+
+IF(WIN32)
+  #TODO figure out how to remove /bin copies this makes
+  include(InstallRequiredSystemLibraries)
+  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION . COMPONENT Libraries)
+  INSTALL(FILES ${CRASHRPT_BINARIES_TO_INSTALL} DESTINATION . CONFIGURATIONS RelWithDebinfo)
+ENDIF()
+
+SET(CPACK_PACKAGE_DIRECTORY "${INVICTUS_ROOT}/packages")
+set(CPACK_PACKAGE_NAME "keyhotee")
+set(CPACK_PACKAGE_VENDOR "Invictus Innovations, Inc.")
+set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+set(CPACK_PACKAGE_DESCRIPTION "A secure digital messaging platform and electronic wallet")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A secure digital messaging platform")
+set(CPACK_PACKAGE_EXECUTABLES "Keyhotee;Keyhotee")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/LICENSE.md")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "Keyhotee ${CPACK_PACKAGE_VERSION}")
+
+if(WIN32)
+ SET(CPACK_GENERATOR "ZIP;NSIS")
+ set(CPACK_PACKAGE_NAME "Keyhotee") # override above
+ set(CPACK_NSIS_CONTACT "contact.us@invictus-innovations.com")
+ set(CPACK_NSIS_EXECUTABLES_DIRECTORY .)
+ set(CPACK_NSIS_PACKAGE_NAME "Keyhotee v${CPACK_PACKAGE_VERSION}")
+ set(CPACK_NSIS_DISPLAY_NAME "${CPACK_NSIS_PACKAGE_NAME}")
+ set(CPACK_NSIS_URL_INFO_ABOUT "http://invictus.io")
+ set(CPACK_NSIS_HELP_LINK "https://bitsharestalk.org/index.php?board=2.0")
+ set(CPACK_NSIS_MENU_LINKS
+     "https://bitsharestalk.org/index.php?board=2.0" "Keyhotee Development Forum"
+     "http://invictus.io" "Invictus Innovations Website")
+ set(CPACK_NSIS_DEFINES "  !define MUI_STARTMENUPAGE_DEFAULTFOLDER \\\"Keyhotee\\\"")
+ # it seems like windows zip files usually don't have a single directory inside them, unix tgz frequently do
+ SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
+
+ include(CPack)
+endif(WIN32)
+
+if(APPLE)
+  set(CPACK_GENERATOR "DragNDrop")
+  set(CPACK_PACKAGE_VENDOR "www.invictus.io")
+endif()
+
+if(LINUX)
+  # Linux gets a .tgz
+  SET(CPACK_GENERATOR "TGZ")
+  SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 1)
+endif(LINUX)
+
+
 

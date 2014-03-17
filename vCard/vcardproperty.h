@@ -122,6 +122,7 @@ public:
     static vCardProperty createKHID(const QString& khID, const vCardParamList& params = vCardParamList());
     static vCardProperty createPublicKey(const QString& publicKey, const vCardParamList& params = vCardParamList());
     static vCardProperty createNotes(const QString& name);
+    static vCardProperty createAvatar(const std::vector<char>& iconData);
 
 protected:
     QString m_name;
