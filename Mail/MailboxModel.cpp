@@ -251,7 +251,7 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
       switch (column)
         {
         case Read:
-          if (!header.header.read_mark)
+          if (!header.header.isRead())
             return my->_read_icon;
           else
             return "";
@@ -269,7 +269,7 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
       switch (column)
         {
         case Read:
-          return header.header.read_mark;
+          return header.header.isRead();
         case Money:
           return header.money_amount;
         case Attachment:
@@ -289,7 +289,7 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
           return QVariant();           //DLNFIX what is this?
         } //switch (column)
     case Qt::FontRole:
-      if (!header.header.read_mark)
+      if (!header.header.isRead())
         {
         QFont boldFont;
         boldFont.setBold(true);
@@ -326,7 +326,7 @@ void MailboxModel::getFullMessage(const QModelIndex& index, MessageHeader& heade
 void MailboxModel::markMessageAsRead(const QModelIndex& index)
   {
   MessageHeader& msg = my->_headers[index.row()];
-  msg.header.read_mark = true;
+  msg.header.setRead();
   my->_mail_db->store_message_header(msg.header);
   }
 
