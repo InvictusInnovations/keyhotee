@@ -10,6 +10,7 @@
 #include "utils.hpp"
 
 #include <QAbstractItemView>
+#include <QAbstractProxyModel>
 #include <QAbstractTextDocumentLayout>
 #include <QCompleter>
 #include <QKeyEvent>
@@ -77,12 +78,27 @@ void ContactListEdit::insertCompletion(const QModelIndex& completionIndex)
 
   QString completion = completionIndex.data(Qt::DisplayRole).toString();
 
-  ilog( "insertCompletion ${c}", ("c", completion.toStdString() ) );
+  ilog("insertCompletion got completion text: ${c}", ("c", completion.toStdString()));
 
-  const Contact& contact = _completerModel->getContact(completionIndex);
+  /** \warning QCompleter passes here its index relative to ITS model which is a filtering one model.
+      Then this index depends on number of items displayed in completer window. Then index is smaller
+      when items are matched more strictly (0 in case just 1 row is matched).
+      To get actual index, it must be remapped but there is a lacking support in QCompleter API
+      to remap such index directly. Indead of cast is needed.
+      \see http://qt-project.org/forums/viewthread/26959 for details
+  */
+  const QAbstractItemModel* completionModel = completionIndex.model();
+  const QAbstractProxyModel* proxyModel = dynamic_cast<const QAbstractProxyModel*>(completionModel);
+  assert(proxyModel != nullptr);
+  QModelIndex sourceIndex = proxyModel->mapToSource(completionIndex);
+
+  const Contact& contact = _completerModel->getContact(sourceIndex);
+
+  assert(completion.toStdString() == contact.get_display_name());
+
+  ilog("insertCompletion chosen contact: ${c}", ("c", contact.get_display_name()));
 
   deleteEnteredText();
-
   addContactEntry(completion, contact, false);
   }
 
