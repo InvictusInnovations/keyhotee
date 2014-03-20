@@ -311,6 +311,11 @@ set( sources
         Mail/TMessageEdit.hpp
         Mail/TMessageEdit.cpp
 
+        Mail/MailTable.hpp
+        Mail/MailTable.cpp
+        Mail/ShowColumnAction.hpp
+        Mail/ShowColumnAction.cpp
+
         KeyhoteeApplication.hpp
         KeyhoteeApplication.cpp
 

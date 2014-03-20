@@ -147,34 +147,36 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
 
   ui->inbox_table->verticalHeader()->setDefaultSectionSize(20);
 
-  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::To, 120);
-  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::Subject, 300);
-  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateReceived, 140);
-  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::From, 120);
-  ui->inbox_table->horizontalHeader()->resizeSection(MailboxModel::DateSent, 140);
+  QHeaderView *horHeader = ui->inbox_table->horizontalHeader();
+
+  horHeader->resizeSection(MailboxModel::To, 120);
+  horHeader->resizeSection(MailboxModel::Subject, 300);
+  horHeader->resizeSection(MailboxModel::DateReceived, 140);
+  horHeader->resizeSection(MailboxModel::From, 120);
+  horHeader->resizeSection(MailboxModel::DateSent, 140);
   if (_type == Inbox)
     {
-    ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::Status);
-    ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::DateSent);
+    horHeader->hideSection(MailboxModel::Status);
+    horHeader->hideSection(MailboxModel::DateReceived);
     
     ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnInbox,
        static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderInbox) );
     }
   else if (_type == Sent)
     {
-    ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::To, MailboxModel::From);
-    ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
-    ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::DateReceived);
+    horHeader->swapSections(MailboxModel::To, MailboxModel::From);
+    horHeader->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
+    horHeader->hideSection(MailboxModel::DateReceived);
 
     ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnSent,
        static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderSent) );
     }
   else if (_type == Drafts)
     {
-    ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::To, MailboxModel::From);
-    ui->inbox_table->horizontalHeader()->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
-    ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::DateReceived);
-    ui->inbox_table->horizontalHeader()->hideSection(MailboxModel::Status);
+    horHeader->swapSections(MailboxModel::To, MailboxModel::From);
+    horHeader->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
+    horHeader->hideSection(MailboxModel::DateReceived);
+    horHeader->hideSection(MailboxModel::Status);
 
     ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnDraft,
        static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderDraft) );
@@ -185,10 +187,10 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
        static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderOutbox) );
     }
 
-  ui->inbox_table->horizontalHeader()->setSectionsMovable(true);
-  ui->inbox_table->horizontalHeader()->setSortIndicatorShown(true);
-  ui->inbox_table->horizontalHeader()->setSectionsClickable(true);
-  ui->inbox_table->horizontalHeader()->setHighlightSections(true);
+  horHeader->setSectionsMovable(true);
+  horHeader->setSortIndicatorShown(true);
+  horHeader->setSectionsClickable(true);
+  horHeader->setHighlightSections(true);
 
   //connect signals for the new selection model (created by setModel call)
   QItemSelectionModel* inbox_selection_model = ui->inbox_table->selectionModel();
@@ -205,6 +207,13 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
   ui->inbox_table->hideColumn(MailboxModel::Money);
   // hidden Chat Column
   ui->inbox_table->hideColumn(MailboxModel::Chat);
+
+  // for now create menu actions only for Inbox
+  if (_type == Inbox)
+    {
+    //it should be called after the horHeader->hideSection, ui->inbox_table->hideColumn
+    ui->inbox_table->initialActions();
+    }
   }
 
 void Mailbox::setupActions()
