@@ -19,6 +19,7 @@ void MailTable::setupActions()
   initializeAction( tr("Read"), MailboxModel::Read);
   initializeAction( tr("Money"), MailboxModel::Money);
   initializeAction( tr("Attachment"), MailboxModel::Attachment);
+  initializeAction( tr("Reply"), MailboxModel::Reply);
   initializeAction( tr("Chat"), MailboxModel::Chat);
   initializeAction( tr("From"), MailboxModel::From);
   initializeAction( tr("To"), MailboxModel::To);
