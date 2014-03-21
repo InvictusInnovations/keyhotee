@@ -59,7 +59,7 @@ git clone https://github.com/InvictusInnovations/fc.git
 - Run CMake
 
  - Let CMake know where to find our libraries:
-    ```
+   ```
 export CMAKE_PREFIX_PATH=$HOME/Invictus/OpenSSL:$HOME/Invictus/icu:$HOME/Invictus/BerkeleyDB:$HOME/Qt/5.2.1/clang_64
 export DYLD_FRAMEWORK_PATH=$HOME/Qt/5.2.1/clang_64/lib:$DYLD_FRAMEWORK_PATH
 ```
