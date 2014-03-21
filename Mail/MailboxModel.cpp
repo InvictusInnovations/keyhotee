@@ -67,9 +67,9 @@ bool MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
 
     mail_header.date_sent = Utils::toQDateTime(header.from_sig_time);
 
-    //fill remaining fields from private_email_message
-    auto raw_data = my->_mail_db->fetch_data(header.digest);
-    auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
+    //fill remaining fields from private_email_message1
+    auto email_msg = unpack(header);
+
     mail_header.to_list = email_msg.to_list;
     mail_header.cc_list = email_msg.cc_list;
     mail_header.subject = email_msg.subject.c_str();
@@ -95,6 +95,19 @@ void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
     endInsertRows();
     }
   }
+
+bts::bitchat::private_email_message1 MailboxModel::unpack(const bts::bitchat::message_header& header) const
+{
+  auto raw_data = my->_mail_db->fetch_data(header.digest);
+  
+  if(header.type == private_message_type::email_msg1)
+    return fc::raw::unpack<private_email_message1>(raw_data);
+  else
+  {
+    auto email_msg0 = fc::raw::unpack<private_email_message>(raw_data);
+    return bts::bitchat::private_email_message1(email_msg0);
+  }
+}
 
 void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
                                   const TStoredMailMessage& msg)
@@ -179,6 +192,7 @@ QVariant MailboxModel::headerData(int section, Qt::Orientation orientation, int 
           case Read:
           case Money:
           case Attachment:
+          case Reply:
           case Chat:
             return QVariant();
           case From:
@@ -213,6 +227,7 @@ QVariant MailboxModel::headerData(int section, Qt::Orientation orientation, int 
           case Read:
           case Money:
           case Attachment:
+          case Reply:
           case Chat:
             return QSize(8, 8);
           case From:
@@ -262,6 +277,13 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
             return my->_attachment_icon;
           else
             return "";
+        case Reply:
+          if(header.header.isReplied() && header.header.isForwarded())
+            return QIcon(":/images/mail_replied_forwarded.png");
+          else if(header.header.isReplied())
+            return QIcon(":/images/mail_replied.png");
+          else if(header.header.isForwarded())
+            return QIcon(":/images/mail_forwarded.png");
         default:
           return QVariant();
         }
@@ -274,6 +296,8 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
           return header.money_amount;
         case Attachment:
           return header.hasAttachments;
+        case Reply:
+          return QVariant();
         //             case Chat:
         case From:
           return Utils::toString(header.header.from_key, Utils::FULL_CONTACT_DETAILS);
@@ -308,8 +332,8 @@ void MailboxModel::getFullMessage(const QModelIndex& index, MessageHeader& heade
     header = my->_headers[index.row()];
     /// Update sender info each time to match data defined in contact/identity list.
     header.from = Utils::toString(header.header.from_key, Utils::TContactTextFormatting::FULL_CONTACT_DETAILS);
-    auto raw_data = my->_mail_db->fetch_data(header.header.digest);
-    auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
+
+    auto email_msg = unpack(header.header);
     header.to_list = email_msg.to_list;
     header.cc_list = email_msg.cc_list;
     header.subject = email_msg.subject.c_str();
@@ -354,8 +378,7 @@ void MailboxModel::getMessageData(const QModelIndex& index,
 
   try
     {
-    auto rawData = my->_mail_db->fetch_data(cachedMsg.header.digest);
-    *decodedMsg = fc::raw::unpack<private_email_message>(rawData);
+    *decodedMsg = unpack(cachedMsg.header);
     }
   catch(const fc::exception& e)
     {

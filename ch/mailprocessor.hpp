@@ -10,7 +10,7 @@ namespace bts
 {
 namespace bitchat
 {
-struct private_email_message;
+struct private_email_message1;
 struct message_header;
 } ///namespace bitchat
 
@@ -25,12 +25,19 @@ class IMailProcessor
   {
   public:
     /// Type holding a data of message prepared to save/send operation.
-    typedef bts::bitchat::private_email_message TPhysicalMailMessage;
+    typedef bts::bitchat::private_email_message1  TPhysicalMailMessage;
     /// Type holding a message data which has been stored in the mail_db.
-    typedef bts::bitchat::message_header        TStoredMailMessage;
-    typedef bts::addressbook::wallet_identity   TIdentity;
-    typedef fc::ecc::public_key                 TRecipientPublicKey;
-    typedef std::vector<TRecipientPublicKey>    TRecipientPublicKeys;
+    typedef bts::bitchat::message_header          TStoredMailMessage;
+    typedef bts::addressbook::wallet_identity     TIdentity;
+    typedef fc::ecc::public_key                   TRecipientPublicKey;
+    typedef std::vector<TRecipientPublicKey>      TRecipientPublicKeys;
+
+    enum TMsgType
+    {
+      Normal,
+      Forward,
+      Reply
+    };
 
     /** Allows to schedule given message send to the outbox queue.
         \param senderId      - identity to be used as sender,
@@ -39,7 +46,7 @@ class IMailProcessor
                                is about to send.
     */
     virtual void Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TStoredMailMessage* savedDraftMsg) = 0;
+      const TMsgType msg_type, const TStoredMailMessage* savedDraftMsg) = 0;
 
     /** Allows to save given message into Drafts folder in the backend storage.
         \param msgBeingReplaced - optional (can be null). If specified given message will be first
@@ -49,7 +56,7 @@ class IMailProcessor
         \see Send description for other parameter details.
     */
     virtual TStoredMailMessage Save(const TIdentity& senderId, const TPhysicalMailMessage& sourceMsg,
-      const TStoredMailMessage* msgBeingReplaced) = 0;
+      const TMsgType msg_type, const TStoredMailMessage* msgBeingReplaced) = 0;
 
   protected:
     virtual ~IMailProcessor() {}
