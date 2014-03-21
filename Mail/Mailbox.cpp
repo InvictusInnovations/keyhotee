@@ -136,12 +136,12 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
   _mailProcessor = &mailProcessor;
   _mainWindow = parentKehoteeMainW;
 
+  readSettings();
+
   //enable sorting the mailbox
   QSortFilterProxyModel* proxyModel = new MailSortFilterProxyModel();
   proxyModel->setSourceModel(model);
   ui->inbox_table->setModel(proxyModel);
-  //ui->inbox_table->sortByColumn(0, Qt::AscendingOrder);
-  //ui->inbox_table->setModel( model );
 
   ui->inbox_table->setShowGrid(false);
 
@@ -157,19 +157,13 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
   if (_type == Inbox)
     {
     horHeader->hideSection(MailboxModel::Status);
-    horHeader->hideSection(MailboxModel::DateReceived);
-    
-    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnInbox,
-       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderInbox) );
+    horHeader->hideSection(MailboxModel::DateReceived);       
     }
   else if (_type == Sent)
     {
     horHeader->swapSections(MailboxModel::To, MailboxModel::From);
     horHeader->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
     horHeader->hideSection(MailboxModel::DateReceived);
-
-    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnSent,
-       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderSent) );
     }
   else if (_type == Drafts)
     {
@@ -177,15 +171,12 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
     horHeader->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
     horHeader->hideSection(MailboxModel::DateReceived);
     horHeader->hideSection(MailboxModel::Status);
-
-    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnDraft,
-       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderDraft) );
     }
   else if (_type == Outbox)
     {
-    ui->inbox_table->sortByColumn(_mainWindow->getMailSettings().sortColumnOutbox,
-       static_cast<Qt::SortOrder>(_mainWindow->getMailSettings().sortOrderOutbox) );
     }
+
+  ui->inbox_table->sortByColumn(_settings.sortColumn, _settings.sortOrder);
 
   horHeader->setSectionsMovable(true);
   horHeader->setSortIndicatorShown(true);
@@ -423,18 +414,38 @@ bool Mailbox::getSelectedMessageData (IMailProcessor::TStoredMailMessage* encode
   return true;
 }
     
-Qt::SortOrder Mailbox::getSortOrder() const
-{
-  return ui->inbox_table->horizontalHeader()->sortIndicatorOrder();
-}
-
-int Mailbox::getSortedColumn() const 
-{
-  return ui->inbox_table->horizontalHeader()->sortIndicatorSection();
-}
-
 void Mailbox::selectAll ()
 {
   ui->inbox_table->selectAll();
   ui->inbox_table->setFocus();
+}
+
+void Mailbox::writeSettings()
+{
+  QSettings settings("Invictus Innovations", "Keyhotee");
+
+  settings.beginGroup("MailBox");
+  //MailBox type
+  settings.beginGroup( QString::number(_type) );
+
+  settings.setValue("sortColumn", ui->inbox_table->horizontalHeader()->sortIndicatorSection());
+  settings.setValue("sortOrder", ui->inbox_table->horizontalHeader()->sortIndicatorOrder());
+
+  settings.endGroup();
+  settings.endGroup();
+}
+
+void Mailbox::readSettings()
+{
+  QSettings settings("Invictus Innovations", "Keyhotee");
+
+  settings.beginGroup("MailBox");
+  //MailBox type
+  settings.beginGroup( QString::number(_type) );  
+
+  _settings.sortColumn = settings.value("sortColumn", QVariant(0)).toInt();
+  _settings.sortOrder = static_cast<Qt::SortOrder>( settings.value("sortOrder", QVariant(0)).toInt() );
+
+  settings.endGroup();
+  settings.endGroup();
 }

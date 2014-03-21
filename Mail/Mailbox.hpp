@@ -41,10 +41,12 @@ public:
   void saveAttachment ();
   bool isSelection () const;
   bool isOneEmailSelected() const;
-  Qt::SortOrder getSortOrder() const;
-  int getSortedColumn() const;
   void selectAll ();
   void checksendmailbuttons();
+  /** Write mail box settings to the system registry
+      when application is closing
+  */
+  void writeSettings();
 
 public slots:
   void onReplyMail()
@@ -70,6 +72,12 @@ private slots:
   void onDoubleClickedItem(QModelIndex);
 
 private:
+  struct Settings
+  {
+    int           sortColumn;
+    Qt::SortOrder sortOrder;
+  };
+
   enum ReplyType { reply, reply_all, forward };
   void setupActions();
   QModelIndex getSelectedMail();
@@ -79,6 +87,8 @@ private:
   void duplicateMail(ReplyType);
   bool getSelectedMessageData (IMailProcessor::TStoredMailMessage* encodedMsg,
                              IMailProcessor::TPhysicalMailMessage* decodedMsg);
+  /// Read mail box settings from the system registry
+  void readSettings();
 
 private:
   QSortFilterProxyModel* sortedModel();
@@ -93,4 +103,5 @@ private:
   QAction*                     forward_mail;
   QAction*                     delete_mail;
   bool                         _attachmentSelected;
+  Settings                     _settings;
 };

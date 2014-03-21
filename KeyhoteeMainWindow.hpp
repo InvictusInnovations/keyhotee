@@ -29,7 +29,6 @@ class ContactsTable;
 class InboxView;
 class Mailbox;
 class MailboxModel;
-class Mailbox;
 class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
@@ -69,9 +68,6 @@ public:
   void setEnabledShareContactOption( bool enable );
   void refreshMenuOptions() const;
   void setEnabledMailActions(bool enable);
-  /// Get mailbox settings like column sorted, column order
-  /// SelfSizingMainWindow::writeSettings() needs to write mailSettings to system registry
-  void getMailBoxSettings (MailSettings* mailSettings);  
   ContactsTable* getContactsPage();
   void shareContact(QList<const Contact*>& contacts);
 
@@ -221,6 +217,7 @@ private:
   TConnectionProcessor                    _connectionProcessor;
   Mailbox*                                _currentMailbox;
   MenuEditControl*                        menuEdit;
+  QList <Mailbox*>                        _mailboxesList;
   /// Set to true when close event processing is in progress (it wasn't yet accepted nor ignored)
   bool                                    _isClosing;
 }; //KeyhoteeMainWindow

@@ -212,7 +212,11 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->inbox_page->initial(_connectionProcessor, _inbox_model, Mailbox::Inbox, this);
   ui->draft_box_page->initial(_connectionProcessor, _draft_model, Mailbox::Drafts, this);
   ui->out_box_page->initial(_connectionProcessor, _pending_model, Mailbox::Outbox, this);
-  ui->sent_box_page->initial(_connectionProcessor, _sent_model, Mailbox::Sent, this);
+  ui->sent_box_page->initial(_connectionProcessor, _sent_model, Mailbox::Sent, this);  
+  _mailboxesList.push_back (ui->inbox_page);
+  _mailboxesList.push_back (ui->draft_box_page);
+  _mailboxesList.push_back (ui->out_box_page);
+  _mailboxesList.push_back (ui->sent_box_page);
 
   ui->widget_stack->setCurrentWidget(ui->inbox_page);
   ui->actionDelete->setShortcut(QKeySequence::Delete);
@@ -390,33 +394,17 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
   if (selected_items.size() )
   {
     disconnect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onRemoveContact()));
-    disconnect(ui->actionDelete, SIGNAL(triggered()), ui->inbox_page, SLOT(onDeleteMail()));
-    disconnect(ui->actionDelete, SIGNAL(triggered()), ui->draft_box_page, SLOT(onDeleteMail()));
-    disconnect(ui->actionDelete, SIGNAL(triggered()), ui->out_box_page, SLOT(onDeleteMail()));
-    disconnect(ui->actionDelete, SIGNAL(triggered()), ui->sent_box_page, SLOT(onDeleteMail()));
     disconnect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onDeleteAuthorizationItem()));
-
-    disconnect(ui->actionReply, SIGNAL(triggered()), ui->inbox_page, SLOT(onReplyMail()));
-    disconnect(ui->actionReply_all, SIGNAL(triggered()), ui->inbox_page, SLOT(onReplyAllMail()));
-    disconnect(ui->actionForward, SIGNAL(triggered()), ui->inbox_page, SLOT(onForwardMail()));
-
-    disconnect(ui->actionReply, SIGNAL(triggered()), ui->draft_box_page, SLOT(onReplyMail()));
-    disconnect(ui->actionReply_all, SIGNAL(triggered()), ui->draft_box_page, SLOT(onReplyAllMail()));
-    disconnect(ui->actionForward, SIGNAL(triggered()), ui->draft_box_page, SLOT(onForwardMail()));
-
-    disconnect(ui->actionReply, SIGNAL(triggered()), ui->out_box_page, SLOT(onReplyMail()));
-    disconnect(ui->actionReply_all, SIGNAL(triggered()), ui->out_box_page, SLOT(onReplyAllMail()));
-    disconnect(ui->actionForward, SIGNAL(triggered()), ui->out_box_page, SLOT(onForwardMail()));
-
-    disconnect(ui->actionReply, SIGNAL(triggered()), ui->sent_box_page, SLOT(onReplyMail()));
-    disconnect(ui->actionReply_all, SIGNAL(triggered()), ui->sent_box_page, SLOT(onReplyAllMail()));
-    disconnect(ui->actionForward, SIGNAL(triggered()), ui->sent_box_page, SLOT(onForwardMail()));
-
     disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
-    disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->inbox_page, SLOT(on_actionShow_details_toggled(bool)));
-    disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->draft_box_page, SLOT(on_actionShow_details_toggled(bool)));
-    disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->out_box_page, SLOT(on_actionShow_details_toggled(bool)));
-    disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->sent_box_page, SLOT(on_actionShow_details_toggled(bool)));
+
+    for (Mailbox* mailBox : _mailboxesList)
+    {
+      disconnect(ui->actionDelete, SIGNAL(triggered()), mailBox, SLOT(onDeleteMail()));
+      disconnect(ui->actionReply, SIGNAL(triggered()), mailBox, SLOT(onReplyMail()));
+      disconnect(ui->actionReply_all, SIGNAL(triggered()), mailBox, SLOT(onReplyAllMail()));
+      disconnect(ui->actionForward, SIGNAL(triggered()), mailBox, SLOT(onForwardMail()));
+      disconnect(ui->actionShow_details, SIGNAL(toggled(bool)), mailBox, SLOT(on_actionShow_details_toggled(bool)));
+    }
 
     setEnabledDeleteOption (false);
     setEnabledAttachmentSaveOption(false);
@@ -1158,6 +1146,11 @@ void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
     _isClosing = true;
 
     writeSettings ();
+    for (Mailbox* mailBox : _mailboxesList)
+    {
+      mailBox->writeSettings ();
+    }
+
     closeEvent->accept();
     ATopLevelWindowsContainer::closeEvent(closeEvent);
     }
@@ -1288,18 +1281,6 @@ void KeyhoteeMainWindow::onRemoveContact()
          _currentMailbox->checksendmailbuttons();
        emit checkSendMailSignal();
   }
-}
-
-void KeyhoteeMainWindow::getMailBoxSettings (MailSettings* mailSettings)
-{
-  mailSettings->sortColumnInbox = ui->inbox_page->getSortedColumn ();
-  mailSettings->sortOrderInbox = ui->inbox_page->getSortOrder ();
-  mailSettings->sortColumnSent = ui->sent_box_page->getSortedColumn ();
-  mailSettings->sortOrderSent = ui->sent_box_page->getSortOrder ();
-  mailSettings->sortColumnDraft = ui->draft_box_page->getSortedColumn ();
-  mailSettings->sortOrderDraft = ui->draft_box_page->getSortOrder ();
-  mailSettings->sortColumnOutbox = ui->out_box_page->getSortedColumn ();
-  mailSettings->sortOrderOutbox = ui->out_box_page->getSortOrder ();
 }
 
 void KeyhoteeMainWindow::keyPressEvent(QKeyEvent *key_event)
