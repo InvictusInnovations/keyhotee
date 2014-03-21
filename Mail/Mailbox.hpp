@@ -46,20 +46,6 @@ public:
   void selectAll ();
   void checksendmailbuttons();
 
-private slots:
-  void onDoubleClickedItem(QModelIndex);
-
-private:
-  enum ReplyType { reply, reply_all, forward };
-  void setupActions();
-  QModelIndex getSelectedMail();
-  void showCurrentMail(const QModelIndex &selected, const QModelIndex &deselected);
-  void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-  void selectNextRow(int idx, int deletedRowCount) const;
-  void duplicateMail(ReplyType);
-  bool getSelectedMessageData (IMailProcessor::TStoredMailMessage* encodedMsg,
-                             IMailProcessor::TPhysicalMailMessage* decodedMsg);
-
 public slots:
   void onReplyMail()
     {
@@ -79,6 +65,21 @@ public slots:
 public slots:
   void onDeleteMail();
   void on_actionShow_details_toggled(bool checked);
+
+private slots:
+  void onDoubleClickedItem(QModelIndex);
+
+private:
+  enum ReplyType { reply, reply_all, forward };
+  void setupActions();
+  QModelIndex getSelectedMail();
+  void showCurrentMail(const QModelIndex &selected, const QModelIndex &deselected);
+  void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  void selectNextRow(int idx, int deletedRowCount) const;
+  void duplicateMail(ReplyType);
+  bool getSelectedMessageData (IMailProcessor::TStoredMailMessage* encodedMsg,
+                             IMailProcessor::TPhysicalMailMessage* decodedMsg);
+
 private:
   QSortFilterProxyModel* sortedModel();
   /// Don't change 'ui' declaration since it breaks QTCreator tools 
@@ -91,5 +92,5 @@ private:
   QAction*                     reply_all_mail;
   QAction*                     forward_mail;
   QAction*                     delete_mail;
-  bool                        _attachmentSelected;
+  bool                         _attachmentSelected;
 };

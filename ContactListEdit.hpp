@@ -6,6 +6,7 @@
 #include <bts/addressbook/contact.hpp>
 
 class QCompleter;
+class QModelIndex;
 class AddressBookModel;
 class TContactCompletionModel;
 

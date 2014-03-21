@@ -311,6 +311,11 @@ set( sources
         Mail/TMessageEdit.hpp
         Mail/TMessageEdit.cpp
 
+        Mail/MailTable.hpp
+        Mail/MailTable.cpp
+        Mail/ShowColumnAction.hpp
+        Mail/ShowColumnAction.cpp
+
         KeyhoteeApplication.hpp
         KeyhoteeApplication.cpp
 
@@ -547,9 +552,9 @@ INSTALL(FILES ${FC_SHARED_LIBRARIES_RELEASE} DESTINATION . CONFIGURATIONS RelWit
 INSTALL(FILES ${FC_SHARED_LIBRARIES_DEBUG} DESTINATION . CONFIGURATIONS Debug)
 
 IF(WIN32)
-  #TODO figure out how to remove /bin copies this makes
+  set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .) # copy the msvcrt files to the top-level directory instead of bin
   include(InstallRequiredSystemLibraries)
-  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION . COMPONENT Libraries)
+  #INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION . COMPONENT Libraries)
   INSTALL(FILES ${CRASHRPT_BINARIES_TO_INSTALL} DESTINATION . CONFIGURATIONS RelWithDebinfo)
 ENDIF()
 
