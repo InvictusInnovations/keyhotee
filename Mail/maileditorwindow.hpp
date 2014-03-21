@@ -181,6 +181,8 @@ class MailEditorMainWindow : public ATopLevelWindow
     QFontComboBox*                   FontCombo;
     QComboBox*                       FontSize;
     bool                             EditMode;
+    fc::uint256                      _src_msg_id;
+    IMailProcessor::TMsgType         _msg_type;
   };
 
 #endif ///__MAILEDITORWINDOW_HPP

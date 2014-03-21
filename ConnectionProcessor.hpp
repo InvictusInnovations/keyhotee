@@ -31,10 +31,10 @@ class TConnectionProcessor : public IMailProcessor,
   /// IMailProcessor interface implementation:
     /// \see IMailProcessor interface description.
     virtual void Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TStoredMailMessage* savedDraftMsg) override;
+      const TMsgType msg_type, const TStoredMailMessage* savedDraftMsg) override;
     /// \see IMailProcessor interface description.
     virtual TStoredMailMessage Save(const TIdentity& senderId, const TPhysicalMailMessage& srcMsg,
-      const TStoredMailMessage* msgBeingReplaced) override;
+      const TMsgType msg_type, const TStoredMailMessage* msgBeingReplaced) override;
 
   /// IConnectionStatusDataSource interface implementation:
     /// \see IConnectionStatusDataSource interface description.
@@ -73,6 +73,8 @@ class TConnectionProcessor : public IMailProcessor,
     virtual void received_email(const bts::bitchat::decrypted_message& msg) override;
     /// \see application_delegate interface description.
     virtual void received_request( const bts::bitchat::decrypted_message& msg) override;
+    /// \see application_delegate interface description.
+    virtual void received_unsupported_msg( const bts::bitchat::decrypted_message& msg) override;
     /// \see application_delegate interface description.
     virtual void message_transmission_finished(bool success) override;
 

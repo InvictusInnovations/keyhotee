@@ -94,6 +94,8 @@ private:
   /// \see IGuiUpdateSink interface description.
   virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) override;
   /// \see IGuiUpdateSink interface description.
+  virtual void OnReceivedUnsupportedMessage(const TDecryptedMessage& msg) override;
+  /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSaving() override;
   /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSaved(const TStoredMailMessage& msg,

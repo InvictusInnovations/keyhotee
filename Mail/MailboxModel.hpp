@@ -27,6 +27,7 @@ public:
     Read,
     Money,
     Attachment,
+    Reply,
     Chat,
     From,
     Subject,
@@ -73,6 +74,8 @@ private:
   bool fillMailHeader(const bts::bitchat::message_header& header, MessageHeader& mail_header);
 
   void readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db);
+
+  bts::bitchat::private_email_message1 unpack(const bts::bitchat::message_header& header) const;
 
   std::unique_ptr<Detail::MailboxModelImpl> my;
 };

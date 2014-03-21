@@ -206,6 +206,7 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
   EditMode(editMode)
   {
   ui->setupUi(this);
+  _msg_type = IMailProcessor::TMsgType::Normal;
 
   /** Disable these toolbars by default. They should be showed up on demand, when given action will
       be trigerred.
@@ -320,11 +321,20 @@ void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessag
       DraftMessage = srcMsgHeader;
       /// Now load source message contents into editor controls.
       loadContents(srcMsgHeader.from_key, srcMsg);
+      _src_msg_id = srcMsgHeader.digest;
+      if(srcMsgHeader.isTempReply())
+        _msg_type = IMailProcessor::TMsgType::Reply;
+      else if(srcMsgHeader.isTempForwa())
+        _msg_type = IMailProcessor::TMsgType::Forward;
+      else
+        _msg_type = IMailProcessor::TMsgType::Normal;
       break;
     case TLoadForm::ReplyAll:
       transformRecipientList(srcMsgHeader.from_key, srcMsg.to_list, srcMsg.cc_list);
       newSubject = transformMailBody(loadForm, srcMsgHeader, srcMsg);
       MailFields->SetSubject(newSubject);
+      _src_msg_id = srcMsgHeader.digest;
+      _msg_type = IMailProcessor::TMsgType::Reply;
       break;
     case TLoadForm::Reply:
       if(srcMsg.to_list.empty() == false)
@@ -332,11 +342,15 @@ void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessag
       transformRecipientList(srcMsgHeader.from_key, sourceToList, sourceCCList);
       newSubject = transformMailBody(loadForm, srcMsgHeader, srcMsg);
       MailFields->SetSubject(newSubject);
+      _src_msg_id = srcMsgHeader.digest;
+      _msg_type = IMailProcessor::TMsgType::Reply;
       break;
     case TLoadForm::Forward:
       FileAttachment->LoadAttachedFiles(srcMsg.attachments);
       newSubject = transformMailBody(loadForm, srcMsgHeader, srcMsg);
       MailFields->SetSubject(newSubject);
+      _src_msg_id = srcMsgHeader.digest;
+      _msg_type = IMailProcessor::TMsgType::Forward;
       break;
     default:
       assert(false);
@@ -479,6 +493,8 @@ bool MailEditorMainWindow::prepareMailMessage(TPhysicalMailMessage* storage)
   MailFields->FillRecipientLists(&storage->to_list, &storage->cc_list, &storage->bcc_list);
   storage->body = ui->messageEdit->document()->toHtml().toStdString();
 
+  storage->src_msg_id = _src_msg_id;
+
   typedef TFileAttachmentWidget::TFileInfoList TFileInfoList;
   TFileInfoList brokenFileInfos;
   if(FileAttachment->GetAttachedFiles(&storage->attachments, &brokenFileInfos) == false)
@@ -580,7 +596,7 @@ bool MailEditorMainWindow::onSave()
 
     //DLN we should probably add get_pointer implementation to fc::optional to avoid code like this
     TStoredMailMessage* oldMessage = DraftMessage.valid() ? &(*DraftMessage) : nullptr;
-    DraftMessage = MailProcessor.Save(senderId, msg, oldMessage);
+    DraftMessage = MailProcessor.Save(senderId, msg, _msg_type, oldMessage);
     }
 
   ui->messageEdit->document()->setModified(false);
@@ -718,7 +734,7 @@ void MailEditorMainWindow::on_actionSend_triggered()
       return;
 
     const IMailProcessor::TIdentity& senderId = MailFields->GetSenderIdentity();
-    MailProcessor.Send(senderId, msg, DraftMessage.valid() ? &(*DraftMessage) : nullptr);
+    MailProcessor.Send(senderId, msg, _msg_type, DraftMessage.valid() ? &(*DraftMessage) : nullptr);
     /// Clear potential modified flag to avoid asking for saving changes.
     ui->messageEdit->document()->setModified(false);
     close();

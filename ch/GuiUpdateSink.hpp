@@ -39,6 +39,7 @@ class IGuiUpdateSink
     typedef IMailProcessor::TRecipientPublicKey           TRecipientPublicKey;
     typedef IMailProcessor::TStoredMailMessage            TStoredMailMessage;
     typedef fc::time_point_sec                            TTime;
+    typedef bts::bitchat::decrypted_message               TDecryptedMessage;
 
   /// Receiving chat messages:
     virtual void OnReceivedChatMessage(const TContact& sender, const TChatMessage& msg,
@@ -50,6 +51,10 @@ class IGuiUpdateSink
   /// Receiving mail messages:
     /// Notifies about received mail message.
     virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) = 0;
+
+  /// Receiving unsupported message:
+    /// Notifies about received unsupported message.
+    virtual void OnReceivedUnsupportedMessage(const TDecryptedMessage& msg) = 0;
 
   /// Saving Drafts operation group:
     /// Notifies about start of message save operation

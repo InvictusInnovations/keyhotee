@@ -67,7 +67,7 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
       {
       /// Leave it as autoconnction to decide by QT engine how signal transmission should be done
       connect(this, SIGNAL(notificationSent(ANotification*)), &Receiver,
-        SLOT(notificationReceived(ANotification*)));
+        SLOT(notificationReceived(ANotification*)), Qt::ConnectionType::QueuedConnection);
       }
 
     virtual ~TThreadSafeGuiNotifier() {}
@@ -81,6 +81,8 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
       const TStoredMailMessage& header) override;
     /// \see IGuiUpdateSink interface description.
     virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) override;
+    /// \see IGuiUpdateSink interface description.
+    virtual void OnReceivedUnsupportedMessage(const TDecryptedMessage& msg) override;
     /// \see IGuiUpdateSink interface description.
     virtual void OnMessageSaving() override;
     /// \see IGuiUpdateSink interface description.
@@ -180,6 +182,30 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
 
       private:
         TStoredMailMessage Msg;
+      };
+
+    class TReceivedUnsupportedMsg : public ANotification
+      {
+      public:
+        static ANotification* Create(const TDecryptedMessage& msg, IGuiUpdateSink& sink)
+          {
+          return new TReceivedUnsupportedMsg(msg, sink);
+          }
+
+      /// ANotification class reimplementation:
+        virtual void Notify()
+          {
+          Sink.OnReceivedUnsupportedMessage(Msg);
+          delete this;
+          }
+
+      private:
+        TReceivedUnsupportedMsg(const TDecryptedMessage& msg, IGuiUpdateSink& sink) :
+          ANotification(sink), Msg(msg) {}
+        virtual ~TReceivedUnsupportedMsg() {}
+
+      private:
+        TDecryptedMessage Msg;
       };
 
     class TNoDataNotification : public ANotification
@@ -367,6 +393,12 @@ void TConnectionProcessor::TThreadSafeGuiNotifier::OnReceivedMailMessage(const T
   emit notificationSent(n);
   }
 
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnReceivedUnsupportedMessage(const bts::bitchat::decrypted_message& msg)
+  {
+    ANotification* n = TReceivedUnsupportedMsg::Create(msg, Sink);
+    emit notificationSent(n);
+  }
+
 void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageSaving()
   {
   ANotification* n = TNoDataNotification::Create([=]() {Sink.OnMessageSaving();}, Sink);
@@ -453,7 +485,7 @@ class TConnectionProcessor::TOutboxQueue
                                folder).
     */
     void AddPendingMessage(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-      const TStoredMailMessage* savedDraftMsg);
+      const TMsgType msg_type, const TStoredMailMessage* savedDraftMsg);
 
     bool AnyOperationsPending() const;
 
@@ -562,13 +594,26 @@ class TConnectionProcessor::TOutboxQueue
   };
 
 void TConnectionProcessor::TOutboxQueue::AddPendingMessage(const TIdentity& senderId,
-  const TPhysicalMailMessage& msg, const TStoredMailMessage* savedDraftMsg)
+  const TPhysicalMailMessage& msg, const TMsgType msg_type, const TStoredMailMessage* savedDraftMsg)
   {
   std::lock_guard<std::mutex> guard(OutboxDbLock);
 
   TStorableMessage storableMsg;
   Processor.PrepareStorableMessage(senderId, msg, &storableMsg);
   TStoredMailMessage storedMsg = Outbox->store_message(storableMsg, nullptr);
+  switch (msg_type)
+  {
+    case TMsgType::Reply:
+      storedMsg.setTempReply();
+      break;
+    case TMsgType::Forward:
+      storedMsg.setTempForwa();
+      break;
+    default:
+      storedMsg.clearTemp();
+      break;
+  }
+  Outbox->store_message_header(storedMsg);
   Processor.Sink->OnMessagePending(storedMsg, savedDraftMsg);
 
   /// Try to start thread checking connection and next potential transmission
@@ -779,6 +824,7 @@ void TConnectionProcessor::TOutboxQueue::moveMsgToSentDB(const TStoredMailMessag
     Processor.PrepareStorableMessage(id, sentMsg, &storableMsg);
 
     TStoredMailMessage savedMsg = Sent->store_message(storableMsg, nullptr);
+    // [GS] - set Reply or Forward flag for source message
     Processor.Sink->OnMessageSent(pendingMsg, savedMsg);
 
     std::lock_guard<std::mutex> guard(OutboxDbLock);
@@ -821,14 +867,14 @@ TConnectionProcessor::~TConnectionProcessor()
   }
 
 void TConnectionProcessor::Send(const TIdentity& senderId, const TPhysicalMailMessage& msg,
-  const TStoredMailMessage* savedDraftMsg)
+  const TMsgType msg_type, const TStoredMailMessage* savedDraftMsg)
   {
-  OutboxQueue->AddPendingMessage(senderId, msg, savedDraftMsg);
+  OutboxQueue->AddPendingMessage(senderId, msg, msg_type, savedDraftMsg);
   }
 
 IMailProcessor::TStoredMailMessage 
 TConnectionProcessor::Save(const TIdentity& senderId, const TPhysicalMailMessage& sourceMsg,
-  const TStoredMailMessage* msgBeingReplaced)
+  const TMsgType msg_type, const TStoredMailMessage* msgBeingReplaced)
   {
   Sink->OnMessageSaving();
 
@@ -839,6 +885,19 @@ TConnectionProcessor::Save(const TIdentity& senderId, const TPhysicalMailMessage
   //time when this version of draft email is being saved.
   storableMsg.sig_time = fc::time_point::now();
   TStoredMailMessage savedMsg = Drafts->store_message(storableMsg,msgBeingReplaced);
+  switch (msg_type)
+  {
+    case TMsgType::Reply:
+      savedMsg.setTempReply();
+      break;
+    case TMsgType::Forward:
+      savedMsg.setTempForwa();
+      break;
+    default:
+      savedMsg.clearTemp();
+      break;
+  }
+  Drafts->store_message_header(savedMsg);
   Sink->OnMessageSaved(savedMsg, msgBeingReplaced);
   return savedMsg;
   }
@@ -965,6 +1024,11 @@ void TConnectionProcessor::received_request(const bts::bitchat::decrypted_messag
     elog("${e}", ("e", e.to_detail_string()));
     }
   }
+
+void TConnectionProcessor::received_unsupported_msg(const bts::bitchat::decrypted_message& msg)
+{
+  Sink->OnReceivedUnsupportedMessage(msg);
+}
 
 void TConnectionProcessor::message_transmission_finished(bool success)
   {

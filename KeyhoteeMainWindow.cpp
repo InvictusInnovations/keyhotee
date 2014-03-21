@@ -1054,6 +1054,12 @@ void KeyhoteeMainWindow::OnReceivedMailMessage(const TStoredMailMessage& msg)
   _inbox_model->addMailHeader(msg);
   }
 
+void KeyhoteeMainWindow::OnReceivedUnsupportedMessage(const TDecryptedMessage& msg)
+{
+  QMessageBox::warning(this, tr("Keyhotee Warning"),
+    tr("Received unsupported message.\nIt's strongly recommended to update application"));
+}
+
 void KeyhoteeMainWindow::OnMessageSaving()
 {
   statusBar()->showMessage(tr("Saving a mail message into Draft folder..."), 1000);
