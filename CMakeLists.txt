@@ -15,7 +15,7 @@ cmake_minimum_required( VERSION 2.8.12.1 )
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "6")
-set(VERSION_PATCH "2")
+set(VERSION_PATCH "3")
 
 
 SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
