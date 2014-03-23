@@ -1,13 +1,16 @@
 #pragma once
 
+#include <QList>
 #include <QWidget>
 
 namespace Ui { class Mailbox; }
 
 #include "ch/mailprocessor.hpp"
 
+#include "MailboxModel.hpp"
+#include "MailTable.hpp"
+
 class ATopLevelWindowsContainer;
-class MailboxModel;
 
 class QAbstractItemModel;
 class QItemSelection;
@@ -72,12 +75,6 @@ private slots:
   void onDoubleClickedItem(QModelIndex);
 
 private:
-  struct Settings
-  {
-    int           sortColumn;
-    Qt::SortOrder sortOrder;
-  };
-
   enum ReplyType { reply, reply_all, forward };
   void setupActions();
   QModelIndex getSelectedMail();
@@ -86,9 +83,20 @@ private:
   void selectNextRow(int idx, int deletedRowCount) const;
   void duplicateMail(ReplyType);
   bool getSelectedMessageData (IMailProcessor::TStoredMailMessage* encodedMsg,
-                             IMailProcessor::TPhysicalMailMessage* decodedMsg);
+                               IMailProcessor::TPhysicalMailMessage* decodedMsg);
   /// Read mail box settings from the system registry
-  void readSettings();
+  void readSettings(MailTable::InitialSettings* initSettings);
+
+  /** Each column encode to one bit: 1 << columnType
+      Return shift bit array of selected columns
+  */
+  unsigned int encodeSelectedColumns();
+
+  /// Decode columns from bit array to list of columns
+  void decodeSelectedColumns(unsigned int columnsEncode/*in*/, 
+                             QList<MailboxModel::Columns>* columnsDecode/*out*/);
+
+  void getDefaultColumns(QList<MailboxModel::Columns>* defaultColumns);
 
 private:
   QSortFilterProxyModel* sortedModel();
@@ -103,5 +111,4 @@ private:
   QAction*                     forward_mail;
   QAction*                     delete_mail;
   bool                         _attachmentSelected;
-  Settings                     _settings;
 };

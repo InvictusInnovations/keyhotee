@@ -5,7 +5,6 @@
 #include "ATopLevelWindowsContainer.hpp"
 #include "FileAttachmentDialog.hpp"
 #include "KeyhoteeMainWindow.hpp"
-#include "MailboxModel.hpp"
 #include "maileditorwindow.hpp"
 
 #include <bts/profile.hpp>
@@ -136,52 +135,37 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
   _mailProcessor = &mailProcessor;
   _mainWindow = parentKehoteeMainW;
 
-  readSettings();
+  MailTable::InitialSettings settings;
+  readSettings(&settings);
 
   //enable sorting the mailbox
   QSortFilterProxyModel* proxyModel = new MailSortFilterProxyModel();
   proxyModel->setSourceModel(model);
   ui->inbox_table->setModel(proxyModel);
 
-  ui->inbox_table->setShowGrid(false);
-
-  ui->inbox_table->verticalHeader()->setDefaultSectionSize(20);
-
   QHeaderView *horHeader = ui->inbox_table->horizontalHeader();
 
-  horHeader->resizeSection(MailboxModel::To, 120);
-  horHeader->resizeSection(MailboxModel::Subject, 300);
-  horHeader->resizeSection(MailboxModel::DateReceived, 140);
-  horHeader->resizeSection(MailboxModel::From, 120);
-  horHeader->resizeSection(MailboxModel::DateSent, 140);
   if (_type == Inbox)
     {
-    horHeader->hideSection(MailboxModel::Status);
-    horHeader->hideSection(MailboxModel::DateReceived);       
     }
   else if (_type == Sent)
     {
     horHeader->swapSections(MailboxModel::To, MailboxModel::From);
     horHeader->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
-    horHeader->hideSection(MailboxModel::DateReceived);
     }
   else if (_type == Drafts)
     {
     horHeader->swapSections(MailboxModel::To, MailboxModel::From);
     horHeader->swapSections(MailboxModel::DateReceived, MailboxModel::DateSent);
-    horHeader->hideSection(MailboxModel::DateReceived);
-    horHeader->hideSection(MailboxModel::Status);
     }
   else if (_type == Outbox)
     {
-    }
+    }  
 
-  ui->inbox_table->sortByColumn(_settings.sortColumn, _settings.sortOrder);
-
-  horHeader->setSectionsMovable(true);
-  horHeader->setSortIndicatorShown(true);
-  horHeader->setSectionsClickable(true);
-  horHeader->setHighlightSections(true);
+  
+  QList<MailboxModel::Columns> defaultColumns;
+  getDefaultColumns(&defaultColumns);
+  ui->inbox_table->initial(settings, defaultColumns);
 
   //connect signals for the new selection model (created by setModel call)
   QItemSelectionModel* inbox_selection_model = ui->inbox_table->selectionModel();
@@ -193,18 +177,6 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
   connect(reply_all_mail, &QAction::triggered, this, &Mailbox::onReplyAllMail);
   connect(forward_mail, &QAction::triggered, this, &Mailbox::onForwardMail);
   connect(delete_mail, &QAction::triggered, this, &Mailbox::onDeleteMail);
-
-  // hidden Coin Attachment Column
-  ui->inbox_table->hideColumn(MailboxModel::Money);
-  // hidden Chat Column
-  ui->inbox_table->hideColumn(MailboxModel::Chat);
-
-  // for now create menu actions only for Inbox
-  if (_type == Inbox)
-    {
-    //it should be called after the horHeader->hideSection, ui->inbox_table->hideColumn
-    ui->inbox_table->initialActions();
-    }
   }
 
 void Mailbox::setupActions()
@@ -428,14 +400,15 @@ void Mailbox::writeSettings()
   //MailBox type
   settings.beginGroup( QString::number(_type) );
 
-  settings.setValue("sortColumn", ui->inbox_table->horizontalHeader()->sortIndicatorSection());
-  settings.setValue("sortOrder", ui->inbox_table->horizontalHeader()->sortIndicatorOrder());
-
+  settings.setValue("SortColumn", ui->inbox_table->horizontalHeader()->sortIndicatorSection());
+  settings.setValue("SortOrder", ui->inbox_table->horizontalHeader()->sortIndicatorOrder());
+  settings.setValue("SelectedColumns", encodeSelectedColumns());
+  
   settings.endGroup();
   settings.endGroup();
 }
 
-void Mailbox::readSettings()
+void Mailbox::readSettings(MailTable::InitialSettings* initSettings)
 {
   QSettings settings("Invictus Innovations", "Keyhotee");
 
@@ -443,9 +416,76 @@ void Mailbox::readSettings()
   //MailBox type
   settings.beginGroup( QString::number(_type) );  
 
-  _settings.sortColumn = settings.value("sortColumn", QVariant(0)).toInt();
-  _settings.sortOrder = static_cast<Qt::SortOrder>( settings.value("sortOrder", QVariant(0)).toInt() );
+  initSettings->sortColumn = settings.value("SortColumn", QVariant(0)).toInt();
+  initSettings->sortOrder = static_cast<Qt::SortOrder>( settings.value("SortOrder", QVariant(0)).toInt() );
+
+  unsigned int columnsEncode = settings.value("SelectedColumns", QVariant(0)).toUInt();
+  decodeSelectedColumns(columnsEncode, &initSettings->columns);
 
   settings.endGroup();
   settings.endGroup();
+}
+
+unsigned int Mailbox::encodeSelectedColumns()
+{
+  QHeaderView* header = ui->inbox_table->horizontalHeader();
+  unsigned int columnsCount = header->count(); 
+  unsigned int selectedColumns = 0x0000;
+
+  //max columns = 32, 
+  //each column encode to one bit  
+  assert (selectedColumns * 8/*bits*/ < columnsCount);
+  for (unsigned int i = 0; i < columnsCount; ++i)
+  {
+    // physical index convsrt to logical index
+    int columnType = header->logicalIndex (i/*visualIndex*/);
+    if (!header->isSectionHidden(columnType) )
+    {
+      selectedColumns |= 1 << columnType;
+    }
+  }
+
+  return selectedColumns;
+}
+
+void Mailbox::decodeSelectedColumns(unsigned int columnsEncode, 
+                             QList<MailboxModel::Columns>* columnsDecode)
+{
+
+  for (unsigned int i = 0; i < MailboxModel::NumColumns; ++i)
+  {
+    if ( (1 << i) & columnsEncode )
+      columnsDecode->push_back(static_cast<MailboxModel::Columns>(i));
+  }
+}
+
+void Mailbox::getDefaultColumns(QList<MailboxModel::Columns>* defaultColumns)
+{
+  defaultColumns->push_back(MailboxModel::Read);
+  //defaultColumns->push_back(MailboxModel::Money);
+  defaultColumns->push_back(MailboxModel::Attachment);
+  //defaultColumns->push_back(MailboxModel::Reply);
+  //defaultColumns->push_back(MailboxModel::Chat);
+  defaultColumns->push_back(MailboxModel::From);
+  defaultColumns->push_back(MailboxModel::Subject);
+  //defaultColumns->push_back(MailboxModel::DateReceived);
+  defaultColumns->push_back(MailboxModel::To);
+  defaultColumns->push_back(MailboxModel::DateSent);
+  //defaultColumns->push_back(MailboxModel::Status);
+                                          
+  if (_type == Inbox)                     
+  {
+  }
+  else if (_type == Sent)
+  {
+    defaultColumns->push_back(MailboxModel::Status);
+  }
+  else if (_type == Drafts)
+  {
+  }
+  else if (_type == Outbox)
+  {
+    defaultColumns->push_back(MailboxModel::DateReceived);
+    defaultColumns->push_back(MailboxModel::Status);
+  }
 }
