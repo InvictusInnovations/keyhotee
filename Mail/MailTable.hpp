@@ -28,6 +28,8 @@ public:
 private slots:
   /// \see ShowColumnAction::showColumn signal description.
   void onShowColumn(bool visible, MailboxModel::Columns column);
+  /// Show default columns in the current mail box
+  void onRestoreDefaultColumns();
 
 private:
   void setupActions();
@@ -38,5 +40,6 @@ private:
   QString getDefaultActionName(MailboxModel::Columns columnType);
 
 private:
-  QList<MailboxModel::Columns> _defaultColumns;
+  QList<MailboxModel::Columns>  _defaultColumns;  
+  ShowColumnAction* _columnActionArray[MailboxModel::NumColumns];
 };

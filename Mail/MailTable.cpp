@@ -58,29 +58,44 @@ void MailTable::setupActions()
 {
   for (uint i = 0; i < MailboxModel::NumColumns; ++i)
   {
-    // Do not let hide the column Subject
-    if (i != MailboxModel::Subject)
-    { 
-      initializeAction ( static_cast<MailboxModel::Columns>(i) );
-    }
+    initializeAction ( static_cast<MailboxModel::Columns>(i) );
   }
+
+  QAction* sep = new QAction(this);
+  sep->setSeparator(true);
+  QAction* restoreDefaultColumns = new QAction(tr("Restore default"), this);
+  
+  horizontalHeader()->addAction(sep);
+  horizontalHeader()->addAction(restoreDefaultColumns);
+  connect(restoreDefaultColumns, &QAction::triggered, 
+          this, &MailTable::onRestoreDefaultColumns);
 }
 
 void MailTable::initializeAction(MailboxModel::Columns columnType)
 {
   const QAbstractItemModel *model = this->model();  
-  QString columnName = model->headerData (columnType, 
-                                          Qt::Horizontal, Qt::DisplayRole).toString();
+  QString columnName = model->headerData (columnType, Qt::Horizontal,
+                                          Qt::DisplayRole).toString();
   if (columnName.isEmpty())
   {
     // when column name is empty call getDefaultActionName.
     // Case for the column e.g. "Read", "Money"
     columnName = getDefaultActionName(columnType);
   }
-  ShowColumnAction* action = new ShowColumnAction(columnName, this, columnType, 
-                                                  isColumnHidden(columnType) == false);
   
-  connect(action,  SIGNAL( showColumn(bool, MailboxModel::Columns) ), 
+  ShowColumnAction *action = 
+                  new ShowColumnAction(columnName, this, columnType, 
+                                       isColumnHidden(columnType) == false);
+  // Do not let hide the column Subject.
+  // That although one column was visible.
+  if (columnType == MailboxModel::Subject)
+  {
+    action->setVisible(false);
+  }
+
+  _columnActionArray[columnType] = action;
+  
+  connect(action, SIGNAL( showColumn(bool, MailboxModel::Columns) ), 
           this, SLOT( onShowColumn(bool, MailboxModel::Columns) ));
 
   //add actions to horizontal header
@@ -110,4 +125,21 @@ QString MailTable::getDefaultActionName(MailboxModel::Columns columnType)
 void MailTable::onShowColumn(bool visible, MailboxModel::Columns column)
 {
   setColumnHidden(column, visible == false);
+}
+
+void MailTable::onRestoreDefaultColumns()
+{
+  QHeaderView *horHeader = horizontalHeader();
+
+  for (uint i = 0; i < MailboxModel::NumColumns; ++i)
+  {
+    horHeader->hideSection (i);
+    _columnActionArray[i]->setChecked(false);
+  }
+
+  for (const auto column : _defaultColumns)
+  {
+    horHeader->showSection (column);
+    _columnActionArray[column]->setChecked(true);
+  }  
 }
