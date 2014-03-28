@@ -17,7 +17,6 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QMimeData>
-#include <QTextDocumentFragment>
 #include <QToolBar>
 #include <QToolButton>
 
@@ -49,9 +48,11 @@ class TDocumentTransform
       const TPhysicalMailMessage& srcMsg, QTextDocument* doc);
 
   private:
+    /// Replace from plain text
     QTextCursor replace(const char* textToFind, const QString& replacement,
       const QTextCursor& startPos = QTextCursor());
-    QTextCursor replace(const char* textToFind, const QTextDocumentFragment& replacement,
+    /// Replace from html text
+    QTextCursor replaceHtml(const char* textToFind, const QString& replacementHtml,
       const QTextCursor& startPos = QTextCursor());
     /// Allows to remove whole line containing given text.
     void removeContainingLine(const char* textToFind, const QTextCursor& startPos = QTextCursor());
@@ -122,8 +123,7 @@ TDocumentTransform::Do(TLoadForm loadForm, const TStoredMailMessage& msgHeader,
 
   replace("$$SUBJECT$$", newSubject);
 
-  QTextDocumentFragment tf(QTextDocumentFragment::fromHtml(QString(srcMsg.body.c_str())));
-  replace("$$SOURCE_BODY$$", tf);
+  replaceHtml("$$SOURCE_BODY$$", srcMsg.body.c_str());
   
   return newSubject;
   }
@@ -152,8 +152,7 @@ QTextCursor TDocumentTransform::replace(const char* textToFind, const QString& r
   }
 
 inline
-QTextCursor 
-TDocumentTransform::replace(const char* textToFind, const QTextDocumentFragment& replacement,
+QTextCursor TDocumentTransform::replaceHtml(const char* textToFind, const QString& replacementHtml,
   const QTextCursor& startPos /*= QTextCursor()*/)
   {
   QTextCursor foundPos = find(textToFind, startPos);
@@ -162,7 +161,7 @@ TDocumentTransform::replace(const char* textToFind, const QTextDocumentFragment&
     {
     foundPos.beginEditBlock();
     foundPos.removeSelectedText();
-    foundPos.insertFragment(replacement);
+    foundPos.insertHtml(replacementHtml);
     foundPos.endEditBlock();
     }
 
