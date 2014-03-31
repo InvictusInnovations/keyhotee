@@ -70,7 +70,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   QString profileName = mainApp.getLoadedProfileName();
 
-  QString title = QString("%1 (%2)").arg(mainApp.getAppName().c_str()).arg(profileName);
+  QString title = QString("%1 v%2 (%3)").arg(mainApp.getAppName().c_str()).arg(mainApp.getVersionNumberString().c_str()).arg(profileName);
   setWindowTitle(title);
   setEnabledAttachmentSaveOption(false);
   setEnabledDeleteOption(false);
@@ -646,32 +646,44 @@ void KeyhoteeMainWindow::onDiagnostic()
 void KeyhoteeMainWindow::onAbout()
 {
   QString title(tr("About "));
-  title += windowTitle();
+  title += TKeyhoteeApplication::getInstance()->getAppName().c_str();
   QString text;
   text = tr("<p align='center'><b>");
-  text += windowTitle();
+  text += TKeyhoteeApplication::getInstance()->getAppName().c_str();
 /// Commented out to avoid difference against install package version.
-//  text += tr(" version ");
-//  text += tr(APPLICATION_VERSION);
+  text += tr(" version ");
+  text += tr(TKeyhoteeApplication::getInstance()->getVersionNumberString().c_str());
   text += tr("</b><br/><br/>");
   /// Build tag: <a href="https://github.com/InvictusInnovations/keyhotee/commit/xxxx">xxxx</a>
-  text += tr("keyhotee Built from revision: <a href=\"https://github.com/InvictusInnovations/keyhotee/commit/");
+  text += tr("<strong>keyhotee</strong> built from revision: <a href=\"https://github.com/InvictusInnovations/keyhotee/commit/");
   text += tr(g_GIT_SHA1);
   text += tr("\">");
-  text += tr(g_GIT_SHA1);
+  text += tr(std::string(g_GIT_SHA1).substr(0, 10).c_str());
   text += tr("</a>");
+  text += tr(" (<em>");
+  text += tr(fc::get_approximate_relative_time_string(fc::time_point_sec(g_GIT_UNIX_TIMESTAMP1)).c_str());
+  text += tr("</em>)");
   text += tr("<br/>");
-  text += tr("BitShares Built from revision: <a href=\"https://github.com/InvictusInnovations/BitShares/commit/");
+  text += tr("<br/>");
+  text += tr("<strong>BitShares</strong> built from revision: <a href=\"https://github.com/InvictusInnovations/BitShares/commit/");
   text += tr(g_GIT_SHA2);
   text += tr("\">");
-  text += tr(g_GIT_SHA2);
+  text += tr(std::string(g_GIT_SHA2).substr(0, 10).c_str());
   text += tr("</a>");
+  text += tr(" (<em>");
+  text += tr(fc::get_approximate_relative_time_string(fc::time_point_sec(g_GIT_UNIX_TIMESTAMP2)).c_str());
+  text += tr("</em>)");
   text += tr("<br/>");
-  text += tr("fc Built from revision: <a href=\"https://github.com/InvictusInnovations/fc/commit/");
+  text += tr("<br/>");
+  text += tr("<strong>fc</strong> built from revision: <a href=\"https://github.com/InvictusInnovations/fc/commit/");
   text += tr(g_GIT_SHA3);
   text += tr("\">");
-  text += tr(g_GIT_SHA3);
+  text += tr(std::string(g_GIT_SHA3).substr(0, 10).c_str());
   text += tr("</a>");
+  text += tr(" (<em>");
+  text += tr(fc::get_approximate_relative_time_string(fc::time_point_sec(g_GIT_UNIX_TIMESTAMP3)).c_str());
+  text += tr("</em>)");
+  text += tr("<br/>");
   text += tr("<br/>");
   text += tr("Invictus Innovations Inc<br/>");
   text += tr("<a href=\"http://invictus-innovations.com/keyhotee/\">http://invictus-innovations.com/keyhotee/</a>");

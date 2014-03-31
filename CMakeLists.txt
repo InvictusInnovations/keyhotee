@@ -120,6 +120,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/fc/GitVersi
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+get_git_unix_timestamp(GIT_UNIX_TIMESTAMP1)
 
 set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
 #message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})

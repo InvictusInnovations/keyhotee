@@ -1,4 +1,7 @@
+#include <sstream>
+
 #include "KeyhoteeApplication.hpp"
+#include "GitSHA1.h"
 
 #include "LoginDialog.hpp"
 #include "KeyhoteeMainWindow.hpp"
@@ -159,7 +162,13 @@ Q_IMPORT_PLUGIN(QOffscreenIntegrationPlugin)
 static TKeyhoteeApplication* s_Instance = nullptr;
 
 #define APP_NAME "Keyhotee"
-#define APP_VERSION "Alpha"
+
+static std::string CreateKeyhoteeVersionNumberString()
+{
+  std::ostringstream versionNumberStream;
+  versionNumberStream << g_KEYHOTEE_VERSION_MAJOR << "." << g_KEYHOTEE_VERSION_MINOR << "." << g_KEYHOTEE_VERSION_PATCH;
+  return versionNumberStream.str();
+}
 
 #define DEF_PROFILE_NAME "default"
 
@@ -195,7 +204,7 @@ int TKeyhoteeApplication::run(int& argc, char** argv)
 {
   ConfigureLoggingToTemporaryFile();
 
-  installCrashRptHandler(APP_NAME, APP_VERSION, gLogFile);
+  installCrashRptHandler(APP_NAME, CreateKeyhoteeVersionNumberString().c_str(), gLogFile);
 
   TKeyhoteeApplication app(argc, argv);
 
@@ -249,6 +258,13 @@ std::string TKeyhoteeApplication::getAppName() const
   return APP_NAME;
 }
 
+std::string TKeyhoteeApplication::getVersionNumberString() const
+{
+  return _keyhoteeVersionNumber;
+}
+
+
+
 TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv) 
 :QApplication(argc, argv),
  _loaded_profile_name(""),
@@ -258,6 +274,8 @@ TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv)
 {
   assert(s_Instance == nullptr && "Only one instance allowed at time");
   s_Instance = this;
+
+  _keyhoteeVersionNumber = CreateKeyhoteeVersionNumberString();
 
   /// Configure the application object
 #ifdef Q_OS_MAC
