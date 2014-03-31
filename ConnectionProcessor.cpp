@@ -1,6 +1,7 @@
 #include "ConnectionProcessor.hpp"
 
 #include "ch/GuiUpdateSink.hpp"
+#include "Mail/MailboxModel.hpp"
 
 #include <bts/application.hpp>
 #include <bts/bitchat/bitchat_private_message.hpp>
@@ -464,10 +465,11 @@ void TConnectionProcessor::TThreadSafeGuiNotifier::OnMissingSenderIdentity(
 class TConnectionProcessor::TOutboxQueue
   {
   public:
-    TOutboxQueue(TConnectionProcessor& processor, const bts::profile_ptr& profile) :
+    TOutboxQueue(TConnectionProcessor& processor, const bts::profile_ptr& profile, MailboxModelRoot* mail_model_root) :
       Processor(processor)
       {
       Profile = profile;
+      _mail_model_root = mail_model_root;
       App = bts::application::instance();
 
       Outbox = profile->get_pending_db();
@@ -591,6 +593,7 @@ class TConnectionProcessor::TOutboxQueue
     fc::future<void>       ConnectionCheckComplete;
     fc::promise<void>::ptr CancelPromise;
     mutable std::mutex     OutboxDbLock;
+    MailboxModelRoot*      _mail_model_root;
   };
 
 void TConnectionProcessor::TOutboxQueue::AddPendingMessage(const TIdentity& senderId,
@@ -825,6 +828,19 @@ void TConnectionProcessor::TOutboxQueue::moveMsgToSentDB(const TStoredMailMessag
 
     TStoredMailMessage savedMsg = Sent->store_message(storableMsg, nullptr);
     // [GS] - set Reply or Forward flag for source message
+    if(sentMsg.src_msg_id)
+    {
+      std::cout << "sentMsg.src_msg_id = " << sentMsg.src_msg_id->str() << "\n";
+      TMailMsgIndex src_msg = _mail_model_root->findSrcMail(*sentMsg.src_msg_id);
+
+      std::cout << src_msg.second.row() << "\n";
+
+      if(pendingMsg.isTempReply())
+        src_msg.first->markMessageAsReplied(src_msg.second);
+      if(pendingMsg.isTempForwa())
+        src_msg.first->markMessageAsForwarded(src_msg.second);
+    }
+
     Processor.Sink->OnMessageSent(pendingMsg, savedMsg);
 
     std::lock_guard<std::mutex> guard(OutboxDbLock);
@@ -842,7 +858,7 @@ void TConnectionProcessor::TOutboxQueue::moveMsgToSentDB(const TStoredMailMessag
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 TConnectionProcessor::TConnectionProcessor(IGuiUpdateSink& updateSink,
-  const bts::profile_ptr& loadedProfile) :
+  const bts::profile_ptr& loadedProfile, MailboxModelRoot* mail_model_root) :
   Profile(loadedProfile),
   TransmissionCancelled(false),
   ReceivingMail(false)
@@ -854,7 +870,7 @@ TConnectionProcessor::TConnectionProcessor(IGuiUpdateSink& updateSink,
   App->set_application_delegate(this);
 
   Drafts = Profile->get_draft_db();
-  OutboxQueue = new TOutboxQueue(*this, Profile);
+  OutboxQueue = new TOutboxQueue(*this, Profile, mail_model_root);
   }
 
 TConnectionProcessor::~TConnectionProcessor()

@@ -20,6 +20,7 @@
 #include "BitShares/fc/GitSHA3.h"
 
 #include "Mail/MailboxModel.hpp"
+#include "Mail/MailboxModelRoot.hpp"
 #include "Mail/maileditorwindow.hpp"
 
 #include <fc/reflect/variant.hpp>
@@ -61,7 +62,7 @@ enum TopLevelItemIndexes
 
 KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _identities_root(nullptr),
-  _connectionProcessor(*this, bts::application::instance()->get_profile()),
+  _connectionProcessor(*this, bts::application::instance()->get_profile(), &_mail_model_root),
   _currentMailbox(nullptr),
   _isClosing(false)
 {
@@ -201,6 +202,11 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model, true);
   _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model, false);
   _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, false);
+  
+  _mail_model_root.addMailboxModel(_inbox_model);
+  _mail_model_root.addMailboxModel(_draft_model);
+  _mail_model_root.addMailboxModel(_pending_model);
+  _mail_model_root.addMailboxModel(_sent_model);
 
   loadStoredRequests(profile->get_request_db());
   connect(_addressbook_model, &QAbstractItemModel::dataChanged, this,

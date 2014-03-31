@@ -272,11 +272,14 @@ set( sources
         AddressBook/ContactvCard.cpp
         AddressBook/ContactGui.hpp
         AddressBook/ContactGui.cpp
-	AddressBook/AuthorizationItem.hpp
+        AddressBook/AuthorizationItem.hpp
         AddressBook/AuthorizationItem.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp
+
+        Mail/MailboxModelRoot.hpp
+        Mail/MailboxModelRoot.cpp
 
         Mail/Mailbox.ui
         Mail/Mailbox.hpp

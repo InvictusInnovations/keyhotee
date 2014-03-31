@@ -16,6 +16,14 @@
 
 using namespace bts::bitchat;
 
+typedef fc::uint256                                       TDigest;
+typedef std::map<TDigest, MessageHeader*>                 TDigest2MsgHeader;
+typedef std::list<MessageHeader>                          TCacheStorage;
+typedef TCacheStorage::iterator                           TCacheStorageItr;
+typedef TDigest2MsgHeader::iterator                       TDigest2MsgHeaderItr;
+typedef std::pair<TCacheStorageItr, TDigest2MsgHeaderItr> TCacheData;
+typedef std::vector<TCacheData>                           TRandomAccessCache;
+
 namespace Detail
 {
 class MailboxModelImpl
@@ -24,7 +32,12 @@ class MailboxModelImpl
     bts::profile_ptr             _profile;
     bts::bitchat::message_db_ptr _mail_db;
     /// FIXME - potential perf. problem while adding/removing message headers (while reallocating vector)
-    std::vector<MessageHeader>   _headers;
+    //std::vector<MessageHeader>   _headers;
+    
+    TDigest2MsgHeader            _digest2headers;
+    TCacheStorage                _headers_storage;
+    TRandomAccessCache           _headers_random;
+
     QIcon                        _attachment_icon;
     QIcon                        _chat_icon;
     QIcon                        _read_icon;
@@ -85,16 +98,30 @@ bool MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
   }
 
 void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
-  {
+{
   MessageHeader mail_header;
   if(fillMailHeader(header, mail_header))
-    {
-    int           newRow = my->_headers.size();
+  {
+    assert(my->_headers_random.size() == my->_headers_storage.size());
+    int newRow = my->_headers_random.size();
     beginInsertRows(QModelIndex(), newRow, newRow);
-    my->_headers.push_back(mail_header);
+    //my->_headers.push_back(mail_header);
+
+    pushBack(mail_header);
+
     endInsertRows();
-    }
   }
+}
+
+void MailboxModel::pushBack(const MessageHeader& mail_header)
+{
+  TCacheData data;
+  data.first = my->_headers_storage.insert(my->_headers_storage.end(), mail_header);
+  MessageHeader& storedHeader = *data.first;
+  data.second = my->_digest2headers.emplace(TDigest2MsgHeader::value_type(storedHeader.header.digest,
+    &storedHeader)).first;
+  my->_headers_random.push_back(data);
+}
 
 bts::bitchat::private_email_message1 MailboxModel::unpack(const bts::bitchat::message_header& header) const
 {
@@ -112,7 +139,7 @@ bts::bitchat::private_email_message1 MailboxModel::unpack(const bts::bitchat::me
 void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
                                   const TStoredMailMessage& msg)
   {
-  for(auto& hdr : my->_headers)
+  for(auto& hdr : my->_headers_storage)                 // ****************************************************************************
     {
     if(hdr.header.digest == overwrittenMsg.digest)
       {
@@ -134,18 +161,19 @@ void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
 void MailboxModel::readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db)
   {
   auto headers = mail_db->fetch_headers(bts::bitchat::private_email_message::type);
-  my->_headers.reserve(headers.size());
+//  my->_headers.reserve(headers.size());
   for (uint32_t i = 0; i < headers.size(); ++i)
     {
     MessageHeader helper;
     if(fillMailHeader(headers[i], helper))
-      my->_headers.push_back(helper);
+      //my->_headers.push_back(helper);
+      pushBack(helper);
     }
   }
 
 int MailboxModel::rowCount(const QModelIndex& parent) const
   {
-  return my->_headers.size();
+    return my->_headers_random.size();
   }
 
 int MailboxModel::columnCount(const QModelIndex& parent) const
@@ -157,13 +185,25 @@ bool MailboxModel::removeRows(int row, int count, const QModelIndex&)
   {
   beginRemoveRows(QModelIndex(), row, row + count - 1);
   for (int i = row; i < row + count; ++i)
-    my->_mail_db->remove_message(my->_headers[i].header);
-  //delete headers from in-memory my->_headers list
-  auto rowI = my->_headers.begin() + row;
-  my->_headers.erase(rowI, rowI + count);
+    removeRow(i);
+//    my->_mail_db->remove_message(my->_headers[i].header);
+//  //delete headers from in-memory my->_headers list
+//  auto rowI = my->_headers.begin() + row;
+//  my->_headers.erase(rowI, rowI + count);
   endRemoveRows();
   return true;
+
   }
+
+void MailboxModel::removeRow(int row_index)
+{
+  auto data = my->_headers_random[row_index];
+  my->_mail_db->remove_message((*data.first).header);
+  my->_headers_storage.erase(data.first);
+  my->_digest2headers.erase(data.second);
+  auto rowI = my->_headers_random.begin() + row_index;
+  my->_headers_random.erase(rowI);
+}
 
 QVariant MailboxModel::headerData(int section, Qt::Orientation orientation, int role) const
   {
@@ -252,7 +292,11 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
   {
   if (!index.isValid() )
     return QVariant();
-  MessageHeader& header = my->_headers[index.row()];
+
+  //  MessageHeader& header = my->_headers[index.row()];
+  auto storage_itr = my->_headers_random[index.row()].first;
+  MessageHeader& header = *storage_itr;
+
   Columns column = (Columns)index.column();
   switch (role)
     {
@@ -321,6 +365,19 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
         }
       else
         return QVariant();
+    case Qt::ToolTipRole:
+      switch (column)
+      {
+      case Reply:
+        if(header.header.isReplied() && header.header.isForwarded())
+          return tr("Replied and Forwarded");
+        else if(header.header.isReplied())
+          return tr("Replied");
+        else if(header.header.isForwarded())
+          return tr("Forwarded");
+      default:
+        return QVariant();
+      } //switch column in ToolTipRole
     } //switch (role)
   return QVariant();
   }
@@ -329,7 +386,8 @@ void MailboxModel::getFullMessage(const QModelIndex& index, MessageHeader& heade
   {
   try
     {
-    header = my->_headers[index.row()];
+    //header = my->_headers[index.row()];
+    header = *(my->_headers_random[index.row()].first);
     /// Update sender info each time to match data defined in contact/identity list.
     header.from = Utils::toString(header.header.from_key, Utils::TContactTextFormatting::FULL_CONTACT_DETAILS);
 
@@ -349,15 +407,38 @@ void MailboxModel::getFullMessage(const QModelIndex& index, MessageHeader& heade
 
 void MailboxModel::markMessageAsRead(const QModelIndex& index)
   {
-  MessageHeader& msg = my->_headers[index.row()];
+  //MessageHeader& msg = my->_headers[index.row()];
+  MessageHeader& msg = *(my->_headers_random[index.row()].first);
+  if(msg.header.isRead())
+    return;
   msg.header.setRead();
   my->_mail_db->store_message_header(msg.header);
   }
 
+void MailboxModel::markMessageAsReplied(const QModelIndex& index)
+{
+  //MessageHeader& msg = my->_headers[index.row()];
+  MessageHeader& msg = *(my->_headers_random[index.row()].first);
+  if(msg.header.isReplied())
+    return;
+  msg.header.setReplied();
+  my->_mail_db->store_message_header(msg.header);
+}
+
+void MailboxModel::markMessageAsForwarded(const QModelIndex& index)
+{
+  //MessageHeader& msg = my->_headers[index.row()];
+  MessageHeader& msg = *(my->_headers_random[index.row()].first);
+  if(msg.header.isForwarded())
+    return;
+  msg.header.setForwarded();
+  my->_mail_db->store_message_header(msg.header);
+}
+
 QModelIndex MailboxModel::findModelIndex(const TStoredMailMessage& msg) const
   {
   int row = 0;
-  for(const auto& hdr : my->_headers)
+  for(const auto& hdr : my->_headers_storage)                 // ****************************************************************************
     {
     if(hdr.header.digest == msg.digest)
       {
@@ -370,10 +451,25 @@ QModelIndex MailboxModel::findModelIndex(const TStoredMailMessage& msg) const
   return QModelIndex();
   }
 
+QModelIndex MailboxModel::findModelIndex(const fc::uint256& digest) const
+{
+  try
+  {
+    MessageHeader* message_header = my->_digest2headers.at(digest);
+    return findModelIndex(message_header->header);
+  }
+  catch (const std::out_of_range& e)
+  {
+    elog("${e}", ("e", e.what()));
+    return QModelIndex();
+  }
+}
+
 void MailboxModel::getMessageData(const QModelIndex& index,
   IMailProcessor::TStoredMailMessage* encodedMsg, IMailProcessor::TPhysicalMailMessage* decodedMsg)
   {
-  const MessageHeader& cachedMsg = my->_headers[index.row()];
+  //const MessageHeader& cachedMsg = my->_headers[index.row()];
+  const MessageHeader& cachedMsg = *(my->_headers_random[index.row()].first);
   *encodedMsg = cachedMsg.header;
 
   try
@@ -394,6 +490,7 @@ AddressBookModel& MailboxModel::getAddressBookModel() const
 
 bool MailboxModel::hasAttachments(const QModelIndex& index) const
   {
-  MessageHeader& msg = my->_headers[index.row()];
+  //MessageHeader& msg = my->_headers[index.row()];
+  MessageHeader& msg = *(my->_headers_random[index.row()].first);
   return msg.hasAttachments;
   }

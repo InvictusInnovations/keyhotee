@@ -259,8 +259,9 @@ void Mailbox::onDeleteMail()
   //model->setUpdatesEnabled(false);
   QItemSelectionModel*   selection_model = ui->inbox_table->selectionModel();
   QModelIndexList        sortFilterIndexes = selection_model->selectedRows();
-  if (sortFilterIndexes.count() == 0)
+  if (sortFilterIndexes.empty())
     return;
+
   if (QMessageBox::question(this, tr("Delete Mail"), tr("Are you sure you want to delete selected email(s)?")) == QMessageBox::Button::No)
     return;
   QModelIndexList indexes;

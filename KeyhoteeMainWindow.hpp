@@ -29,6 +29,7 @@ class ContactsTable;
 class InboxView;
 class Mailbox;
 class MailboxModel;
+class MailboxModelRoot;
 class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
@@ -209,6 +210,7 @@ private:
   MailboxModel*                           _draft_model;
   MailboxModel*                           _pending_model;
   MailboxModel*                           _sent_model;
+  MailboxModelRoot                        _mail_model_root;
 
   AddressBookModel*                       _addressbook_model;
   bts::addressbook::addressbook_ptr       _addressbook;

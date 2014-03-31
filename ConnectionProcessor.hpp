@@ -5,6 +5,8 @@
 #include "ch/connectionstatusds.h"
 #include "ch/mailprocessor.hpp"
 
+#include "Mail/MailboxModelRoot.hpp"
+
 #include <bts/application.hpp>
 
 #include <atomic>
@@ -25,7 +27,7 @@ class TConnectionProcessor : public IMailProcessor,
 
   {
   public:
-    TConnectionProcessor(IGuiUpdateSink& updateSink, const bts::profile_ptr& loadedProfile);
+    TConnectionProcessor(IGuiUpdateSink& updateSink, const bts::profile_ptr& loadedProfile, MailboxModelRoot* mail_model_root);
     virtual ~TConnectionProcessor();
 
   /// IMailProcessor interface implementation:

@@ -13,7 +13,7 @@ class AddressBookModel;
 class MailboxModel : public QAbstractTableModel
 {
 public:
-  typedef IMailProcessor::TStoredMailMessage TStoredMailMessage;
+  typedef IMailProcessor::TStoredMailMessage                TStoredMailMessage;
 
   /** Class constructor.
       \param abModel - access to the main address book model, needed for message editing purposes
@@ -46,7 +46,10 @@ public:
   void replaceMessage(const TStoredMailMessage& overwrittenMsg, const TStoredMailMessage& msg);
   void getFullMessage(const QModelIndex& index, MessageHeader& header) const;
   void markMessageAsRead(const QModelIndex& index);
+  void markMessageAsReplied(const QModelIndex& index);
+  void markMessageAsForwarded(const QModelIndex& index);
   QModelIndex findModelIndex(const TStoredMailMessage& msg) const;
+  QModelIndex findModelIndex(const fc::uint256& digest) const;
   /** Allows to retrieve given message data in encoded & decoded from.
       Encoded form (the message_header) is needed to retrieve sender for example.
       Decoded message contains all others attributes.
@@ -74,6 +77,9 @@ private:
   bool fillMailHeader(const bts::bitchat::message_header& header, MessageHeader& mail_header);
 
   void readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db);
+
+  void pushBack(const MessageHeader& mail_header);
+  void removeRow(int row_index);
 
   bts::bitchat::private_email_message1 unpack(const bts::bitchat::message_header& header) const;
 
