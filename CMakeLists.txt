@@ -496,6 +496,8 @@ ELSE (KH_STATIC_QT EQUAL 1)
   )
 ENDIF (KH_STATIC_QT EQUAL 1)
 
+include(GetPrerequisites)
+
 if (MSVC)
   message(STATUS "Setting up debug options for MSVC build")
 # Probably cmake has a bug and vcxproj generated for executable in Debug conf. has disabled debug info
@@ -546,6 +548,9 @@ if(APPLE)
       fixup_bundle(\"${APPS}\" \"\${QTPLUGINS}\" \"/Users/syncad/Qt/\")
       " COMPONENT Runtime)
 endif(APPLE)
+
+get_target_property(FC_INTERFACE_PDB_LIST_RELEASE fc INTERFACE_LINK_PDB_RELEASE)
+get_target_property(FC_INTERFACE_PDB_LIST_DEBUG fc INTERFACE_LINK_PDB_DEBUG)
 
 get_target_property(FC_SHARED_LIBRARIES_DEBUG fc SHARED_LIBRARIES_DEBUG)
 get_target_property(FC_SHARED_LIBRARIES_RELEASE fc SHARED_LIBRARIES_RELEASE)
