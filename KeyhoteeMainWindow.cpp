@@ -872,7 +872,8 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& ms
   authorization_item->setIcon(0, QIcon(":/images/request_authorization.png") );
   authorization_item->setFromKey(header.from_key);
   QDateTime dateTime;
-  dateTime.setTime_t(header.from_sig_time.sec_since_epoch());
+  /// \warning time_since_epoch retrieves time in microseconds, but QT expects it in miliseconds.
+  dateTime.setMSecsSinceEpoch(header.from_sig_time.time_since_epoch().count()/1000);
   authorization_item->setText(0, dateTime.toString(Qt::SystemLocaleShortDate));
   authorization_item->setHidden(false);
   view->setOwnerItem(authorization_item);
