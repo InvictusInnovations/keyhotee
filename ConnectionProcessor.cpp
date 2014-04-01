@@ -1,6 +1,7 @@
 #include "ConnectionProcessor.hpp"
 
 #include "ch/GuiUpdateSink.hpp"
+#include "Mail/MailboxModel.hpp"
 
 #include <bts/application.hpp>
 #include <bts/bitchat/bitchat_private_message.hpp>
@@ -99,7 +100,7 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
     virtual void OnMessageSendingStart() override;
     /// \see IGuiUpdateSink interface description.
     virtual void OnMessageSent(const TStoredMailMessage& pendingMsg,
-      const TStoredMailMessage& sentMsg) override;
+      const TStoredMailMessage& sentMsg, const TDigest& digest) override;
     /// \see IGuiUpdateSink interface description.
     virtual void OnMessageSendingEnd() override;
     /// \see IGuiUpdateSink interface description.
@@ -308,23 +309,24 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
       {
       public:
         static ANotification* Create(const TStoredMailMessage& pendingMsg,
-          const TStoredMailMessage& sentMsg, IGuiUpdateSink& sink)
+          const TStoredMailMessage& sentMsg, const TDigest& digest, IGuiUpdateSink& sink)
           {
-          return new TSentMailMessage(pendingMsg, sentMsg, sink);
+          return new TSentMailMessage(pendingMsg, sentMsg, digest, sink);
           }
 
       /// ANotification class reimplementation:
         virtual void Notify()
           {
-          Sink.OnMessageSent(PendingMsg, SentMsg);
+          Sink.OnMessageSent(PendingMsg, SentMsg, Digest);
           delete this;
           }
 
       private:
         TSentMailMessage(const TStoredMailMessage& pendingMsg, const TStoredMailMessage& sentMsg,
-          IGuiUpdateSink& sink) : ANotification(sink),
+          const TDigest& digest, IGuiUpdateSink& sink) : ANotification(sink),
           PendingMsg(pendingMsg),
-          SentMsg(sentMsg) {}
+          SentMsg(sentMsg),
+          Digest(digest) {}
 
         virtual ~TSentMailMessage() {}
 
@@ -332,6 +334,7 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
       private:
         TStoredMailMessage PendingMsg;
         TStoredMailMessage SentMsg;
+        TDigest            Digest;
       };
 
     class TMissingSenderIdentity : public ANotification
@@ -438,9 +441,9 @@ void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageSendingStart()
   }
 
 void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageSent(const TStoredMailMessage& pendingMsg,
-  const TStoredMailMessage& sentMsg)
+  const TStoredMailMessage& sentMsg, const TDigest& digest)
   {
-  ANotification* n = TSentMailMessage::Create(pendingMsg, sentMsg, Sink);
+  ANotification* n = TSentMailMessage::Create(pendingMsg, sentMsg, digest, Sink);
   emit notificationSent(n);
   }
 
@@ -824,8 +827,8 @@ void TConnectionProcessor::TOutboxQueue::moveMsgToSentDB(const TStoredMailMessag
     Processor.PrepareStorableMessage(id, sentMsg, &storableMsg);
 
     TStoredMailMessage savedMsg = Sent->store_message(storableMsg, nullptr);
-    // [GS] - set Reply or Forward flag for source message
-    Processor.Sink->OnMessageSent(pendingMsg, savedMsg);
+
+    Processor.Sink->OnMessageSent(pendingMsg, savedMsg, *sentMsg.src_msg_id);
 
     std::lock_guard<std::mutex> guard(OutboxDbLock);
 

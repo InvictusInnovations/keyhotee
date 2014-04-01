@@ -320,7 +320,7 @@ void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessag
       DraftMessage = srcMsgHeader;
       /// Now load source message contents into editor controls.
       loadContents(srcMsgHeader.from_key, srcMsg);
-      _src_msg_id = srcMsgHeader.digest;
+      _src_msg_id = *srcMsg.src_msg_id;
       if(srcMsgHeader.isTempReply())
         _msg_type = IMailProcessor::TMsgType::Reply;
       else if(srcMsgHeader.isTempForwa())
