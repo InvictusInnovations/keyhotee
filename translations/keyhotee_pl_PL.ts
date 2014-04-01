@@ -643,12 +643,12 @@ Czy chcesz zapisać zmiany?</translation>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="164"/>
         <source>Inbox</source>
-        <translation>Skrzynka odbiorcza</translation>
+        <translation>Odebrane</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="173"/>
         <source>Drafts</source>
-        <translation>Kopie robocze</translation>
+        <translation>Szkice</translation>
     </message>
     <message>
         <location filename="../KeyhoteeMainWindow.ui" line="182"/>

@@ -5,6 +5,8 @@
 #include "ch/connectionstatusds.h"
 #include "ch/mailprocessor.hpp"
 
+#include "Mail/MailboxModelRoot.hpp"
+
 #include <bts/application.hpp>
 
 #include <atomic>

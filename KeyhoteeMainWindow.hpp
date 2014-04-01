@@ -29,6 +29,7 @@ class ContactsTable;
 class InboxView;
 class Mailbox;
 class MailboxModel;
+class MailboxModelRoot;
 class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
@@ -107,7 +108,7 @@ private:
   virtual void OnMessageSendingStart() override;
   /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSent(const TStoredMailMessage& pendingMsg,
-    const TStoredMailMessage& sentMsg) override;
+    const TStoredMailMessage& sentMsg, const TDigest& digest) override;
   /// \see IGuiUpdateSink interface description.
   virtual void OnMessageSendingEnd() override;
   /// \see IGuiUpdateSink interface description.
@@ -209,6 +210,7 @@ private:
   MailboxModel*                           _draft_model;
   MailboxModel*                           _pending_model;
   MailboxModel*                           _sent_model;
+  MailboxModelRoot*                       _mail_model_root;
 
   AddressBookModel*                       _addressbook_model;
   bts::addressbook::addressbook_ptr       _addressbook;

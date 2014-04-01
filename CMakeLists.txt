@@ -14,8 +14,8 @@ project( keyhotee )
 cmake_minimum_required( VERSION 2.8.12.1 )
 
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "6")
-set(VERSION_PATCH "3")
+set(VERSION_MINOR "7")
+set(VERSION_PATCH "0")
 
 
 SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
@@ -120,6 +120,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/fc/GitVersi
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+get_git_unix_timestamp(GIT_UNIX_TIMESTAMP1)
 
 set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
 #message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
@@ -272,11 +273,14 @@ set( sources
         AddressBook/ContactvCard.cpp
         AddressBook/ContactGui.hpp
         AddressBook/ContactGui.cpp
-	AddressBook/AuthorizationItem.hpp
+        AddressBook/AuthorizationItem.hpp
         AddressBook/AuthorizationItem.cpp
 
         Mail/MailboxModel.hpp
         Mail/MailboxModel.cpp
+
+        Mail/MailboxModelRoot.hpp
+        Mail/MailboxModelRoot.cpp
 
         Mail/Mailbox.ui
         Mail/Mailbox.hpp
@@ -495,6 +499,8 @@ ELSE (KH_STATIC_QT EQUAL 1)
   )
 ENDIF (KH_STATIC_QT EQUAL 1)
 
+include(GetPrerequisites)
+
 if (MSVC)
   message(STATUS "Setting up debug options for MSVC build")
 # Probably cmake has a bug and vcxproj generated for executable in Debug conf. has disabled debug info
@@ -545,6 +551,9 @@ if(APPLE)
       fixup_bundle(\"${APPS}\" \"\${QTPLUGINS}\" \"/Users/syncad/Qt/\")
       " COMPONENT Runtime)
 endif(APPLE)
+
+get_target_property(FC_INTERFACE_PDB_LIST_RELEASE fc INTERFACE_LINK_PDB_RELEASE)
+get_target_property(FC_INTERFACE_PDB_LIST_DEBUG fc INTERFACE_LINK_PDB_DEBUG)
 
 get_target_property(FC_SHARED_LIBRARIES_DEBUG fc SHARED_LIBRARIES_DEBUG)
 get_target_property(FC_SHARED_LIBRARIES_RELEASE fc SHARED_LIBRARIES_RELEASE)

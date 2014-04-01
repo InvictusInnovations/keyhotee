@@ -14,7 +14,7 @@ struct public_key_address
   public_key_address(const fc::ecc::public_key_data& k)
     {
     key = k;
-    check = uint32_t(fc::city_hash64( (char*)&key, sizeof(key) ));
+    check = uint32_t(fc::hash64( (char*)&key, sizeof(key) ));
     }
 
   /** Allows to validate given keyStr before creating a public key object.

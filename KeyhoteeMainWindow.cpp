@@ -20,6 +20,7 @@
 #include "BitShares/fc/GitSHA3.h"
 
 #include "Mail/MailboxModel.hpp"
+#include "Mail/MailboxModelRoot.hpp"
 #include "Mail/maileditorwindow.hpp"
 
 #include <fc/reflect/variant.hpp>
@@ -70,7 +71,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   QString profileName = mainApp.getLoadedProfileName();
 
-  QString title = QString("%1 (%2)").arg(mainApp.getAppName().c_str()).arg(profileName);
+  QString title = QString("%1 v%2 (%3)").arg(mainApp.getAppName().c_str()).arg(mainApp.getVersionNumberString().c_str()).arg(profileName);
   setWindowTitle(title);
   setEnabledAttachmentSaveOption(false);
   setEnabledDeleteOption(false);
@@ -197,10 +198,16 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   auto addressbook = profile->get_addressbook();
   _addressbook_model = new AddressBookModel(this, addressbook);
 
-  _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db(), *_addressbook_model, false);
-  _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model, true);
-  _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model, false);
-  _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, false);
+  _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db(), *_addressbook_model, _inbox_root, false);
+  _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model, _drafts_root, true);
+  _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model, _out_box_root, false);
+  _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, _sent_root, false);
+  
+  _mail_model_root = new MailboxModelRoot();
+  _mail_model_root->addMailboxModel(_inbox_model);
+  _mail_model_root->addMailboxModel(_draft_model);
+  _mail_model_root->addMailboxModel(_pending_model);
+  _mail_model_root->addMailboxModel(_sent_model);
 
   loadStoredRequests(profile->get_request_db());
   connect(_addressbook_model, &QAbstractItemModel::dataChanged, this,
@@ -646,32 +653,44 @@ void KeyhoteeMainWindow::onDiagnostic()
 void KeyhoteeMainWindow::onAbout()
 {
   QString title(tr("About "));
-  title += windowTitle();
+  title += TKeyhoteeApplication::getInstance()->getAppName().c_str();
   QString text;
   text = tr("<p align='center'><b>");
-  text += windowTitle();
+  text += TKeyhoteeApplication::getInstance()->getAppName().c_str();
 /// Commented out to avoid difference against install package version.
-//  text += tr(" version ");
-//  text += tr(APPLICATION_VERSION);
+  text += tr(" version ");
+  text += tr(TKeyhoteeApplication::getInstance()->getVersionNumberString().c_str());
   text += tr("</b><br/><br/>");
   /// Build tag: <a href="https://github.com/InvictusInnovations/keyhotee/commit/xxxx">xxxx</a>
-  text += tr("keyhotee Built from revision: <a href=\"https://github.com/InvictusInnovations/keyhotee/commit/");
+  text += tr("<strong>keyhotee</strong> built from revision: <a href=\"https://github.com/InvictusInnovations/keyhotee/commit/");
   text += tr(g_GIT_SHA1);
   text += tr("\">");
-  text += tr(g_GIT_SHA1);
+  text += tr(std::string(g_GIT_SHA1).substr(0, 10).c_str());
   text += tr("</a>");
+  text += tr(" (<em>");
+  text += tr(fc::get_approximate_relative_time_string(fc::time_point_sec(g_GIT_UNIX_TIMESTAMP1)).c_str());
+  text += tr("</em>)");
   text += tr("<br/>");
-  text += tr("BitShares Built from revision: <a href=\"https://github.com/InvictusInnovations/BitShares/commit/");
+  text += tr("<br/>");
+  text += tr("<strong>BitShares</strong> built from revision: <a href=\"https://github.com/InvictusInnovations/BitShares/commit/");
   text += tr(g_GIT_SHA2);
   text += tr("\">");
-  text += tr(g_GIT_SHA2);
+  text += tr(std::string(g_GIT_SHA2).substr(0, 10).c_str());
   text += tr("</a>");
+  text += tr(" (<em>");
+  text += tr(fc::get_approximate_relative_time_string(fc::time_point_sec(g_GIT_UNIX_TIMESTAMP2)).c_str());
+  text += tr("</em>)");
   text += tr("<br/>");
-  text += tr("fc Built from revision: <a href=\"https://github.com/InvictusInnovations/fc/commit/");
+  text += tr("<br/>");
+  text += tr("<strong>fc</strong> built from revision: <a href=\"https://github.com/InvictusInnovations/fc/commit/");
   text += tr(g_GIT_SHA3);
   text += tr("\">");
-  text += tr(g_GIT_SHA3);
+  text += tr(std::string(g_GIT_SHA3).substr(0, 10).c_str());
   text += tr("</a>");
+  text += tr(" (<em>");
+  text += tr(fc::get_approximate_relative_time_string(fc::time_point_sec(g_GIT_UNIX_TIMESTAMP3)).c_str());
+  text += tr("</em>)");
+  text += tr("<br/>");
   text += tr("<br/>");
   text += tr("Invictus Innovations Inc<br/>");
   text += tr("<a href=\"http://invictus-innovations.com/keyhotee/\">http://invictus-innovations.com/keyhotee/</a>");
@@ -853,7 +872,8 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& ms
   authorization_item->setIcon(0, QIcon(":/images/request_authorization.png") );
   authorization_item->setFromKey(header.from_key);
   QDateTime dateTime;
-  dateTime.setTime_t(header.from_sig_time.sec_since_epoch());
+  /// \warning time_since_epoch retrieves time in microseconds, but QT expects it in miliseconds.
+  dateTime.setMSecsSinceEpoch(header.from_sig_time.time_since_epoch().count()/1000);
   authorization_item->setText(0, dateTime.toString(Qt::SystemLocaleShortDate));
   authorization_item->setHidden(false);
   view->setOwnerItem(authorization_item);
@@ -1094,8 +1114,18 @@ void KeyhoteeMainWindow::OnMessageSendingStart()
 }
 
 void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
-  const TStoredMailMessage& sentMsg)
+  const TStoredMailMessage& sentMsg, const TDigest& src_msg_id)
 {
+  if(src_msg_id)
+  {
+    TMailMsgIndex src_msg = _mail_model_root->findSrcMail(*src_msg_id);
+
+    if(pendingMsg.isTempReply())
+      src_msg.first->markMessageAsReplied(src_msg.second);
+    else if(pendingMsg.isTempForwa())
+      src_msg.first->markMessageAsForwarded(src_msg.second);
+  }
+
   ui->out_box_page->removeMessage(pendingMsg);
   ui->out_box_page->refreshMessageViewer();
   _sent_model->addMailHeader(sentMsg);
