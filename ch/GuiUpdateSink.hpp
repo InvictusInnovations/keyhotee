@@ -2,6 +2,7 @@
 #define __GUIUPDATESINK_HPP
 
 #include "ch/mailprocessor.hpp"
+#include <fc/optional.hpp>
 
 namespace bts
 {

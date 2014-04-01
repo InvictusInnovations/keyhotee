@@ -332,9 +332,9 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
 
       /// Class attributes:
       private:
-        TStoredMailMessage PendingMsg;
-        TStoredMailMessage SentMsg;
-        TDigest            Digest;
+        TStoredMailMessage  PendingMsg;
+        TStoredMailMessage  SentMsg;
+        TDigest             Digest;
       };
 
     class TMissingSenderIdentity : public ANotification
@@ -830,7 +830,7 @@ void TConnectionProcessor::TOutboxQueue::moveMsgToSentDB(const TStoredMailMessag
     savedMsg.setRead();
     Sent->store_message_header(savedMsg);
 
-    Processor.Sink->OnMessageSent(pendingMsg, savedMsg, *sentMsg.src_msg_id);
+    Processor.Sink->OnMessageSent(pendingMsg, savedMsg, sentMsg.src_msg_id);
 
     std::lock_guard<std::mutex> guard(OutboxDbLock);
 
