@@ -35,6 +35,9 @@ class TKeyhoteeApplication : protected QApplication
 
     /// Gives access to the application name.
     std::string  getAppName() const;
+
+    std::string  getVersionNumberString() const;
+
     /// Returns selected (from command line) current profile to load.
     QString getLoadedProfileName() const {return _loaded_profile_name;};
     void setLoadedProfileName(QString loaded_profile_name) {_loaded_profile_name = loaded_profile_name;};
@@ -78,6 +81,7 @@ class TKeyhoteeApplication : protected QApplication
     ProfileWizard*          _profile_wizard;
     int                     _exit_status;
     bool                    _last_loaded_profile_name;
+    std::string             _keyhoteeVersionNumber;
 };
 
 
