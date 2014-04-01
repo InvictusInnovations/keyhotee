@@ -20,6 +20,7 @@ struct private_text_message;
 namespace fc
 {
 class time_point_sec;
+class sha256;
 } /// namespace fc
 
 /** Helper callback interface notifying client object about several events.
@@ -40,6 +41,7 @@ class IGuiUpdateSink
     typedef IMailProcessor::TStoredMailMessage            TStoredMailMessage;
     typedef fc::time_point_sec                            TTime;
     typedef bts::bitchat::decrypted_message               TDecryptedMessage;
+    typedef fc::optional<fc::sha256>                      TDigest;
 
   /// Receiving chat messages:
     virtual void OnReceivedChatMessage(const TContact& sender, const TChatMessage& msg,
@@ -84,7 +86,7 @@ class IGuiUpdateSink
     virtual void OnMessageSendingStart() = 0;
     /// Notifies about end of send operation for given message.
     virtual void OnMessageSent(const TStoredMailMessage& pendingMsg,
-      const TStoredMailMessage& sentMsg) = 0;
+      const TStoredMailMessage& sentMsg, const TDigest& digest) = 0;
     /// Notifies about message sending end (empty quite).
     virtual void OnMessageSendingEnd() = 0;
     /** Called when there is no matching identity to specified sender PK. Implemented identity

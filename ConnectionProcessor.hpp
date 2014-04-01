@@ -27,7 +27,7 @@ class TConnectionProcessor : public IMailProcessor,
 
   {
   public:
-    TConnectionProcessor(IGuiUpdateSink& updateSink, const bts::profile_ptr& loadedProfile, MailboxModelRoot* mail_model_root);
+    TConnectionProcessor(IGuiUpdateSink& updateSink, const bts::profile_ptr& loadedProfile);
     virtual ~TConnectionProcessor();
 
   /// IMailProcessor interface implementation:

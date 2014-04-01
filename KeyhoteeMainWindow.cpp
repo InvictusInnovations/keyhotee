@@ -62,7 +62,7 @@ enum TopLevelItemIndexes
 
 KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _identities_root(nullptr),
-  _connectionProcessor(*this, bts::application::instance()->get_profile(), &_mail_model_root),
+  _connectionProcessor(*this, bts::application::instance()->get_profile()),
   _currentMailbox(nullptr),
   _isClosing(false)
 {
@@ -203,10 +203,11 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model, false);
   _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, false);
   
-  _mail_model_root.addMailboxModel(_inbox_model);
-  _mail_model_root.addMailboxModel(_draft_model);
-  _mail_model_root.addMailboxModel(_pending_model);
-  _mail_model_root.addMailboxModel(_sent_model);
+  _mail_model_root = new MailboxModelRoot();
+  _mail_model_root->addMailboxModel(_inbox_model);
+  _mail_model_root->addMailboxModel(_draft_model);
+  _mail_model_root->addMailboxModel(_pending_model);
+  _mail_model_root->addMailboxModel(_sent_model);
 
   loadStoredRequests(profile->get_request_db());
   connect(_addressbook_model, &QAbstractItemModel::dataChanged, this,
@@ -1100,8 +1101,18 @@ void KeyhoteeMainWindow::OnMessageSendingStart()
 }
 
 void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
-  const TStoredMailMessage& sentMsg)
+  const TStoredMailMessage& sentMsg, const TDigest& src_msg_id)
 {
+  if(src_msg_id)
+  {
+    TMailMsgIndex src_msg = _mail_model_root->findSrcMail(*src_msg_id);
+
+    if(pendingMsg.isTempReply())
+      src_msg.first->markMessageAsReplied(src_msg.second);
+    else if(pendingMsg.isTempForwa())
+      src_msg.first->markMessageAsForwarded(src_msg.second);
+  }
+
   ui->out_box_page->removeMessage(pendingMsg);
   ui->out_box_page->refreshMessageViewer();
   _sent_model->addMailHeader(sentMsg);
