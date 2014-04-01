@@ -35,4 +35,4 @@ void ContactGui::updateTreeItemDisplay()
     display_text = name;
   _tree_item->setText(0, display_text);
   _tree_item->setHidden (false);
-  }
+}

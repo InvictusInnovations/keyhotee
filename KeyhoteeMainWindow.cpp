@@ -198,10 +198,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   auto addressbook = profile->get_addressbook();
   _addressbook_model = new AddressBookModel(this, addressbook);
 
-  _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db(), *_addressbook_model, false);
-  _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model, true);
-  _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model, false);
-  _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, false);
+  _inbox_model = new MailboxModel(this, profile, profile->get_inbox_db(), *_addressbook_model, _inbox_root, false);
+  _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model, _drafts_root, true);
+  _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model, _out_box_root, false);
+  _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, _sent_root, false);
   
   _mail_model_root = new MailboxModelRoot();
   _mail_model_root->addMailboxModel(_inbox_model);

@@ -6,6 +6,7 @@
 #include <QIcon>
 #include <QPixmap>
 #include <QImage>
+#include <QTreeWidgetItem>
 
 #include <bts/bitchat/bitchat_message_db.hpp>
 #include <bts/address.hpp>
@@ -48,9 +49,12 @@ class MailboxModelImpl
 }
 
 MailboxModel::MailboxModel(QObject* parent, const bts::profile_ptr& profile,
-  bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel, bool isDraftFolder)
+  bts::bitchat::message_db_ptr mail_db, AddressBookModel& abModel, QTreeWidgetItem* tree_item, bool isDraftFolder)
   : QAbstractTableModel(parent),
-  my(new Detail::MailboxModelImpl() )
+  my(new Detail::MailboxModelImpl()),
+  _unread_msg_count(0),
+  _tree_item(tree_item),
+  _item_name(tree_item->text(0))
   {
   my->_profile = profile;
   my->_mail_db = mail_db;
@@ -110,6 +114,11 @@ void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
 
     endInsertRows();
   }
+
+  if(mail_header.header.isUnread())
+    _unread_msg_count++;
+  
+  updateTreeItemDisplay();
 }
 
 void MailboxModel::pushBack(const MessageHeader& mail_header)
@@ -158,15 +167,20 @@ void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
   }
 
 void MailboxModel::readMailBoxHeadersDb(bts::bitchat::message_db_ptr mail_db)
-  {
+{
   auto headers = mail_db->fetch_headers(bts::bitchat::private_email_message::type);
   for (uint32_t i = 0; i < headers.size(); ++i)
-    {
+  {
     MessageHeader helper;
     if(fillMailHeader(headers[i], helper))
+    {
       pushBack(helper);
+      if(helper.header.isUnread())
+        _unread_msg_count++;
     }
   }
+  updateTreeItemDisplay();
+}
 
 int MailboxModel::rowCount(const QModelIndex& parent) const
   {
@@ -184,6 +198,7 @@ bool MailboxModel::removeRows(int row, int count, const QModelIndex&)
   for (int i = row; i < row + count; ++i)
     removeRow(i);
   endRemoveRows();
+  updateTreeItemDisplay();
   return true;
 
   }
@@ -191,6 +206,8 @@ bool MailboxModel::removeRows(int row, int count, const QModelIndex&)
 void MailboxModel::removeRow(int row_index)
 {
   auto data = my->_headers_random[row_index];
+  if((*data.first).header.isUnread())
+    _unread_msg_count--;
   my->_mail_db->remove_message((*data.first).header);
   my->_headers_storage.erase(data.first);
   my->_digest2headers.erase(data.second);
@@ -286,7 +303,6 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
   if (!index.isValid() )
     return QVariant();
 
-  //  MessageHeader& header = my->_headers[index.row()];
   auto storage_itr = my->_headers_random[index.row()].first;
   MessageHeader& header = *storage_itr;
 
@@ -303,7 +319,7 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
       switch (column)
         {
         case Read:
-          if (!header.header.isRead())
+          if (header.header.isUnread())
             return my->_read_icon;
           else
             return "";
@@ -350,12 +366,12 @@ QVariant MailboxModel::data(const QModelIndex& index, int role) const
           return QVariant();           //DLNFIX what is this?
         } //switch (column)
     case Qt::FontRole:
-      if (!header.header.isRead())
-        {
+      if (header.header.isUnread())
+      {
         QFont boldFont;
         boldFont.setBold(true);
         return boldFont;
-        }
+      }
       else
         return QVariant();
     case Qt::ToolTipRole:
@@ -403,6 +419,10 @@ void MailboxModel::markMessageAsRead(const QModelIndex& index)
   if(msg.header.isRead())
     return;
   msg.header.setRead();
+
+  _unread_msg_count--;
+  updateTreeItemDisplay();
+
   my->_mail_db->store_message_header(msg.header);
   }
 
@@ -489,3 +509,24 @@ bool MailboxModel::hasAttachments(const QModelIndex& index) const
   MessageHeader& msg = *(my->_headers_random[index.row()].first);
   return msg.hasAttachments;
   }
+
+void MailboxModel::updateTreeItemDisplay()
+{
+  QString display_text;
+  QFont font;
+  if (_unread_msg_count)
+  {
+    display_text = QString("%1 (%2)").arg(_item_name).arg(_unread_msg_count);
+    font.setBold(true);
+  }
+  else
+  {
+    display_text = _item_name;
+    font.setBold(false);
+  }
+  _tree_item->setFont(0, font);
+  _tree_item->setText(0, display_text);
+
+  QString tool_tip(tr("Unread %1 / All %2").arg(_unread_msg_count).arg(my->_headers_random.size()));
+  _tree_item->setToolTip(0, tool_tip);
+}

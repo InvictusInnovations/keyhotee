@@ -827,6 +827,8 @@ void TConnectionProcessor::TOutboxQueue::moveMsgToSentDB(const TStoredMailMessag
     Processor.PrepareStorableMessage(id, sentMsg, &storableMsg);
 
     TStoredMailMessage savedMsg = Sent->store_message(storableMsg, nullptr);
+    savedMsg.setRead();
+    Sent->store_message_header(savedMsg);
 
     Processor.Sink->OnMessageSent(pendingMsg, savedMsg, *sentMsg.src_msg_id);
 
