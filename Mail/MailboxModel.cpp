@@ -126,7 +126,7 @@ void MailboxModel::pushBack(const MessageHeader& mail_header)
   TCacheData data;
   data.first = my->_headers_storage.insert(my->_headers_storage.end(), mail_header);
   MessageHeader& storedHeader = *data.first;
-  data.second = my->_digest2headers.emplace(TDigest2MsgHeader::value_type(storedHeader.header.digest,
+  data.second = my->_digest2headers.insert(TDigest2MsgHeader::value_type(storedHeader.header.digest,
     &storedHeader)).first;
   my->_headers_random.push_back(data);
 }
