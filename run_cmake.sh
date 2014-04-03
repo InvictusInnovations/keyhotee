@@ -1,5 +1,7 @@
-#! /bin/sh
-BASE_PATH=`dirname $0`
+#!/bin/bash
+pushd `dirname $0` > /dev/null
+BASE_PATH=`pwd -P`
+popd > /dev/null
 . $BASE_PATH/setenv.sh
 cmake-gui
 

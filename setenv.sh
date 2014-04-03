@@ -1,17 +1,13 @@
-#! /bin/sh
+#!/bin/bash
+pushd `dirname $0`/.. > /dev/null
+INVICTUS_ROOT=`pwd -P`
+popd > /dev/null
 
-BASE_PATH=`dirname $0`
-
-INVICTUS_ROOT=$BASE_PATH/..
 export INVICTUS_ROOT
 echo "Using: "$INVICTUS_ROOT "as INVICTUS_ROOT"
 
-QTDIR=$INVICTUS_ROOT/QT
-export QTDIR
+export QTDIR=$INVICTUS_ROOT/QT
 echo "Using: "$QTDIR "as QTDIR"
 
-DBROOTDIR=$INVICTUS_ROOT/BerkeleyDB
-export DBROOTDIR
+export DBROOTDIR=$INVICTUS_ROOT/BerkeleyDB
 echo "Using: "$DBROOTDIR "as DBROOTDIR"
-
-
