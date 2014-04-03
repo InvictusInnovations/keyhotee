@@ -67,7 +67,7 @@ MailboxModel::MailboxModel(QObject* parent, const bts::profile_ptr& profile,
 
   readMailBoxHeadersDb(mail_db);
   }
-
+   
 MailboxModel::~MailboxModel()
   {}
 
@@ -76,6 +76,8 @@ bool MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
   {
   try
     {
+    if (my->_digest2headers.find( header.digest ) != my->_digest2headers.end() )
+      FC_THROW("Received a duplicate message, ignoring");
     mail_header.header = header;
     auto addressbook = my->_profile->get_addressbook();
     mail_header.date_received = Utils::toQDateTime(header.received_time);
@@ -101,6 +103,7 @@ bool MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
     }
   }
 
+
 void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
 {
   MessageHeader mail_header;
@@ -113,12 +116,14 @@ void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
     pushBack(mail_header);
 
     endInsertRows();
+
+    //TODO: Dan says: PaulEU can you review this to ensure it's ok (remove this comment if so)
+    if(mail_header.header.isUnread())
+      _unread_msg_count++;
+  
+    updateTreeItemDisplay();
   }
 
-  if(mail_header.header.isUnread())
-    _unread_msg_count++;
-  
-  updateTreeItemDisplay();
 }
 
 void MailboxModel::pushBack(const MessageHeader& mail_header)
@@ -126,8 +131,9 @@ void MailboxModel::pushBack(const MessageHeader& mail_header)
   TCacheData data;
   data.first = my->_headers_storage.insert(my->_headers_storage.end(), mail_header);
   MessageHeader& storedHeader = *data.first;
-  data.second = my->_digest2headers.insert(TDigest2MsgHeader::value_type(storedHeader.header.digest,
-    &storedHeader)).first;
+  auto result = my->_digest2headers.insert(TDigest2MsgHeader::value_type(storedHeader.header.digest, &storedHeader));
+  assert(result.second); //check to be sure no duplicate hash in mailbox
+  data.second = result.first;
   my->_headers_random.push_back(data);
 }
 
