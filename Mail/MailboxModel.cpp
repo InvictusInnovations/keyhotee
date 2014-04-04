@@ -118,10 +118,9 @@ void MailboxModel::addMailHeader(const bts::bitchat::message_header& header)
 
     endInsertRows();
 
-    //TODO: Dan says: PaulEU can you review this to ensure it's ok (remove this comment if so)
     if(mail_header.header.isUnread())
       _unread_msg_count++;
-  
+
     updateTreeItemDisplay();
   }
 
@@ -147,7 +146,12 @@ void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
       {
       MessageHeader helper;
       if(fillMailHeader(msg, helper))
+      {
         hdr = helper;
+        
+        _unread_msg_count++;
+        updateTreeItemDisplay();
+      }
 
       /// Replace complete - return.
       return;
