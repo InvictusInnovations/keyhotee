@@ -86,8 +86,9 @@ bool MailboxModel::fillMailHeader(const bts::bitchat::message_header& header,
 
     mail_header.date_sent = Utils::toQDateTime(header.from_sig_time);
 
-    //fill remaining fields from private_email_message1
-    auto email_msg = unpack(header);
+    //fill remaining fields from private_email_message
+    auto raw_data = my->_mail_db->fetch_data(header.digest);
+    auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
 
     mail_header.to_list = email_msg.to_list;
     mail_header.cc_list = email_msg.cc_list;
@@ -135,19 +136,6 @@ void MailboxModel::pushBack(const MessageHeader& mail_header)
   assert(result.second); //check to be sure no duplicate hash in mailbox
   data.second = result.first;
   my->_headers_random.push_back(data);
-}
-
-bts::bitchat::private_email_message1 MailboxModel::unpack(const bts::bitchat::message_header& header) const
-{
-  auto raw_data = my->_mail_db->fetch_data(header.digest);
-  
-  if(header.type == private_message_type::email_msg1)
-    return fc::raw::unpack<private_email_message1>(raw_data);
-  else
-  {
-    auto email_msg0 = fc::raw::unpack<private_email_message>(raw_data);
-    return bts::bitchat::private_email_message1(email_msg0);
-  }
 }
 
 void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
@@ -405,7 +393,9 @@ void MailboxModel::getFullMessage(const QModelIndex& index, MessageHeader& heade
     /// Update sender info each time to match data defined in contact/identity list.
     header.from = Utils::toString(header.header.from_key, Utils::TContactTextFormatting::FULL_CONTACT_DETAILS);
 
-    auto email_msg = unpack(header.header);
+    auto raw_data = my->_mail_db->fetch_data(header.header.digest);
+    auto email_msg = fc::raw::unpack<private_email_message>(raw_data);
+
     header.to_list = email_msg.to_list;
     header.cc_list = email_msg.cc_list;
     header.subject = email_msg.subject.c_str();
@@ -496,7 +486,8 @@ void MailboxModel::getMessageData(const QModelIndex& index,
 
   try
     {
-    *decodedMsg = unpack(cachedMsg.header);
+      auto raw_data = my->_mail_db->fetch_data(cachedMsg.header.digest);
+      *decodedMsg = fc::raw::unpack<private_email_message>(raw_data);
     }
   catch(const fc::exception& e)
     {

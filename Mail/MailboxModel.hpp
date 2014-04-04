@@ -82,8 +82,6 @@ private:
   void pushBack(const MessageHeader& mail_header);
   void removeRow(int row_index);
 
-  bts::bitchat::private_email_message1 unpack(const bts::bitchat::message_header& header) const;
-
   void updateTreeItemDisplay();
 
 private:
