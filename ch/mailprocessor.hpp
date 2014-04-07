@@ -10,7 +10,7 @@ namespace bts
 {
 namespace bitchat
 {
-struct private_email_message1;
+struct private_email_message;
 struct message_header;
 } ///namespace bitchat
 
@@ -25,7 +25,7 @@ class IMailProcessor
   {
   public:
     /// Type holding a data of message prepared to save/send operation.
-    typedef bts::bitchat::private_email_message1  TPhysicalMailMessage;
+    typedef bts::bitchat::private_email_message   TPhysicalMailMessage;
     /// Type holding a message data which has been stored in the mail_db.
     typedef bts::bitchat::message_header          TStoredMailMessage;
     typedef bts::addressbook::wallet_identity     TIdentity;
