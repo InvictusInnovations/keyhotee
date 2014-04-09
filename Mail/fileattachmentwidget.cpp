@@ -801,12 +801,20 @@ void TFileAttachmentWidget::onDelTriggered()
 
   bool sortEnabled = FreezeAttachmentTable();
 
+  int row_no = 0;
+
   for(AAttachmentItem* item : selection)
     {
     item->Unregister();
     int rowNo = item->row();
     ui->attachmentTable->removeRow(rowNo);
+    row_no = rowNo;
     }
+
+  if(row_no < ui->attachmentTable->rowCount())
+    ui->attachmentTable->selectRow(row_no);
+  else
+    ui->attachmentTable->selectRow(row_no-1);
 
   UnFreezeAttachmentTable(sortEnabled);
 
