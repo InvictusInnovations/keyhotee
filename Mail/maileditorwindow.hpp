@@ -167,6 +167,11 @@ class MailEditorMainWindow : public ATopLevelWindow
     /// Notification sent when some file attachement item(s) will be pasted/dropeed onto document body.
     void onFileAttachmentAdded(const QStringList& files);
 
+  /// Mail Reply/Forward
+    void onMailReplyTriggered();
+    void onMailReplyAllTriggered();
+    void onMailForwardTriggered();
+
   private:
     Ui::MailEditorWindow*    ui;
     /** Filled when mail editor has been opened with message already stored in Drafts. During save
