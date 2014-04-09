@@ -10,6 +10,9 @@
 # Warning: it must appear before starting project definition
 SET (CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebinfo" CACHE STRING "" FORCE)
 
+project( keyhotee )
+cmake_minimum_required( VERSION 2.8.12.1 )
+
 IF(WIN32)
    # Build all windows projects with /EHsc, which will prevent the compiler from 
    # translating structured exceptions into C++ exceptions (which would make
@@ -18,15 +21,14 @@ IF(WIN32)
       SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
    ENDIF()
 
-  set(CMAKE_GENERATOR "Visual Studio 12" CACHE INTERNAL "Generator name")
-
   #Set to allow xp compatibility
   set(CMAKE_GENERATOR_TOOLSET "v120_xp" CACHE STRING "Platform toolset" FORCE)
-#  set(CMAKE_GENERATOR_TOOLSET "v120_xp")
-ENDIF(WIN32)
 
-project( keyhotee )
-cmake_minimum_required( VERSION 2.8.12.1 )
+#looks like this flag can have different default on some machines.
+SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
+
+ENDIF(WIN32)
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "7")
