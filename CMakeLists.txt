@@ -18,7 +18,7 @@ IF(WIN32)
       SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
    ENDIF()
 
-  set(CMAKE_GENERATOR "Visual Studio 12" CACHE INTERNAL "Generator name")
+#  set(CMAKE_GENERATOR "Visual Studio 12" CACHE INTERNAL "Generator name")
 
   #Set to allow xp compatibility
   set(CMAKE_GENERATOR_TOOLSET "v120_xp" CACHE STRING "Platform toolset" FORCE)
