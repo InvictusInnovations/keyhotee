@@ -4,27 +4,25 @@
 
 class IIdentitiesUpdate;
 
-/** Register/Unregister identity observers.
-    Notify observers when Identities changed.
-*/
+/** This singleton class manages identity observers.
+    Notify observers when identities changed.
+ */ 
 class IdentityObservable
 {
 public:
-  /// Get instance of IdentityObservable (Singleton)
+  /// Get instance of IdentityObservable
   static IdentityObservable& getInstance();
 
+/// Observer methods
   void addObserver (IIdentitiesUpdate* identityObserver);
   void deleteObserver (IIdentitiesUpdate* identityObserver);
   void notify ();
 
-protected:
-  virtual ~IdentityObservable() {}
-
 private:
   IdentityObservable() {};
+  virtual ~IdentityObservable() {};
 
 private:
-  static IdentityObservable     _instance;
   std::list<IIdentitiesUpdate*> _identObservers;
 };
 

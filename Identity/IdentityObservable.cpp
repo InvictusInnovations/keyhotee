@@ -1,11 +1,10 @@
 #include "IdentityObservable.hpp"
 #include "IdentitiesUpdate.hpp"
 
-IdentityObservable IdentityObservable::_instance;
-
 IdentityObservable& IdentityObservable::getInstance()
 {
-  return _instance;
+  static IdentityObservable instance;
+  return instance;
 }
 
 void IdentityObservable::addObserver (IIdentitiesUpdate* identityObserver)
@@ -20,7 +19,11 @@ void IdentityObservable::addObserver (IIdentitiesUpdate* identityObserver)
 
 void IdentityObservable::deleteObserver (IIdentitiesUpdate* identityObserver)
 {
-
+  _identObservers.remove_if( [=](IIdentitiesUpdate* n)
+                             { 
+                                return n == identityObserver; 
+                             }
+                           );
 }
 
 void IdentityObservable::notify ()

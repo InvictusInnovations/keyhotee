@@ -17,11 +17,15 @@ class IdentitySelection : public QWidget,
   Q_OBJECT
 
 public:
+  typedef bts::addressbook::wallet_identity TIdentity;
+
   explicit IdentitySelection(QWidget *parent = 0);
   ~IdentitySelection();
 
-  /// Returns keyhoteeId from current selected identity in the ComboBox.
-  std::string getCurrentIdentity();
+  /** Returns current selected identity in the ComboBox.
+      @note if there is no identities returns nullptr
+  */
+  const TIdentity* currentIdentity();
 
 protected:
 /// IIdentitiesUpdate interface implementation:

@@ -1,8 +1,8 @@
 #include "mailfieldswidget.hpp"
+#include "ui_mailfieldswidget.h"
 
 #include "AddressBook/AddressBookModel.hpp"
-
-#include "ui_mailfieldswidget.h"
+#include "Identity/IdentityObservable.hpp"
 
 #include <bts/application.hpp>
 #include <bts/profile.hpp>
@@ -65,6 +65,7 @@ MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, Address
 
 MailFieldsWidget::~MailFieldsWidget()
   {
+  IdentityObservable::getInstance().deleteObserver(this);
   delete ui;
   }
 
@@ -226,51 +227,6 @@ void MailFieldsWidget::validateSendButtonState()
   ui->sendButton->setEnabled(anyRecipient && anySender);
   }
 
-void MailFieldsWidget::fillSenderIdentities()
-  {
-  QMenu* menu = new QMenu(this);
-  ui->fromButton->setMenu(menu);
-
-  QAction* first = nullptr;
-
-  auto profile = bts::application::instance()->get_profile();
-  std::vector<bts::addressbook::wallet_identity> identities = profile->identities();
-
-  for(const auto& identity : identities)
-    {
-    std::string entry = identity.get_display_name();
-    auto ipk = identity.public_key;
-    assert(ipk.valid());
-
-    QAction* action = menu->addAction(tr(entry.c_str()));
-    action->setCheckable(true);
-    Action2Identity.insert(TAction2IdentityIndex::value_type(action, identity));
-
-    if(first == nullptr)
-      first = action;
-    }
-
-  connect(menu, SIGNAL(triggered(QAction*)), this, SLOT(onFromBtnTriggered(QAction*)));
-
-  /** \warning nowadays because of broken profile creation process, application can be in inconsistent
-      state and have no identity defined.
-  */
-  if(first != nullptr)
-    {
-    onFromBtnTriggered(first);
-    menu->setActiveAction(first);
-    }
-  else
-    {
-    QAction* action = menu->addAction(tr("No identity defined"));
-    action->setDisabled(true);
-    }
-
-  /// Show from controls when multiple identities are defined.
-  bool showFromControl = Action2Identity.size() > 1;
-  showFromControls(showFromControl);
-  }
-
 void MailFieldsWidget::selectSenderIdentity(const TRecipientPublicKey& senderPK)
   {
   assert(senderPK.valid());
@@ -333,3 +289,57 @@ void MailFieldsWidget::onFromBtnTriggered(QAction* action)
     }
   }
 
+void MailFieldsWidget::fillSenderIdentities()
+  {
+  QMenu* menu = new QMenu(this);
+  ui->fromButton->setMenu(menu);
+
+  connect(menu, SIGNAL(triggered(QAction*)), this, SLOT(onFromBtnTriggered(QAction*)));
+
+  /// add identity observer
+  IdentityObservable::getInstance().addObserver(this);
+  }
+
+void MailFieldsWidget::onIdentitiesChanged(const TIdentities& identities)
+{
+  QMenu* menu = ui->fromButton->menu();
+  assert (menu != nullptr);
+
+  /// Clear and fill again
+  menu->clear();
+  Action2Identity.clear();
+
+  QAction* first = nullptr;
+
+  for(const auto& identity : identities)
+    {
+    std::string entry = identity.get_display_name();
+    auto ipk = identity.public_key;
+    assert(ipk.valid());
+
+    QAction* action = menu->addAction(entry.c_str());
+    action->setCheckable(true);
+    Action2Identity.insert(TAction2IdentityIndex::value_type(action, identity));
+
+    if(first == nullptr)
+      first = action;
+    }
+
+  /** \warning nowadays because of broken profile creation process, application can be in inconsistent
+      state and have no identity defined.
+  */
+  if(first != nullptr)
+    {
+    onFromBtnTriggered(first);
+    menu->setActiveAction(first);
+    }
+  else
+    {
+    QAction* action = menu->addAction(tr("No identity defined"));
+    action->setDisabled(true);
+    }
+
+  /// Show from controls when multiple identities are defined.
+  bool showFromControl = Action2Identity.size() > 1;
+  showFromControls(showFromControl);  
+}

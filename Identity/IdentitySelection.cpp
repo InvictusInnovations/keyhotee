@@ -21,8 +21,10 @@ void IdentitySelection::onIdentitiesChanged(const TIdentities& identities)
   int i = 0;
   for (const auto& v : identities)
   {
-    ui->identity_select->addItem(v.get_display_name().c_str());
-    ++i;
+    std::string entry = v.get_display_name();
+    auto ipk = v.public_key;
+    assert(ipk.valid());
+    ui->identity_select->addItem(entry.c_str());
   }
 
   if (identities.empty() == false)
@@ -34,16 +36,16 @@ void IdentitySelection::onIdentitiesChanged(const TIdentities& identities)
 }
 
 
-std::string IdentitySelection::getCurrentIdentity()
+const IdentitySelection::TIdentity* IdentitySelection::currentIdentity()
 {
   if (_identities.size () == 1)
-    return _identities[0].dac_id_string;
+    return &_identities[0];
 
   /// get current selection from ComboBox
   int identityIdx = ui->identity_select->currentIndex();
   if (identityIdx != -1)
   {
-    return _identities[identityIdx].dac_id_string;
+    return &_identities[identityIdx];
   }   
-  return "";
+  return nullptr;
 }

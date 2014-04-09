@@ -55,13 +55,14 @@ void ContactView::sendChatMessage()
   auto msg = ui->chat_input->toPlainText();
   if (msg.size() != 0)
   {
-    auto                               app = bts::application::instance();
-    auto                               profile = app->get_profile();
-    bts::bitchat::private_text_message text_msg(msg.toUtf8().constData() );
-    std::string dac_id_string = ui->widget_Identity->getCurrentIdentity();
-    if (dac_id_string.empty() == false)
+    auto identity = ui->widget_Identity->currentIdentity();
+    if (identity != nullptr)
     {
-      fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key( dac_id_string );
+      auto                               app = bts::application::instance();
+      auto                               profile = app->get_profile();
+      bts::bitchat::private_text_message text_msg(msg.toUtf8().constData() );
+
+      fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key( identity->dac_id_string );
       app->send_text_message(text_msg, _current_contact.public_key, my_priv_key);
       appendChatMessage("me", msg);
     }
@@ -119,7 +120,7 @@ ContactView::ContactView(QWidget* parent)
   //default contact view: info page
   ui->contact_pages->setCurrentIndex(info);
   
-  /// add Identity observer
+  /// add identity observer
   IdentityObservable::getInstance().addObserver( ui->widget_Identity );
 
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
@@ -176,6 +177,12 @@ ContactView::ContactView(QWidget* parent)
 
   checkSendMailButton();
   setContact(Contact() );
+}
+
+ContactView::~ContactView()
+{
+  IdentityObservable::getInstance().deleteObserver( ui->widget_Identity );
+  delete ui;
 }
 
 void ContactView::onEdit()
@@ -306,11 +313,6 @@ void ContactView::onRequestContact()
   request->enableAddContact(false);
   request->setAddressBook(_address_book);
   request->show();
-}
-
-ContactView::~ContactView()
-{
-  delete ui;
 }
 
 void ContactView::setContact(const Contact& current_contact)

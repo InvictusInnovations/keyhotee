@@ -22,7 +22,6 @@ public:
   void enableAddContact(bool active);
 
 private:
-  void fillSelectIdentities();
   void checkAddAsNewContact();
   void addAsNewContact();
   void genExtendedPubKey(bts::extended_public_key &extended_pub_key);

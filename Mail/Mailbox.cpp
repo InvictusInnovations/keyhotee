@@ -77,9 +77,9 @@ void Mailbox::checksendmailbuttons()
     auto profile = app->get_profile();
 
     auto idents = profile->identities();
-    reply_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
-    reply_all_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
-    forward_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
+    reply_mail->setEnabled(oneEmailSelected && ( ! idents.empty()));
+    reply_all_mail->setEnabled(oneEmailSelected && ( ! idents.empty()));
+    forward_mail->setEnabled(oneEmailSelected && ( ! idents.empty()));
 }
 
 void Mailbox::onSelectionChanged(const QItemSelection &selected,
