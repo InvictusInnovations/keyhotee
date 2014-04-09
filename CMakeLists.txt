@@ -10,13 +10,25 @@
 # Warning: it must appear before starting project definition
 SET (CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebinfo" CACHE STRING "" FORCE)
 
+IF(WIN32)
+   # Build all windows projects with /EHsc, which will prevent the compiler from 
+   # translating structured exceptions into C++ exceptions (which would make
+   # our crash reporter less useful)
+   IF (NOT CMAKE_CXX_FLAGS MATCHES "/EHsc")
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+   ENDIF()
+
+  #Set to allow xp compatibility
+  set(CMAKE_GENERATOR_TOOLSET "v120_xp" CACHE STRING "Platform toolset" FORCE)
+#  set(CMAKE_GENERATOR_TOOLSET "v120_xp")
+ENDIF(WIN32)
+
 project( keyhotee )
 cmake_minimum_required( VERSION 2.8.12.1 )
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "7")
 set(VERSION_PATCH "0")
-
 
 SET (INVICTUS_ROOT $ENV{INVICTUS_ROOT})
 
@@ -27,6 +39,7 @@ ENDIF("${INVICTUS_ROOT}" STREQUAL "")
 GET_FILENAME_COMPONENT(INVICTUS_ROOT ${INVICTUS_ROOT} REALPATH) # remove ugliness
 
 message(STATUS "Using invictus root: " ${INVICTUS_ROOT})
+message(STATUS "Using platform toolset: ${CMAKE_GENERATOR_TOOLSET}")
 
 # Let's configure binaries output directory (by default invictus-root/bin)
 if (APPLE)
@@ -46,15 +59,6 @@ endif(APPLE)
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "${INVICTUS_ROOT}/install" CACHE PATH "Keyhotee install prefix" FORCE)
 endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-
-IF(WIN32)
-   # Build all windows projects with /EHsc, which will prevent the compiler from 
-   # translating structured exceptions into C++ exceptions (which would make
-   # our crash reporter less useful)
-   IF (NOT CMAKE_CXX_FLAGS MATCHES "/EHsc")
-      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")    
-   ENDIF()
-ENDIF(WIN32)
 
 add_subdirectory(BitShares)
 add_subdirectory(miner)
@@ -162,9 +166,6 @@ IF( WIN32 )
     # Use dedicated prefix to find static versions of libraries 
     SET(ICU_LIBS_PREFIX "s")
   ENDIF()
-
-  #Set to allow xp compatibility
-  set(CMAKE_GENERATOR_TOOLSET "v110_xp" CACHE INTERNAL "XP-compatible VS 11")
 ELSE()
   IF(KH_STATIC_QT EQUAL 1)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
@@ -469,6 +470,14 @@ set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_DEBUG KeyhoteeD )
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELWITHDEBINFO Keyhotee )
 
+set (PDB_LIST_RELEASE)
+set (PDB_LIST_DEBUG)
+set (KeyhoteePDB_RELEASE)
+set (KeyhoteePDB_DEBUG)
+
+get_target_property(PDB_LIST_RELEASE fc INTERFACE_LINK_PDB_RELEASE)
+get_target_property(PDB_LIST_DEBUG fc INTERFACE_LINK_PDB_DEBUG)
+
 # Use the Widgets module from Qt 5.
 qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport)
 
@@ -505,6 +514,7 @@ if (MSVC)
   message(STATUS "Setting up debug options for MSVC build")
 # Probably cmake has a bug and vcxproj generated for executable in Debug conf. has disabled debug info
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
+#INSTALL ( FILES ${PROJECT_BINARY_DIR}/Bin/Debug/file.pdb DIRECTORY lib CONFIGURATIONS Debug )
 endif(MSVC)
 
 MACRO(SUBDIRLIST result curdir)
