@@ -58,6 +58,7 @@ ENDIF(WIN32)
 
 add_subdirectory(BitShares)
 add_subdirectory(miner)
+add_
 
 macro(FillQtDependentLibraries)
   GET_TARGET_PROPERTY(QT_LIB_DIR Qt5::Core LOCATION)
@@ -226,7 +227,7 @@ qt5_wrap_ui( UiMailFieldsWidgets               Mail/mailfieldswidget.ui )
 qt5_wrap_ui( UiMoneyAttachementWidget          Mail/moneyattachementwidget.ui )
 qt5_wrap_ui( UiFileAttachmentWidget            Mail/fileattachmentwidget.ui )
 qt5_wrap_ui( UiFileAttachmentDialog            Mail/FileAttachmentDialog.ui )
-qt5_wrap_ui( UiWallets                         wallets.ui )
+qt5_wrap_ui( UiWallets                         Wallets/wallets.ui )
 
 set( sources  
         qtreusable/selfsizingmainwindow.h
@@ -340,6 +341,14 @@ set( sources
         KeyhoteeMainWindow.hpp
         KeyhoteeMainWindow.cpp
 
+		Wallets/wallets.ui
+		Wallets/wallets.hpp
+		Wallets/wallets.cpp
+		Wallets/transactionhistorymodel.hpp
+		Wallets/transactionhistorymodel.cpp
+		Wallets/wallettransaction.hpp
+		Wallets/wallettransaction.hpp
+
         ATopLevelWindowsContainer.hpp
         ATopLevelWindowsContainer.cpp
         ATopLevelWindow.hpp
@@ -357,10 +366,6 @@ set( sources
         connectionstatusframe.ui
         connectionstatusframe.h
         connectionstatusframe.cpp
-
-        wallets.ui
-        wallets.hpp
-        wallets.cpp
 
         public_key_address.hpp
 
