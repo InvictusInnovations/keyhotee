@@ -552,7 +552,7 @@ class TConnectionProcessor::TOutboxQueue
     void connectionCheckingLoop();
     void startTransmission()
       {
-      if(TransferLoopComplete.valid() == false || TransferLoopComplete.ready())
+      if(!TransferLoopComplete.valid() || TransferLoopComplete.ready())
         TransferLoopComplete = fc::async([=]{ transmissionLoop(); });
       }
 
@@ -644,9 +644,9 @@ void TConnectionProcessor::TOutboxQueue::transmissionLoop()
   TPhysicalMailMessage msg;
   TStoredMailMessage   storedMsg;
 
-  while(isCancelled() == false && fetchNextMessage(&storedMsg, &msg))
+  while(!isCancelled()  && fetchNextMessage(&storedMsg, &msg))
     {
-    if(notificationSent == false)
+    if(!notificationSent)
       {
       Processor.Sink->OnMessageSendingStart();
       notificationSent = true;
@@ -674,7 +674,7 @@ void TConnectionProcessor::TOutboxQueue::connectionCheckingLoop()
     if(isMailConnected())
       {
       startTransmission();
-      break;
+      return;
       }
 
     fc::usleep(fc::milliseconds(250));

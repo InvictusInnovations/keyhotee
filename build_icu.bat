@@ -22,7 +22,7 @@ for /f "delims=" %%a in ('cygpath %ICU_ROOT%') do @set ICU_PREFIX=%%a
 
 echo ICU prefix: %ICU_PREFIX%
 
-call "%VS110COMNTOOLS%\..\..\VC\vcvarsall.bat"
+call "%VS120COMNTOOLS%\..\..\VC\vcvarsall.bat"
 
 dos2unix *
 dos2unix -f configure
