@@ -24,9 +24,9 @@ IF(WIN32)
   #Set to allow xp compatibility
   set(CMAKE_GENERATOR_TOOLSET "v120_xp" CACHE STRING "Platform toolset" FORCE)
 
-#looks like this flag can have different default on some machines.
-SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
+  #looks like this flag can have different default on some machines.
+  SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
+  SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
 
 ENDIF(WIN32)
 
