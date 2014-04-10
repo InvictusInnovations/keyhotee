@@ -96,6 +96,12 @@ class IGuiUpdateSink
     virtual void OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
       const TPhysicalMailMessage& msg) = 0;
 
+    /** Called when the server rejects a message we've sent it.
+     * (this can happen if the message exceeds the size limits)
+     */
+    virtual void OnMessageRejectedByServer(const TPhysicalMailMessage& msg,
+                                           const std::string& reasonText) = 0;
+
   protected:
     virtual ~IGuiUpdateSink() {}
   };

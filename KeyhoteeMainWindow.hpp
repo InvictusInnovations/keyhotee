@@ -114,6 +114,9 @@ private:
   /// \see IGuiUpdateSink interface description.
   virtual void OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
     const TPhysicalMailMessage& msg) override;
+  /// \see IGuiUpdateSink interface description.
+  virtual void OnMessageRejectedByServer(const TPhysicalMailMessage& msg, 
+                                         const std::string& reasonText) override;
 
   /// Only TKeyhoteeApplication can build main window object.
   friend class TKeyhoteeApplication;

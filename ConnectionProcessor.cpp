@@ -106,6 +106,7 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
     /// \see IGuiUpdateSink interface description.
     virtual void OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
       const TPhysicalMailMessage& msg) override;
+    virtual void OnMessageRejectedByServer(const TPhysicalMailMessage& msg, const std::string& reasonText) override;
 
   private:
     class TReceivedChatMsg : public ANotification
@@ -367,6 +368,36 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
       TPhysicalMailMessage Msg;
       };
 
+    class TMessageRejectedByServer: public ANotification
+    {
+    public:
+      static ANotification* Create(const TPhysicalMailMessage& msg, const std::string& reasonText, IGuiUpdateSink& sink)
+      {
+        return new TMessageRejectedByServer(msg, reasonText, sink);
+      }
+
+      /// ANotification class reimplementation:
+      virtual void Notify()
+      {
+        Sink.OnMessageRejectedByServer(Msg, ReasonText);
+        delete this;
+      }
+
+    private:
+      TMessageRejectedByServer(const TPhysicalMailMessage& msg, 
+                               const std::string& reasonText,
+                               IGuiUpdateSink& sink) : 
+        ANotification(sink),
+        ReasonText(reasonText),
+        Msg(msg) {}
+
+      virtual ~TMessageRejectedByServer() {}
+
+      /// Class attributes:
+    private:
+      TPhysicalMailMessage Msg;
+      std::string          ReasonText;
+    };
     Q_SIGNALS:
       /// Emmitted when some GUI notification should be propagated across threads.
       void notificationSent(ANotification* notification);
@@ -455,10 +486,16 @@ void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageSendingEnd()
 
 void TConnectionProcessor::TThreadSafeGuiNotifier::OnMissingSenderIdentity(
   const TRecipientPublicKey& senderId, const TPhysicalMailMessage& msg)
-  {
+{
   ANotification* n = TMissingSenderIdentity::Create(senderId, msg, Sink);
   emit notificationSent(n);
-  }
+}
+
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnMessageRejectedByServer(const TPhysicalMailMessage& msg, const std::string& reasonText)
+{
+  ANotification* n = TMessageRejectedByServer::Create(msg, reasonText, Sink);
+  emit notificationSent(n);
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///                             TConnectionProcessor::TOutboxQueue                              ///
@@ -756,7 +793,21 @@ bool TConnectionProcessor::TOutboxQueue::transferMessage(const TRecipientPublicK
       sendStatus = false;
       }
     }
-  catch(const fc::exception& e)
+  catch (bts::message_rejected_exception& e)
+  {
+    // Right now our handling of rejected messages is very sloppy
+    // It's just good enough to avoid having the client repeatedly 
+    // send the same message to the server, but not good enough for general
+    // use.
+    // When a message is rejected, we fire off a notification that displays a message box,
+    // then we move the message to the sent folder.
+    // We should do something better, like move it to a designated "rejected" folder, 
+    // or send a copy of the message to the inbox with some text explaining
+    // that the server rejected it prepended, like what a regular mail server would do.
+    Processor.Sink->OnMessageRejectedByServer(msg, e.get_reason_text());
+    sendStatus = true;
+  }
+  catch (const fc::exception& e)
     {
     sendStatus = false;
     elog("${e}", ("e", e.to_detail_string()));

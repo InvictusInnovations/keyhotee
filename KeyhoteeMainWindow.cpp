@@ -1148,6 +1148,15 @@ void KeyhoteeMainWindow::OnMissingSenderIdentity(const TRecipientPublicKey& send
     QString(pkAddressText.c_str()));
 }
 
+void KeyhoteeMainWindow::OnMessageRejectedByServer(const TPhysicalMailMessage& msg, const std::string& reasonText)
+{
+  QMessageBox::warning(this, tr("Mail rejected"),
+    tr("This message was rejected by the server:\n") +
+    tr("\tSubject: ") + QString(msg.subject.c_str()) + QString("\n") +
+    tr("Reason: ") + QString(reasonText.c_str()) + QString("\n\n") + 
+    tr("The unsent message has been saved to your Outbox"));
+}
+
 void KeyhoteeMainWindow::notSupported()
 {
   QMessageBox::warning(this, "Warning", "Not supported");

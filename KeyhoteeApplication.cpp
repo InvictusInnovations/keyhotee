@@ -214,6 +214,8 @@ int TKeyhoteeApplication::run(int& argc, char** argv)
   HICON hIcon = qt_pixmapToWinHICON(px);
   SetConsoleIcon(hIcon);
 
+  SetConsoleOutputCP(60051); // utf8
+
   freopen("CONOUT$", "wb", stdout);
   freopen("CONOUT$", "wb", stderr);
   //freopen( "console.txt", "wb", stdout);
