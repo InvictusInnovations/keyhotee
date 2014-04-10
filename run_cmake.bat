@@ -1,4 +1,6 @@
+rem this script runs cmake to generate project files accoring to CMakeLists specifications.
+rem Should be started from directory where build should be performed (ie %INVICTUS_ROOT%\vs12)
 setlocal
-call setenv.bat
-cd %INVICTUS_ROOT%
-cmake-gui -G "Visual Studio 11"
+call %~dp0\setenv.bat
+rem cd %INVICTUS_ROOT%
+cmake -G "Visual Studio 12" "%INVICTUS_ROOT%\keyhotee" -T "v120_xp" "%INVICTUS_ROOT%\keyhotee"

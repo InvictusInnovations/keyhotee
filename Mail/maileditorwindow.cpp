@@ -215,6 +215,7 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
   ui->editToolBar->hide();
   ui->adjustToolbar->hide();
   ui->formatToolBar->hide();
+  ui->mailToolBar->hide();
 
   MoneyAttachement = new TMoneyAttachementWidget(ui->moneyAttachementToolBar);
   ui->moneyAttachementToolBar->addWidget(MoneyAttachement);
@@ -255,6 +256,8 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
     ui->actionMailFields->setMenu(mailFieldsMenu);
     ui->mainToolBar->insertAction(ui->actionShowFormatOptions, ui->actionMailFields);
     }
+  else
+    ui->mailToolBar->show();
 
   setupEditorCommands();
 
@@ -581,6 +584,7 @@ void MailEditorMainWindow::toggleReadOnlyMode()
   ui->messageEdit->setReadOnly(EditMode == false);
   ui->formatToolBar->setEnabled(EditMode);
   ui->adjustToolbar->setEnabled(EditMode);
+  ui->mailToolBar->setDisabled(EditMode);
   }
 
 bool MailEditorMainWindow::onSave()
@@ -772,4 +776,19 @@ void MailEditorMainWindow::addContactCard (const Contact& contact)
 {
   FileAttachment->addContactCard(contact);
   ui->fileAttachementToolBar->setVisible(true);
+}
+
+void MailEditorMainWindow::onMailReplyTriggered()
+{
+  QMessageBox::warning(this, "Warning", "Not supported");
+}
+
+void MailEditorMainWindow::onMailReplyAllTriggered()
+{
+  QMessageBox::warning(this, "Warning", "Not supported");
+}
+
+void MailEditorMainWindow::onMailForwardTriggered()
+{
+  QMessageBox::warning(this, "Warning", "Not supported");
 }
