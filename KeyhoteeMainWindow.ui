@@ -723,7 +723,7 @@
   <customwidget>
    <class>Wallets</class>
    <extends>QWidget</extends>
-   <header>wallets.hpp</header>
+   <header>Wallets/wallets.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>

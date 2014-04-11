@@ -177,17 +177,19 @@ class MailEditorMainWindow : public ATopLevelWindow
     /** Filled when mail editor has been opened with message already stored in Drafts. During save
         this old message should be replaced with new one.
     */
-    fc::optional<TStoredMailMessage> DraftMessage;
-    AddressBookModel&                ABModel;
-    IMailProcessor&                  MailProcessor;
-    MailFieldsWidget*                MailFields;
-    TMoneyAttachementWidget*         MoneyAttachement;
-    TFileAttachmentWidget*           FileAttachment;
-    QFontComboBox*                   FontCombo;
-    QComboBox*                       FontSize;
-    bool                             EditMode;
-    fc::optional<fc::uint256>        _src_msg_id;
-    IMailProcessor::TMsgType         _msg_type;
+    fc::optional<TStoredMailMessage>  DraftMessage;
+    AddressBookModel&                 ABModel;
+    IMailProcessor&                   MailProcessor;
+    MailFieldsWidget*                 MailFields;
+    TMoneyAttachementWidget*          MoneyAttachement;
+    TFileAttachmentWidget*            FileAttachment;
+    QFontComboBox*                    FontCombo;
+    QComboBox*                        FontSize;
+    bool                              EditMode;
+    fc::optional<fc::uint256>         _src_msg_id;
+    IMailProcessor::TMsgType          _msg_type;
+    ATopLevelWindowsContainer*        _parent;
+    TPhysicalMailMessage              _src_msg;
   };
 
 #endif ///__MAILEDITORWINDOW_HPP
