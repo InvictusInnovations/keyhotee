@@ -366,6 +366,7 @@ void MailEditorMainWindow::closeEvent(QCloseEvent *e)
   {
   if(maybeSave())
     {
+    MailFields->closeEvent();
     e->accept();
     ATopLevelWindow::closeEvent(e);
     }

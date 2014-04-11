@@ -35,8 +35,6 @@ RequestAuthorization::RequestAuthorization(QWidget *parent) :
 
 RequestAuthorization::~RequestAuthorization()
 {
-  /// delete identity observer
-  IdentityObservable::getInstance().deleteObserver( ui->widget_Identity );
   delete ui;
 }
 
@@ -180,4 +178,12 @@ void RequestAuthorization::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState st
     default:
       assert(false);
   }
+}
+
+void RequestAuthorization::done(int code)
+{
+  /// delete identity observer
+  IdentityObservable::getInstance().deleteObserver(ui->widget_Identity);
+
+  QDialog::done(code);
 }

@@ -26,6 +26,10 @@ private:
   void addAsNewContact();
   void genExtendedPubKey(bts::extended_public_key &extended_pub_key);
   void setAuthorizationStatus();
+  /** QDialog reimplementation to delete identity observer.
+      "done" method is called when dialog is canceled or accepted
+  */
+  virtual void done(int code) override;
 
 private slots:
   void onExtendPubKey(bool checked);

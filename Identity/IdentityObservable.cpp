@@ -19,9 +19,10 @@ void IdentityObservable::addObserver (IIdentitiesUpdate* identityObserver)
 
 void IdentityObservable::deleteObserver (IIdentitiesUpdate* identityObserver)
 {
-  _identObservers.remove_if( [=](IIdentitiesUpdate* n)
+  _identObservers.remove_if( [=](IIdentitiesUpdate* deleteObserver)
                              { 
-                                return n == identityObserver; 
+                               /// find and remove observer
+                               return deleteObserver == identityObserver;
                              }
                            );
 }

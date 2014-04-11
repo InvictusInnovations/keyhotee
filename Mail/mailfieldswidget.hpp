@@ -73,6 +73,9 @@ class MailFieldsWidget : public QWidget,
       return (VisibleFields & field) != 0;
       }
 
+    /// Calling from maileditorwindow when window get closeEvent
+    void closeEvent();
+
   Q_SIGNAL void subjectChanged(const QString& subject);
   Q_SIGNAL void recipientListChanged();
 

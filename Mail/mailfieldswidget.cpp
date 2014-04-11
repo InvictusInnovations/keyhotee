@@ -64,8 +64,7 @@ MailFieldsWidget::MailFieldsWidget(QWidget& parent, QAction& actionSend, Address
   }
 
 MailFieldsWidget::~MailFieldsWidget()
-  {
-  IdentityObservable::getInstance().deleteObserver(this);
+  {  
   delete ui;
   }
 
@@ -342,4 +341,9 @@ void MailFieldsWidget::onIdentitiesChanged(const TIdentities& identities)
   /// Show from controls when multiple identities are defined.
   bool showFromControl = Action2Identity.size() > 1;
   showFromControls(showFromControl);  
+}
+
+void MailFieldsWidget::closeEvent()
+{
+  IdentityObservable::getInstance().deleteObserver(this);
 }
