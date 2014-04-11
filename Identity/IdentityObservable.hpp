@@ -20,7 +20,7 @@ public:
 
 private:
   IdentityObservable() {};
-  virtual ~IdentityObservable() {};
+  virtual ~IdentityObservable();
 
 private:
   std::list<IIdentitiesUpdate*> _identObservers;

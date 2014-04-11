@@ -308,7 +308,7 @@ void MailFieldsWidget::onIdentitiesChanged(const TIdentities& identities)
   menu->clear();
   Action2Identity.clear();
 
-  QAction* first = nullptr;
+  QAction* initial = nullptr;
 
   for(const auto& identity : identities)
     {
@@ -320,17 +320,23 @@ void MailFieldsWidget::onIdentitiesChanged(const TIdentities& identities)
     action->setCheckable(true);
     Action2Identity.insert(TAction2IdentityIndex::value_type(action, identity));
 
-    if(first == nullptr)
-      first = action;
+    if (initial == nullptr)
+      initial = action;
+
+    if (SenderIdentity.get_display_name() == identity.get_display_name())
+      {
+      /// save current selected identity (don't clear selection)
+      initial = action;
+      }
     }
 
   /** \warning nowadays because of broken profile creation process, application can be in inconsistent
       state and have no identity defined.
   */
-  if(first != nullptr)
+  if (initial != nullptr)
     {
-    onFromBtnTriggered(first);
-    menu->setActiveAction(first);
+    onFromBtnTriggered(initial);
+    menu->setActiveAction(initial);
     }
   else
     {

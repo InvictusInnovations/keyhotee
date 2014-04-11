@@ -1,6 +1,11 @@
 #include "IdentityObservable.hpp"
 #include "IdentitiesUpdate.hpp"
 
+IdentityObservable::~IdentityObservable()
+{
+  assert(_identObservers.empty());
+}
+
 IdentityObservable& IdentityObservable::getInstance()
 {
   static IdentityObservable instance;
