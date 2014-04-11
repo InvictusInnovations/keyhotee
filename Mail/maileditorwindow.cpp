@@ -199,6 +199,7 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
   IMailProcessor& mailProcessor, bool editMode) :
   ATopLevelWindow(parent),
   ui(new Ui::MailEditorWindow()),
+  _parent(parent),
   ABModel(abModel),
   MailProcessor(mailProcessor), 
   FontCombo(nullptr),
@@ -313,6 +314,8 @@ void MailEditorMainWindow::LoadMessage(Mailbox* mailbox, const TStoredMailMessag
   TPublicKeyIndex allRecipients, toRecipients;
   TRecipientPublicKeys sourceToList, sourceCCList;
   QString newSubject;
+
+  _src_msg = srcMsg;
 
   ui->messageEdit->setOpenExternalLinks(true);
   ui->messageEdit->setOpenLinks(true);
@@ -781,15 +784,21 @@ void MailEditorMainWindow::addContactCard (const Contact& contact)
 
 void MailEditorMainWindow::onMailReplyTriggered()
 {
-  QMessageBox::warning(this, "Warning", "Not supported");
+  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_parent, ABModel, MailProcessor, true);
+  mailEditor->LoadMessage(nullptr, *DraftMessage, _src_msg, Reply);
+  mailEditor->show();
 }
 
 void MailEditorMainWindow::onMailReplyAllTriggered()
 {
-  QMessageBox::warning(this, "Warning", "Not supported");
+  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_parent, ABModel, MailProcessor, true);
+  mailEditor->LoadMessage(nullptr, *DraftMessage, _src_msg, ReplyAll);
+  mailEditor->show();
 }
 
 void MailEditorMainWindow::onMailForwardTriggered()
 {
-  QMessageBox::warning(this, "Warning", "Not supported");
+  MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_parent, ABModel, MailProcessor, true);
+  mailEditor->LoadMessage(nullptr, *DraftMessage, _src_msg, Forward);
+  mailEditor->show();
 }
