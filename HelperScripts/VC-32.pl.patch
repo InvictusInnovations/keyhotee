@@ -1,0 +1,49 @@
+--- VC-32.pl.org	2014-03-17 16:14:20.000000000 +0100
++++ VC-32.pl	2014-04-11 12:16:42.994961500 +0200
+@@ -3,8 +3,8 @@
+ # Win64 and WinCE [follow $FLAVOR variable to trace the differences].
+ #
+ 
+-$ssl=	"ssleay32";
+-$crypto="libeay32";
++$ssl=	$debug ? "ssleay32MDd" : "ssleay32MD";
++$crypto=$debug ? "libeay32MDd" : "libeay32MD";
+ 
+ if ($fips && !$shlib)
+ 	{
+@@ -13,7 +13,7 @@
+ 	}
+ else
+ 	{
+-	$crypto="libeay32";
++	$crypto=$debug ? "libeay32MDd" : "libeay32MD";
+ 	}
+ 
+ $o='\\';
+@@ -45,7 +45,7 @@
+     # considered safe to ignore.
+     # 
+     $base_cflags= " $mf_cflag";
+-    my $f = $shlib || $fips ?' /MD':' /MT';
++    my $f = ' /MD';
+     $lib_cflag='/Zl' if (!$shlib);	# remove /DEFAULTLIBs from static lib
+     $opt_cflags=$f.' /Ox';
+     $dbg_cflags=$f.'d /Od -DDEBUG -D_DEBUG';
+@@ -126,7 +126,7 @@
+ else	# Win32
+     {
+     $base_cflags= " $mf_cflag";
+-    my $f = $shlib || $fips ?' /MD':' /MT';
++    my $f = ' /MD';
+     $lib_cflag='/Zl' if (!$shlib);	# remove /DEFAULTLIBs from static lib
+     $ff = "/fixed";
+     $opt_cflags=$f.' /Ox /O2 /Ob2';
+@@ -152,7 +152,7 @@
+ 
+ # generate symbols.pdb unconditionally
+ $app_cflag.=" /Zi /Fd\$(TMP_D)/app";
+-$lib_cflag.=" /Zi /Fd\$(TMP_D)/lib";
++$lib_cflag.=" /Z7 /Fd\$(TMP_D)/lib";
+ $lflags.=" /debug";
+ 
+ $obj='.obj';
