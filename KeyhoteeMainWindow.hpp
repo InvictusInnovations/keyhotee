@@ -34,6 +34,7 @@ class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
 
+class QAction;
 class QCompleter;
 class QLineEdit;
 class QTreeWidgetItem;
@@ -144,6 +145,8 @@ private slots:
   void onSetIcon();
   void onRequestAuthorization();
   void onShareContact();
+  // Language
+  void onLanguageChanged(QAction*);
   // Help
   void onDiagnostic();
   void onAbout();
@@ -190,6 +193,7 @@ private:
   void addContact();
   void processResponse(const TAuthorizationMessage& msg, const TStoredMailMessage& header);
   void loadStoredRequests(bts::bitchat::message_db_ptr request_db);
+  void initMenuLanguage();
 
   /// Class attributes:
 
@@ -224,6 +228,7 @@ private:
   QList <Mailbox*>                        _mailboxesList;
   /// Set to true when close event processing is in progress (it wasn't yet accepted nor ignored)
   bool                                    _isClosing;
+  QList <QAction*>                        _actionsLang;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();
