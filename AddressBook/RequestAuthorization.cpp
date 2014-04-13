@@ -22,7 +22,7 @@ RequestAuthorization::RequestAuthorization(QWidget *parent) :
   ui->keyhoteeidpubkey->setEditable(true);
   ui->button_send->setEnabled(false);
   ui->keyhoteeidpubkey->showCopyToClipboard(false);
-  ui->widget_Identity->setFocus();
+  ui->keyhoteeidpubkey->setFocus(Qt::ActiveWindowFocusReason);
     
   ui->widget_Identity->addWidgetRelated(ui->line);
   /// add identity observer

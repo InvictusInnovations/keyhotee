@@ -10,13 +10,16 @@
     <height>22</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <widget class="QLabel" name="identity_label">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>0</x>
      <y>0</y>
      <width>90</width>
      <height>22</height>
@@ -29,7 +32,7 @@
   <widget class="QComboBox" name="identity_select">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>110</x>
      <y>0</y>
      <width>235</width>
      <height>22</height>
@@ -41,6 +44,9 @@
      <weight>75</weight>
      <bold>true</bold>
     </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
    </property>
   </widget>
  </widget>
