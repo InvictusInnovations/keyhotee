@@ -25,7 +25,13 @@ public:
   /** Returns current selected identity in the ComboBox.
       @note if there is no identities returns nullptr
   */
-  const TIdentity* currentIdentity();
+  const TIdentity* currentIdentity() const;
+
+  /** Add widget associated with the IdentitySelection class.
+      When identities size is <= 1 hide IdentitySelection widgets
+      and also hide widgets related.
+  */
+  void addWidgetRelated(QWidget* widget);
 
 protected:
 /// IIdentitiesUpdate interface implementation:
@@ -35,6 +41,7 @@ protected:
 private:
   Ui::IdentitySelection*  ui;
   TIdentities             _identities;
+  QList<QWidget*>         _widgetsRelated;
 };
 
 #endif // IDENTITYSELECTION_H

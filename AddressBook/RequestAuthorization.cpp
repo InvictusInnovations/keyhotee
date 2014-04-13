@@ -23,7 +23,8 @@ RequestAuthorization::RequestAuthorization(QWidget *parent) :
   ui->button_send->setEnabled(false);
   ui->keyhoteeidpubkey->showCopyToClipboard(false);
   ui->widget_Identity->setFocus();
-
+    
+  ui->widget_Identity->addWidgetRelated(ui->line);
   /// add identity observer
   IdentityObservable::getInstance().addObserver( ui->widget_Identity );
 

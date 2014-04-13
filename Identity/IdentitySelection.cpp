@@ -56,12 +56,16 @@ void IdentitySelection::onIdentitiesChanged(const TIdentities& identities)
   }  
 
   bool show = (_identities.size() > 1);
-  ui->identity_select->setVisible(show);
-  ui->identity_label->setVisible(show);
+  this->setVisible(show);
+
+  for (auto v : _widgetsRelated)
+  {
+    v->setVisible(show);
+  }  
 }
 
 
-const IdentitySelection::TIdentity* IdentitySelection::currentIdentity()
+const IdentitySelection::TIdentity* IdentitySelection::currentIdentity() const
 {
   if (_identities.size () == 1)
     return &_identities[0];
@@ -73,4 +77,9 @@ const IdentitySelection::TIdentity* IdentitySelection::currentIdentity()
     return &_identities[identityIdx];
   }   
   return nullptr;
+}
+
+void IdentitySelection::addWidgetRelated(QWidget* widget)
+{
+  _widgetsRelated.push_back(widget);
 }
