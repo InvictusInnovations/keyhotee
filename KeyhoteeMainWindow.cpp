@@ -1382,9 +1382,6 @@ void KeyhoteeMainWindow::initMenuLanguage()
   _actionsLang.push_back(ui->actionSpanish);
   ui->actionSpanish->setData(QLocale(QLocale::Spanish, QLocale::AnyCountry).name());
 
-  _actionsLang.push_back(ui->actionSpanish_Chile);
-  ui->actionSpanish_Chile->setData(QLocale(QLocale::Spanish, QLocale::Chile).name());
-
   QSettings settings("Invictus Innovations", "Keyhotee");
   QString locale = settings.value("Language", "").toString();
   /// Set checked language action

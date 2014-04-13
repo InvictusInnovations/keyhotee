@@ -467,7 +467,6 @@
     <addaction name="actionPolish"/>
     <addaction name="actionPortuguese"/>
     <addaction name="actionSpanish"/>
-    <addaction name="actionSpanish_Chile"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
