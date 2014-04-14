@@ -47,6 +47,9 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
       <property name="dragDropOverwriteMode">
        <bool>false</bool>
       </property>
@@ -123,6 +126,81 @@
     </widget>
    </item>
   </layout>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/mail_open.png</normaloff>:/images/mail_open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="toolTip">
+    <string>Open the message in standalone window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionMark_as_unread">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/mail.png</normaloff>:/images/mail.png</iconset>
+   </property>
+   <property name="text">
+    <string>Mark as unread</string>
+   </property>
+   <property name="toolTip">
+    <string>Mark selected messages as unread</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/delete_icon.png</normaloff>:/images/delete_icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete selected messages</string>
+   </property>
+  </action>
+  <action name="actionReply">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/mail_reply.png</normaloff>:/images/mail_reply.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reply</string>
+   </property>
+   <property name="toolTip">
+    <string>Reply to the sender of this message</string>
+   </property>
+  </action>
+  <action name="actionReply_All">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/mail_reply_all.png</normaloff>:/images/mail_reply_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reply All</string>
+   </property>
+   <property name="toolTip">
+    <string>Reply to sender and all recipients</string>
+   </property>
+  </action>
+  <action name="actionForward">
+   <property name="icon">
+    <iconset resource="../Keyhotee.qrc">
+     <normaloff>:/images/mail_forward.png</normaloff>:/images/mail_forward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Forward</string>
+   </property>
+   <property name="toolTip">
+    <string>Forward this message</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -137,6 +215,8 @@
    <header>Mail/MailTable.hpp</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../Keyhotee.qrc"/>
+ </resources>
  <connections/>
 </ui>

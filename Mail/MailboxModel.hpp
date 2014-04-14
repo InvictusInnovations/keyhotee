@@ -47,6 +47,7 @@ public:
   void replaceMessage(const TStoredMailMessage& overwrittenMsg, const TStoredMailMessage& msg);
   void getFullMessage(const QModelIndex& index, MessageHeader& header) const;
   void markMessageAsRead(const QModelIndex& index);
+  void markMessageAsUnread(const QModelIndex& index);
   void markMessageAsReplied(const QModelIndex& index);
   void markMessageAsForwarded(const QModelIndex& index);
   QModelIndex findModelIndex(const TStoredMailMessage& msg) const;

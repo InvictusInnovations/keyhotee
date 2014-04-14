@@ -426,6 +426,19 @@ void MailboxModel::markMessageAsRead(const QModelIndex& index)
   my->_mail_db->store_message_header(msg.header);
   }
 
+void MailboxModel::markMessageAsUnread(const QModelIndex& index)
+{
+  MessageHeader& msg = *(my->_headers_random[index.row()].first);
+  if (msg.header.isUnread())
+    return;
+  msg.header.setUnread();
+
+  _unread_msg_count++;
+  updateTreeItemDisplay();
+
+  my->_mail_db->store_message_header(msg.header);
+}
+
 void MailboxModel::markMessageAsReplied(const QModelIndex& index)
 {
   MessageHeader& msg = *(my->_headers_random[index.row()].first);

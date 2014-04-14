@@ -63,61 +63,74 @@ void Mailbox::onDoubleClickedItem(QModelIndex index)
   mailEditor->show();
   }
 
+void Mailbox::onOpenMail()
+{
+  QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
+  QModelIndexList      indexes = selection_model->selectedRows();
+  onDoubleClickedItem(indexes.first());
+}
+
+void Mailbox::onMarkAsUnreadMail()
+{
+  QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
+  QModelIndexList      indexes = selection_model->selectedRows();
+  QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
+  MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
+
+  foreach(QModelIndex index, indexes)
+    sourceModel->markMessageAsUnread(index);
+}
+
 void Mailbox::showCurrentMail(const QModelIndex &selected,
                               const QModelIndex &deselected)
   {}
 
 void Mailbox::checksendmailbuttons()
 {
-    QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
-    QModelIndexList      indexes = selection_model->selectedRows();
+    QItemSelectionModel*  selection_model = ui->inbox_table->selectionModel();
+    QModelIndexList       indexes = selection_model->selectedRows();
 
-    bool                 oneEmailSelected = (indexes.size() == 1);
-    auto app = bts::application::instance();
-    auto profile = app->get_profile();
+    bool                  oneEmailSelected = (indexes.size() == 1);
+    bool                  identity = isIdentity();
 
-    auto idents = profile->identities();
-    reply_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
-    reply_all_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
-    forward_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
+    ui->actionReply->setEnabled(oneEmailSelected && identity);
+    ui->actionReply_All->setEnabled(oneEmailSelected && identity);
+    ui->actionForward->setEnabled(oneEmailSelected && identity);
 }
 
 void Mailbox::onSelectionChanged(const QItemSelection &selected,
                                  const QItemSelection &deselected)
-  {
-  QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
-  QModelIndexList      indexes = selection_model->selectedRows();
+{
+  QItemSelectionModel*  selection_model = ui->inbox_table->selectionModel();
+  QModelIndexList       indexes = selection_model->selectedRows();
   //disable reply buttons if more than one email selected
-  bool                 oneEmailSelected = (indexes.size() == 1);
-  auto app = bts::application::instance();
-  auto profile = app->get_profile();
+  bool                  oneEmailSelected = (indexes.size() == 1);
+  bool                  identity = isIdentity();
 
-  auto idents = profile->identities();
-  reply_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
-  reply_all_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
-  forward_mail->setEnabled(oneEmailSelected && (idents.size() > 0));
-
-  reply_mail->setEnabled(idents.size() > 0);
-  reply_all_mail->setEnabled(idents.size() > 0);
-  forward_mail->setEnabled(idents.size() > 0);
+  ui->actionOpen->setEnabled(oneEmailSelected);
+  ui->actionMark_as_unread->setEnabled(indexes.size() > 0);
+  ui->actionDelete->setEnabled(indexes.size() > 0);
+  ui->actionReply->setEnabled(oneEmailSelected && identity);
+  ui->actionReply_All->setEnabled(oneEmailSelected && identity);
+  ui->actionForward->setEnabled(oneEmailSelected && identity);
 
   //display selected email(s) in message preview window
   if (oneEmailSelected)
-    {
+  {
     refreshMessageViewer();
     getKeyhoteeWindow()->setEnabledMailActions(true);
-    }
+  }
   else
-    {
+  {
     if (indexes.size() > 1)
       ui->mail_viewer->setCurrentWidget(ui->info_2);
     else
       ui->mail_viewer->setCurrentWidget(ui->info_1);
     //TODO: not implemented ui->current_message->displayMailMessages(indexes,selection_model);
-
+    
     getKeyhoteeWindow()->setEnabledMailActions(false);
     getKeyhoteeWindow()->setEnabledAttachmentSaveOption( _attachmentSelected = false );
-    }
+  }
 
   getKeyhoteeWindow()->setEnabledDeleteOption( indexes.size() > 0 );
   }
@@ -173,38 +186,50 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
   connect(inbox_selection_model, &QItemSelectionModel::currentChanged, this, &Mailbox::showCurrentMail);
   connect(ui->inbox_table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onDoubleClickedItem(QModelIndex)));
 
-  connect(reply_mail, &QAction::triggered, this, &Mailbox::onReplyMail);
-  connect(reply_all_mail, &QAction::triggered, this, &Mailbox::onReplyAllMail);
-  connect(forward_mail, &QAction::triggered, this, &Mailbox::onForwardMail);
-  connect(delete_mail, &QAction::triggered, this, &Mailbox::onDeleteMail);
+  connect(ui->actionOpen, &QAction::triggered, this, &Mailbox::onOpenMail);
+  connect(ui->actionMark_as_unread, &QAction::triggered, this, &Mailbox::onMarkAsUnreadMail);
+  connect(ui->actionDelete, &QAction::triggered, this, &Mailbox::onDeleteMail);
+  connect(ui->actionReply, &QAction::triggered, this, &Mailbox::onReplyMail);
+  connect(ui->actionReply_All, &QAction::triggered, this, &Mailbox::onReplyAllMail);
+  connect(ui->actionForward, &QAction::triggered, this, &Mailbox::onForwardMail);
   }
 
 void Mailbox::setupActions()
-  {
-  reply_mail = new QAction(QIcon(":/images/mail_reply.png"), tr("Reply"), this);
-  reply_all_mail = new QAction(QIcon(":/images/mail_reply_all.png"), tr("Reply All"), this);
-  forward_mail = new QAction(QIcon(":/images/mail_forward.png"), tr("Forward"), this);
-  delete_mail = new QAction(QIcon(":/images/delete_icon.png"), tr("Delete"), this);
-  //delete_mail->setShortcut(Qt::Key_Delete);
+{
   //add actions to MailViewer toolbar
   QToolBar* message_tools = ui->current_message->message_tools;
   auto app = bts::application::instance();
   auto profile = app->get_profile();
 
-  auto idents = profile->identities();
-  if(idents.size() == 0) {
-    reply_mail->setEnabled(false);
-    reply_all_mail->setEnabled(false);
-    forward_mail->setEnabled(false);
-  }
-  message_tools->addAction(reply_mail);
-  message_tools->addAction(reply_all_mail);
-  message_tools->addAction(forward_mail);
+  message_tools->addAction(ui->actionReply);
+  message_tools->addAction(ui->actionReply_All);
+  message_tools->addAction(ui->actionForward);
   QWidget* spacer = new QWidget(message_tools);
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   message_tools->addWidget(spacer);
-  message_tools->addAction(delete_mail);
-  }
+  message_tools->addAction(ui->actionDelete);
+
+  QAction* separator1 = new QAction(this);
+  separator1->setSeparator(true);
+  QAction* separator2 = new QAction(this);
+  separator2->setSeparator(true);
+
+  ui->inbox_table->addAction(ui->actionOpen);
+  ui->inbox_table->addAction(ui->actionMark_as_unread);
+  ui->inbox_table->addAction(separator1);
+  ui->inbox_table->addAction(ui->actionDelete);
+  ui->inbox_table->addAction(separator2);
+  ui->inbox_table->addAction(ui->actionReply);
+  ui->inbox_table->addAction(ui->actionReply_All);
+  ui->inbox_table->addAction(ui->actionForward);
+
+  ui->actionOpen->setEnabled(false);
+  ui->actionMark_as_unread->setEnabled(false);
+  ui->actionDelete->setEnabled(false);
+  ui->actionReply->setEnabled(false);
+  ui->actionReply_All->setEnabled(false);
+  ui->actionForward->setEnabled(false);
+}
 
 QModelIndex Mailbox::getSelectedMail()
   {
@@ -489,4 +514,16 @@ void Mailbox::getDefaultColumns(QList<MailboxModel::Columns>* defaultColumns)
     defaultColumns->push_back(MailboxModel::DateReceived);
     defaultColumns->push_back(MailboxModel::Status);
   }
+}
+
+bool Mailbox::isIdentity()
+{
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+  auto idents = profile->identities();
+
+  if (idents.size() > 0)
+    return true;
+  else
+    return false;
 }

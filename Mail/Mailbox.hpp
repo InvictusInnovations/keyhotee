@@ -74,6 +74,9 @@ public slots:
 private slots:
   void onDoubleClickedItem(QModelIndex);
 
+  void onOpenMail();
+  void onMarkAsUnreadMail();
+
 private:
   enum ReplyType { reply, reply_all, forward };
   void setupActions();
@@ -98,6 +101,8 @@ private:
 
   void getDefaultColumns(QList<MailboxModel::Columns>* defaultColumns);
 
+  bool isIdentity();
+
 private:
   QSortFilterProxyModel* sortedModel();
   /// Don't change 'ui' declaration since it breaks QTCreator tools 
@@ -106,9 +111,9 @@ private:
   MailboxModel*                _sourceModel;
   IMailProcessor*              _mailProcessor;
   ATopLevelWindowsContainer*   _mainWindow;
-  QAction*                     reply_mail;
-  QAction*                     reply_all_mail;
-  QAction*                     forward_mail;
-  QAction*                     delete_mail;
+  //QAction*                     reply_mail;
+  //QAction*                     reply_all_mail;
+  //QAction*                     forward_mail;
+  //QAction*                     delete_mail;
   bool                         _attachmentSelected;
 };
