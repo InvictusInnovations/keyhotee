@@ -76,7 +76,10 @@ void Mailbox::onMarkAsUnreadMail()
   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
   MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
   foreach(QModelIndex index, indexes)
-    sourceModel->markMessageAsUnread(index);
+  {
+    QModelIndex mapped_index = model->mapToSource(index);
+    sourceModel->markMessageAsUnread(mapped_index);
+  }
 }
 void Mailbox::showCurrentMail(const QModelIndex &selected,
                               const QModelIndex &deselected)
