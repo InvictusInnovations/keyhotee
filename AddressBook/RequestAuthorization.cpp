@@ -4,9 +4,14 @@
 #include "AddressBookModel.hpp"
 #include "public_key_address.hpp"
 
+#include "Identity/IdentityObservable.hpp"
+#include "Identity/IdentitySelection.hpp"
+
 #include <QAction>
 #include <QMenu>
 #include <QMessageBox>
+
+#include <string>
 
 RequestAuthorization::RequestAuthorization(QWidget *parent) :
     QDialog(parent), ui(new Ui::RequestAuthorization)
@@ -17,9 +22,11 @@ RequestAuthorization::RequestAuthorization(QWidget *parent) :
   ui->keyhoteeidpubkey->setEditable(true);
   ui->button_send->setEnabled(false);
   ui->keyhoteeidpubkey->showCopyToClipboard(false);
-  ui->identity_select->setFocus();
-
-  fillSelectIdentities();
+  ui->keyhoteeidpubkey->setFocus(Qt::ActiveWindowFocusReason);
+    
+  ui->widget_Identity->addWidgetRelated(ui->line);
+  /// add identity observer
+  IdentityObservable::getInstance().addObserver( ui->widget_Identity );
 
   connect(ui->extend_public_key , &QCheckBox::toggled, this, &RequestAuthorization::onExtendPubKey);
   connect(ui->add_contact , &QGroupBox::toggled, this, &RequestAuthorization::onAddAsNewContact);
@@ -53,29 +60,6 @@ void RequestAuthorization::enableAddContact(bool active)
   ui->add_contact->setEnabled(active);
 }
 
-void RequestAuthorization::fillSelectIdentities()
-{
-  std::vector<bts::addressbook::wallet_identity> identities = bts::get_profile()->identities();
-
-  if(identities.size() < 2)
-  {
-    ui->identity_select->addItem(tr(identities[0].get_display_name().c_str()));
-    ui->identity_select->setVisible(false);
-    ui->identity_select_label->setVisible(false);
-    ui->line->setVisible(false);
-    return;
-  }
-
-  for(const auto& identity : identities)
-  {
-    std::string entry = identity.get_display_name();
-    auto ipk = identity.public_key;
-    assert(ipk.valid());
-
-    ui->identity_select->addItem(tr(entry.c_str()));
-  }
-}
-
 void RequestAuthorization::checkAddAsNewContact()
 {
   if(ui->extend_public_key->isChecked() &&
@@ -105,26 +89,27 @@ void RequestAuthorization::addAsNewContact()
 void RequestAuthorization::genExtendedPubKey(bts::extended_public_key &extended_pub_key)
 {
   if(ui->extend_public_key->isChecked())
-  {
-    auto profile = bts::get_profile();
-    auto idents = profile->identities();
-    int  identity = ui->identity_select->currentIndex();
-    auto addressbook = profile->get_addressbook();
+  {    
     bts::addressbook::wallet_contact contact;
     if(!Utils::matchContact(ui->keyhoteeidpubkey->getPublicKey(), &contact))
       return;
 
-    extended_pub_key = profile->get_keychain().get_public_account(idents[identity].dac_id_string, contact.wallet_index);
+    auto identity = ui->widget_Identity->currentIdentity();
+    if (identity != nullptr)
+    {
+      auto profile = bts::get_profile();
+      extended_pub_key = profile->get_keychain().get_public_account(identity->dac_id_string, contact.wallet_index);
+    }
   }
 }
 
 void RequestAuthorization::setAuthorizationStatus()
 {
-  auto addressbook = bts::get_profile()->get_addressbook();
   bts::addressbook::wallet_contact contact;
   if(!Utils::matchContact(ui->keyhoteeidpubkey->getPublicKey(), &contact))
     return;
 
+  auto addressbook = bts::get_profile()->get_addressbook();
   contact.auth_status = bts::addressbook::authorization_status::sent_request;
   addressbook->store_contact(contact);
 }
@@ -142,17 +127,15 @@ void RequestAuthorization::onAddAsNewContact(bool checked)
 void RequestAuthorization::onSend()
 {
   addAsNewContact();
-
-  auto                                          app = bts::application::instance();
-  auto                                          profile = bts::get_profile();
-  auto                                          idents = profile->identities();
-  bts::bitchat::private_contact_request_message request_msg;
-  if (idents.size() )
+  
+  auto identity = ui->widget_Identity->currentIdentity();
+  if (identity != nullptr)
   {
-    int identity = ui->identity_select->currentIndex();
-    request_msg.from_first_name = idents[identity].first_name;
-    request_msg.from_last_name = idents[identity].last_name;
-    request_msg.from_keyhotee_id = idents[identity].dac_id_string;
+    bts::bitchat::private_contact_request_message request_msg;    
+
+    request_msg.from_first_name = identity->first_name;
+    request_msg.from_last_name = identity->last_name;
+    request_msg.from_keyhotee_id = identity->dac_id_string;
     request_msg.greeting_message = ui->message->toPlainText().toStdString();
     request_msg.from_channel = bts::network::channel_id(1);
     
@@ -165,7 +148,10 @@ void RequestAuthorization::onSend()
 
     genExtendedPubKey(request_msg.extended_pub_key);
 
-    fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(idents[identity].dac_id_string);
+    auto  app = bts::application::instance();
+    auto  profile = bts::get_profile();
+
+    fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(identity->dac_id_string);
     app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
 
     setAuthorizationStatus();
@@ -193,4 +179,12 @@ void RequestAuthorization::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState st
     default:
       assert(false);
   }
+}
+
+void RequestAuthorization::done(int code)
+{
+  /// delete identity observer
+  IdentityObservable::getInstance().deleteObserver(ui->widget_Identity);
+
+  QDialog::done(code);
 }

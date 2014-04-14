@@ -4,9 +4,6 @@
 
 #include <QWidget>
 
-#include <string>
-#include <vector>
-
 namespace Ui { class ContactView; }
 class AddressBookModel;
 class QToolBar;
@@ -70,8 +67,6 @@ protected:
   void contactEditable(bool enable);
 
 private:
-  typedef std::vector<bts::addressbook::wallet_identity> TIdentities;
-
   void setModified(bool modified = true);
   bool isModified() const { return _modified; } 
 
@@ -84,9 +79,6 @@ private:
   void setEnabledSaveContact();
   /// refresh Contact view window from param data of contact
   void refreshDialog(const Contact &contact);
-  void updateIdentities();
-  /// Returns keyhoteeId from current selected identity in the ComboBox.
-  std::string getCurrentIdentity();
 
   Contact                                 _current_contact;
   fc::optional<bts::bitname::name_record> _current_record;
@@ -107,6 +99,5 @@ private:
   bool                                    _modified;
   bool                                    _editing;
   bool                                    _validForm;
-  TIdentities                             _identities;
 };
 

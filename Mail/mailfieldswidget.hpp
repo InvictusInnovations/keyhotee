@@ -2,8 +2,8 @@
 #define MAILFIELDSWIDGET_HPP
 
 #include "ch/mailprocessor.hpp"
-
 #include <bts/addressbook/contact.hpp>
+#include "Identity/IdentitiesUpdate.hpp"
 
 #include <QWidget>
 #include <map>
@@ -15,7 +15,8 @@ class MailFieldsWidget;
 
 class AddressBookModel;
 
-class MailFieldsWidget : public QWidget
+class MailFieldsWidget : public QWidget,
+                         protected IIdentitiesUpdate
   {
   Q_OBJECT
 
@@ -72,8 +73,15 @@ class MailFieldsWidget : public QWidget
       return (VisibleFields & field) != 0;
       }
 
+    /// Calling from maileditorwindow when window get closeEvent
+    void closeEvent();
+
   Q_SIGNAL void subjectChanged(const QString& subject);
   Q_SIGNAL void recipientListChanged();
+
+  protected:
+    /// \see IIdentitiesUpdate interface description.
+    virtual void onIdentitiesChanged(const TIdentities& identities) override;
 
   private:
     /** Helper function to trim subject text and avoid crashes since looks like QT Line edit has

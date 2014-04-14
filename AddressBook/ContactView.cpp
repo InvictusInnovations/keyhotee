@@ -8,8 +8,7 @@
 #include "public_key_address.hpp"
 #include "RequestAuthorization.hpp"
 
-#include <bts/application.hpp>
-#include <bts/address.hpp>
+#include "Identity/IdentityObservable.hpp"
 
 #include <fc/thread/thread.hpp>
 #include <fc/log/logger.hpp>
@@ -56,13 +55,14 @@ void ContactView::sendChatMessage()
   auto msg = ui->chat_input->toPlainText();
   if (msg.size() != 0)
   {
-    auto                               app = bts::application::instance();
-    auto                               profile = app->get_profile();
-    bts::bitchat::private_text_message text_msg(msg.toUtf8().constData() );
-    std::string dac_id_string = getCurrentIdentity();
-    if (dac_id_string.empty() == false)
+    auto identity = ui->widget_Identity->currentIdentity();
+    if (identity != nullptr)
     {
-      fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key( dac_id_string );
+      auto                               app = bts::application::instance();
+      auto                               profile = app->get_profile();
+      bts::bitchat::private_text_message text_msg(msg.toUtf8().constData() );
+
+      fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key( identity->dac_id_string );
       app->send_text_message(text_msg, _current_contact.public_key, my_priv_key);
       appendChatMessage("me", msg);
     }
@@ -119,9 +119,10 @@ ContactView::ContactView(QWidget* parent)
   ui->privacy_level_label->setVisible (false);//unsupported
   //default contact view: info page
   ui->contact_pages->setCurrentIndex(info);
-
-  updateIdentities();
   
+  /// add identity observer
+  IdentityObservable::getInstance().addObserver( ui->widget_Identity );
+
   send_mail = new QAction( QIcon( ":/images/128x128/contact_info_send_mail.png"), tr("Mail"), this);
   chat_contact = new QAction( QIcon( ":/images/chat.png"), tr("Chat"), this);  
   edit_contact = new QAction( QIcon(":/images/128x128/contact_info_edit.png"), tr("Edit"), this);
@@ -176,6 +177,12 @@ ContactView::ContactView(QWidget* parent)
 
   checkSendMailButton();
   setContact(Contact() );
+}
+
+ContactView::~ContactView()
+{
+  IdentityObservable::getInstance().deleteObserver( ui->widget_Identity );
+  delete ui;
 }
 
 void ContactView::onEdit()
@@ -306,11 +313,6 @@ void ContactView::onRequestContact()
   request->enableAddContact(false);
   request->setAddressBook(_address_book);
   request->show();
-}
-
-ContactView::~ContactView()
-{
-  delete ui;
 }
 
 void ContactView::setContact(const Contact& current_contact)
@@ -699,50 +701,4 @@ void ContactView::refreshDialog(const Contact &contact)
   //DLNFIX TODO: add check to see if we are synced on blockchain. If not synched,
   //             display "Keyhotee ledger not accessible"
   checkKeyhoteeIdStatus();
-}
-
-
-void ContactView::updateIdentities()
-{
-  _identities.clear();
-  ui->currentIdentity->clear();
-
-  _identities = bts::get_profile()->identities();
-  int i = 0;
-  for (const auto& v : _identities)
-  {
-    ui->currentIdentity->addItem(v.get_display_name().c_str());
-    /// map item
-    ui->currentIdentity->setItemData(i, i);
-    ++i;
-  }
-
-  if (_identities.empty() == false)
-  {
-    ui->currentIdentity->setCurrentIndex(0);
-    ui->currentIdentity->show();
-    ui->labelIdentity->show();
-  }
-
-  if (_identities.empty() == true || _identities.size() == 1)
-  {
-    ui->currentIdentity->hide();
-    ui->labelIdentity->hide();
-  }
-}
-
-
-std::string ContactView::getCurrentIdentity()
-{
-  if (_identities.size () == 1)
-    return _identities[0].dac_id_string;
-
-  /// get current selection from ComboBox
-  int curSel = ui->currentIdentity->currentIndex();
-  if (curSel != -1)
-  {
-    int identityIdx = ui->currentIdentity->itemData(curSel).toInt();
-    return _identities[identityIdx].dac_id_string;
-  }   
-  return "";
 }

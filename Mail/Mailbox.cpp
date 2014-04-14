@@ -69,30 +69,27 @@ void Mailbox::onOpenMail()
   QModelIndexList      indexes = selection_model->selectedRows();
   onDoubleClickedItem(indexes.first());
 }
-
 void Mailbox::onMarkAsUnreadMail()
 {
   QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
   QModelIndexList      indexes = selection_model->selectedRows();
   QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->inbox_table->model());
   MailboxModel* sourceModel = dynamic_cast<MailboxModel*>(model->sourceModel());
-
   foreach(QModelIndex index, indexes)
     sourceModel->markMessageAsUnread(index);
 }
-
 void Mailbox::showCurrentMail(const QModelIndex &selected,
                               const QModelIndex &deselected)
   {}
 
 void Mailbox::checksendmailbuttons()
 {
-    QItemSelectionModel*  selection_model = ui->inbox_table->selectionModel();
-    QModelIndexList       indexes = selection_model->selectedRows();
+    QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
+    QModelIndexList      indexes = selection_model->selectedRows();
 
-    bool                  oneEmailSelected = (indexes.size() == 1);
+    bool                 oneEmailSelected = (indexes.size() == 1);
+
     bool                  identity = isIdentity();
-
     ui->actionReply->setEnabled(oneEmailSelected && identity);
     ui->actionReply_All->setEnabled(oneEmailSelected && identity);
     ui->actionForward->setEnabled(oneEmailSelected && identity);
@@ -100,37 +97,38 @@ void Mailbox::checksendmailbuttons()
 
 void Mailbox::onSelectionChanged(const QItemSelection &selected,
                                  const QItemSelection &deselected)
-{
-  QItemSelectionModel*  selection_model = ui->inbox_table->selectionModel();
-  QModelIndexList       indexes = selection_model->selectedRows();
+  {
+  QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
+  QModelIndexList      indexes = selection_model->selectedRows();
   //disable reply buttons if more than one email selected
-  bool                  oneEmailSelected = (indexes.size() == 1);
+  bool                 oneEmailSelected = (indexes.size() == 1);
   bool                  identity = isIdentity();
 
   ui->actionOpen->setEnabled(oneEmailSelected);
   ui->actionMark_as_unread->setEnabled(indexes.size() > 0);
   ui->actionDelete->setEnabled(indexes.size() > 0);
   ui->actionReply->setEnabled(oneEmailSelected && identity);
+
   ui->actionReply_All->setEnabled(oneEmailSelected && identity);
   ui->actionForward->setEnabled(oneEmailSelected && identity);
 
   //display selected email(s) in message preview window
   if (oneEmailSelected)
-  {
+    {
     refreshMessageViewer();
     getKeyhoteeWindow()->setEnabledMailActions(true);
-  }
+    }
   else
-  {
+    {
     if (indexes.size() > 1)
       ui->mail_viewer->setCurrentWidget(ui->info_2);
     else
       ui->mail_viewer->setCurrentWidget(ui->info_1);
     //TODO: not implemented ui->current_message->displayMailMessages(indexes,selection_model);
-    
+
     getKeyhoteeWindow()->setEnabledMailActions(false);
     getKeyhoteeWindow()->setEnabledAttachmentSaveOption( _attachmentSelected = false );
-  }
+    }
 
   getKeyhoteeWindow()->setEnabledDeleteOption( indexes.size() > 0 );
   }
@@ -195,7 +193,7 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
   }
 
 void Mailbox::setupActions()
-{
+  {
   //add actions to MailViewer toolbar
   QToolBar* message_tools = ui->current_message->message_tools;
   auto app = bts::application::instance();
@@ -229,7 +227,7 @@ void Mailbox::setupActions()
   ui->actionReply->setEnabled(false);
   ui->actionReply_All->setEnabled(false);
   ui->actionForward->setEnabled(false);
-}
+  }
 
 QModelIndex Mailbox::getSelectedMail()
   {
@@ -515,15 +513,13 @@ void Mailbox::getDefaultColumns(QList<MailboxModel::Columns>* defaultColumns)
     defaultColumns->push_back(MailboxModel::Status);
   }
 }
-
 bool Mailbox::isIdentity()
 {
   auto app = bts::application::instance();
   auto profile = app->get_profile();
   auto idents = profile->identities();
-
-  if (idents.size() > 0)
-    return true;
-  else
+  if (idents.empty())
     return false;
+  else
+    return true;
 }

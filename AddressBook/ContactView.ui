@@ -747,47 +747,14 @@ Enter</string>
               <string>Send</string>
              </property>
             </widget>
-            <widget class="QComboBox" name="currentIdentity">
+            <widget class="IdentitySelection" name="widget_Identity" native="true">
              <property name="geometry">
               <rect>
-               <x>180</x>
+               <x>106</x>
                <y>6</y>
-               <width>219</width>
-               <height>22</height>
+               <width>493</width>
+               <height>23</height>
               </rect>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>200</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Allows to select the identity of which will be sent message</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="labelIdentity">
-             <property name="geometry">
-              <rect>
-               <x>124</x>
-               <y>8</y>
-               <width>54</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Identity:</string>
              </property>
             </widget>
            </widget>
@@ -809,6 +776,12 @@ Enter</string>
    <header>AddressBook/keyhoteeidpubkeywidget.hpp</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>IdentitySelection</class>
+   <extends>QWidget</extends>
+   <header>Identity/IdentitySelection.hpp</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>contact_pages</tabstop>
@@ -824,7 +797,6 @@ Enter</string>
   <tabstop>chat_conversation</tabstop>
   <tabstop>chat_input</tabstop>
   <tabstop>sendButton</tabstop>
-  <tabstop>currentIdentity</tabstop>
  </tabstops>
  <resources>
   <include location="../Keyhotee.qrc"/>

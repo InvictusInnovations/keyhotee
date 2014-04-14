@@ -46,6 +46,8 @@ public:
   fc::ecc::public_key getPublicKey();
   QString getPublicKeyText();
   QString getKeyhoteeID();
+  // override to focused first widget in the KeyhoteeIDPubKeyWidget
+  void setFocus(Qt::FocusReason reason);
 
 private:
   bool isLookupThreadActive() const;

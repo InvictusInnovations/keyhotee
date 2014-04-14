@@ -1,10 +1,14 @@
 #include "ContactsTable.hpp"
 #include "ui_ContactsTable.h"
 #include "AddressBookModel.hpp"
+#include "KeyhoteeMainWindow.hpp"
+
+#include "AddressBook/ContactView.hpp"
+
 #include <bts/application.hpp>
 #include <bts/profile.hpp>
-#include "AddressBook/ContactView.hpp"
-#include "KeyhoteeMainWindow.hpp"
+
+#include "Identity/IdentityObservable.hpp"
 
 #include <QClipboard>
 #include <QSortFilterProxyModel>
@@ -121,6 +125,8 @@ void ContactsTable::onDeleteContact()
     if(profile->isIdentityPresent(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string))
     {
       profile->removeIdentity(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
+      /// notify identity observers
+      IdentityObservable::getInstance().notify();
     }
     sourceModel->removeRows(indexes.at(i).row(), 1);
     Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted

@@ -380,3 +380,7 @@ QString KeyhoteeIDPubKeyWidget::getKeyhoteeID()
   return ui->keyhotee_id->text();
 }
 
+void KeyhoteeIDPubKeyWidget::setFocus(Qt::FocusReason reason)
+{
+  ui->keyhotee_id->setFocus(reason);
+}

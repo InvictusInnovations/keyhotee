@@ -314,10 +314,20 @@ int TKeyhoteeApplication::run()
     setOrganizationName("Invictus Innovations, Inc");
     setApplicationName(APP_NAME);
 
-    QString locale = QLocale::system().name();
+    QSettings settings("Invictus Innovations", "Keyhotee");
+    QString locale = settings.value("Language", "").toString();
+
+    /// If empty set default system locale
+    if (locale.isEmpty())
+    {
+      locale = QLocale::system().name();
+      settings.setValue("Language", locale);
+    }
+
     QTranslator translator;
-    translator.load(QString(":/keyhotee_")+locale);
-    installTranslator(&translator);
+    bool loadOk = translator.load(QString(":/keyhotee_") + locale);
+    if (loadOk)
+      installTranslator(&translator);
 
     if(_loaded_profile_name.isEmpty())
     {

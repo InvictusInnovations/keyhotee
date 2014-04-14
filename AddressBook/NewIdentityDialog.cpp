@@ -1,13 +1,13 @@
 #include "NewIdentityDialog.hpp"
-
 #include "ui_NewIdentityDialog.h"
-
-#include "public_key_address.hpp"
 
 #include "AddressBookModel.hpp"
 #include "Contact.hpp"
 #include "KeyhoteeApplication.hpp"
 #include "KeyhoteeMainWindow.hpp"
+#include "public_key_address.hpp"
+
+#include "Identity/IdentityObservable.hpp"
 
 #include <QPushButton>
 
@@ -193,6 +193,8 @@ void NewIdentityDialog::onSave()
     auto priv_key = profile->get_keychain().get_identity_key(dac_id);
     ident.public_key = priv_key.get_public_key();
     profile->store_identity( ident );
+    /// notify identity observers
+    IdentityObservable::getInstance().notify();
     try 
     {
       app->mine_name(dac_id,
