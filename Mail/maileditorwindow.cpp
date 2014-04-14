@@ -588,7 +588,9 @@ void MailEditorMainWindow::toggleReadOnlyMode()
   ui->messageEdit->setReadOnly(EditMode == false);
   ui->formatToolBar->setEnabled(EditMode);
   ui->adjustToolbar->setEnabled(EditMode);
-  ui->mailToolBar->setDisabled(EditMode);
+
+  auto profile = bts::application::instance()->get_profile();
+  ui->mailToolBar->setDisabled(EditMode || profile->identities().empty());
   }
 
 bool MailEditorMainWindow::onSave()

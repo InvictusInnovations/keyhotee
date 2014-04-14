@@ -244,6 +244,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   {
       ui->actionNew_Message->setEnabled(false);
       ui->actionRequest_authorization->setEnabled(false);
+      ui->actionReply->setEnabled(false);
+      ui->actionReply_all->setEnabled(false);
+      ui->actionForward->setEnabled(false);
   }
 
   for (size_t i = 0; i < idents.size(); ++i)
@@ -611,6 +614,9 @@ void KeyhoteeMainWindow::enableNewMessageIcon()
     if(isIdentityPresent() == true ) {
          ui->actionNew_Message->setEnabled(true);
          ui->actionRequest_authorization->setEnabled(true);
+         ui->actionReply->setEnabled(true);
+         ui->actionReply_all->setEnabled(true);
+         ui->actionForward->setEnabled(true);
          emit checkSendMailSignal();
          if(nullptr != _currentMailbox)
            _currentMailbox->checksendmailbuttons();
@@ -1318,6 +1324,9 @@ void KeyhoteeMainWindow::onRemoveContact()
   if(isIdentityPresent() == false ){
        ui->actionNew_Message->setEnabled(false);
        ui->actionRequest_authorization->setEnabled(false);
+       ui->actionReply->setEnabled(false);
+       ui->actionReply_all->setEnabled(false);
+       ui->actionForward->setEnabled(false);
        if(nullptr != _currentMailbox)
          _currentMailbox->checksendmailbuttons();
        emit checkSendMailSignal();
