@@ -999,9 +999,11 @@ void TConnectionProcessor::received_email(const bts::bitchat::decrypted_message&
   {
   try
     {
-    ReceivingMail = false;
     auto header = Profile->get_inbox_db()->store_message(msg,nullptr);
+    wlog("email stored in database");
     Sink->OnReceivedMailMessage(header);
+    wlog("gui notified");
+    ReceivingMail = false;
     }
   catch(const fc::exception& e)
     {
