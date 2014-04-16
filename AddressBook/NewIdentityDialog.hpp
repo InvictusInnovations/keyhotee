@@ -11,12 +11,14 @@ class NewIdentityDialog : public QDialog
       NewIdentityDialog(QWidget* parent = nullptr);
       ~NewIdentityDialog();
 
-      void onUserNameChanged( const QString& name );
-      void onKey( const QString& name );
-      void onSave();
+  signals:
+    void identityadded();
 
-   signals:
-        void identityadded();
+  private:
+    void onUserNameChanged(const QString& name);
+    void onKey(const QString& name);
+    void onSave();
+
    private:
-      std::unique_ptr<Ui::NewIdentityDialog>        ui;
+      Ui::NewIdentityDialog*        ui;
 };
