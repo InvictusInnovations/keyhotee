@@ -654,8 +654,6 @@ void TConnectionProcessor::TOutboxQueue::transmissionLoop()
 
     if(transferMessage(storedMsg.from_key, msg))
       moveMsgToSentDB(storedMsg, msg);
-    else
-      break;
 
     if(isCancelled())
       break;
