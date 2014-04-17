@@ -7,74 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>598</width>
-    <height>212</height>
+    <height>264</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Create New Identity</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="2">
-    <widget class="QLineEdit" name="lastname">
-     <property name="placeholderText">
-      <string>Last Name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Keyhotee ID</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="2">
-    <widget class="QLineEdit" name="username"/>
-   </item>
-   <item row="1" column="3">
-    <widget class="QCheckBox" name="register_checkbox">
-     <property name="toolTip">
-      <string>If your desired identity has not been registered by another user, Keyhotee will do the work necessary to register this identity to your public key.</string>
-     </property>
-     <property name="text">
-      <string>Register</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="firstname">
-     <property name="placeholderText">
-      <string>First Name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Display Name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Public Key</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>1</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="2" column="1" colspan="2">
     <widget class="QLineEdit" name="publickey">
      <property name="font">
@@ -88,10 +27,78 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Keyhotee ID</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLineEdit" name="lastname">
+     <property name="placeholderText">
+      <string>Last Name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="2">
+    <widget class="QLineEdit" name="username"/>
+   </item>
+   <item row="6" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>1</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="0" colspan="4">
+    <widget class="QLabel" name="status_label">
+     <property name="text">
+      <string>Status:  Unknown</string>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Founder Code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Public Key</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="firstname">
+     <property name="placeholderText">
+      <string>First Name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QCheckBox" name="register_checkbox">
+     <property name="toolTip">
+      <string>If your desired identity has not been registered by another user, Keyhotee will do the work necessary to register this identity to your public key.</string>
+     </property>
+     <property name="text">
+      <string>Register</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Display Name</string>
      </property>
     </widget>
    </item>
@@ -105,14 +112,24 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="4">
-    <widget class="QLabel" name="status_label">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Status:  Unknown</string>
+      <string>Download Identity History</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
+   <item row="7" column="2" colspan="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="2">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -125,15 +142,8 @@
      </property>
     </spacer>
    </item>
-   <item row="6" column="2" colspan="2">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
-     </property>
-    </widget>
+   <item row="5" column="1">
+    <widget class="QComboBox" name="downloadHistory"/>
    </item>
   </layout>
  </widget>
@@ -144,6 +154,7 @@
   <tabstop>register_checkbox</tabstop>
   <tabstop>publickey</tabstop>
   <tabstop>founder_code</tabstop>
+  <tabstop>downloadHistory</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>

@@ -30,6 +30,21 @@ NewIdentityDialog::NewIdentityDialog( QWidget* parent_widget )
 :QDialog(parent_widget),ui( new Ui::NewIdentityDialog() )
 {
    ui->setupUi(this);
+
+   const int WEEK = 1;
+   const int MONTH = 4 * WEEK;
+   const int YEAR = 12 * MONTH;
+   const int ALL = -1;
+   ui->downloadHistory->addItem(tr("1 week"), WEEK);
+   ui->downloadHistory->addItem(tr("1 month"), MONTH);
+   ui->downloadHistory->addItem(tr("3 months"), 3*MONTH);
+   ui->downloadHistory->addItem(tr("6 months"), 6*MONTH);
+   ui->downloadHistory->addItem(tr("1 year"), YEAR);
+   ui->downloadHistory->addItem(tr("2 years"), 2*YEAR);
+   ui->downloadHistory->addItem(tr("3 years"), 3*YEAR);
+   ui->downloadHistory->addItem(tr("5 years"), 5*YEAR);
+   ui->downloadHistory->addItem(tr("all"), ALL);
+
    ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
 
    connect(ui->username, &QLineEdit::textChanged, this, &NewIdentityDialog::onUserNameChanged);
@@ -39,6 +54,7 @@ NewIdentityDialog::NewIdentityDialog( QWidget* parent_widget )
 
 NewIdentityDialog::~NewIdentityDialog()
 {
+  delete ui;
 }
 
 void NewIdentityDialog::onUserNameChanged( const QString& name )
@@ -192,6 +208,11 @@ void NewIdentityDialog::onSave()
     ident.set_dac_id( dac_id );
     auto priv_key = profile->get_keychain().get_identity_key(dac_id);
     ident.public_key = priv_key.get_public_key();
+    /**
+      downloadHistory field does't exist yet
+      storing format: number of weeks ??
+      ident. ... = ui->downloadHistory->currentData().toInt();
+    */
     profile->store_identity( ident );
     /// notify identity observers
     IdentityObservable::getInstance().notify();
