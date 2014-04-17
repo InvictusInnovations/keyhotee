@@ -54,6 +54,7 @@ NewIdentityDialog::NewIdentityDialog( QWidget* parent_widget )
 
 NewIdentityDialog::~NewIdentityDialog()
 {
+  delete ui;
 }
 
 void NewIdentityDialog::onUserNameChanged( const QString& name )
