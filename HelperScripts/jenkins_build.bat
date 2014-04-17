@@ -53,10 +53,11 @@ echo Checking packages directory: %INVICTUS_ROOT%\packages
 
 IF EXIST "%INVICTUS_ROOT%\packages" (
   echo Removing packages directory
+  del /F /Q "%INVICTUS_ROOT%\packages"
   rmdir /Q /S "%INVICTUS_ROOT%\packages" || exit /b 8
 )
 
-mkdir "%INVICTUS_ROOT%packages" || exit /b 9
+mkdir "%INVICTUS_ROOT%\packages" || exit /b 9
 
 if "%1" == "" (
   set BUILD_NUMBER=0
