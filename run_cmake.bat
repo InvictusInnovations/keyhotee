@@ -3,4 +3,6 @@ rem Should be started from directory where build should be performed (ie %INVICT
 setlocal
 call %~dp0\setenv.bat
 rem cd %INVICTUS_ROOT%
-cmake -G "Visual Studio 12" "%INVICTUS_ROOT%\keyhotee" -T "v120_xp" "%INVICTUS_ROOT%\keyhotee"
+cmake -G "Visual Studio 12" "%INVICTUS_ROOT%\keyhotee" -T "v120_xp" "%INVICTUS_ROOT%\keyhotee" %*
+endlocal
+
