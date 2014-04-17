@@ -60,8 +60,7 @@ mkdir "%INVICTUS_ROOT%packages" || exit /b 9
 
 if "%1" == "" (
   set BUILD_NUMBER=0
-)
-else (
+) else (
   set BUILD_NUMBER=%1
 )
 
