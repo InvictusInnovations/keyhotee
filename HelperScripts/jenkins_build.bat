@@ -1,6 +1,6 @@
 setlocal
 
-call %~dp0\..\setenv.bat
+call "%~dp0\..\setenv.bat"
 
 rem goto doBld
 pushd "%INVICTUS_ROOT%\keyhotee"
