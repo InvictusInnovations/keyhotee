@@ -253,6 +253,10 @@ void ContactView::onSave()
       _current_contact.privacy_setting = bts::addressbook::secret_contact;
       int idxNewContact = _address_book->storeContact(_current_contact);
 
+      /// notify identity observers
+      if (_current_contact.isOwn())
+        IdentityObservable::getInstance().notify(_current_contact);
+
       contactEditable(false);
       emit savedNewContact(idxNewContact);
     }    

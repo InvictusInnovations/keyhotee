@@ -214,8 +214,7 @@ void NewIdentityDialog::onSave()
       ident. ... = ui->downloadHistory->currentData().toInt();
     */
     profile->store_identity( ident );
-    /// notify identity observers
-    IdentityObservable::getInstance().notify();
+
     try 
     {
       app->mine_name(dac_id,
@@ -239,6 +238,9 @@ void NewIdentityDialog::onSave()
     myself.notes = ui->founder_code->text().toStdString();
 #endif
     TKeyhoteeApplication::getInstance()->getMainWindow()->getAddressBookModel()->storeContact( Contact(myself) );
+
+    /// notify identity observers
+    IdentityObservable::getInstance().notify();
 
     app->add_receive_key(priv_key);
     emit identityadded();
