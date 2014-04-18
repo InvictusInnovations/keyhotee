@@ -31,7 +31,7 @@ NewIdentityDialog::NewIdentityDialog( QWidget* parent_widget )
 {
    ui->setupUi(this);
 
-   const int WEEK = 1;
+   const int WEEK = 7;
    const int MONTH = 4 * WEEK;
    const int YEAR = 12 * MONTH;
    const int ALL = -1;
@@ -208,11 +208,6 @@ void NewIdentityDialog::onSave()
     ident.set_dac_id( dac_id );
     auto priv_key = profile->get_keychain().get_identity_key(dac_id);
     ident.public_key = priv_key.get_public_key();
-    /**
-      downloadHistory field does't exist yet
-      storing format: number of weeks ??
-      ident. ... = ui->downloadHistory->currentData().toInt();
-    */
     profile->store_identity( ident );
     /// notify identity observers
     IdentityObservable::getInstance().notify();
@@ -241,6 +236,15 @@ void NewIdentityDialog::onSave()
     TKeyhoteeApplication::getInstance()->getMainWindow()->getAddressBookModel()->storeContact( Contact(myself) );
 
     app->add_receive_key(priv_key);
+
+	//re-connect to mail server to send an updated sync_time (get past mail for identities)
+	int days_in_past_to_fetch = ui->downloadHistory->currentData().toInt();
+	fc::time_point sync_time;
+	if (days_in_past_to_fetch != -1)
+	  sync_time = fc::time_point::now() - fc::days(days_in_past_to_fetch);
+	profile->set_last_sync_time(sync_time);
+	app->connect_to_network();
+
     emit identityadded();
 
 }
