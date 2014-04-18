@@ -31,10 +31,11 @@ NewIdentityDialog::NewIdentityDialog( QWidget* parent_widget )
 {
    ui->setupUi(this);
 
-   const int WEEK = 1;
+   const int WEEK = 7;
    const int MONTH = 4 * WEEK;
    const int YEAR = 12 * MONTH;
    const int ALL = -1;
+   ui->downloadHistory->addItem(tr("No History"), 0);
    ui->downloadHistory->addItem(tr("1 week"), WEEK);
    ui->downloadHistory->addItem(tr("1 month"), MONTH);
    ui->downloadHistory->addItem(tr("3 months"), 3*MONTH);
@@ -168,81 +169,87 @@ void NewIdentityDialog::onKey( const QString& key )
 
 void NewIdentityDialog::onSave()
 {
-    //store new identity in profile
-    auto app = bts::application::instance();
-    auto profile = app->get_profile();
-    auto trimmed_dac_id = ui->username->text().trimmed();
-    fc::string dac_id = trimmed_dac_id.toStdString();
+  //store new identity in profile
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+  auto trimmed_dac_id = ui->username->text().trimmed();
+  fc::string dac_id = trimmed_dac_id.toStdString();
 
-    // make sure the key is unique..
-    try {
-        bts::addressbook::wallet_identity cur_ident = profile->get_identity( dac_id );
-        ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
-        ui->status_label->setStyleSheet("QLabel { color : red; }");
-        ui->publickey->setText( "" );
-        if (cur_ident.dac_id_string == dac_id)
-            ui->status_label->setText( tr( "Status: You have already created this identity." ) );
-        else
-            ui->status_label->setText( tr( "Status: You have already created a similar id." ) );
-        return;
-    }
-    catch ( fc::key_not_found_exception& )
-    {
-        fc::optional<bts::bitname::name_record> current_record = bts::application::instance()->lookup_name(dac_id);
-        if(current_record)
-        {
-           ui->status_label->setStyleSheet("QLabel { color : red; }");
-           ui->status_label->setText(tr("Status: This Keyhotee ID was already registered by someone else."));
-           ui->publickey->setText( "" );
-           ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
-           return;
-        }
-    }
+  // make sure the key is unique..
+  try {
+      bts::addressbook::wallet_identity cur_ident = profile->get_identity( dac_id );
+      ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
+      ui->status_label->setStyleSheet("QLabel { color : red; }");
+      ui->publickey->setText( "" );
+      if (cur_ident.dac_id_string == dac_id)
+          ui->status_label->setText( tr( "Status: You have already created this identity." ) );
+      else
+          ui->status_label->setText( tr( "Status: You have already created a similar id." ) );
+      return;
+  }
+  catch ( fc::key_not_found_exception& )
+  {
+      fc::optional<bts::bitname::name_record> current_record = bts::application::instance()->lookup_name(dac_id);
+      if(current_record)
+      {
+          ui->status_label->setStyleSheet("QLabel { color : red; }");
+          ui->status_label->setText(tr("Status: This Keyhotee ID was already registered by someone else."));
+          ui->publickey->setText( "" );
+          ui->buttonBox->button( QDialogButtonBox::Save )->setEnabled(false);
+          return;
+      }
+  }
 
 
-    bts::addressbook::wallet_identity ident;
-    ident.first_name = fc::trim( ui->firstname->text().toUtf8().constData() );
-    ident.last_name = fc::trim( ui->lastname->text().toUtf8().constData() );
-    ident.mining_effort = ui->register_checkbox->isChecked() ? 25.0 : 0.0;
-    ident.wallet_ident = dac_id;
-    ident.set_dac_id( dac_id );
-    auto priv_key = profile->get_keychain().get_identity_key(dac_id);
-    ident.public_key = priv_key.get_public_key();
-    /**
-      downloadHistory field does't exist yet
-      storing format: number of weeks ??
-      ident. ... = ui->downloadHistory->currentData().toInt();
-    */
-    profile->store_identity( ident );
+  bts::addressbook::wallet_identity ident;
+  ident.first_name = fc::trim( ui->firstname->text().toUtf8().constData() );
+  ident.last_name = fc::trim( ui->lastname->text().toUtf8().constData() );
+  ident.mining_effort = ui->register_checkbox->isChecked() ? 25.0 : 0.0;
+  ident.wallet_ident = dac_id;
+  ident.set_dac_id( dac_id );
+  auto priv_key = profile->get_keychain().get_identity_key(dac_id);
+  ident.public_key = priv_key.get_public_key();
+  profile->store_identity( ident );
+  /// notify identity observers
+  IdentityObservable::getInstance().notify();
+  try 
+  {
+    app->mine_name(dac_id,
+              profile->get_keychain().get_identity_key(dac_id).get_public_key(),
+              ident.mining_effort);
+  }
+  catch ( const fc::exception& e )
+  {
+    wlog( "${e}", ("e",e.to_detail_string()) );
+  }
 
-    try 
-    {
-      app->mine_name(dac_id,
-                profile->get_keychain().get_identity_key(dac_id).get_public_key(),
-                ident.mining_effort);
-    }
-    catch ( const fc::exception& e )
-    {
-      wlog( "${e}", ("e",e.to_detail_string()) );
-    }
-
-    //store contact for new identity
-    bts::addressbook::wallet_contact myself;
-    //copy common fields from new identity into contact
-    static_cast<bts::addressbook::contact&>(myself) = ident;
-    //fill in remaining fields for contact
-    myself.first_name = ident.first_name;
-    myself.last_name = ident.last_name;
+  //store contact for new identity
+  bts::addressbook::wallet_contact myself;
+  //copy common fields from new identity into contact
+  static_cast<bts::addressbook::contact&>(myself) = ident;
+  //fill in remaining fields for contact
+  myself.first_name = ident.first_name;
+  myself.last_name = ident.last_name;
 #ifdef ALPHA_RELEASE
-   //just store the founder code here so we can access it over in ContactView temporarily for alpha release
-    myself.notes = ui->founder_code->text().toStdString();
+  //just store the founder code here so we can access it over in ContactView temporarily for alpha release
+  myself.notes = ui->founder_code->text().toStdString();
 #endif
-    TKeyhoteeApplication::getInstance()->getMainWindow()->getAddressBookModel()->storeContact( Contact(myself) );
+  TKeyhoteeApplication::getInstance()->getMainWindow()->getAddressBookModel()->storeContact( Contact(myself) );
 
-    /// notify identity observers
-    IdentityObservable::getInstance().notify();
+  app->add_receive_key(priv_key);
 
-    app->add_receive_key(priv_key);
-    emit identityadded();
+	//re-connect to mail server to send an updated sync_time (get past mail for identities) if history should be downloaded
+	int days_in_past_to_fetch = ui->downloadHistory->currentData().toInt();
+  if (days_in_past_to_fetch != 0)
+  {
+    fc::time_point sync_time;
+    if (days_in_past_to_fetch != -1)
+      sync_time = fc::time_point::now() - fc::days(days_in_past_to_fetch);
+    //if requested sync time further in the past than last sync time, change last_sync_time
+    if (sync_time < profile->get_last_sync_time())
+      profile->set_last_sync_time(sync_time);
+    app->connect_to_network();
+  }
+  emit identityadded();
 
 }
