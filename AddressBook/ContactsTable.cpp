@@ -124,7 +124,10 @@ void ContactsTable::onDeleteContact()
     auto contact_id = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).wallet_index;
     if(profile->isIdentityPresent(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string))
     {
+      auto priv_key = profile->get_keychain().get_identity_key(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
+      app->remove_receive_key(priv_key);
       profile->removeIdentity(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
+
       /// notify identity observers
       IdentityObservable::getInstance().notify();
     }
