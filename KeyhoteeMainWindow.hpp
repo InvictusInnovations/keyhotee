@@ -217,7 +217,6 @@ private:
   MailboxModelRoot*                       _mail_model_root;
 
   AddressBookModel*                       _addressbook_model;
-  bts::addressbook::addressbook_ptr       _addressbook;
   std::unordered_map<int, ContactGui>     _contact_guis;
 
   QLineEdit*                              _search_edit;

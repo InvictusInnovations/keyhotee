@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IdentitiesUpdate.hpp"
 #include <list>
 
 class IIdentitiesUpdate;
@@ -16,14 +17,24 @@ public:
 /// Observer methods
   void addObserver (IIdentitiesUpdate* identityObserver);
   void deleteObserver (IIdentitiesUpdate* identityObserver);
-  void notify ();
+  /// Called when identity will be added/deleted
+  void notify();
+  /** Called when ownership contact alias will be changed.
+      The same as notify() but more efficient. Not reload all
+      identities but just change alias in the identity
+  */
+  void notify(const bts::addressbook::wallet_contact& contact);
+  
 
 private:
   IdentityObservable() {};
   virtual ~IdentityObservable();
+  void reloadIdentities();
+  void notifyObservers();
 
 private:
   std::list<IIdentitiesUpdate*> _identObservers;
+  IIdentitiesUpdate::TIdentities _identities;
 };
 
 

@@ -263,7 +263,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   }
   app->set_mining_intensity(0);
   ui->actionEnable_Mining->setChecked(app->get_mining_intensity() != 0);
-  _addressbook = profile->get_addressbook();
 
   /*
      auto abook  = profile->get_addressbook();

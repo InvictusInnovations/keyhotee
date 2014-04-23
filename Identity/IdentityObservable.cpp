@@ -1,5 +1,7 @@
 #include "IdentityObservable.hpp"
-#include "IdentitiesUpdate.hpp"
+
+#include <bts/addressbook/addressbook.hpp>
+#include <fc/log/logger.hpp>
 
 IdentityObservable::~IdentityObservable()
 {
@@ -16,10 +18,11 @@ void IdentityObservable::addObserver (IIdentitiesUpdate* identityObserver)
 {
   _identObservers.push_back(identityObserver);
 
-  IIdentitiesUpdate::TIdentities idents;
-  idents = bts::get_profile()->identities();
+  if (_identities.empty())
+    reloadIdentities();
+
   /// Initialize TIdentities container
-  identityObserver->onIdentitiesChanged(idents);
+  identityObserver->onIdentitiesChanged(_identities);
 }
 
 void IdentityObservable::deleteObserver (IIdentitiesUpdate* identityObserver)
@@ -34,11 +37,57 @@ void IdentityObservable::deleteObserver (IIdentitiesUpdate* identityObserver)
 
 void IdentityObservable::notify ()
 {
-  IIdentitiesUpdate::TIdentities idents;
-  idents = bts::get_profile()->identities();
+  reloadIdentities();
+  notifyObservers();
+}
 
+void IdentityObservable::notify(const bts::addressbook::wallet_contact& contact)
+{
+  for (auto& identity : _identities)
+  {
+    if (identity.public_key == contact.public_key)
+    {
+      /// Update alias in the identity
+      identity.first_name = contact.first_name;
+      identity.last_name = contact.last_name;
+
+      notifyObservers();
+      return;
+    }
+  }
+}
+
+void IdentityObservable::notifyObservers()
+{
   for (const auto& identityObserver : _identObservers)
   {
-    identityObserver->onIdentitiesChanged(idents);
+    identityObserver->onIdentitiesChanged(_identities);
   }
+}
+
+void IdentityObservable::reloadIdentities()
+{
+  bts::profile_ptr profile = bts::get_profile();
+  _identities = profile->identities();
+
+  bts::addressbook::addressbook_ptr addressbook = profile->get_addressbook();
+
+  for (auto& v : _identities)
+  {
+    try
+    {
+      /// Find contact containing identity public_key
+      auto findContact = addressbook->get_contact_by_public_key(v.public_key);
+      if (findContact)
+      {
+        /// copy contact alias to identity
+        v.first_name = findContact->first_name;
+        v.last_name = findContact->last_name;
+      }
+    }
+    catch (const fc::exception& e)
+    {
+      elog("${e}", ("e", e.to_detail_string()));
+    }
+  } 
 }
