@@ -23,6 +23,8 @@
 #include "Mail/MailboxModelRoot.hpp"
 #include "Mail/maileditorwindow.hpp"
 
+#include "Options/OptionsDialog.h"
+
 #include <fc/reflect/variant.hpp>
 #include <fc/log/logger.hpp>
 
@@ -69,8 +71,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);
-
-  initMenuLanguage();
 
   QString profileName = mainApp.getLoadedProfileName();
 
@@ -132,6 +132,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   // ---------------------- MenuBar
   // File
+  connect(ui->actionOptions, &QAction::triggered, this, &KeyhoteeMainWindow::onOptions);
   connect(ui->actionExit, &QAction::triggered, this, &KeyhoteeMainWindow::onExit);
   // Edit
   connect(ui->actionCopy, &QAction::triggered, this, &KeyhoteeMainWindow::onCopy);
@@ -150,8 +151,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   connect(ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts);
   connect(ui->actionRequest_authorization, &QAction::triggered, this, &KeyhoteeMainWindow::onRequestAuthorization);
   connect(ui->actionShare_contact, &QAction::triggered, this, &KeyhoteeMainWindow::onShareContact);
-  // Language
-  connect(ui->menuLanguage, SIGNAL(triggered(QAction*)), this, SLOT(onLanguageChanged(QAction*)));
   // Help
   connect(ui->actionDiagnostic, &QAction::triggered, this, &KeyhoteeMainWindow::onDiagnostic);
   connect(ui->actionAbout, &QAction::triggered, this, &KeyhoteeMainWindow::onAbout);
@@ -1373,53 +1372,19 @@ void KeyhoteeMainWindow::onShareContact()
   shareContact(contacts);
 }
 
-
-void KeyhoteeMainWindow::initMenuLanguage()
+void KeyhoteeMainWindow::updateOptions(bool lang_changed)
 {
-  _actionsLang.push_back(ui->actionChinese);
-  ui->actionChinese->setData(QLocale(QLocale::Chinese, QLocale::China).name());
-
-  _actionsLang.push_back(ui->actionEnglish);
-  ui->actionEnglish->setData(QLocale(QLocale::English, QLocale::UnitedStates).name());
-
-  _actionsLang.push_back(ui->actionPolish);
-  ui->actionPolish->setData(QLocale(QLocale::Polish, QLocale::Poland).name());
-
-  _actionsLang.push_back(ui->actionPortuguese);
-  ui->actionPortuguese->setData(QLocale(QLocale::Portuguese, QLocale::Portugal).name());
-
-  _actionsLang.push_back(ui->actionSpanish);
-  ui->actionSpanish->setData(QLocale(QLocale::Spanish, QLocale::AnyCountry).name());
-
-  QSettings settings("Invictus Innovations", "Keyhotee");
-  QString locale = settings.value("Language", "").toString();
-  /// Set checked language action
-  for (const auto& v : _actionsLang)
-  {
-    if (locale == v->data().toString())
-    {
-      v->setChecked(true);
-      return;
-    }
-  }
-  /// If not found language set english action
-  ui->actionEnglish->setChecked(true);
-  return;
+  if (lang_changed)
+    QMessageBox::information(this, tr("Change language"),
+      tr("Please restart application for the changes to take effect") );
 }
 
-void KeyhoteeMainWindow::onLanguageChanged(QAction* langAction)
+void KeyhoteeMainWindow::onOptions()
 {
-  QString localeName = langAction->data().toString();
+  OptionsDialog* options_dialog = new OptionsDialog(this);
 
-  /// Clear checked state for all languages
-  for (const auto& v : _actionsLang)
-    v->setChecked(false);
+  QObject::connect(options_dialog, SIGNAL(optionsSaved(bool)),
+    this, SLOT(updateOptions(bool)));
 
-  langAction->setChecked(true);
-
-  QSettings settings("Invictus Innovations", "Keyhotee");
-  settings.setValue("Language", localeName);
-
-  QMessageBox::information(this, tr("Change language"),
-    tr("Please restart application for the changes to take effect") );
+  options_dialog->show();
 }

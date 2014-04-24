@@ -233,6 +233,7 @@ qt5_wrap_ui( UiMoneyAttachementWidget          Mail/moneyattachementwidget.ui )
 qt5_wrap_ui( UiFileAttachmentWidget            Mail/fileattachmentwidget.ui )
 qt5_wrap_ui( UiFileAttachmentDialog            Mail/FileAttachmentDialog.ui )
 qt5_wrap_ui( UiWallets                         Wallets/wallets.ui )
+qt5_wrap_ui( UiOptionsDialog                   Options/OptionsDialog.ui )
 
 set( sources  
         qtreusable/selfsizingmainwindow.h
@@ -353,13 +354,13 @@ set( sources
         KeyhoteeMainWindow.hpp
         KeyhoteeMainWindow.cpp
 
-		Wallets/wallets.ui
-		Wallets/wallets.hpp
-		Wallets/wallets.cpp
-		Wallets/transactionhistorymodel.hpp
-		Wallets/transactionhistorymodel.cpp
-		Wallets/wallettransaction.hpp
-		Wallets/wallettransaction.hpp
+        Wallets/wallets.ui
+        Wallets/wallets.hpp
+        Wallets/wallets.cpp
+        Wallets/transactionhistorymodel.hpp
+        Wallets/transactionhistorymodel.cpp
+        Wallets/wallettransaction.hpp
+        Wallets/wallettransaction.hpp
 
         ATopLevelWindowsContainer.hpp
         ATopLevelWindowsContainer.cpp
@@ -399,6 +400,10 @@ set( sources
         vCard/vcardproperty.cpp
         vCard/vcardparam.cpp
         vCard/vcard.cpp
+
+        Options/OptionsDialog.ui
+        Options/OptionsDialog.h
+        Options/OptionsDialog.cpp
 
         main.cpp )
 

@@ -129,6 +129,7 @@ private:
 private slots:
   // ---------- MenuBar
   // File
+  void onOptions();
   void onExit();
   // Edit
   void onCopy();
@@ -145,8 +146,6 @@ private slots:
   void onSetIcon();
   void onRequestAuthorization();
   void onShareContact();
-  // Language
-  void onLanguageChanged(QAction*);
   // Help
   void onDiagnostic();
   void onAbout();
@@ -167,6 +166,8 @@ private slots:
 
   void onSidebarSelectionChanged();
   void onSidebarDoubleClicked();
+
+  void updateOptions(bool lang_changed);
 
 private:
   bool isIdentityPresent();
@@ -193,7 +194,6 @@ private:
   void addContact();
   void processResponse(const TAuthorizationMessage& msg, const TStoredMailMessage& header);
   void loadStoredRequests(bts::bitchat::message_db_ptr request_db);
-  void initMenuLanguage();
 
   /// Class attributes:
 
