@@ -323,7 +323,7 @@ void MailFieldsWidget::onIdentitiesChanged(const TIdentities& identities)
     if (initial == nullptr)
       initial = action;
 
-    if (SenderIdentity.get_display_name() == identity.get_display_name())
+    if (SenderIdentity.public_key == identity.public_key)
       {
       /// save current selected identity (don't clear selection)
       initial = action;

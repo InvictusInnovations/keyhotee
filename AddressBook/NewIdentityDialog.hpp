@@ -1,6 +1,7 @@
 #pragma once
 #include <QDialog>
-#include <memory>
+
+class QString;
 
 namespace Ui { class NewIdentityDialog; }
 
