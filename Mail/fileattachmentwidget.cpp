@@ -819,6 +819,8 @@ void TFileAttachmentWidget::onDelTriggered()
   UnFreezeAttachmentTable(sortEnabled);
 
   UpdateColumnHeaders();
+
+  ui->attachmentTable->setFocus();
   
   emit attachmentListChanged();
   }

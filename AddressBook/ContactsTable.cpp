@@ -109,7 +109,7 @@ void ContactsTable::onDeleteContact()
   QModelIndexList        sortFilterIndexes = selection_model->selectedRows();
   if (sortFilterIndexes.count() == 0)
     return;
-  if (QMessageBox::question(this, tr("Delete Contact"), tr("Are you sure you want to delete selected contact(s)?")) == QMessageBox::Button::No)
+  if (QMessageBox::question(getKeyhoteeWindow(), tr("Delete Contact"), tr("Are you sure you want to delete selected contact(s)?")) == QMessageBox::Button::No)
     return;
   QModelIndexList        indexes;
   for(const QModelIndex& sortFilterIndex : sortFilterIndexes)
