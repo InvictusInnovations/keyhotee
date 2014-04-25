@@ -595,7 +595,7 @@ void KeyhoteeMainWindow::onNewIdentity()
    QObject::connect(ident_dialog, SIGNAL(identityadded()),
                     this, SLOT(enableNewMessageIcon()));
 
-   ident_dialog->show();
+   ident_dialog->exec();
 }
 
 bool KeyhoteeMainWindow::isIdentityPresent()
