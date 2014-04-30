@@ -195,6 +195,15 @@
            <normaloff>:/images/128x128/sent_items.png</normaloff>:/images/128x128/sent_items.png</iconset>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Spam</string>
+         </property>
+         <property name="icon">
+          <iconset resource="Keyhotee.qrc">
+           <normaloff>:/images/mail_spam.png</normaloff>:/images/mail_spam.png</iconset>
+         </property>
+        </item>
        </item>
        <item>
         <property name="text">
@@ -337,7 +346,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>6</number>
+        <number>4</number>
        </property>
        <widget class="Mailbox" name="inbox_page">
         <layout class="QGridLayout" name="inboxlayout">
@@ -361,6 +370,7 @@
        <widget class="Mailbox" name="draft_box_page"/>
        <widget class="Mailbox" name="out_box_page"/>
        <widget class="Mailbox" name="sent_box_page"/>
+       <widget class="Mailbox" name="spam_box_page"/>
        <widget class="ContactsTable" name="contacts_page">
         <layout class="QGridLayout" name="gridLayout_3">
          <property name="leftMargin">

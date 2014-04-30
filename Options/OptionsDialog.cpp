@@ -4,7 +4,7 @@
 #include <QSettings>
 #include <QDirIterator>
 
-OptionsDialog::OptionsDialog(QWidget *parent) :
+OptionsDialog::OptionsDialog(QWidget *parent, QString profile_name) :
   QDialog(parent),
   ui(new Ui::OptionsDialog)
 {
@@ -13,18 +13,17 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
   fillLanguageComboBox();
 
   QSettings globa_settings("Invictus Innovations", "Keyhotee");
-  QString loaded_profile_name = globa_settings.value("last_profile").toString();
   
-  _settings_file = "keyhotee_";
-  _settings_file.append(loaded_profile_name);
-  QSettings settings("Invictus Innovations", _settings_file);
-
-  QLocale locale = QLocale(settings.value("Language", "").toString());
+  QLocale locale = QLocale(globa_settings.value("Language", "").toString());
   _lang_id = ui->language->findData(locale.name());
   ui->language->setCurrentIndex(_lang_id);
 
-  ui->chat_authorized->setChecked(settings.value("AllowChat", "").toBool());
-  ui->mail_authorized->setChecked(settings.value("AllowMail", "").toBool());
+  _settings_file = "keyhotee_";
+  _settings_file.append(profile_name);
+  QSettings profile_settings("Invictus Innovations", _settings_file);
+
+  ui->chat_authorized->setChecked(profile_settings.value("AllowChat", "").toBool());
+  ui->mail_authorized->setChecked(profile_settings.value("AllowMail", "").toBool());
 
   connect(this, &QDialog::accepted, this, &OptionsDialog::onSave);
 }
@@ -59,25 +58,27 @@ void OptionsDialog::fillLanguageComboBox()
 
 void OptionsDialog::onSave()
 {
-  QSettings settings("Invictus Innovations", _settings_file);
+  QSettings globa_settings("Invictus Innovations", "Keyhotee");
 
   // General
   QString localeName = ui->language->currentData().toString();
-  settings.setValue("Language", localeName);
+  globa_settings.setValue("Language", localeName);
   int index = ui->language->currentIndex();
 
   bool lang_changed = (_lang_id != index);
 
+  QSettings profile_settings("Invictus Innovations", _settings_file);
+
   // Privacy
   if (ui->chat_authorized->isChecked())
-    settings.setValue("AllowChat", true);
+    profile_settings.setValue("AllowChat", true);
   else if (ui->chat_contacts->isChecked())
-    settings.setValue("AllowChat", false);
+    profile_settings.setValue("AllowChat", false);
 
   if (ui->mail_authorized->isChecked())
-    settings.setValue("AllowMail", true);
+    profile_settings.setValue("AllowMail", true);
   else if (ui->mail_anyone->isChecked())
-    settings.setValue("AllowMail", false);
+    profile_settings.setValue("AllowMail", false);
   
   emit optionsSaved(lang_changed);
 }

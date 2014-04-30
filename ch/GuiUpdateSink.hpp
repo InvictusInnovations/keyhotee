@@ -53,7 +53,7 @@ class IGuiUpdateSink
 
   /// Receiving mail messages:
     /// Notifies about received mail message.
-    virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) = 0;
+    virtual void OnReceivedMailMessage(const TStoredMailMessage& msg, const bool spam) = 0;
 
   /// Receiving unsupported message:
     /// Notifies about received unsupported message.

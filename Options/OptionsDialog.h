@@ -12,7 +12,7 @@ class OptionsDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit OptionsDialog(QWidget *parent = 0);
+  explicit OptionsDialog(QWidget *parent, QString profile_name);
   ~OptionsDialog();
 
 signals:

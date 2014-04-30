@@ -90,7 +90,7 @@ private:
   virtual void OnReceivedAuthorizationMessage(const TAuthorizationMessage& msg,
     const TStoredMailMessage& header) override;
   /// \see IGuiUpdateSink interface description.
-  virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) override;
+  virtual void OnReceivedMailMessage(const TStoredMailMessage& msg, const bool spam) override;
   /// \see IGuiUpdateSink interface description.
   virtual void OnReceivedUnsupportedMessage(const TDecryptedMessage& msg) override;
   /// \see IGuiUpdateSink interface description.
@@ -167,7 +167,7 @@ private slots:
   void onSidebarSelectionChanged();
   void onSidebarDoubleClicked();
 
-  void updateOptions(bool lang_changed);
+  void onUpdateOptions(bool lang_changed);
 
 private:
   bool isIdentityPresent();
@@ -206,6 +206,7 @@ private:
   QTreeWidgetItem*                        _drafts_root;
   QTreeWidgetItem*                        _out_box_root;
   QTreeWidgetItem*                        _sent_root;
+  QTreeWidgetItem*                        _spam_root;
   QTreeWidgetItem*                        _bitcoin_root;
   QTreeWidgetItem*                        _bitshares_root;
   QTreeWidgetItem*                        _litecoin_root;
@@ -214,6 +215,7 @@ private:
   MailboxModel*                           _draft_model;
   MailboxModel*                           _pending_model;
   MailboxModel*                           _sent_model;
+  MailboxModel*                           _spam_model;
   MailboxModelRoot*                       _mail_model_root;
 
   AddressBookModel*                       _addressbook_model;

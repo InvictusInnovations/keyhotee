@@ -9,7 +9,8 @@ enum MailboxChildren
   Inbox,
   Drafts,
   Outbox,
-  Sent
+  Sent,
+  Spam
   };
 
 enum SidebarItemTypes
