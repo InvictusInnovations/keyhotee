@@ -242,6 +242,7 @@ void TKeyhoteeApplication::displayMainWindow()
   if(_main_window == nullptr)
   {
     _main_window = new KeyhoteeMainWindow(*this);
+    _main_window->setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
     _main_window->show();
     connect(this, &QApplication::focusChanged, _main_window, &KeyhoteeMainWindow::onFocusChanged);
     _backend_app->connect_to_network();
