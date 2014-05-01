@@ -28,6 +28,7 @@
 #include <QTranslator>
 
 #include <assert.h>
+#include <iostream>
 
 #ifdef WIN32
   #include <Windows.h>
