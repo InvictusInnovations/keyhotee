@@ -17,6 +17,7 @@
 #include <fc/log/logger.hpp>
 
 #include <bts/addressbook/addressbook.hpp>
+#include <iostream>
 
 #if 0
 class NymPage : public QWizardPage
