@@ -371,6 +371,7 @@ int TKeyhoteeApplication::run()
 void TKeyhoteeApplication::displayLogin()
 {
   ilog( "." );
+  std::cerr << "displayLogin\n";
   LoginDialog* loginDialog = new LoginDialog(*this);
   loginDialog->connect(loginDialog, &QDialog::accepted,
     [ = ]()
@@ -394,7 +395,8 @@ void TKeyhoteeApplication::displayLogin()
 
 void TKeyhoteeApplication::displayProfileWizard()
 {
-  ilog( "." );
+  std::cerr << "displayProfileWizard\n";
+  ilog(".");
   auto profile_wizard = new ProfileWizard(*this);
   profile_wizard->resize(QSize(680, 600) );
   profile_wizard->show();
@@ -433,6 +435,7 @@ bool TKeyhoteeApplication::notify(QObject* receiver, QEvent* e)
 
 void TKeyhoteeApplication::startup()
 {
+  std::cerr << "startup()\n";
   ilog( "." );
 
   if(_backend_app->has_profile() )

@@ -261,6 +261,7 @@ void ProfileWizard::createProfile()
 {
   if (_profile_edit->isComplete() )
   {
+    std::cerr << "createProfile()\n";
     ilog( "." );
     bts::profile_config conf;
     QString fName = _profile_edit->trimmedFirstName();
@@ -324,6 +325,7 @@ void ProfileWizard::createProfile()
       },
         [=](QString e)
       {
+      std::cerr << "Error creating profile\n";
       if(e.isEmpty())
         {
         QMessageBox::warning(nullptr, tr("Profile wizard"),
@@ -338,6 +340,7 @@ void ProfileWizard::createProfile()
   }
   else
     {
+    std::cerr << "createProfile: Incomplete profile\n";
     ilog( "createProfile: Incomplete profile" );
     }
 }

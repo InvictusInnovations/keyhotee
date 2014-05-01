@@ -2,6 +2,7 @@
 
 #include <fc/log/logger.hpp>
 #include <fc/thread/thread.hpp>
+#include <iostream> //for cerr
 
 typedef std::shared_ptr<fc::exception> TSharedException;
 
@@ -69,7 +70,7 @@ TAutoUpdateProgressBar::create(const QRect& rect, const QString& title, unsigned
 #endif /// !WIN32
   bar->resize(rect.size());
   bar->show();
-
+  std::cerr << "Creating TAutoUpdatProgressBar\n";
   ilog("Creating TAutoUpdateProgressBar");
 
   return bar;
@@ -80,30 +81,35 @@ void TAutoUpdateProgressBar::doTask(std::function<void()> mainTask, std::functio
   {
   _onFinishAction = onFinish;
   _onErrorAction = onError;
-
+  std::cerr << "doTask()\n";
   ilog("Entering...");
 
   fc::async([=]() {
     try
       {
+      std::cerr << "before mainTask()\n";
       ilog("before mainTask()");
       mainTask();
+      std::cerr << "after mainTask()\n";
       ilog("after mainTask()");
       _notifier->notifyFinished();
+      std::cerr << "after notifyFinished()\n";
       ilog("after notifyFinished()");
       }
     catch(const fc::exception& e)
       {
+      std::cerr << "fc exception caught while creating profile\n";
       elog("${e}", ("e", e.to_detail_string()));
       _notifier->notifyError(&e);
       }
     catch(...)
       {
+      std::cerr << "unrecognized exception while creating profile\n";
       elog("unrecognized exception while creating profile");
       _notifier->notifyError(nullptr);
       }
     });
-
+  std::cerr << "Exiting doTask()\n";
   ilog("Leaving...");
   }
 
@@ -115,6 +121,7 @@ void TAutoUpdateProgressBar::release()
 
 void TAutoUpdateProgressBar::updateValue(int value)
   {
+  std::cerr << "Updating progress value...\n";
   ilog("Updating progress value...");
   _notifier->updateProgress(value);
   }
@@ -133,21 +140,25 @@ TAutoUpdateProgressBar::~TAutoUpdateProgressBar()
 
 void TAutoUpdateProgressBar::onFinish()
   {
+  std::cerr << "Entering onFinish()\n";
   ilog("Entering...");
   setValue(_maxValue);
   release();
   ilog("executing _onFinishAction");
   _onFinishAction();
+  std::cerr << "Exiting onFinish()\n";
   ilog("Leaving...");
   }
 
 void TAutoUpdateProgressBar::onFinishWithError(QString e)
   {
+  std::cerr << "Entering onFinishWithError()\n";
   ilog("Entering...");
   release();
 
   _onErrorAction(e);
   
+  std::cerr << "Exiting onFinishWithError(), Performing a rethrow\n";
   ilog("Performing a rethrow...");
 
   //if(e.isEmpty())
