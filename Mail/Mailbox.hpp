@@ -26,7 +26,8 @@ public:
     Inbox,
     Drafts,
     Outbox,
-    Sent
+    Sent,
+    Spam
     };
 
   Mailbox(ATopLevelWindowsContainer* parent = nullptr);

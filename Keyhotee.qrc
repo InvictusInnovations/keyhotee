@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file>images/mail_spam.png</file>
     <file>images/mail.png</file>
     <file>images/mail_delete.png</file>
     <file>images/mail_open.png</file>

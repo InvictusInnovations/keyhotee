@@ -63,6 +63,8 @@ class TConnectionProcessor : public IMailProcessor,
     */
     void CancelTransmission();
 
+    void updateOptions();
+
   /// application_delegate interface implementation:
   private:
     /// \see application_delegate interface description.
@@ -104,6 +106,8 @@ class TConnectionProcessor : public IMailProcessor,
     std::atomic<bool>       TransmissionCancelled;
     /// Set to true between calls: receiving_mail_message <=> received_message
     std::atomic<bool>       ReceivingMail;
+    bool                    chat_allow_flag;
+    bool                    mail_allow_flag;
   };
 
 #endif /// __CONNECTIONPROCESSOR_HPP

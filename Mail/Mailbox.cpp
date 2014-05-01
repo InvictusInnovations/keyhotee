@@ -174,7 +174,10 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
     }
   else if (_type == Outbox)
     {
-    }  
+    }
+  else if(_type == Spam)
+  {
+  }
 
   
   QList<MailboxModel::Columns> defaultColumns;
@@ -288,7 +291,7 @@ void Mailbox::onDeleteMail()
   if (sortFilterIndexes.empty())
     return;
 
-  if (QMessageBox::question(this, tr("Delete Mail"), tr("Are you sure you want to delete selected email(s)?")) == QMessageBox::Button::No)
+  if (QMessageBox::question(nullptr, tr("Delete Mail"), tr("Are you sure you want to delete selected email(s)?")) == QMessageBox::Button::No)
     return;
   QModelIndexList indexes;
   for(const QModelIndex& sortFilterIndex : sortFilterIndexes)
@@ -514,6 +517,9 @@ void Mailbox::getDefaultColumns(QList<MailboxModel::Columns>* defaultColumns)
   {
     defaultColumns->push_back(MailboxModel::DateReceived);
     defaultColumns->push_back(MailboxModel::Status);
+  }
+  else if(_type == Spam)
+  {
   }
 }
 bool Mailbox::isIdentity()

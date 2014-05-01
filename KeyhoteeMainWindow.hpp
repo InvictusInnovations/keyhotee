@@ -90,7 +90,7 @@ private:
   virtual void OnReceivedAuthorizationMessage(const TAuthorizationMessage& msg,
     const TStoredMailMessage& header) override;
   /// \see IGuiUpdateSink interface description.
-  virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) override;
+  virtual void OnReceivedMailMessage(const TStoredMailMessage& msg, const bool spam) override;
   /// \see IGuiUpdateSink interface description.
   virtual void OnReceivedUnsupportedMessage(const TDecryptedMessage& msg) override;
   /// \see IGuiUpdateSink interface description.
@@ -129,6 +129,7 @@ private:
 private slots:
   // ---------- MenuBar
   // File
+  void onOptions();
   void onExit();
   // Edit
   void onCopy();
@@ -145,8 +146,6 @@ private slots:
   void onSetIcon();
   void onRequestAuthorization();
   void onShareContact();
-  // Language
-  void onLanguageChanged(QAction*);
   // Help
   void onDiagnostic();
   void onAbout();
@@ -167,6 +166,8 @@ private slots:
 
   void onSidebarSelectionChanged();
   void onSidebarDoubleClicked();
+
+  void onUpdateOptions(bool lang_changed);
 
 private:
   bool isIdentityPresent();
@@ -193,7 +194,6 @@ private:
   void addContact();
   void processResponse(const TAuthorizationMessage& msg, const TStoredMailMessage& header);
   void loadStoredRequests(bts::bitchat::message_db_ptr request_db);
-  void initMenuLanguage();
 
   /// Class attributes:
 
@@ -206,6 +206,7 @@ private:
   QTreeWidgetItem*                        _drafts_root;
   QTreeWidgetItem*                        _out_box_root;
   QTreeWidgetItem*                        _sent_root;
+  QTreeWidgetItem*                        _spam_root;
   QTreeWidgetItem*                        _bitcoin_root;
   QTreeWidgetItem*                        _bitshares_root;
   QTreeWidgetItem*                        _litecoin_root;
@@ -214,6 +215,7 @@ private:
   MailboxModel*                           _draft_model;
   MailboxModel*                           _pending_model;
   MailboxModel*                           _sent_model;
+  MailboxModel*                           _spam_model;
   MailboxModelRoot*                       _mail_model_root;
 
   AddressBookModel*                       _addressbook_model;

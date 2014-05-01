@@ -81,7 +81,7 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
     virtual void OnReceivedAuthorizationMessage(const TAuthorizationMessage& msg,
       const TStoredMailMessage& header) override;
     /// \see IGuiUpdateSink interface description.
-    virtual void OnReceivedMailMessage(const TStoredMailMessage& msg) override;
+    virtual void OnReceivedMailMessage(const TStoredMailMessage& msg, const bool spam) override;
     /// \see IGuiUpdateSink interface description.
     virtual void OnReceivedUnsupportedMessage(const TDecryptedMessage& msg) override;
     /// \see IGuiUpdateSink interface description.
@@ -164,25 +164,26 @@ class TConnectionProcessor::TThreadSafeGuiNotifier : public QObject,
     class TReceivedMailMsg : public ANotification
       {
       public:
-        static ANotification* Create(const TStoredMailMessage& msg, IGuiUpdateSink& sink)
+        static ANotification* Create(const TStoredMailMessage& msg, const bool spam, IGuiUpdateSink& sink)
           {
-          return new TReceivedMailMsg(msg, sink);
+          return new TReceivedMailMsg(msg, spam, sink);
           }
 
       /// ANotification class reimplementation:
         virtual void Notify()
           {
-          Sink.OnReceivedMailMessage(Msg);
+          Sink.OnReceivedMailMessage(Msg, Spam);
           delete this;
           }
 
       private:
-        TReceivedMailMsg(const TStoredMailMessage& msg, IGuiUpdateSink& sink) :
-          ANotification(sink), Msg(msg) {}
+        TReceivedMailMsg(const TStoredMailMessage& msg, const bool spam, IGuiUpdateSink& sink) :
+          ANotification(sink), Msg(msg), Spam(spam) {}
         virtual ~TReceivedMailMsg() {}
 
       private:
-        TStoredMailMessage Msg;
+        TStoredMailMessage  Msg;
+        bool                Spam;
       };
 
     class TReceivedUnsupportedMsg : public ANotification
@@ -390,9 +391,9 @@ void TConnectionProcessor::TThreadSafeGuiNotifier::OnReceivedAuthorizationMessag
   emit notificationSent(n);
   }
 
-void TConnectionProcessor::TThreadSafeGuiNotifier::OnReceivedMailMessage(const TStoredMailMessage& msg)
+void TConnectionProcessor::TThreadSafeGuiNotifier::OnReceivedMailMessage(const TStoredMailMessage& msg, const bool spam)
   {
-  ANotification* n = TReceivedMailMsg::Create(msg, Sink);
+  ANotification* n = TReceivedMailMsg::Create(msg, spam, Sink);
   emit notificationSent(n);
   }
 
@@ -858,6 +859,8 @@ TConnectionProcessor::TConnectionProcessor(IGuiUpdateSink& updateSink,
 
   Drafts = Profile->get_draft_db();
   OutboxQueue = new TOutboxQueue(*this, Profile);
+
+  updateOptions();
   }
 
 TConnectionProcessor::~TConnectionProcessor()
@@ -978,9 +981,17 @@ void TConnectionProcessor::received_text(const bts::bitchat::decrypted_message& 
     if (optContact)
       {
       wlog("Received text from known contact!");
-      Profile->get_chat_db()->store_message(msg,nullptr);
-      auto chatMsg = msg.as<bts::bitchat::private_text_message>();
-      Sink->OnReceivedChatMessage(*optContact, chatMsg, msg.sig_time);
+      if (!chat_allow_flag ||
+        ((*optContact).auth_status == bts::addressbook::authorization_status::accepted))
+        {
+        Profile->get_chat_db()->store_message(msg, nullptr);
+        auto chatMsg = msg.as<bts::bitchat::private_text_message>();
+        Sink->OnReceivedChatMessage(*optContact, chatMsg, msg.sig_time);
+        }
+      else
+        {
+        wlog("Chat message from known contact rejected!");
+        }
       }
     else
       {
@@ -994,20 +1005,46 @@ void TConnectionProcessor::received_text(const bts::bitchat::decrypted_message& 
   }
 
 void TConnectionProcessor::received_email(const bts::bitchat::decrypted_message& msg)
-  {
+{
   try
+  {
+    bool allow = false;
+    if(mail_allow_flag)
     {
-    auto header = Profile->get_inbox_db()->store_message(msg,nullptr);
-    wlog("email stored in database");
-    Sink->OnReceivedMailMessage(header);
-    wlog("gui notified");
-    ReceivingMail = false;
+      auto aBook = Profile->get_addressbook();
+      fc::optional<bts::addressbook::wallet_contact> optContact;
+
+      if(msg.from_key)
+        optContact = aBook->get_contact_by_public_key(*msg.from_key);
+
+      if(optContact)
+        if((*optContact).auth_status == bts::addressbook::authorization_status::accepted)
+          allow = true;
     }
-  catch(const fc::exception& e)
+    else
+      allow = true;
+
+    if(allow)
     {
-    elog("${e}", ("e", e.to_detail_string()));
+      auto header = Profile->get_inbox_db()->store_message(msg, nullptr);
+      wlog("email stored in database");
+      Sink->OnReceivedMailMessage(header, false);
+      wlog("gui notified");
+      ReceivingMail = false;
+    }
+    else
+    {
+      wlog("email message moved to spam!");
+      auto header = Profile->get_spam_db()->store_message(msg, nullptr);
+      Sink->OnReceivedMailMessage(header, true);
+      ReceivingMail = false;
     }
   }
+  catch(const fc::exception& e)
+  {
+    elog("${e}", ("e", e.to_detail_string()));
+  }
+}
 
 void TConnectionProcessor::received_request(const bts::bitchat::decrypted_message& msg)
   {
@@ -1039,6 +1076,17 @@ void TConnectionProcessor::message_transmission_finished(bool success)
   {
   ReceivingMail = false;
   }
+
+void TConnectionProcessor::updateOptions()
+{
+  QString profile_name = QString::fromStdWString(Profile->get_name());
+  QString settings_file = "keyhotee_";
+  settings_file.append(profile_name);
+  QSettings settings("Invictus Innovations", settings_file);
+
+  chat_allow_flag = settings.value("AllowChat", "").toBool();
+  mail_allow_flag = settings.value("AllowMail", "").toBool();
+}
 
 void TConnectionProcessor::PrepareStorableMessage(const TIdentity& senderId,
   const TPhysicalMailMessage& sourceMsg, TStorableMessage* storableMsg)

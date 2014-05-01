@@ -23,6 +23,8 @@
 #include "Mail/MailboxModelRoot.hpp"
 #include "Mail/maileditorwindow.hpp"
 
+#include "Options/OptionsDialog.h"
+
 #include <fc/reflect/variant.hpp>
 #include <fc/log/logger.hpp>
 
@@ -69,8 +71,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);
-
-  initMenuLanguage();
 
   QString profileName = mainApp.getLoadedProfileName();
 
@@ -132,6 +132,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
   // ---------------------- MenuBar
   // File
+  connect(ui->actionOptions, &QAction::triggered, this, &KeyhoteeMainWindow::onOptions);
   connect(ui->actionExit, &QAction::triggered, this, &KeyhoteeMainWindow::onExit);
   // Edit
   connect(ui->actionCopy, &QAction::triggered, this, &KeyhoteeMainWindow::onCopy);
@@ -150,8 +151,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   connect(ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts);
   connect(ui->actionRequest_authorization, &QAction::triggered, this, &KeyhoteeMainWindow::onRequestAuthorization);
   connect(ui->actionShare_contact, &QAction::triggered, this, &KeyhoteeMainWindow::onShareContact);
-  // Language
-  connect(ui->menuLanguage, SIGNAL(triggered(QAction*)), this, SLOT(onLanguageChanged(QAction*)));
   // Help
   connect(ui->actionDiagnostic, &QAction::triggered, this, &KeyhoteeMainWindow::onDiagnostic);
   connect(ui->actionAbout, &QAction::triggered, this, &KeyhoteeMainWindow::onAbout);
@@ -190,6 +189,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _drafts_root = _mailboxes_root->child(Drafts);
   _out_box_root = _mailboxes_root->child(Outbox);
   _sent_root = _mailboxes_root->child(Sent);
+  _spam_root = _mailboxes_root->child(Spam);
 
   _wallets_root->setExpanded(true);
   _bitcoin_root = _wallets_root->child(Bitcoin);
@@ -207,12 +207,14 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _draft_model = new MailboxModel(this, profile, profile->get_draft_db(), *_addressbook_model, _drafts_root, true);
   _pending_model = new MailboxModel(this, profile, profile->get_pending_db(), *_addressbook_model, _out_box_root, false);
   _sent_model = new MailboxModel(this, profile, profile->get_sent_db(), *_addressbook_model, _sent_root, false);
+  _spam_model = new MailboxModel(this, profile, profile->get_spam_db(), *_addressbook_model, _spam_root, false);
   
   _mail_model_root = new MailboxModelRoot();
   _mail_model_root->addMailboxModel(_inbox_model);
   _mail_model_root->addMailboxModel(_draft_model);
   _mail_model_root->addMailboxModel(_pending_model);
   _mail_model_root->addMailboxModel(_sent_model);
+  _mail_model_root->addMailboxModel(_spam_model);
 
   loadStoredRequests(profile->get_request_db());
   connect(_addressbook_model, &QAbstractItemModel::dataChanged, this,
@@ -224,7 +226,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   ui->inbox_page->initial(_connectionProcessor, _inbox_model, Mailbox::Inbox, this);
   ui->draft_box_page->initial(_connectionProcessor, _draft_model, Mailbox::Drafts, this);
   ui->out_box_page->initial(_connectionProcessor, _pending_model, Mailbox::Outbox, this);
-  ui->sent_box_page->initial(_connectionProcessor, _sent_model, Mailbox::Sent, this);  
+  ui->sent_box_page->initial(_connectionProcessor, _sent_model, Mailbox::Sent, this);
+  ui->spam_box_page->initial(_connectionProcessor, _spam_model, Mailbox::Spam, this);
   _mailboxesList.push_back (ui->inbox_page);
   _mailboxesList.push_back (ui->draft_box_page);
   _mailboxesList.push_back (ui->out_box_page);
@@ -489,6 +492,10 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       {
       activateMailboxPage(ui->sent_box_page);
       }
+    else if(selectedItem == _spam_root)
+    {
+      activateMailboxPage(ui->spam_box_page);
+    }
     else if (selected_items[0] == _wallets_root)
     {
       ui->widget_stack->setCurrentWidget(ui->wallets);
@@ -596,7 +603,7 @@ void KeyhoteeMainWindow::onNewIdentity()
    QObject::connect(ident_dialog, SIGNAL(identityadded()),
                     this, SLOT(enableNewMessageIcon()));
 
-   ident_dialog->show();
+   ident_dialog->exec();
 }
 
 bool KeyhoteeMainWindow::isIdentityPresent()
@@ -1067,9 +1074,12 @@ void KeyhoteeMainWindow::OnReceivedAuthorizationMessage(const TAuthorizationMess
     processResponse(msg, header);
   }
 
-void KeyhoteeMainWindow::OnReceivedMailMessage(const TStoredMailMessage& msg)
+void KeyhoteeMainWindow::OnReceivedMailMessage(const TStoredMailMessage& msg, const bool spam)
   {
-  _inbox_model->addMailHeader(msg);
+  if(spam)
+    _spam_model->addMailHeader(msg);
+  else
+    _inbox_model->addMailHeader(msg);
   }
 
 void KeyhoteeMainWindow::OnReceivedUnsupportedMessage(const TDecryptedMessage& msg)
@@ -1372,53 +1382,25 @@ void KeyhoteeMainWindow::onShareContact()
   shareContact(contacts);
 }
 
-
-void KeyhoteeMainWindow::initMenuLanguage()
+void KeyhoteeMainWindow::onUpdateOptions(bool lang_changed)
 {
-  _actionsLang.push_back(ui->actionChinese);
-  ui->actionChinese->setData(QLocale(QLocale::Chinese, QLocale::China).name());
+  if (lang_changed)
+    QMessageBox::information(this, tr("Change language"),
+      tr("Please restart application for the changes to take effect") );
 
-  _actionsLang.push_back(ui->actionEnglish);
-  ui->actionEnglish->setData(QLocale(QLocale::English, QLocale::UnitedStates).name());
-
-  _actionsLang.push_back(ui->actionPolish);
-  ui->actionPolish->setData(QLocale(QLocale::Polish, QLocale::Poland).name());
-
-  _actionsLang.push_back(ui->actionPortuguese);
-  ui->actionPortuguese->setData(QLocale(QLocale::Portuguese, QLocale::Portugal).name());
-
-  _actionsLang.push_back(ui->actionSpanish);
-  ui->actionSpanish->setData(QLocale(QLocale::Spanish, QLocale::AnyCountry).name());
-
-  QSettings settings("Invictus Innovations", "Keyhotee");
-  QString locale = settings.value("Language", "").toString();
-  /// Set checked language action
-  for (const auto& v : _actionsLang)
-  {
-    if (locale == v->data().toString())
-    {
-      v->setChecked(true);
-      return;
-    }
-  }
-  /// If not found language set english action
-  ui->actionEnglish->setChecked(true);
-  return;
+  _connectionProcessor.updateOptions();
 }
 
-void KeyhoteeMainWindow::onLanguageChanged(QAction* langAction)
+void KeyhoteeMainWindow::onOptions()
 {
-  QString localeName = langAction->data().toString();
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+  QString profile_name = QString::fromStdWString(profile->get_name());
 
-  /// Clear checked state for all languages
-  for (const auto& v : _actionsLang)
-    v->setChecked(false);
+  OptionsDialog* options_dialog = new OptionsDialog(this, profile_name);
 
-  langAction->setChecked(true);
+  QObject::connect(options_dialog, SIGNAL(optionsSaved(bool)),
+    this, SLOT(onUpdateOptions(bool)));
 
-  QSettings settings("Invictus Innovations", "Keyhotee");
-  settings.setValue("Language", localeName);
-
-  QMessageBox::information(this, tr("Change language"),
-    tr("Please restart application for the changes to take effect") );
+  options_dialog->show();
 }

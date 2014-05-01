@@ -242,6 +242,7 @@ void TKeyhoteeApplication::displayMainWindow()
   if(_main_window == nullptr)
   {
     _main_window = new KeyhoteeMainWindow(*this);
+    _main_window->setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
     _main_window->show();
     connect(this, &QApplication::focusChanged, _main_window, &KeyhoteeMainWindow::onFocusChanged);
     _backend_app->connect_to_network();
@@ -318,7 +319,7 @@ int TKeyhoteeApplication::run()
     QString locale = settings.value("Language", "").toString();
 
     /// If empty set default system locale
-    if (locale.isEmpty())
+    if(locale.isEmpty())
     {
       locale = QLocale::system().name();
       settings.setValue("Language", locale);
@@ -326,14 +327,15 @@ int TKeyhoteeApplication::run()
 
     QTranslator translator;
     bool loadOk = translator.load(QString(":/keyhotee_") + locale);
-    if (loadOk)
+    if(loadOk)
       installTranslator(&translator);
-
-    if(_loaded_profile_name.isEmpty())
+    else
+      settings.setValue("Language", "en_US");
+    
+    if (_loaded_profile_name.isEmpty())
     {
-      QSettings settings("Invictus Innovations", "Keyhotee");
       _loaded_profile_name = settings.value("last_profile").toString();
-      if(!_loaded_profile_name.isEmpty())
+      if (!_loaded_profile_name.isEmpty())
         _last_loaded_profile_name = true;
     }
 

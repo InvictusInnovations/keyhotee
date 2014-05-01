@@ -195,6 +195,15 @@
            <normaloff>:/images/128x128/sent_items.png</normaloff>:/images/128x128/sent_items.png</iconset>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Spam</string>
+         </property>
+         <property name="icon">
+          <iconset resource="Keyhotee.qrc">
+           <normaloff>:/images/mail_spam.png</normaloff>:/images/mail_spam.png</iconset>
+         </property>
+        </item>
        </item>
        <item>
         <property name="text">
@@ -337,7 +346,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>6</number>
+        <number>4</number>
        </property>
        <widget class="Mailbox" name="inbox_page">
         <layout class="QGridLayout" name="inboxlayout">
@@ -361,6 +370,7 @@
        <widget class="Mailbox" name="draft_box_page"/>
        <widget class="Mailbox" name="out_box_page"/>
        <widget class="Mailbox" name="sent_box_page"/>
+       <widget class="Mailbox" name="spam_box_page"/>
        <widget class="ContactsTable" name="contacts_page">
         <layout class="QGridLayout" name="gridLayout_3">
          <property name="leftMargin">
@@ -400,6 +410,8 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionOptions"/>
+    <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -458,22 +470,11 @@
      <string>Window</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuLanguage">
-    <property name="title">
-     <string>Language</string>
-    </property>
-    <addaction name="actionChinese"/>
-    <addaction name="actionEnglish"/>
-    <addaction name="actionPolish"/>
-    <addaction name="actionPortuguese"/>
-    <addaction name="actionSpanish"/>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuIdentity"/>
    <addaction name="menuMail"/>
    <addaction name="menuContact"/>
-   <addaction name="menuLanguage"/>
    <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -711,11 +712,6 @@
     <string>Share contact...</string>
    </property>
   </action>
-  <action name="actionLanguage">
-   <property name="text">
-    <string>Language</string>
-   </property>
-  </action>
   <action name="actionPolish">
    <property name="checkable">
     <bool>true</bool>
@@ -762,6 +758,11 @@
    </property>
    <property name="text">
     <string>Spanish (Chile)</string>
+   </property>
+  </action>
+  <action name="actionOptions">
+   <property name="text">
+    <string>Options</string>
    </property>
   </action>
  </widget>

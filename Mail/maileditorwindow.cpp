@@ -48,15 +48,13 @@ class TDocumentTransform
       const TPhysicalMailMessage& srcMsg, QTextDocument* doc);
 
   private:
-    /// Replace from plain text
-    QTextCursor replace(const char* textToFind, const QString& replacement,
-      const QTextCursor& startPos = QTextCursor());
-    /// Replace from html text
-    QTextCursor replaceHtml(const char* textToFind, const QString& replacementHtml,
-      const QTextCursor& startPos = QTextCursor());
     /// Allows to remove whole line containing given text.
     void removeContainingLine(const char* textToFind, const QTextCursor& startPos = QTextCursor());
     QTextCursor find(const char* textToFind, const QTextCursor& startPos);
+    /** Remove nested html header from the message body.
+    RepliedMailPattern.html already contains html header
+    */
+    void removeHtmlHeader(QString &body);
   /// Class attributes:
   private:
     QTextDocument* Doc;
@@ -105,67 +103,40 @@ TDocumentTransform::Do(TLoadForm loadForm, const TStoredMailMessage& msgHeader,
 
   QByteArray contents = htmlPattern.readAll();
   QString patternHtml(contents);
-  doc->setHtml(patternHtml);
 
   QString senderText(Utils::toString(msgHeader.from_key, Utils::FULL_CONTACT_DETAILS));
   QString sentDate(Utils::toQDateTime(msgHeader.from_sig_time).toString(Qt::DefaultLocaleShortDate));
   QString toList(Utils::makeContactListString(srcMsg.to_list, ';', Utils::FULL_CONTACT_DETAILS));
   QString ccList(Utils::makeContactListString(srcMsg.cc_list, ';', Utils::FULL_CONTACT_DETAILS));
 
-  replace("$$SENDER$$", senderText);
-  replace("$$SENT_DATE$$", sentDate);
-  replace("$$TO_RECIPIENTS$$", toList);
+  patternHtml.replace("$$SENDER$$", senderText);
+  patternHtml.replace("$$SENT_DATE$$", sentDate);
+  patternHtml.replace("$$TO_RECIPIENTS$$", toList);
   
-  if(ccList.isEmpty())
-    removeContainingLine("$$CC_RECIPIENTS$$");
-  else
-    replace("$$CC_RECIPIENTS$$", ccList);
-
-  replace("$$SUBJECT$$", newSubject);
-
-  replaceHtml("$$SOURCE_BODY$$", srcMsg.body.c_str());
-  
-  return newSubject;
-  }
-
-inline
-QTextCursor TDocumentTransform::replace(const char* textToFind, const QString& replacement,
-  const QTextCursor& startPos /*= QTextCursor()*/)
+  if (!ccList.isEmpty())
   {
-  /** \warning It is impossible to use here QTextDocumentFragment::fromPlainText and next pass
-      it to another replace version, since formatting gets broken (new instered text uses formatting
-      from begin of block instead of this one which was specified for replaced text).
-      It looks like it is some bug in insertFragment (where fragment was built from plain text).
+    patternHtml.replace("$$CC_RECIPIENTS$$", ccList);
+  }
+  patternHtml.replace("$$SUBJECT$$", newSubject);
+
+  QString body = QString(srcMsg.body.c_str());
+  /** Even forcing the following conversion:
+  QTextDocumentFragment tf(QTextDocumentFragment::fromHtml(QString(srcMsg.body.c_str())));
+  and next
+  replace("$$SOURCE_BODY$$", tf);
+  Html tags doesn't work properly for $$SOURCE_BODY$$" section.
+  Therefore first replace section $$...$$ in the patternHtml and next insert
+  html document to QTextDocument
   */
-  QTextCursor foundPos = find(textToFind, startPos);
-
-  if(foundPos.isNull() == false && foundPos.hasSelection())
-    {
-    auto cf = foundPos.charFormat();
-    foundPos.beginEditBlock();
-    foundPos.removeSelectedText();
-    foundPos.insertText(replacement, cf);
-    foundPos.endEditBlock();
-    }
-
-  return foundPos;
+  removeHtmlHeader(body);
+  patternHtml.replace("$$SOURCE_BODY$$", body);
+  doc->setHtml(patternHtml);
+  if (ccList.isEmpty())
+  {
+    removeContainingLine("$$CC_RECIPIENTS$$");
   }
 
-inline
-QTextCursor TDocumentTransform::replaceHtml(const char* textToFind, const QString& replacementHtml,
-  const QTextCursor& startPos /*= QTextCursor()*/)
-  {
-  QTextCursor foundPos = find(textToFind, startPos);
-
-  if(foundPos.isNull() == false && foundPos.hasSelection())
-    {
-    foundPos.beginEditBlock();
-    foundPos.removeSelectedText();
-    foundPos.insertHtml(replacementHtml);
-    foundPos.endEditBlock();
-    }
-
-  return foundPos;
+  return newSubject;
   }
 
 void TDocumentTransform::removeContainingLine(const char* textToFind,
@@ -194,6 +165,28 @@ QTextCursor TDocumentTransform::find(const char* textToFind, const QTextCursor& 
   }
 
 } ///namespace
+
+void TDocumentTransform::removeHtmlHeader(QString &body)
+{
+  /// Remove nested html header
+  int pos = 0;
+  /// find start of body section
+  pos = body.indexOf("<body", pos);
+  pos = body.indexOf(">", pos);
+  /// remove <head.. and <body..
+  body.remove(0, pos + 1);
+
+  /// Find end of body section.
+  /// Set position to end of the document not to search the entire message
+  pos = body.size() - 100/*sizeof(<body><head> + reserve)*/;
+  pos = body.indexOf("</body>", pos);
+  assert(pos != -1);
+  if (pos != -1)
+  {
+    /// remove </body..</html.. section
+    body.remove(pos, body.size() - pos);
+  }
+}
 
 MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, AddressBookModel& abModel,
   IMailProcessor& mailProcessor, bool editMode) :
