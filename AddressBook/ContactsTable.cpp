@@ -58,7 +58,10 @@ ContactsTable::ContactsTable(QWidget* parent)
   //connect( _delete_contact, &QAction::triggered, this, &ContactsTable::onDeleteContact);
   }
 
-ContactsTable::~ContactsTable(){}
+ContactsTable::~ContactsTable()
+{
+  delete ui;
+}
 
 void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
   {
@@ -293,7 +296,7 @@ bool ContactsTable::EscapeIfEditMode() const
 
 QWidget* ContactsTable::getContactsTableWidget () const
 {
-  return static_cast<QWidget*>(ui->contact_table);
+  return ui->contact_table;
 }
 
 void ContactsTable::copy()

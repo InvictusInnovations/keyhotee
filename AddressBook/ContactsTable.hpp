@@ -54,7 +54,7 @@ Q_SIGNALS:
   void contactDeleted(int contact_id);
 
 private:
-  std::unique_ptr<Ui::ContactsTable> ui;
+  Ui::ContactsTable*                 ui;
   AddressBookModel*                  _addressbook_model;
   QSortFilterProxyModel*             _sorted_addressbook_model;
   QAction*                           _delete_contact;

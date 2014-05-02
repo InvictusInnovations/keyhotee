@@ -347,6 +347,8 @@ void MailFieldsWidget::onIdentitiesChanged(const TIdentities& identities)
   /// Show from controls when multiple identities are defined.
   bool showFromControl = Action2Identity.size() > 1;
   showFromControls(showFromControl);  
+
+  validateSendButtonState();
 }
 
 void MailFieldsWidget::closeEvent()
