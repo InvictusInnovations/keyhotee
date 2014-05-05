@@ -24,6 +24,7 @@ OptionsDialog::OptionsDialog(QWidget *parent, QString profile_name) :
 
   ui->chat_authorized->setChecked(profile_settings.value("AllowChat", "").toBool());
   ui->mail_authorized->setChecked(profile_settings.value("AllowMail", "").toBool());
+  ui->save_spam->setChecked(profile_settings.value("SaveSpam", "").toBool());
 
   connect(this, &QDialog::accepted, this, &OptionsDialog::onSave);
 }
@@ -79,6 +80,11 @@ void OptionsDialog::onSave()
     profile_settings.setValue("AllowMail", true);
   else if (ui->mail_anyone->isChecked())
     profile_settings.setValue("AllowMail", false);
+
+  if(ui->save_spam->isChecked())
+    profile_settings.setValue("SaveSpam", true);
+  else
+    profile_settings.setValue("SaveSpam", false);
   
   emit optionsSaved(lang_changed);
 }

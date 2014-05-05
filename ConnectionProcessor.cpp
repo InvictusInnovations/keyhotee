@@ -1039,10 +1039,15 @@ void TConnectionProcessor::received_email(const bts::bitchat::decrypted_message&
     }
     else
     {
-      wlog("email message moved to spam!");
-      auto header = Profile->get_spam_db()->store_message(msg, nullptr);
-      Sink->OnReceivedMailMessage(header, true);
-      ReceivingMail = false;
+      if(save_spam_flag)
+      {
+        wlog("email message moved to spam!");
+        auto header = Profile->get_spam_db()->store_message(msg, nullptr);
+        Sink->OnReceivedMailMessage(header, true);
+        ReceivingMail = false;
+      }
+      else
+        wlog("*** email message rejected!");
     }
   }
   catch(const fc::exception& e)
@@ -1091,6 +1096,7 @@ void TConnectionProcessor::updateOptions()
 
   chat_allow_flag = settings.value("AllowChat", "").toBool();
   mail_allow_flag = settings.value("AllowMail", "").toBool();
+  save_spam_flag = settings.value("SaveSpam", "").toBool();
 }
 
 bool TConnectionProcessor::isMyIdentity(const TRecipientPublicKey& senderId)

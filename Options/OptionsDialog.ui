@@ -42,7 +42,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="general">
     <attribute name="title">
@@ -198,6 +198,25 @@
       <string notr="true">allow_mail</string>
      </attribute>
     </widget>
+    <widget class="QCheckBox" name="save_spam">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>170</y>
+       <width>251</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Blocked message save in Spam folder</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>
@@ -235,9 +254,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>mail_authorized</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>save_spam</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>168</x>
+     <y>192</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>248</x>
+     <y>210</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="allow_mail"/>
   <buttongroup name="allow_chat"/>
+  <buttongroup name="allow_mail"/>
  </buttongroups>
 </ui>

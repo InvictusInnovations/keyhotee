@@ -109,6 +109,7 @@ class TConnectionProcessor : public IMailProcessor,
     std::atomic<bool>       ReceivingMail;
     bool                    chat_allow_flag;
     bool                    mail_allow_flag;
+    bool                    save_spam_flag;
   };
 
 #endif /// __CONNECTIONPROCESSOR_HPP
