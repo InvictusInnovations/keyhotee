@@ -232,6 +232,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _mailboxesList.push_back (ui->draft_box_page);
   _mailboxesList.push_back (ui->out_box_page);
   _mailboxesList.push_back (ui->sent_box_page);
+  _mailboxesList.push_back(ui->spam_box_page);
 
   ui->widget_stack->setCurrentWidget(ui->inbox_page);
   ui->actionDelete->setShortcut(QKeySequence::Delete);
