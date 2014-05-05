@@ -1011,15 +1011,20 @@ void TConnectionProcessor::received_email(const bts::bitchat::decrypted_message&
     bool allow = false;
     if(mail_allow_flag)
     {
-      auto aBook = Profile->get_addressbook();
-      fc::optional<bts::addressbook::wallet_contact> optContact;
+      if(isMyIdentity(*msg.from_key))
+        allow = true;
+      else
+      {
+        auto aBook = Profile->get_addressbook();
+        fc::optional<bts::addressbook::wallet_contact> optContact;
 
-      if(msg.from_key)
-        optContact = aBook->get_contact_by_public_key(*msg.from_key);
+        if(msg.from_key)
+          optContact = aBook->get_contact_by_public_key(*msg.from_key);
 
-      if(optContact)
-        if((*optContact).auth_status == bts::addressbook::authorization_status::accepted)
-          allow = true;
+        if(optContact)
+          if((*optContact).auth_status == bts::addressbook::authorization_status::accepted)
+            allow = true;
+      }
     }
     else
       allow = true;
@@ -1086,6 +1091,17 @@ void TConnectionProcessor::updateOptions()
 
   chat_allow_flag = settings.value("AllowChat", "").toBool();
   mail_allow_flag = settings.value("AllowMail", "").toBool();
+}
+
+bool TConnectionProcessor::isMyIdentity(const TRecipientPublicKey& senderId)
+{
+  for(const TIdentity& id : Profile->identities())
+  {
+    if(id.public_key == senderId)
+      return true;
+  }
+
+  return false;
 }
 
 void TConnectionProcessor::PrepareStorableMessage(const TIdentity& senderId,

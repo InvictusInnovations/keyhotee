@@ -84,6 +84,7 @@ class TConnectionProcessor : public IMailProcessor,
 
   /// Other implementation helpers:
   private:
+    bool isMyIdentity(const TRecipientPublicKey& senderId);
     typedef bts::bitchat::decrypted_message TStorableMessage;
     void PrepareStorableMessage(const TIdentity& senderId, const TPhysicalMailMessage& msg,
       TStorableMessage* storableMsg);
