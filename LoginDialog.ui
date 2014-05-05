@@ -60,12 +60,6 @@
      <property name="text">
       <string>Quit</string>
      </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-     <property name="default">
-      <bool>false</bool>
-     </property>
     </widget>
    </item>
    <item row="3" column="1">

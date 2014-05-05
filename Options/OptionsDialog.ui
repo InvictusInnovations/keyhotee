@@ -42,7 +42,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="general">
     <attribute name="title">
@@ -272,7 +272,7 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="allow_chat"/>
   <buttongroup name="allow_mail"/>
+  <buttongroup name="allow_chat"/>
  </buttongroups>
 </ui>
