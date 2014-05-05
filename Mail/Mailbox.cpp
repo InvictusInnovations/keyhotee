@@ -291,7 +291,7 @@ void Mailbox::onDeleteMail()
   if (sortFilterIndexes.empty())
     return;
 
-  if (QMessageBox::question(nullptr, tr("Delete Mail"), tr("Are you sure you want to delete selected email(s)?")) == QMessageBox::Button::No)
+  if (QMessageBox::question(this, tr("Delete Mail"), tr("Are you sure you want to delete selected email(s)?")) == QMessageBox::Button::No)
     return;
   QModelIndexList indexes;
   for(const QModelIndex& sortFilterIndex : sortFilterIndexes)
