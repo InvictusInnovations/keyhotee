@@ -1201,6 +1201,7 @@ void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
   if (checkSaving() && stopMailTransmission())
     {
     _isClosing = true;
+    menuEdit->onClosingApp();
 
     writeSettings ();
     for (Mailbox* mailBox : _mailboxesList)
@@ -1367,7 +1368,7 @@ void KeyhoteeMainWindow::onClipboardChanged()
 
 void KeyhoteeMainWindow::onFocusChanged(QWidget *old, QWidget *now)
 {
-  menuEdit->setEnabled(old, now);
+  menuEdit->onFocusChanged(old, now);
 }
 
 ContactsTable* KeyhoteeMainWindow::getContactsPage()
