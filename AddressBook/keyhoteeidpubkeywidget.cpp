@@ -37,13 +37,17 @@ KeyhoteeIDPubKeyWidget::~KeyhoteeIDPubKeyWidget()
 void KeyhoteeIDPubKeyWidget::setKeyhoteeID(const QString& keyhotee_id)
 {
   ui->keyhotee_id->setText(keyhotee_id);
-  keyhoteeIdEdited(keyhotee_id);
+  if(_my_mode != AuthorizationView)
+    keyhoteeIdEdited(keyhotee_id);
 }
 
 void KeyhoteeIDPubKeyWidget::setPublicKey(const QString& public_key_string)
 {
   ui->public_key->setText(public_key_string);
-  publicKeyEdited(public_key_string);
+  if(_my_mode == AuthorizationView)
+    existContactWithPublicKey(public_key_string.toStdString());
+  else
+    publicKeyEdited(public_key_string);
 }
 
 void KeyhoteeIDPubKeyWidget::keyhoteeIdChanged(const QString& /*keyhotee_id*/)
@@ -306,6 +310,7 @@ bool KeyhoteeIDPubKeyWidget::existContactWithPublicKey (const std::string& publi
             ui->id_status->setStyleSheet("QLabel { color : red; }");
             return true;
           case ModeWidget::RequestAuthorization:
+          case ModeWidget::AuthorizationView:
             ui->id_status->setText( tr("Public Key Only Mode: valid key") ); //tr("This contact is already added to the list") );
             ui->id_status->setStyleSheet("QLabel { color : green; }");
             emit currentState(IsStored);
@@ -346,6 +351,12 @@ void KeyhoteeIDPubKeyWidget::setEditable(bool editable)
       ui->keyhotee_id->setEnabled(editable && gMiningIsPossible);
       ui->keyhotee_id->setReadOnly(!editable);
       ui->public_key->setReadOnly(!editable);
+      break;
+    case ModeWidget::AuthorizationView:
+      ui->keyhotee_id->setEnabled(false);
+      ui->keyhotee_id->setReadOnly(true);
+      ui->public_key->setReadOnly(true);
+      ui->id_status->setVisible(false);
       break;
     default:
       assert(false);

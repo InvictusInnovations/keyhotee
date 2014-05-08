@@ -956,7 +956,10 @@ void KeyhoteeMainWindow::processResponse(const TAuthorizationMessage& msg,
 {
   Authorization *authorization = new Authorization(_connectionProcessor, msg, header);
   authorization->processResponse();
+
+  statusBar()->showMessage(tr("Received a reply to a request for authorization..."), 3000);
 }
+
 void KeyhoteeMainWindow::loadStoredRequests(bts::bitchat::message_db_ptr request_db)
 {
   try
@@ -964,6 +967,7 @@ void KeyhoteeMainWindow::loadStoredRequests(bts::bitchat::message_db_ptr request
     auto headers = request_db->fetch_headers(bts::bitchat::private_contact_request_message::type);
     for(uint32_t i = 0; i < headers.size(); ++i)
     {
+      ilog("loading stored requests...");
       auto header = headers[i];
       auto raw_data = request_db->fetch_data(header.digest);
       auto msg = fc::raw::unpack<bts::bitchat::private_contact_request_message>(raw_data);

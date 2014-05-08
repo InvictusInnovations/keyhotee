@@ -311,9 +311,12 @@ void ContactView::onRequestContact()
 {
   RequestAuthorization *request = new RequestAuthorization(this);
   if(!ui->khid_pubkey->getKeyhoteeID().isEmpty() && gMiningIsPossible)
-    request->setKeyhoteeID(ui->khid_pubkey->getKeyhoteeID());
+    request->setKeyhoteeID(_current_contact.dac_id_string.c_str());
   else
-    request->setPublicKey(ui->khid_pubkey->getPublicKeyText());
+  {
+    std::string public_key_string = public_key_address(_current_contact.public_key.serialize());
+    request->setPublicKey(public_key_string.c_str());
+  }
   request->enableAddContact(false);
   request->setAddressBook(_address_book);
   request->show();

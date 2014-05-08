@@ -92,7 +92,7 @@ AuthorizationView::AuthorizationView(IAuthProcessor& auth_processor, const TRequ
   _address_book = nullptr;
   _owner_item = nullptr;
 
-  ui->keyhoteeidpubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::RequestAuthorization);
+  ui->keyhoteeidpubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::AuthorizationView);
   ui->keyhoteeidpubkey->setEditable(false);
   ui->keyhoteeidpubkey->showCopyToClipboard(false);
 
@@ -222,30 +222,33 @@ void AuthorizationView::sendReply(TAuthorizationStatus status)
   if(!Utils::matchIdentity(_reqmsg.recipient, &my_identity))
     return;
 
-  auto app = bts::application::instance();
-  auto profile = app->get_profile();
-  bts::bitchat::private_contact_request_message request_msg;
+  if(status != TAuthorizationStatus::deny)
+  {
+    auto app = bts::application::instance();
+    auto profile = app->get_profile();
+    bts::bitchat::private_contact_request_message request_msg;
 
-  request_msg.from_first_name = my_identity.first_name;
-  request_msg.from_last_name = my_identity.last_name;
-  request_msg.from_keyhotee_id = my_identity.dac_id_string;
-  request_msg.greeting_message = "";
-  request_msg.from_channel = bts::network::channel_id(1);
-    
-  uint16_t request_param = ui->check_box_chat->isChecked();
-  request_param |= ui->check_box_mail->isChecked() << 1;
-  request_param |= ui->extend_public_key->isChecked() << 8;
-  request_msg.request_param = request_param;
-  
-  request_msg.status = status;
-  request_msg.recipient = _from_pub_key;
+    request_msg.from_first_name = my_identity.first_name;
+    request_msg.from_last_name = my_identity.last_name;
+    request_msg.from_keyhotee_id = my_identity.dac_id_string;
+    request_msg.greeting_message = "";
+    request_msg.from_channel = bts::network::channel_id(1);
 
-  if(status == TAuthorizationStatus::accept)
-    if(ui->extend_public_key->isChecked())
-      genExtendedPubKey(my_identity.dac_id_string, request_msg.extended_pub_key);
+    uint16_t request_param = ui->check_box_chat->isChecked();
+    request_param |= ui->check_box_mail->isChecked() << 1;
+    request_param |= ui->extend_public_key->isChecked() << 8;
+    request_msg.request_param = request_param;
 
-  fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(my_identity.dac_id_string);
-  app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
+    request_msg.status = status;
+    request_msg.recipient = _from_pub_key;
+
+    if(status == TAuthorizationStatus::accept)
+      if(ui->extend_public_key->isChecked())
+        genExtendedPubKey(my_identity.dac_id_string, request_msg.extended_pub_key);
+
+    fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(my_identity.dac_id_string);
+    app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
+  }
 
   _auth_processor.storeAuthorization(my_identity, _reqmsg, _header);
 }

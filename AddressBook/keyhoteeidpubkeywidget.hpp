@@ -27,7 +27,8 @@ public:
   enum ModeWidget{
     ShowContact,
     AddContact,
-    RequestAuthorization
+    RequestAuthorization,
+    AuthorizationView
   };
 
   void setAddressBook(AddressBookModel* address_book);
