@@ -45,7 +45,10 @@ public:
   void cut();
   void paste();
   void selectAll();
-  void setEnabled(QWidget *old, QWidget *now);
+  ///Notify when focus changed in the KeyhoteeMainWindow
+  void onFocusChanged(QWidget *old, QWidget *now);
+  ///Notify when Keyhotee application is closing
+  void onClosingApp();
 
 private:
   bool isSelected(QWidget* focused, bool& canCut) const;
@@ -62,6 +65,7 @@ private:
   QAction*    _actionPaste;
   QWidget *   _currentWidget;
   std::vector<ITextDoc*>   _textDocs;
+  bool        _isClosingApp;
 };
 
 #endif // MENUEDITCONTROL_HPP
