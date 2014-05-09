@@ -969,47 +969,48 @@ bool TConnectionProcessor::receiving_mail_message()
   }
 
 void TConnectionProcessor::received_text(const bts::bitchat::decrypted_message& msg)
-  {
+{
   try
-    {
+  {
     auto aBook = Profile->get_addressbook();
     fc::optional<bts::addressbook::wallet_contact> optContact;
-    
+
     if(msg.from_key)
       optContact = aBook->get_contact_by_public_key(*msg.from_key);
 
-    if (optContact)
-      {
+    if(optContact)
+    {
       wlog("Received text from known contact!");
-      if (!chat_allow_flag ||
-        ((*optContact).auth_status == bts::addressbook::authorization_status::accepted))
-        {
+      if(!_chat_allow_flag ||
+        (*optContact).auth_status == bts::addressbook::authorization_status::accepted ||
+        (*optContact).auth_status == bts::addressbook::authorization_status::accepted_chat)
+      {
         Profile->get_chat_db()->store_message(msg, nullptr);
         auto chatMsg = msg.as<bts::bitchat::private_text_message>();
         Sink->OnReceivedChatMessage(*optContact, chatMsg, msg.sig_time);
-        }
-      else
-        {
-        wlog("Chat message from known contact rejected!");
-        }
       }
-    else
+      else
       {
-      elog("Received chat message from unknown contact/missing sender - ignoring");
+        wlog("Chat message from known contact rejected!");
       }
     }
-  catch(const fc::exception& e)
+    else
     {
-    elog("${e}", ("e", e.to_detail_string()));
+      elog("Received chat message from unknown contact/missing sender - ignoring");
     }
   }
+  catch(const fc::exception& e)
+  {
+    elog("${e}", ("e", e.to_detail_string()));
+  }
+}
 
 void TConnectionProcessor::received_email(const bts::bitchat::decrypted_message& msg)
 {
   try
   {
     bool allow = false;
-    if(mail_allow_flag)
+    if(_mail_allow_flag)
     {
       if(isMyIdentity(*msg.from_key))
         allow = true;
@@ -1022,7 +1023,8 @@ void TConnectionProcessor::received_email(const bts::bitchat::decrypted_message&
           optContact = aBook->get_contact_by_public_key(*msg.from_key);
 
         if(optContact)
-          if((*optContact).auth_status == bts::addressbook::authorization_status::accepted)
+          if((*optContact).auth_status == bts::addressbook::authorization_status::accepted ||
+             (*optContact).auth_status == bts::addressbook::authorization_status::accepted_mail)
             allow = true;
       }
     }
@@ -1039,7 +1041,7 @@ void TConnectionProcessor::received_email(const bts::bitchat::decrypted_message&
     }
     else
     {
-      if(save_spam_flag)
+      if(_save_spam_flag)
       {
         wlog("email message moved to spam!");
         auto header = Profile->get_spam_db()->store_message(msg, nullptr);
@@ -1057,25 +1059,34 @@ void TConnectionProcessor::received_email(const bts::bitchat::decrypted_message&
 }
 
 void TConnectionProcessor::received_request(const bts::bitchat::decrypted_message& msg)
-  {
+{
   try
-    {
+  {
     if(msg.from_key)
-      {
-      auto header = Profile->get_request_db()->store_message(msg, nullptr);
-      auto req_msg = msg.as<bts::bitchat::private_contact_request_message>();
-      Sink->OnReceivedAuthorizationMessage(req_msg, header);
-      }
-    else
-      {
-      elog("Received auth. message with missing sender key - ignoring");
-      }
-    }
-  catch(const fc::exception& e)
     {
-    elog("${e}", ("e", e.to_detail_string()));
+      auto aBook = Profile->get_addressbook();
+      fc::optional<bts::addressbook::wallet_contact> optContact;
+      optContact = aBook->get_contact_by_public_key(*msg.from_key);
+
+      if((*optContact).auth_status != bts::addressbook::authorization_status::blocked)
+      {
+        auto header = Profile->get_request_db()->store_message(msg, nullptr);
+        auto req_msg = msg.as<bts::bitchat::private_contact_request_message>();
+        Sink->OnReceivedAuthorizationMessage(req_msg, header);
+      }
+      else
+        ilog("Received auth. message from blocked contact - ignoring");
+    }
+    else
+    {
+      elog("Received auth. message with missing sender key - ignoring");
     }
   }
+  catch(const fc::exception& e)
+  {
+    elog("${e}", ("e", e.to_detail_string()));
+  }
+}
 
 void TConnectionProcessor::received_unsupported_msg(const bts::bitchat::decrypted_message& msg)
 {
@@ -1094,9 +1105,9 @@ void TConnectionProcessor::updateOptions()
   settings_file.append(profile_name);
   QSettings settings("Invictus Innovations", settings_file);
 
-  chat_allow_flag = settings.value("AllowChat", "").toBool();
-  mail_allow_flag = settings.value("AllowMail", "").toBool();
-  save_spam_flag = settings.value("SaveSpam", "").toBool();
+  _chat_allow_flag = settings.value("AllowChat", "").toBool();
+  _mail_allow_flag = settings.value("AllowMail", "").toBool();
+  _save_spam_flag = settings.value("SaveSpam", "").toBool();
 }
 
 bool TConnectionProcessor::isMyIdentity(const TRecipientPublicKey& senderId)
