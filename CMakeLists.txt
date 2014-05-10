@@ -365,7 +365,11 @@ set( sources
         Wallets/transactionhistorymodel.hpp
         Wallets/transactionhistorymodel.cpp
         Wallets/wallettransaction.hpp
-        Wallets/wallettransaction.hpp
+        Wallets/wallettransaction.cpp
+        Wallets/WalletsGui.hpp
+        Wallets/WalletsGui.cpp
+        Wallets/XmlWalletsReader.hpp
+        Wallets/XmlWalletsReader.cpp
 
         ATopLevelWindowsContainer.hpp
         ATopLevelWindowsContainer.cpp

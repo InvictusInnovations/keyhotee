@@ -6,7 +6,7 @@ echo Using %INVICTUS_ROOT% as Invictus root directory
 
 call "%VS120COMNTOOLS%\..\..\VC\vcvarsall.bat"
 
-set PREFIX=%INVICTUS_ROOT%\OpenSSL
+set PREFIX=..\OpenSSL
 
 patch -d util/pl -i %INVICTUS_ROOT%\keyhotee\HelperScripts\VC-32.pl.patch
 

@@ -25,6 +25,8 @@
 
 #include "Options/OptionsDialog.h"
 
+#include "Wallets/WalletsGui.hpp"
+
 #include <fc/reflect/variant.hpp>
 #include <fc/log/logger.hpp>
 
@@ -71,6 +73,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);
+  
+  /// _walletsGui = std::make_unique<WalletsGui>(this);
 
   QString profileName = mainApp.getLoadedProfileName();
 

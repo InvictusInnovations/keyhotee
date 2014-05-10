@@ -33,6 +33,7 @@ class MailboxModelRoot;
 class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
+class WalletsGui;
 
 class QAction;
 class QCompleter;
@@ -230,6 +231,7 @@ private:
   /// Set to true when close event processing is in progress (it wasn't yet accepted nor ignored)
   bool                                    _isClosing;
   QList <QAction*>                        _actionsLang;
+  std::unique_ptr<WalletsGui>             _walletsGui;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();
