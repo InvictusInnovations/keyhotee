@@ -2,6 +2,7 @@
 
 #include <QIODevice>
 #include <QFile>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QString>
 #include <QXmlStreamReader>
@@ -9,9 +10,13 @@
 XmlWalletsReader::XmlWalletsReader(QWidget* parent, QList<WalletsGui::Data>* data)
 : _parent(parent), _data(data)
 {
-  QString xmlDefault = ":Wallets/DefaultWallets.xml";
-  QString xmlFileName = "\WalletsGui.xml";
   bool xmlFileError = false;
+  QString xmlDefault = ":Wallet/DefaultWallets.xml";
+  QString xmlFileName = "WalletsGui.xml";  
+
+  QFileInfo fileInfo(xmlFileName);
+  /// Display absolute file path
+  xmlFileName = fileInfo.absoluteFilePath();
 
   if (QFile::exists(xmlFileName) == false)
   {
@@ -50,12 +55,13 @@ bool XmlWalletsReader::parseXML(const QString& fileName)
 {
   _data->clear();
 
-  QFile file(fileName);
+  QFile file(fileName);   
+
   if (file.open(QIODevice::ReadOnly | QIODevice::Text) == false)
   {
     QMessageBox::critical(_parent,
       QObject::tr("Wallets reading ..."),
-      QObject::tr("Error opening file: ") + fileName);
+      QObject::tr("Error opening file: %1").arg(fileName));
   }
 
   QXmlStreamReader xml(&file);
@@ -74,8 +80,8 @@ bool XmlWalletsReader::parseXML(const QString& fileName)
         if (xml.attributes().value("version") != "1.0")
         {
           /// wrong version
-          xml.raiseError(QObject::tr("The file: ") + fileName +
-            QObject::tr("\nis not wallets version 1.0."));
+          xml.raiseError(
+            QObject::tr("The file: %1 \nis not wallets version 1.0.").arg(fileName));
         }
       }
       else if (xml.name() == "wallet")
@@ -87,9 +93,11 @@ bool XmlWalletsReader::parseXML(const QString& fileName)
 
   /// Error handling
   if (xml.hasError())
-  {
+  {    
+    QString lineNumber = 
+      QObject::tr("\n(Line number: %1)").arg(QString::number(xml.lineNumber()));
     QMessageBox::critical(_parent, QObject::tr("Wallets reading ..."),
-      xml.errorString() );
+      xml.errorString() + lineNumber);
     return false;
   }
 
@@ -109,7 +117,7 @@ WalletsGui::Data XmlWalletsReader::parseWallet(QXmlStreamReader& xml, const QStr
   else
   {
     /// Attribute 'name' not found in the file:
-    xml.raiseError(QObject::tr("Attribute ""name"" not found in the file:\n") + fileName);
+    xml.raiseError(QObject::tr("Attribute ""name"" not found in the file: %1\n").arg(fileName));
     return wallet;
   }
   /// Next element...
@@ -134,7 +142,7 @@ WalletsGui::Data XmlWalletsReader::parseWallet(QXmlStreamReader& xml, const QStr
         }
         else
         {
-          xml.raiseError(QObject::tr("Attribute ""url"" not found in the file:\n") + fileName);
+          xml.raiseError(QObject::tr("Attribute ""url"" not found in the file: %1\n").arg(fileName));
           return wallet;
         }
       }
@@ -148,7 +156,7 @@ WalletsGui::Data XmlWalletsReader::parseWallet(QXmlStreamReader& xml, const QStr
         }
         else
         {
-          xml.raiseError(QObject::tr("Attribute ""icon"" not found in the file:\n") + fileName);
+          xml.raiseError(QObject::tr("Attribute ""icon"" not found in the file: %1\n").arg(fileName));
           return wallet;
         }
       }
