@@ -62,7 +62,18 @@ void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
   switch(status)
   {
     case TAuthorizationStatus::accept:
-      contact.auth_status = TContAuthoStatus::accepted;
+      switch(_reqmsg.request_param & 0x03)
+      {
+        case 1:   // chat
+          contact.auth_status = TContAuthoStatus::accepted_chat;
+          break;
+        case 2:   // mail
+          contact.auth_status = TContAuthoStatus::accepted_mail;
+          break;
+        case 3:   // chat and mail
+          contact.auth_status = TContAuthoStatus::accepted;
+          break;
+      }
       break;
     case TAuthorizationStatus::block:
       contact.auth_status = TContAuthoStatus::blocked;

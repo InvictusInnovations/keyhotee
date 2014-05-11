@@ -667,6 +667,14 @@ void ContactView::checkAuthorizationStatus()
   {
     ui->authorization_status->setText( tr("Authorized") );
   }
+  else if(status == bts::addressbook::authorization_status::accepted_chat)
+  {
+    ui->authorization_status->setText(tr("Authorized chat"));
+  }
+  else if(status == bts::addressbook::authorization_status::accepted_mail)
+  {
+    ui->authorization_status->setText(tr("Authorized mail"));
+  }
   else if(status == bts::addressbook::authorization_status::denied)
   {
     ui->authorization_status->setText( tr("Denied") );
