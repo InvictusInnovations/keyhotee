@@ -9,66 +9,152 @@
 XmlWalletsReader::XmlWalletsReader(QWidget* parent, QList<WalletsGui::Data>* data)
 : _parent(parent), _data(data)
 {
-  QString xmlFileName = ":Wallets/DefaultWallets.xml";
-  QFile file(xmlFileName);
-  if (! file.open(QIODevice::ReadOnly | QIODevice::Text)) 
-  {   
-    QMessageBox::critical(parent,
-      QObject::tr("Wallets reading ..."), 
-      QObject::tr("Error opening file: ") + xmlFileName);
-  }
+  QString xmlDefault = ":Wallets/DefaultWallets.xml";
+  QString xmlFileName = "\WalletsGui.xml";
+  bool xmlFileError = false;
 
-  QXmlStreamReader xml(&file);
-
-  while (xml.atEnd() == false && 
-        xml.hasError() == false)
+  if (QFile::exists(xmlFileName) == false)
   {
-    /// Read next element
-    QXmlStreamReader::TokenType token = xml.readNext();    
-
-    const QString *name = xml.name().string();
-
-    /// If token is just StartDocument, we'll go to next
-    if (token == QXmlStreamReader::StartDocument)
+    /// copy default xml file to Keyhotee.exe path
+    if (QFile::copy(xmlDefault, xmlFileName) == false)
     {
-      continue;
+      QMessageBox::critical(_parent, QObject::tr("Wallets reading ..."),
+        QObject::tr("Can't copy file from ""%1"" \nto ""%2"" ").arg(xmlDefault, xmlFileName));
+      xmlFileError = true;
     }
+  }
+ 
 
-    /// If token is StartElement, we'll see if we can read it
-    if (token == QXmlStreamReader::StartElement) 
+  if (xmlFileError == false)
+  {
+    if (parseXML(xmlFileName) == false)
     {
-      if (xml.name() == "wallets")
-      {
-        /// check wallets version
-        if (xml.attributes().value("version") == "1.0")
-        {
-          xml.readNextStartElement();
-          continue;          
-        }
-        else
-          xml.raiseError(QObject::tr("The file is not Wallets version 1.0."));
-      }
-
-      if (xml.name() == "wallet") 
-      {
-        /// read wallet attributes;
-      }
+      /// error parsing user wallets xml file
+      xmlFileError = true;
     }
   }
 
-  /* Error handling. */
-  if (xml.hasError()) 
+  /// if any error exists,  parse default xml file from resource
+  if (xmlFileError == true)
   {
-    QMessageBox::critical(_parent,
-      QObject::tr("Wallets reading ..."),
-      xml.errorString()
-      );
+    Q_ASSERT (parseXML(xmlDefault) == true);
   }
-  /* Removes any device() or data from the reader
-  * and resets its internal state to the initial state. */
-  xml.clear();
 }
 
 XmlWalletsReader::~XmlWalletsReader()
 {
+}
+
+
+bool XmlWalletsReader::parseXML(const QString& fileName)
+{
+  _data->clear();
+
+  QFile file(fileName);
+  if (file.open(QIODevice::ReadOnly | QIODevice::Text) == false)
+  {
+    QMessageBox::critical(_parent,
+      QObject::tr("Wallets reading ..."),
+      QObject::tr("Error opening file: ") + fileName);
+  }
+
+  QXmlStreamReader xml(&file);
+
+  while (xml.atEnd() == false &&
+    xml.hasError() == false)
+  {
+    /// Read next element
+    QXmlStreamReader::TokenType token = xml.readNext();
+
+    /// If token is StartElement, we'll see if we can read it
+    if (token == QXmlStreamReader::StartElement)
+    {
+      if (xml.name() == "wallets")
+      {
+        if (xml.attributes().value("version") != "1.0")
+        {
+          /// wrong version
+          xml.raiseError(QObject::tr("The file: ") + fileName +
+            QObject::tr("\nis not wallets version 1.0."));
+        }
+      }
+      else if (xml.name() == "wallet")
+      {
+        _data->push_back(parseWallet(xml, fileName));
+      }
+    }
+  }
+
+  /// Error handling
+  if (xml.hasError())
+  {
+    QMessageBox::critical(_parent, QObject::tr("Wallets reading ..."),
+      xml.errorString() );
+    return false;
+  }
+
+  return true;
+}
+
+WalletsGui::Data XmlWalletsReader::parseWallet(QXmlStreamReader& xml, const QString& fileName)
+{  
+  WalletsGui::Data wallet;
+
+  /// Get the attributes for wallet
+  QXmlStreamAttributes attributes = xml.attributes();
+  if (attributes.hasAttribute("name")) 
+  {
+    wallet.name = attributes.value("name").toString();
+  }
+  else
+  {
+    /// Attribute 'name' not found in the file:
+    xml.raiseError(QObject::tr("Attribute ""name"" not found in the file:\n") + fileName);
+    return wallet;
+  }
+  /// Next element...
+  xml.readNext();
+
+  /// continue the loop until we hit an EndElement named wallet
+  while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
+           xml.name() == "wallet")) 
+  {
+    if (xml.atEnd() == true || xml.hasError() == true)
+      return wallet;
+
+    if (xml.tokenType() == QXmlStreamReader::StartElement) 
+    {
+      if (xml.name() == "url") 
+      {
+        /// read attribute from element
+        xml.readNext();
+        if (xml.tokenType() == QXmlStreamReader::Characters)
+        {
+          wallet.url = xml.text().toString();
+        }
+        else
+        {
+          xml.raiseError(QObject::tr("Attribute ""url"" not found in the file:\n") + fileName);
+          return wallet;
+        }
+      }
+      else if (xml.name() == "icon")
+      {
+        /// read attribute from element
+        xml.readNext();
+        if (xml.tokenType() == QXmlStreamReader::Characters)
+        {
+          wallet.iconPath = xml.text().toString();
+        }
+        else
+        {
+          xml.raiseError(QObject::tr("Attribute ""icon"" not found in the file:\n") + fileName);
+          return wallet;
+        }
+      }
+    }
+
+    xml.readNext();
+  }
+  return wallet;
 }

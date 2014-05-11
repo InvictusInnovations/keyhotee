@@ -13,7 +13,7 @@ public:
   struct Data
   {
     QString name;
-    QIcon icon;
+    QString iconPath;
     QString url;
   };
 

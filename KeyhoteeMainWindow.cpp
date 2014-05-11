@@ -72,9 +72,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _isClosing(false)
 {
   ui = new Ui::KeyhoteeMainWindow;
-  ui->setupUi(this);
-  
-  /// _walletsGui = std::make_unique<WalletsGui>(this);
+  ui->setupUi(this);   
 
   QString profileName = mainApp.getLoadedProfileName();
 
@@ -296,6 +294,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   this->setMenuWindow(ui->menuWindow);
   this->registration(actionMenu);
   actionMenu->setVisible(false);
+
+  //_walletsGui = std::make_unique<WalletsGui>(this);
 }
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
