@@ -11,7 +11,7 @@ XmlWalletsReader::XmlWalletsReader(QWidget* parent, QList<WalletsGui::Data>* dat
 : _parent(parent), _data(data)
 {
   bool xmlFileError = false;
-  QString xmlDefault = ":Wallet/DefaultWallets.xml";
+  QString xmlDefault = ":Wallets/DefaultWallets.xml";
   QString xmlFileName = "WalletsGui.xml";  
 
   QFileInfo fileInfo(xmlFileName);

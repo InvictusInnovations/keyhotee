@@ -21,13 +21,6 @@ enum SidebarItemTypes
   RequestItem   = 1000 + 5
   };
 
-enum WalletsChildren
-  {
-  Bitcoin,
-  BitShares,
-  Litecoin
-  };
-
 class TreeWidgetCustom : public QTreeWidget
 {
     Q_OBJECT

@@ -10,5 +10,10 @@ WalletsGui::WalletsGui(QWidget* parent)
 
 void WalletsGui::read(QWidget* parent)
 {
-  XmlWalletsReader reader(parent, &data);
+  XmlWalletsReader reader(parent, &_data);
+}
+
+const QList	<WalletsGui::Data>& WalletsGui::getData() const
+{
+  return _data;
 }
