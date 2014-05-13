@@ -69,7 +69,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _identities_root(nullptr),
   _connectionProcessor(*this, bts::application::instance()->get_profile()),
   _currentMailbox(nullptr),
-  _isClosing(false)
+  _isClosing(false),
+  _walletsGui(new WalletsGui(this))
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);   
@@ -193,7 +194,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _sent_root = _mailboxes_root->child(Sent);
   _spam_root = _mailboxes_root->child(Spam);
 
-  _walletsGui = std::make_unique<WalletsGui>(this);
   const QList<WalletsGui::Data>& _walletsData = _walletsGui->getData();
 
   _wallets_root->setExpanded(true);
