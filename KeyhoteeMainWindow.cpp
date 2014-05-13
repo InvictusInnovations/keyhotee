@@ -193,10 +193,14 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _sent_root = _mailboxes_root->child(Sent);
   _spam_root = _mailboxes_root->child(Spam);
 
+  _walletsGui = std::make_unique<WalletsGui>(this);
+  const QList<WalletsGui::Data>& _walletsData = _walletsGui->getData();
+
   _wallets_root->setExpanded(true);
-  _bitcoin_root = _wallets_root->child(Bitcoin);
-  _bitshares_root = _wallets_root->child(BitShares);
-  _litecoin_root = _wallets_root->child(Litecoin);
+  for (size_t i = 0; i < _walletsData.size(); i++)
+  {
+    _walletItems.push_back(_wallets_root->child(i));
+  }
 
   auto app = bts::application::instance();
   auto profile = app->get_profile();
@@ -294,8 +298,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   this->setMenuWindow(ui->menuWindow);
   this->registration(actionMenu);
   actionMenu->setVisible(false);
-
-  //_walletsGui = std::make_unique<WalletsGui>(this);
 }
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
@@ -501,21 +503,19 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     {
       activateMailboxPage(ui->spam_box_page);
     }
-    else if (selected_items[0] == _wallets_root)
+    else if (selectedItem == _wallets_root)
     {
       ui->widget_stack->setCurrentWidget(ui->wallets);
     }
-    else if (selected_items[0] == _bitcoin_root)
+    else
     {
-      ui->widget_stack->setCurrentWidget(ui->wallets);
-    }
-    else if (selected_items[0] == _bitshares_root)
-    {
-      ui->widget_stack->setCurrentWidget(ui->wallets);
-    }
-    else if (selected_items[0] == _litecoin_root)
-    {
-      ui->widget_stack->setCurrentWidget(ui->wallets);
+      for (const auto& walletItem : _walletItems)
+      {
+        if (selectedItem == walletItem)
+        {
+          ui->widget_stack->setCurrentWidget(ui->wallets);
+        }
+      }
     }
   }
 }

@@ -209,9 +209,7 @@ private:
   QTreeWidgetItem*                        _out_box_root;
   QTreeWidgetItem*                        _sent_root;
   QTreeWidgetItem*                        _spam_root;
-  QTreeWidgetItem*                        _bitcoin_root;
-  QTreeWidgetItem*                        _bitshares_root;
-  QTreeWidgetItem*                        _litecoin_root;
+  QList<QTreeWidgetItem*>                 _walletItems;
 
   MailboxModel*                           _inbox_model;
   MailboxModel*                           _draft_model;
