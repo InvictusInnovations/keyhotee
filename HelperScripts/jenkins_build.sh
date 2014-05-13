@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 if [ -e "BitShares" ]
 then
     cd BitShares
