@@ -484,12 +484,19 @@ class TConnectionProcessor::TOutboxQueue
     /** Allows to add new pending message to the sending queue.
         \param senderId      - identity chosen to be specified as mail sender,
         \param msg           - mail message to be sent,
+        \param msg_type      - message type: Normal, Forward, Reply
         \param savedDraftMsg - optional, can be nullptr. If not null, it means that previously saved
                                draft message is about to send (it should be removed from Draft
                                folder).
     */
     void AddPendingMessage(const TIdentity& senderId, const TPhysicalMailMessage& msg,
       const TMsgType msg_type, const TStoredMailMessage* savedDraftMsg);
+
+    /** Allows to add new pending message to the sending queue.
+    \param senderId      - identity chosen to be specified as maessage sender,
+    \param msg           - authorization message to be sent,
+    */
+    void AddPendingAuthoMsg(const TIdentity& senderId, const TRequestMessage& msg);
 
     bool AnyOperationsPending() const;
 
@@ -568,9 +575,13 @@ class TConnectionProcessor::TOutboxQueue
       return CancelPromise->ready();
       }
 
-    bool fetchNextMessage(TStoredMailMessage* storedMsg, TPhysicalMailMessage* storage);
+    bool fetchNextMessage(TStoredMailMessage* storedMsg, TPhysicalMailMessage* mail_msg,
+      TRequestMessage* auth_msg, bool* auth_flag);
     bool transferMessage(const TRecipientPublicKey& senderId, const TPhysicalMailMessage& msg);
+    bool transferAuthMsg(const TRecipientPublicKey& senderId, const TRequestMessage& auth_msg);
     void sendMail(const TPhysicalMailMessage& email, const TRecipientPublicKey& to,
+      const fc::ecc::private_key& from);
+    void sendAuthMsg(const TRequestMessage& auth_msg, const TRecipientPublicKey& to,
       const fc::ecc::private_key& from);
 
     /** Allows to get identity associated to given public key. Returns false if there is no
@@ -624,6 +635,18 @@ void TConnectionProcessor::TOutboxQueue::AddPendingMessage(const TIdentity& send
   checkForAvailableConnection();
   }
 
+void TConnectionProcessor::TOutboxQueue::AddPendingAuthoMsg(const TIdentity& senderId, const TRequestMessage& msg)
+{
+  std::lock_guard<std::mutex> guard(OutboxDbLock);
+
+  TStorableMessage storableMsg;
+  Processor.PrepareStorableAuthMsg(senderId, msg, &storableMsg);
+  TStoredMailMessage storedMsg = Outbox->store_message(storableMsg, nullptr);
+
+  /// Try to start thread checking connection and next potential transmission
+  checkForAvailableConnection();
+}
+
 bool TConnectionProcessor::TOutboxQueue::AnyOperationsPending() const
   {
   bool transferLoopActive = isTransmissionLoopActive();
@@ -642,10 +665,12 @@ void TConnectionProcessor::TOutboxQueue::transmissionLoop()
   {
   bool notificationSent = false;
 
-  TPhysicalMailMessage msg;
-  TStoredMailMessage   storedMsg;
+  TPhysicalMailMessage  mail_msg;
+  TRequestMessage       auth_msg;
+  TStoredMailMessage    storedMsg;
+  bool                  auth_flag = false;
 
-  while(!isCancelled()  && fetchNextMessage(&storedMsg, &msg))
+  while(!isCancelled() && fetchNextMessage(&storedMsg, &mail_msg, &auth_msg, &auth_flag))
     {
     if(!notificationSent)
       {
@@ -653,8 +678,12 @@ void TConnectionProcessor::TOutboxQueue::transmissionLoop()
       notificationSent = true;
       }
 
-    if(transferMessage(storedMsg.from_key, msg))
-      moveMsgToSentDB(storedMsg, msg);
+    if(auth_flag)
+      if(transferAuthMsg(storedMsg.from_key, auth_msg))
+        Outbox->remove_message(storedMsg);
+    else
+      if(transferMessage(storedMsg.from_key, mail_msg))
+        moveMsgToSentDB(storedMsg, mail_msg);
 
     if(isCancelled())
       break;
@@ -682,10 +711,11 @@ void TConnectionProcessor::TOutboxQueue::connectionCheckingLoop()
   }
 
 bool TConnectionProcessor::TOutboxQueue::fetchNextMessage(TStoredMailMessage* storedMsg,
-  TPhysicalMailMessage* storage)
+  TPhysicalMailMessage* mail_msg, TRequestMessage* auth_msg, bool* auth_flag)
   {
   assert(storedMsg != nullptr);
-  assert(storage != nullptr);
+  assert(mail_msg != nullptr);
+  assert(auth_msg != nullptr);
 
   std::lock_guard<std::mutex> guard(OutboxDbLock);
 
@@ -693,12 +723,24 @@ bool TConnectionProcessor::TOutboxQueue::fetchNextMessage(TStoredMailMessage* st
     {
     /// FIXME - message_db interface is terrible - there should be a way to query just for 1 object
     auto pendingMsgHeaders = Outbox->fetch_headers(TPhysicalMailMessage::type);
-    if(pendingMsgHeaders.empty())
+    auto pendingAuthHeaders = Outbox->fetch_headers(TRequestMessage::type);
+    if(pendingMsgHeaders.empty() && pendingAuthHeaders.empty())
       return false;
 
-    *storedMsg = pendingMsgHeaders.front();
-    auto rawData = Outbox->fetch_data(storedMsg->digest);
-    *storage = fc::raw::unpack<TPhysicalMailMessage>(rawData);
+    if(!pendingMsgHeaders.empty())
+    {
+      *storedMsg = pendingMsgHeaders.front();
+      auto rawData = Outbox->fetch_data(storedMsg->digest);
+      *mail_msg = fc::raw::unpack<TPhysicalMailMessage>(rawData);
+      *auth_flag = false;
+    }
+    else if(!pendingAuthHeaders.empty())
+    {
+      *storedMsg = pendingAuthHeaders.front();
+      auto rawData = Outbox->fetch_data(storedMsg->digest);
+      *auth_msg = fc::raw::unpack<TRequestMessage>(rawData);
+      *auth_flag = true;
+    }
 
     return true;
     }
@@ -766,6 +808,30 @@ bool TConnectionProcessor::TOutboxQueue::transferMessage(const TRecipientPublicK
   return sendStatus;
   }
 
+bool TConnectionProcessor::TOutboxQueue::transferAuthMsg(const TRecipientPublicKey& senderId,
+  const TRequestMessage& auth_msg)
+{
+  bool sendStatus = false;
+
+  try
+  {
+    bts::extended_private_key senderPrivKey;
+    if(findIdentityPrivateKey(senderId, &senderPrivKey))
+      sendAuthMsg(auth_msg, auth_msg.recipient, senderPrivKey);
+
+    sendStatus = true;
+  }
+  catch(const fc::exception& e)
+  {
+    sendStatus = false;
+    elog("${e}", ("e", e.to_detail_string()));
+    /// Probably connection related error, try to start it again
+    checkForAvailableConnection();
+  }
+
+  return sendStatus;
+}
+
 inline
 void TConnectionProcessor::TOutboxQueue::sendMail(const TPhysicalMailMessage& email,
   const TRecipientPublicKey& to, const fc::ecc::private_key& from)
@@ -778,6 +844,19 @@ void TConnectionProcessor::TOutboxQueue::sendMail(const TPhysicalMailMessage& em
 
   FC_THROW("No connection to execute send_email"); 
   }
+
+inline
+void TConnectionProcessor::TOutboxQueue::sendAuthMsg(const TRequestMessage& auth_msg,
+  const TRecipientPublicKey& to, const fc::ecc::private_key& from)
+{
+  if(isMailConnected())
+  {
+    App->send_contact_request(auth_msg, to, from);
+    return;
+  }
+
+  FC_THROW("No connection to execute send_contact_request");
+}
 
 inline
 bool TConnectionProcessor::TOutboxQueue::findIdentity(const TRecipientPublicKey& senderId,
@@ -917,6 +996,11 @@ bool TConnectionProcessor::IsMailConnected() const
   {
   return App->is_mail_connected();
   }
+
+void TConnectionProcessor::SendAuth(const TCurrIdentity& senderId, const TRequestMessage& msg)
+{
+  OutboxQueue->AddPendingAuthoMsg(senderId, msg);
+}
 
 void TConnectionProcessor::storeAuthorization(const TCurrIdentity& senderId, const TRequestMessage& src_msg,
                                               const TStoredMessage& msg_header)
@@ -1154,6 +1238,19 @@ void TConnectionProcessor::PrepareStorableMessage(const TIdentity& senderId,
 
   encMsg.decrypt(senderPrivKey, *storableMsg);
   }
+
+void TConnectionProcessor::PrepareStorableAuthMsg(const TIdentity& senderId,
+  const TRequestMessage& sourceMsg, TStorableMessage* storableMsg)
+{
+  bts::bitchat::decrypted_message msg(sourceMsg);
+
+  auto senderPrivKey = Profile->get_keychain().get_identity_key(senderId.dac_id_string);
+  msg.sign(senderPrivKey);
+  auto encMsg = msg.encrypt(senderId.public_key);
+  encMsg.timestamp = fc::time_point::now();
+
+  encMsg.decrypt(senderPrivKey, *storableMsg);
+}
 
 #include "ConnectionProcessor.moc"
 

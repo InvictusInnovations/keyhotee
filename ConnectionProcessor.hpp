@@ -46,6 +46,8 @@ class TConnectionProcessor : public IMailProcessor,
 
   /// IAuthProcessor interface implementation:
     /// \see IAuthProcessor interface description.
+    virtual void SendAuth(const TCurrIdentity& senderId, const TRequestMessage& msg) override;
+    /// \see IAuthProcessor interface description.
     virtual void storeAuthorization(const TCurrIdentity& senderId, const TRequestMessage& src_msg,
       const TStoredMessage& msg_header) override;
 
@@ -87,6 +89,8 @@ class TConnectionProcessor : public IMailProcessor,
     bool isMyIdentity(const TRecipientPublicKey& senderId);
     typedef bts::bitchat::decrypted_message TStorableMessage;
     void PrepareStorableMessage(const TIdentity& senderId, const TPhysicalMailMessage& msg,
+      TStorableMessage* storableMsg);
+    void PrepareStorableAuthMsg(const TIdentity& senderId, const TRequestMessage& sourceMsg,
       TStorableMessage* storableMsg);
 
   /// Class attributes:

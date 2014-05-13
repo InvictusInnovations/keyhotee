@@ -319,7 +319,9 @@ bool KeyhoteeIDPubKeyWidget::existContactWithPublicKey (const std::string& publi
             assert(false);
         }
       }
-    }     
+      if(_my_mode == ModeWidget::AuthorizationView)
+        emit currentState(OkPubKey);
+    }
   }
   return false;
 }

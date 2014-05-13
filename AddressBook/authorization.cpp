@@ -172,6 +172,13 @@ void AuthorizationView::setOwnerItem(AuthorizationItem* item)
   _owner_item = item;
 }
 
+void AuthorizationView::updateView()
+{
+  std::string public_key_string = public_key_address(_from_pub_key.serialize());
+  ui->keyhoteeidpubkey->setPublicKey(public_key_string.c_str());
+  ui->keyhoteeidpubkey->setKeyhoteeID(_reqmsg.from_keyhotee_id.c_str());
+}
+
 void AuthorizationView::onAccept()
 {
   addAsNewContact();
@@ -192,6 +199,7 @@ void AuthorizationView::onDeny()
 
 void AuthorizationView::onBlock()
 {
+  addAsNewContact();
   sendReply(TAuthorizationStatus::block);
   setAuthorizationStatus(TAuthorizationStatus::block);
   close();
@@ -202,14 +210,17 @@ void AuthorizationView::addAsNewContact()
 {
   if(ui->add_contact->isEnabled() && ui->add_contact->isChecked())
   {
-    Contact new_conntact;
-    new_conntact.first_name       = ui->first_name->text().toStdString();
-    new_conntact.last_name        = ui->last_name->text().toStdString();
-    new_conntact.dac_id_string    = ui->keyhoteeidpubkey->getKeyhoteeID().toStdString();     // can better directly from the message?
-    new_conntact.public_key       = _from_pub_key;
-    new_conntact.privacy_setting  = bts::addressbook::secret_contact;
-    new_conntact.setIcon(QIcon(":/images/user.png"));
+    bts::addressbook::wallet_contact new_wallet_contact;
+    new_wallet_contact.first_name       = ui->first_name->text().toStdString();
+    new_wallet_contact.last_name        = ui->last_name->text().toStdString();
+    new_wallet_contact.dac_id_string    = _reqmsg.from_keyhotee_id;
+    new_wallet_contact.public_key       = _from_pub_key;
+    new_wallet_contact.privacy_setting  = bts::addressbook::secret_contact;
+    if(_reqmsg.from_icon_png)
+      new_wallet_contact.icon_png       = *_reqmsg.from_icon_png;
 
+    Contact new_conntact = Contact(new_wallet_contact);
+    
     _address_book->storeContact(new_conntact);
   }
 }
@@ -257,8 +268,7 @@ void AuthorizationView::sendReply(TAuthorizationStatus status)
       if(ui->extend_public_key->isChecked())
         genExtendedPubKey(my_identity.dac_id_string, request_msg.extended_pub_key);
 
-    fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(my_identity.dac_id_string);
-    app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
+    _auth_processor.SendAuth(my_identity, request_msg);
   }
 
   _auth_processor.storeAuthorization(my_identity, _reqmsg, _header);
@@ -281,10 +291,12 @@ void AuthorizationView::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state
     case KeyhoteeIDPubKeyWidget::CurrentState::InvalidData:
     case KeyhoteeIDPubKeyWidget::CurrentState::IsStored:
       ui->add_contact->setEnabled(false);
+      ui->add_contact->setChecked(false);
       break;
     case KeyhoteeIDPubKeyWidget::CurrentState::OkKeyhoteeID:
     case KeyhoteeIDPubKeyWidget::CurrentState::OkPubKey:
       ui->add_contact->setEnabled(true);
+      ui->add_contact->setChecked(true);
       break;
     default:
       assert(false);

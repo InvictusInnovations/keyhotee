@@ -13,8 +13,9 @@
 
 #include <string>
 
-RequestAuthorization::RequestAuthorization(QWidget *parent) :
-    QDialog(parent), ui(new Ui::RequestAuthorization)
+RequestAuthorization::RequestAuthorization(QWidget *parent, IAuthProcessor& auth_processor) :
+  QDialog(parent), ui(new Ui::RequestAuthorization),
+  _auth_processor(auth_processor)
 {
   ui->setupUi(this);
 
@@ -131,14 +132,14 @@ void RequestAuthorization::onSend()
   auto identity = ui->widget_Identity->currentIdentity();
   if (identity != nullptr)
   {
-    bts::bitchat::private_contact_request_message request_msg;    
+    bts::bitchat::private_contact_request_message request_msg;
 
     request_msg.from_first_name = identity->first_name;
     request_msg.from_last_name = identity->last_name;
     request_msg.from_keyhotee_id = identity->dac_id_string;
     request_msg.greeting_message = ui->message->toPlainText().toStdString();
     request_msg.from_channel = bts::network::channel_id(1);
-    
+
     uint16_t request_param = ui->check_box_chat->isChecked();
     request_param |= ui->check_box_mail->isChecked() << 1;
     request_param |= ui->extend_public_key->isChecked() << 8;
@@ -148,11 +149,11 @@ void RequestAuthorization::onSend()
 
     genExtendedPubKey(request_msg.extended_pub_key);
 
-    auto  app = bts::application::instance();
-    auto  profile = bts::get_profile();
+    bts::addressbook::wallet_contact contact;
+    if(Utils::matchContact(identity->public_key, &contact))
+      request_msg.from_icon_png = contact.icon_png;
 
-    fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(identity->dac_id_string);
-    app->send_contact_request(request_msg, ui->keyhoteeidpubkey->getPublicKey(), my_priv_key);
+    _auth_processor.SendAuth(*identity, request_msg);
 
     setAuthorizationStatus();
   }

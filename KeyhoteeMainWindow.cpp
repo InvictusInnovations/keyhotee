@@ -655,7 +655,7 @@ void KeyhoteeMainWindow::onSetIcon()
 
 void KeyhoteeMainWindow::onRequestAuthorization()
 {
-  RequestAuthorization *request = new RequestAuthorization(this);
+  RequestAuthorization *request = new RequestAuthorization(this, _connectionProcessor);
   request->setAddressBook(_addressbook_model);
   request->show();
 }
@@ -934,7 +934,8 @@ KeyhoteeMainWindow::findExistSenderItem(AuthorizationItem::TPublicKey from_key, 
 
 void KeyhoteeMainWindow::showAuthorizationItem(AuthorizationItem *item)
 {
-    ui->widget_stack->setCurrentWidget(item->getView());
+  item->getView()->updateView();
+  ui->widget_stack->setCurrentWidget(item->getView());
 }
 
 void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)

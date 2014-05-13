@@ -75,6 +75,7 @@ public:
   void shareContact(QList<const Contact*>& contacts);
 
   AddressBookModel* getAddressBookModel() const { return _addressbook_model; }
+  TConnectionProcessor* getConnectionProcessor() { return &_connectionProcessor; }
 
 signals:
   void checkSendMailSignal();
