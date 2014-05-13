@@ -1,7 +1,7 @@
 rem All operations made here are related to instructions: http://qt-project.org/wiki/Compiling-ICU-with-MSVC
 @echo off
 REM - there is created root directory (ICU_ROOT)
-REM - inside them is extracted icu4c-52_1-src.zip
+REM - inside them is extracted icu4c-53_1-src.zip
 REM - ICU_ROOT/sources contains all ICU sources.
 REM - ICU_ROOT/build is a cwd and this script must be started from it
 REM To preserve debug info (in produced static libraries) lets open source\runConfigureICU, find
@@ -30,7 +30,7 @@ dos2unix -f configure
 rem Configuring release & debug versions
 
 bash ../source/runConfigureICU --enable-debug --disable-release Cygwin/MSVC --prefix=%ICU_PREFIX% ^
---enable-static --disable-shared 2>&1 | tee ../configure_debug.log && ^
+ 2>&1 | tee ../configure_debug.log && ^
 make -j%NUMBER_OF_PROCESSORS% 2>&1 | tee ../build_debug.log && ^
 make install 2>&1 | tee ../install_debug.log
 
@@ -39,7 +39,7 @@ bash -c "rm -rf %ICU_PREFIX%/build"
 mkdir build
 cd %ICU_ROOT%\build
 
-bash ../source/runConfigureICU Cygwin/MSVC --prefix=%ICU_PREFIX% --enable-static --disable-shared 2>&1 | tee ../configure_release.log && ^
+bash ../source/runConfigureICU Cygwin/MSVC --prefix=%ICU_PREFIX% 2>&1 | tee ../configure_release.log && ^
 make -j%NUMBER_OF_PROCESSORS% 2>&1 | tee ../build_release.log && ^
 make install 2>&1 | tee ../install_release.log
 
