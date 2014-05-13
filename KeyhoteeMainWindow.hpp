@@ -197,6 +197,13 @@ private:
   void processResponse(const TAuthorizationMessage& msg, const TStoredMailMessage& header);
   void loadStoredRequests(bts::bitchat::message_db_ptr request_db);
 
+  /** Load wallets data from WalletsGui.xml file and initialize Wallets tree.
+   * User can edit and add new wallets to WalletsGui.xml file.
+   * WalletsGui.xml file exists in the ../Keyhotee.exe directory.
+   * If WalletsGui.xml file doesn't exist Application copy it from resource ":Wallets/DefaultWallets.xml"
+   */
+  void setupWallets();
+
   /// Class attributes:
 
   QTreeWidgetItem*                        _identities_root;

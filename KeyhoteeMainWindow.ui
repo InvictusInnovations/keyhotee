@@ -231,33 +231,6 @@
           </color>
          </brush>
         </property>
-        <item>
-         <property name="text">
-          <string>Bitcoin</string>
-         </property>
-         <property name="icon">
-          <iconset resource="Keyhotee.qrc">
-           <normaloff>:/images/bitcoin.png</normaloff>:/images/bitcoin.png</iconset>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>BitShares</string>
-         </property>
-         <property name="icon">
-          <iconset resource="Keyhotee.qrc">
-           <normaloff>:/images/bitshares.png</normaloff>:/images/bitshares.png</iconset>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Litecoin</string>
-         </property>
-         <property name="icon">
-          <iconset resource="Keyhotee.qrc">
-           <normaloff>:/images/litecoin128.png</normaloff>:/images/litecoin128.png</iconset>
-         </property>
-        </item>
        </item>
        <item>
         <property name="text">

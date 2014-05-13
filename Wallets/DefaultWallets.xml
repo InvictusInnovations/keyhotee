@@ -2,14 +2,14 @@
 <wallets version="1.0">
   <wallet name="Bitcoin">
     <url>https://Invictus/Bitcoin</url>
-    <icon>":images/bitcoin.png"</icon>   <!-- path to icon -->
+    <icon>:images/bitcoin.png</icon>   <!-- path to icon -->
   </wallet>
   <wallet name="BitShares">
     <url>https://Invictus/BitShares</url>
-    <icon>":images/bitshares.png"</icon>
+    <icon>:images/bitshares.png</icon>
   </wallet>
   <wallet name="Litecoin">
     <url>https://Invictus/Litecoin</url>
-    <icon>":images/litecoin128.png"</icon>
+    <icon>:images/litecoin128.png</icon>
   </wallet>
 </wallets>
