@@ -679,11 +679,15 @@ void TConnectionProcessor::TOutboxQueue::transmissionLoop()
       }
 
     if(auth_flag)
+    {
       if(transferAuthMsg(storedMsg.from_key, auth_msg))
         Outbox->remove_message(storedMsg);
+    }
     else
+    {
       if(transferMessage(storedMsg.from_key, mail_msg))
         moveMsgToSentDB(storedMsg, mail_msg);
+    }
 
     if(isCancelled())
       break;
