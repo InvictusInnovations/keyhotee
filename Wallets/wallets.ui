@@ -18,69 +18,31 @@
     <number>0</number>
    </property>
    <property name="topMargin">
-    <number>9</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>9</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item row="2" column="1" colspan="5">
-    <widget class="QTableView" name="transactionHistoryTable"/>
-   </item>
-   <item row="0" column="5">
-    <widget class="QPushButton" name="sendPaymentButton">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelInfo">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
-      <string>Send Payment</string>
+      <string> No support for Qt WebKit</string>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLabel" name="pendingLabel">
-     <property name="text">
-      <string>Pending:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="5">
-    <widget class="QPushButton" name="requestPaymentButton">
-     <property name="text">
-      <string>Request Payment</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="4" rowspan="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="balanceLabel">
-     <property name="text">
-      <string>Balance:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="balanceDisplay">
-     <property name="text">
-      <string>1.23</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QLabel" name="pendingDisplay">
-     <property name="text">
-      <string>0.12</string>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>

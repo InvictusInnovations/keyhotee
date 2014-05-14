@@ -91,7 +91,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Please select the contact</string>
+           <string>Please select contact</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>

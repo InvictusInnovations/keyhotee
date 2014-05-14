@@ -25,6 +25,7 @@
 
 #include "Options/OptionsDialog.h"
 
+#include "Wallets/wallets.hpp"
 #include "Wallets/WalletsGui.hpp"
 
 #include <fc/reflect/variant.hpp>
@@ -57,7 +58,7 @@ enum TopLevelItemIndexes
 {
   Mailboxes,
   Space2,
-  Wallets,
+  WalletsItems,
   Space3,
   Contacts,
   Space4,
@@ -180,7 +181,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   //_identities_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Identities);
   _mailboxes_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Mailboxes);
   _contacts_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Contacts);
-  _wallets_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Wallets);
+  _wallets_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::WalletsItems);
   _requests_root = ui->side_bar->topLevelItem(TopLevelItemIndexes::Requests);
 
   _contacts_root->setExpanded(true);
@@ -507,7 +508,13 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       {
         if (selectedItem == walletItem)
         {
-          ui->widget_stack->setCurrentWidget(ui->wallets);
+          /// Find and show wallet WebSite
+          TTreeItem2WalletWebSite::const_iterator foundPos = _treeItem2Wallet.find(selectedItem);
+          if (foundPos != _treeItem2Wallet.end())
+          {
+            Wallets* walletWeb = foundPos->second;
+            ui->widget_stack->setCurrentWidget(walletWeb);
+          }          
         }
       }
     }
@@ -1426,6 +1433,11 @@ void KeyhoteeMainWindow::setupWallets()
     /// delete illegal character " from path
     path.replace("\"", "");
     walletItem->setIcon(0, QIcon(path));
+    
+    Wallets* walletWeb = new Wallets(this, _walletsData[i].url);
+    ui->widget_stack->addWidget(walletWeb);
+    /// map QTreeWidgetItem with Wallets WebSite
+    _treeItem2Wallet.insert(TTreeItem2WalletWebSite::value_type(walletItem, walletWeb));
 
     _walletItems.push_back(walletItem);
     _wallets_root->addChild(walletItem);

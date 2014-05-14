@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wallets version="1.0">
   <wallet name="Bitcoin">
-    <url>https://Invictus/Bitcoin</url>
+    <url>http://www.bitcoin.com/</url>
     <icon>:images/bitcoin.png</icon>   <!-- path to icon -->
   </wallet>
   <wallet name="BitShares">
-    <url>https://Invictus/BitShares</url>
+    <url>about:blank</url>
     <icon>:images/bitshares.png</icon>
   </wallet>
   <wallet name="Litecoin">
-    <url>https://Invictus/Litecoin</url>
+    <url>https://litecoin.org/</url>
     <icon>:images/litecoin128.png</icon>
   </wallet>
 </wallets>

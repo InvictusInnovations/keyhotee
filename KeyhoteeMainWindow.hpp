@@ -33,6 +33,7 @@ class MailboxModelRoot;
 class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
+class Wallets;
 class WalletsGui;
 
 class QAction;
@@ -205,6 +206,8 @@ private:
   void setupWallets();
 
   /// Class attributes:
+private:
+  typedef std::map<QTreeWidgetItem*, Wallets*> TTreeItem2WalletWebSite;
 
   QTreeWidgetItem*                        _identities_root;
   QTreeWidgetItem*                        _mailboxes_root;
@@ -217,6 +220,8 @@ private:
   QTreeWidgetItem*                        _sent_root;
   QTreeWidgetItem*                        _spam_root;
   QList<QTreeWidgetItem*>                 _walletItems;
+  /// map tree item widget with wallet web site
+  TTreeItem2WalletWebSite                 _treeItem2Wallet;
 
   MailboxModel*                           _inbox_model;
   MailboxModel*                           _draft_model;

@@ -12,8 +12,12 @@ class Wallets : public QWidget
     Q_OBJECT
 
 public:
-    explicit Wallets(QWidget* parent = nullptr);
-    ~Wallets();
+  Wallets(QWidget* parent = nullptr);
+  Wallets(QWidget* parent, const QString& url);
+  ~Wallets();
+
+private:
+  void setupWebPage(QWidget* parent, const QString& url);
 
 private:
     Ui::Wallets *ui;
