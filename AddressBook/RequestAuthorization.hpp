@@ -1,6 +1,10 @@
 #pragma once
-#include <QDialog>
+
+#include "ch/authprocessor.hpp"
+
 #include "keyhoteeidpubkeywidget.hpp"
+
+#include <QDialog>
 
 namespace Ui {
 class RequestAuthorization;
@@ -11,7 +15,7 @@ class RequestAuthorization : public QDialog
   Q_OBJECT
 
 public:
-  explicit RequestAuthorization(QWidget *parent = 0);
+  explicit RequestAuthorization(QWidget *parent, IAuthProcessor& auth_processor);
   ~RequestAuthorization();
 
   void setAddressBook(AddressBookModel* address_book);
@@ -40,4 +44,5 @@ private slots:
 private:
   Ui::RequestAuthorization *ui;
   AddressBookModel*         _address_book;
+  IAuthProcessor&           _auth_processor;
 };

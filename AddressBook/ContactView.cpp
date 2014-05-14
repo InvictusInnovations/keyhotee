@@ -309,7 +309,7 @@ void ContactView::onShareContact()
 
 void ContactView::onRequestContact()
 {
-  RequestAuthorization *request = new RequestAuthorization(this);
+  RequestAuthorization *request = new RequestAuthorization(this, *getKeyhoteeWindow()->getConnectionProcessor());
   if(!ui->khid_pubkey->getKeyhoteeID().isEmpty() && gMiningIsPossible)
     request->setKeyhoteeID(_current_contact.dac_id_string.c_str());
   else

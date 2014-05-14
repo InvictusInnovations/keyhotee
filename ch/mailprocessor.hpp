@@ -42,6 +42,7 @@ class IMailProcessor
     /** Allows to schedule given message send to the outbox queue.
         \param senderId      - identity to be used as sender,
         \param msg           - message to be sent,
+        \param msg_type      - message type: Normal, Forward, Reply
         \param savedDraftMsg - optional, should be passed not null if one of saved draft messages
                                is about to send.
     */

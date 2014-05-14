@@ -21,6 +21,12 @@ public:
   typedef bts::bitchat::message_header                  TStoredMessage;
   typedef bts::addressbook::wallet_identity             TCurrIdentity;
 
+  /** Allows to schedule given message send to the outbox queue.
+  \param senderId      - identity to be used as sender,
+  \param msg           - message to be sent,
+  */
+  virtual void SendAuth(const TCurrIdentity& senderId, const TRequestMessage& msg) = 0;
+
   /** Allows to save given message into Authorization folder in the backend storage.
     \param senderId     - identity to be used as sender,
     \param src_msg      - message to be stored,

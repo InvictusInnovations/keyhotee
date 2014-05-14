@@ -18,7 +18,8 @@ enum SidebarItemTypes
   IdentityItem  = 1000 + 2,
   MailboxItem   = 1000 + 3,
   ContactItem   = 1000 + 4,
-  RequestItem   = 1000 + 5
+  RequestItem   = 1000 + 5,
+  WalletItem    = 1000 + 6
   };
 
 class TreeWidgetCustom : public QTreeWidget

@@ -55,6 +55,7 @@ public:
   void setAddressBook(AddressBookModel* addressbook);
 
   void setOwnerItem(AuthorizationItem* item);
+  void updateView();
 
 Q_SIGNALS:
   void itemAcceptRequest (AuthorizationItem* item);

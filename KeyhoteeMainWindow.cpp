@@ -194,13 +194,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _sent_root = _mailboxes_root->child(Sent);
   _spam_root = _mailboxes_root->child(Spam);
 
-  const QList<WalletsGui::Data>& _walletsData = _walletsGui->getData();
-
-  _wallets_root->setExpanded(true);
-  for (size_t i = 0; i < _walletsData.size(); i++)
-  {
-    _walletItems.push_back(_wallets_root->child(i));
-  }
+  setupWallets();
 
   auto app = bts::application::instance();
   auto profile = app->get_profile();
@@ -655,7 +649,7 @@ void KeyhoteeMainWindow::onSetIcon()
 
 void KeyhoteeMainWindow::onRequestAuthorization()
 {
-  RequestAuthorization *request = new RequestAuthorization(this);
+  RequestAuthorization *request = new RequestAuthorization(this, _connectionProcessor);
   request->setAddressBook(_addressbook_model);
   request->show();
 }
@@ -934,7 +928,8 @@ KeyhoteeMainWindow::findExistSenderItem(AuthorizationItem::TPublicKey from_key, 
 
 void KeyhoteeMainWindow::showAuthorizationItem(AuthorizationItem *item)
 {
-    ui->widget_stack->setCurrentWidget(item->getView());
+  item->getView()->updateView();
+  ui->widget_stack->setCurrentWidget(item->getView());
 }
 
 void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
@@ -1413,4 +1408,26 @@ void KeyhoteeMainWindow::onOptions()
     this, SLOT(onUpdateOptions(bool)));
 
   options_dialog->show();
+}
+
+void KeyhoteeMainWindow::setupWallets()
+{
+  const QList<WalletsGui::Data>& _walletsData = _walletsGui->getData();
+
+  _wallets_root->setExpanded(true);
+  for (int  i = 0; i < _walletsData.size(); i++)
+  {
+    auto walletItem = new QTreeWidgetItem(_wallets_root, (QTreeWidgetItem::ItemType)WalletItem);
+
+    walletItem->setText(0, _walletsData[i].name);
+    // _walletsData[i].url);
+
+    QString path = _walletsData[i].iconPath;
+    /// delete illegal character " from path
+    path.replace("\"", "");
+    walletItem->setIcon(0, QIcon(path));
+
+    _walletItems.push_back(walletItem);
+    _wallets_root->addChild(walletItem);
+  }
 }
