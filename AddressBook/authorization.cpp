@@ -290,6 +290,7 @@ void AuthorizationView::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state
   {
     case KeyhoteeIDPubKeyWidget::CurrentState::InvalidData:
     case KeyhoteeIDPubKeyWidget::CurrentState::IsStored:
+    case KeyhoteeIDPubKeyWidget::CurrentState::IsIdentity:
       ui->add_contact->setEnabled(false);
       ui->add_contact->setChecked(false);
       break;

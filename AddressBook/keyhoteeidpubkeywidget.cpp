@@ -310,6 +310,13 @@ bool KeyhoteeIDPubKeyWidget::existContactWithPublicKey (const std::string& publi
             ui->id_status->setStyleSheet("QLabel { color : red; }");
             return true;
           case ModeWidget::RequestAuthorization:
+            if(Utils::isOwnedPublicKey(getPublicKey()))
+            {
+              ui->id_status->setText(tr("This contact is your identity"));
+              ui->id_status->setStyleSheet("QLabel { color : red; }");
+              emit currentState(IsIdentity);
+              return true;
+            }
           case ModeWidget::AuthorizationView:
             ui->id_status->setText( tr("Public Key Only Mode: valid key") ); //tr("This contact is already added to the list") );
             ui->id_status->setStyleSheet("QLabel { color : green; }");

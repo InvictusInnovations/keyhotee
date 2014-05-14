@@ -21,7 +21,8 @@ public:
     InvalidData,
     OkKeyhoteeID,
     OkPubKey,
-    IsStored
+    IsStored,
+    IsIdentity
   };
 
   enum ModeWidget{

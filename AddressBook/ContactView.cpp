@@ -632,6 +632,7 @@ void ContactView::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState state)
       setValid(true);
       break;
     case KeyhoteeIDPubKeyWidget::CurrentState::IsStored:
+    case KeyhoteeIDPubKeyWidget::CurrentState::IsIdentity:
       break;
     default:
       assert(false);

@@ -164,18 +164,26 @@ void RequestAuthorization::onStateWidget(KeyhoteeIDPubKeyWidget::CurrentState st
   switch(state)
   {
     case KeyhoteeIDPubKeyWidget::CurrentState::InvalidData:
-      ui->button_send->setEnabled(false);;
+      ui->button_send->setEnabled(false);
       ui->add_contact->setEnabled(false);
+      ui->add_contact->setChecked(false);
       break;
     case KeyhoteeIDPubKeyWidget::CurrentState::OkKeyhoteeID:
     case KeyhoteeIDPubKeyWidget::CurrentState::OkPubKey:
       ui->add_contact->setEnabled(true);
+      ui->add_contact->setChecked(true);
       ui->button_send->setEnabled(true);
       checkAddAsNewContact();
       break;
     case KeyhoteeIDPubKeyWidget::CurrentState::IsStored:
       ui->add_contact->setEnabled(false);
+      ui->add_contact->setChecked(false);
       ui->button_send->setEnabled(true);
+      break;
+    case KeyhoteeIDPubKeyWidget::CurrentState::IsIdentity:
+      ui->add_contact->setEnabled(false);
+      ui->add_contact->setChecked(false);
+      ui->button_send->setEnabled(false);
       break;
     default:
       assert(false);
