@@ -220,7 +220,7 @@ private:
   QTreeWidgetItem*                        _sent_root;
   QTreeWidgetItem*                        _spam_root;
   QList<QTreeWidgetItem*>                 _walletItems;
-  /// map tree item widget with wallet web site
+  /// map tree item widget to wallet web site
   TTreeItem2WalletWebSite                 _treeItem2Wallet;
 
   MailboxModel*                           _inbox_model;

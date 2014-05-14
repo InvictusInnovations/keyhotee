@@ -1,7 +1,9 @@
 #include "wallets.hpp"
 #include "ui_wallets.h"
 
+#ifndef __STATIC_QT
 #include <QtWebKitWidgets/QWebView>
+#endif
 
 Wallets::Wallets(QWidget* parent) :
 QWidget(parent),
@@ -23,7 +25,7 @@ Wallets::Wallets(QWidget* parent, const QString&  url) :
   /// QWebView is not available
   ui->labelInfo->setText(tr("No support for Qt WebKit"));
   ui->labelInfo->setVisible(true);
-#else    
+#else
   /// Hide text: "No support for Qt WebKit"
   ui->labelInfo->setVisible(false);
   setupWebPage(parent, url);
