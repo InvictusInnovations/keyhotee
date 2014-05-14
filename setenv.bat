@@ -13,7 +13,7 @@ rem set BOOST_ROOT only if it is not yet configured
 rem if "%BOOST_ROOT%" == "" set BOOST_ROOT=%INVICTUS_ROOT%\boost
 set BOOST_ROOT=%INVICTUS_ROOT%\boost_1.55
 
-set PATH=%QTDIR%\bin;%ICUROOT%\bin;%INVICTUS_ROOT%\bin;%INVICTUS_ROOT%\Cmake\bin;%PATH%
+set PATH=%QTDIR%\bin;%ICUROOT%\bin;%ICUROOT%\lib;%INVICTUS_ROOT%\bin;%INVICTUS_ROOT%\Cmake\bin;%PATH%
 
 echo Setting up VS2013 environment...
 call "%VS120COMNTOOLS%\..\..\VC\vcvarsall.bat"
