@@ -139,9 +139,11 @@ get_git_unix_timestamp(GIT_UNIX_TIMESTAMP1)
 set( CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} ";$ENV{QTDIR}/lib/cmake"  )
 #message(CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
-IF (NOT DEFINED KH_STATIC_QT)
+IF(WIN32)
+  SET(KH_STATIC_QT 0)
+ELSE()
   SET(KH_STATIC_QT 1)
-ENDIF()
+ENDIF(WIN32)
 
 SET(QT_DEPENDENCY_LIBRARIES "")
 SET(ICU_LIBS_PREFIX "")
@@ -191,13 +193,15 @@ find_package( Qt5PrintSupport )
 find_package( Qt5Svg )
 find_package( Qt5Widgets )
 
+IF(KH_STATIC_QT EQUAL 0)
+  find_package( Qt5WebKit )
+ENDIF()
+
 #Note: bitshares repo should be checked out under keyhotee dir or path here should be changed
 set(BITSHARES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BitShares)
 message(STATUS ${BITSHARES_DIR})
 
 IF( APPLE )
-    SET(KH_STATIC_QT 0)
-
     SET(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
 
     SET_SOURCE_FILES_PROPERTIES(
@@ -537,7 +541,11 @@ get_target_property(PDB_LIST_RELEASE fc INTERFACE_LINK_PDB_RELEASE)
 get_target_property(PDB_LIST_DEBUG fc INTERFACE_LINK_PDB_DEBUG)
 
 # Use the Widgets module from Qt 5.
-qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport)
+IF(KH_STATIC_QT EQUAL 0)
+  qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport WebKitWidgets)
+ELSE()
+  qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport)
+ENDIF()
 
 set(CMAKE_STATIC_TYPE true)
 
