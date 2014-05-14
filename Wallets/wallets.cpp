@@ -40,12 +40,12 @@ Wallets::~Wallets()
 
 void Wallets::setupWebPage(QWidget* parent, const QString& url)
 {
+#ifndef __STATIC_QT
   QWebView *webView;
   webView = new QWebView(parent);
   webView->setObjectName(QStringLiteral("webView"));
   webView->setUrl(QUrl(QStringLiteral("about:blank")));
   ui->gridLayout->addWidget(webView, 0, 0, 1, 1);
-
   
   webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
   webView->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
@@ -57,4 +57,13 @@ void Wallets::setupWebPage(QWidget* parent, const QString& url)
 
   webView->setHtml("", QUrl(url));
   webView->reload();
+#endif
 }
+
+/**
+TODO
+/// display some info about loading WebSite
+void onLoadStarted();
+/// hide info about loading WebSite
+void onLoadFinished(bool);
+*/
