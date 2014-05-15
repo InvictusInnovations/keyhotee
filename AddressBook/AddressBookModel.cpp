@@ -162,7 +162,11 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
         case LastName:
           return current_contact.last_name.c_str();
         case Id:
-          return current_contact.dac_id_string.c_str();
+          if(current_contact.dac_id_string.empty() &&
+            current_contact.first_name.empty() && current_contact.last_name.empty())
+            return current_contact.get_trim_pk().c_str();
+          else
+            return current_contact.dac_id_string.c_str();
         case Age:
           return current_contact.getAge();
         case Repute:
