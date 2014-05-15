@@ -46,17 +46,16 @@ void Wallets::setupWebPage(QWidget* parent, const QString& url)
   webView->setObjectName(QStringLiteral("webView"));
   webView->setUrl(QUrl(QStringLiteral("about:blank")));
   ui->gridLayout->addWidget(webView, 0, 0, 1, 1);
-  
-  webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
-  webView->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
-  webView->settings()->setAttribute(QWebSettings::JavaEnabled, true);
-  webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
-  webView->settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-  webView->settings()->setAttribute(QWebSettings::WebGLEnabled, true);
+    
   webView->settings()->setAttribute(QWebSettings::AutoLoadImages, true);
+  webView->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);  
+  webView->settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, false);
+  webView->settings()->setAttribute(QWebSettings::JavascriptCanAccessClipboard, false);
+  webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
+  webView->settings()->setAttribute(QWebSettings::PluginsEnabled, false);
+  webView->settings()->setAttribute(QWebSettings::WebGLEnabled, false);    
 
-  webView->setHtml("", QUrl(url));
-  webView->reload();
+  webView->load(QUrl(url));
 #endif
 }
 
