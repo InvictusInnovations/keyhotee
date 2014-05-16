@@ -33,7 +33,7 @@ export ICUROOT=/opt/ICU
 
 #'compat' version of toolchain should be used eventually instead of native
 #cmake -DCMAKE_TOOLCHAIN_FILE=/opt/toolchain/toolchain.cmake ../keyhotee
-cmake ../keyhotee
+cmake -DBUILD_VERSION_PATCH=$BUILD_NUMBER ../keyhotee
 make -j8
 
 
