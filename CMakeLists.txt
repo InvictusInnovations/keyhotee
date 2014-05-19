@@ -65,17 +65,12 @@ else(APPLE)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${INVICTUS_ROOT}/bin)
 endif(APPLE)
 
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "${INVICTUS_ROOT}/install" CACHE PATH "Keyhotee install prefix" FORCE)
-endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+set(CMAKE_INSTALL_PREFIX "${INVICTUS_ROOT}/packages" CACHE PATH "Keyhotee install prefix" FORCE)
 
 add_subdirectory(BitShares)
 add_subdirectory(miner)
 
 macro(FillQtDependentLibraries)
-  GET_TARGET_PROPERTY(QT_LIB_DIR Qt5::Core LOCATION)
-  GET_FILENAME_COMPONENT(QT_LIB_DIR "${QT_LIB_DIR}" PATH)
-  
   # Warning this lib doesn't have an associated .cmake :-(
   find_library(Qt5Platform_LIBRARIES_RELEASE Qt5PlatformSupport HINTS "${QT_LIB_DIR}" "${QT_LIB_DIR}/../lib")
   find_library(Qt5Platform_LIBRARIES_DEBUG Qt5PlatformSupport${DEBUG_SUFFIX} HINTS "${QT_LIB_DIR}" "${QT_LIB_DIR}/../lib")
@@ -198,6 +193,11 @@ find_package( Qt5Widgets )
 IF(KH_STATIC_QT EQUAL 0)
   find_package( Qt5WebKit )
 ENDIF()
+
+GET_TARGET_PROPERTY(QT_LIB_DIR Qt5::Core LOCATION)
+GET_FILENAME_COMPONENT(QT_LIB_DIR "${QT_LIB_DIR}" PATH)
+
+message("QT-DIRECTORY is ${QT_LIB_DIR}")
 
 #Note: bitshares repo should be checked out under keyhotee dir or path here should be changed
 set(BITSHARES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BitShares)
@@ -530,6 +530,7 @@ IF(KH_STATIC_QT EQUAL 1)
 ENDIF()
 
 # Let's configure different target names for release and debug builds.
+set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME Keyhotee )
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_DEBUG KeyhoteeD )
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
 set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELWITHDEBINFO Keyhotee )
@@ -585,50 +586,48 @@ if (MSVC)
 #INSTALL ( FILES ${PROJECT_BINARY_DIR}/Bin/Debug/file.pdb DIRECTORY lib CONFIGURATIONS Debug )
 endif(MSVC)
 
-MACRO(SUBDIRLIST result curdir)
-  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
-  SET(dirlist "")
-  FOREACH(child ${children})
-    IF(IS_DIRECTORY ${curdir}/${child})
-        SET(dirlist ${dirlist} ${child})
-    ENDIF()
-  ENDFOREACH()
-  SET(${result} ${dirlist})
-ENDMACRO()
-
 IF(APPLE)
   SET(plugin_dest_dir Keyhotee.app/Contents/MacOS)
   SET(qtconf_dest_dir Keyhotee.app/Contents/Resources)
   SET(APPS "\${CMAKE_INSTALL_PREFIX}/Keyhotee.app")
+else()
+  SET(plugin_dest_dir .)
+  SET(qtconf_dest_dir .)
+  GET_TARGET_PROPERTY(APPS Keyhotee LOCATION_RELWITHDEBINFO)
 ENDIF(APPLE)
 
-INSTALL(TARGETS Keyhotee
-        RUNTIME DESTINATION .
-        BUNDLE DESTINATION . COMPONENT Runtime)
+message(STATUS "KH output path: ${APPS}")
+message(STATUS "CMAKE_SHARED_LIBRARY_SUFFIX: ${CMAKE_SHARED_LIBRARY_SUFFIX}")
+INSTALL(TARGETS Keyhotee RUNTIME DESTINATION . BUNDLE DESTINATION . COMPONENT Runtime)
 
-if(APPLE)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/dependency_install.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/dependency_install.cmake"
+  @ONLY
+  )
+
+if(APPLE OR WIN32)
+  SET (QTPLUGINS )
   foreach(plugin ${Qt5Gui_PLUGINS})
     get_target_property(_loc ${plugin} LOCATION)
     get_filename_component(plugin_path ${_loc} DIRECTORY)
     get_filename_component(plugin_classification ${plugin_path} NAME)
     #message("Plugin ${plugin} is an ${plugin_classification} at location ${_loc}")
+    list(APPEND QTPLUGINS "${_loc}") 
     INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins/${plugin_classification} COMPONENT Runtime) 
   endforeach()
 
   INSTALL(CODE "
-      file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
+    INCLUDE(BundleUtilities)
+    FIXUP_BUNDLE(\"${APPS}\" \"${QTPLUGINS}\" \"${QT_LIB_DIR}\")
+    file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
       " COMPONENT Runtime)
+    INSTALL(DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/" DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo
+      FILES_MATCHING PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+#    file(GLOB_RECURSE QTPLUGINS
+#      \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
 
-  GET_TARGET_PROPERTY(DIRS Qt5::Core LOCATION)
-  #message("DIRS is ${DIRS}")
-
-  INSTALL(CODE "
-      file(GLOB_RECURSE QTPLUGINS
-       \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
-      include(BundleUtilities)
-      fixup_bundle(\"${APPS}\" \"\${QTPLUGINS}\" \"/Users/syncad/Qt/\")
-      " COMPONENT Runtime)
-endif(APPLE)
+endif(APPLE OR WIN32)
 
 IF(FC_SHARED_LIBRARIES_RELEASE)
   INSTALL(FILES ${FC_SHARED_LIBRARIES_RELEASE} DESTINATION . CONFIGURATIONS RelWithDebinfo)
@@ -653,14 +652,18 @@ IF(WIN32)
   else()
     get_target_property(KH_NAME Keyhotee OUTPUT_NAME_RELWITHDEBINFO)
     set(KH_PDB_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${KH_NAME}.pdb")
+    LIST (APPEND TOTAL_PDB_LIST ${KH_PDB_PATH})
+#    get_target_property(KH_NAME Keyhotee OUTPUT_NAME_DEBUG)
+#    set(KH_PDB_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${KH_NAME}.pdb")
+#    LIST (APPEND TOTAL_PDB_LIST ${KH_PDB_PATH})
   endif()
-
-  LIST (APPEND TOTAL_PDB_LIST ${KH_PDB_PATH})
 
   IF(TOTAL_PDB_LIST)
     set(PDB_POST_BUILD_COPY_COMMANDS)
-    foreach(pdb ${TOTAL_PDB_LIST})
-      set(PDB_POST_BUILD_COPY_COMMANDS ${PDB_POST_BUILD_COPY_COMMANDS} COMMAND ${CMAKE_COMMAND} -E copy_if_different ${pdb} "${INVICTUS_ROOT}/packages")
+    FOREACH(pdb ${TOTAL_PDB_LIST})
+      IF(EXISTS "${pdb}")
+        set(PDB_POST_BUILD_COPY_COMMANDS ${PDB_POST_BUILD_COPY_COMMANDS} COMMAND ${CMAKE_COMMAND} -E copy_if_different ${pdb} "${INVICTUS_ROOT}/packages")
+      ENDIF()
     endforeach()
 
     ADD_CUSTOM_COMMAND(TARGET Keyhotee POST_BUILD ${PDB_POST_BUILD_COPY_COMMANDS} 
@@ -668,10 +671,13 @@ IF(WIN32)
     )
   ENDIF()
 
+
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .) # copy the msvcrt files to the top-level directory instead of bin
   include(InstallRequiredSystemLibraries)
   #INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION . COMPONENT Libraries)
-  INSTALL(FILES ${CRASHRPT_BINARIES_TO_INSTALL} DESTINATION . CONFIGURATIONS RelWithDebinfo)
+  INSTALL(FILES ${CRASHRPT_BINARIES_TO_INSTALL} DESTINATION . CONFIGURATIONS RelWithDebinfo COMPONENT Runtime)
+
+#  INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/dependency_install.cmake")
 ENDIF()
 
 SET(CPACK_PACKAGE_DIRECTORY "${INVICTUS_ROOT}/packages")

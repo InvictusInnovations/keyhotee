@@ -73,7 +73,7 @@ call "%INVICTUS_ROOT%\keyhotee\run_cmake.bat" -DBUILD_VERSION_PATCH=%BUILD_NUMBE
 rem /p:VCTargetsPath="C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110/"
 msbuild.exe /M:%NUMBER_OF_PROCESSORS% /p:Configuration=RelWithDebinfo /p:Platform=Win32 /target:rebuild /clp:ErrorsOnly keyhotee.sln
 if %ERRORLEVEL% neq 0 exit /b 12
-cpack || exit /b 13
+cpack --verbose || exit /b 13
 
 pushd "%INVICTUS_ROOT%/packages"
 tar -czf Keyhotee_build_%BUILD_NUMBER%.tgz *.zip *.pdb || exit /b 14
