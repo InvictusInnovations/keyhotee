@@ -489,7 +489,7 @@ IF(WIN32)
   IF(FC_SHARED_LIBRARIES_DEBUG)
     foreach(binary ${FC_SHARED_LIBRARIES_DEBUG})
       set(POST_BUILD_STEP_COMMANDS
-       "${POST_BUILD_STEP_COMMANDS} COMMAND ${CMAKE_COMMAND} -E copy_if_different \"${binary}\" \"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}\"")
+       ${POST_BUILD_STEP_COMMANDS} COMMAND ${CMAKE_COMMAND} -E copy_if_different "${binary}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
     endforeach()
   ENDIF()
   
