@@ -21,9 +21,7 @@ KeyhoteeIDPubKeyWidget::KeyhoteeIDPubKeyWidget(QWidget *parent) :
   _my_mode = ShowContact;
 
   connect(ui->public_key_to_clipboard, &QToolButton::clicked, this, &KeyhoteeIDPubKeyWidget::onPublicKeyToClipboard);
-  connect(ui->keyhotee_id, &QLineEdit::textChanged, this, &KeyhoteeIDPubKeyWidget::keyhoteeIdChanged);
   connect(ui->keyhotee_id, &QLineEdit::textEdited, this, &KeyhoteeIDPubKeyWidget::keyhoteeIdEdited);
-  connect(ui->public_key, &QLineEdit::textChanged, this, &KeyhoteeIDPubKeyWidget::publicKeyChanged);
   connect(ui->public_key, &QLineEdit::textEdited, this, &KeyhoteeIDPubKeyWidget::publicKeyEdited);
 }
 
@@ -37,27 +35,26 @@ KeyhoteeIDPubKeyWidget::~KeyhoteeIDPubKeyWidget()
 void KeyhoteeIDPubKeyWidget::setKeyhoteeID(const QString& keyhotee_id)
 {
   ui->keyhotee_id->setText(keyhotee_id);
-  if(_my_mode != AuthorizationView)
+  if (_my_mode != AuthorizationView && 
+      /// Keyhotee ID and public key you can not edit
+      /// so donn't call keyhoteeIdEdited
+      _my_mode != ShowContact)
     keyhoteeIdEdited(keyhotee_id);
 }
 
 void KeyhoteeIDPubKeyWidget::setPublicKey(const QString& public_key_string)
 {
   ui->public_key->setText(public_key_string);
-  if(_my_mode == AuthorizationView)
+  if (_my_mode == AuthorizationView ||
+      /// Keyhotee ID and public key you can not edit
+      /// so donn't call keyhoteeIdEdited
+      _my_mode == ShowContact)
+  {
     existContactWithPublicKey(public_key_string.toStdString());
+  }
   else
     publicKeyEdited(public_key_string);
 }
-
-void KeyhoteeIDPubKeyWidget::keyhoteeIdChanged(const QString& /*keyhotee_id*/)
-{
-}
-
-void KeyhoteeIDPubKeyWidget::publicKeyChanged(const QString& public_key_string)
-{
-}
-
 
 /*****************  Algorithm for handling keyhoteeId, keyhoteeeId status, and public key fields
    Notes:
@@ -376,9 +373,9 @@ bool KeyhoteeIDPubKeyWidget::event(QEvent *e)
 {
   if (e->type() == QEvent::Show)
   {
-    if(ui->keyhotee_id->text().size() > 0)
+    if(ui->keyhotee_id->text().isEmpty() == false)
       setKeyhoteeID(ui->keyhotee_id->text());
-    else if(ui->public_key->text().size() > 0)
+    else if(ui->public_key->text().isEmpty() == false)
       setPublicKey(ui->public_key->text());
   }
   return QWidget::event(e);

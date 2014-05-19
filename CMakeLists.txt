@@ -368,10 +368,6 @@ set( sources
         Wallets/wallets.ui
         Wallets/wallets.hpp
         Wallets/wallets.cpp
-        Wallets/transactionhistorymodel.hpp
-        Wallets/transactionhistorymodel.cpp
-        Wallets/wallettransaction.hpp
-        Wallets/wallettransaction.cpp
         Wallets/WalletsGui.hpp
         Wallets/WalletsGui.cpp
         Wallets/XmlWalletsReader.hpp
