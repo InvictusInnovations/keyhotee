@@ -17,7 +17,7 @@
 #include "AddressBook/RequestAuthorization.hpp"
 
 #include "BitShares/GitSHA2.h"
-#include "BitShares/fc/GitSHA3.h"
+#include <fc/git_revision.hpp>
 
 #include "Mail/MailboxModel.hpp"
 #include "Mail/MailboxModelRoot.hpp"
@@ -706,12 +706,12 @@ void KeyhoteeMainWindow::onAbout()
   text += tr("<br/>");
   text += tr("<br/>");
   text += tr("<strong>fc</strong> built from revision: <a href=\"https://github.com/InvictusInnovations/fc/commit/");
-  text += tr(g_GIT_SHA3);
+  text += tr(fc::git_revision_sha);
   text += tr("\">");
-  text += tr(std::string(g_GIT_SHA3).substr(0, 10).c_str());
+  text += tr(std::string(fc::git_revision_sha).substr(0, 10).c_str());
   text += tr("</a>");
   text += tr(" (<em>");
-  text += tr(fc::get_approximate_relative_time_string(fc::time_point_sec(g_GIT_UNIX_TIMESTAMP3)).c_str());
+  text += tr(fc::get_approximate_relative_time_string(fc::time_point_sec(fc::git_revision_unix_timestamp)).c_str());
   text += tr("</em>)");
   text += tr("<br/>");
   text += tr("<br/>");
