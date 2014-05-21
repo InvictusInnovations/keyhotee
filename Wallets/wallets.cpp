@@ -1,6 +1,11 @@
 #include "wallets.hpp"
 #include "ui_wallets.h"
 
+#include "../qtreusable/LoginInputBox.hpp"
+
+#include <QAuthenticator>
+#include <QNetworkReply>
+
 #ifndef __STATIC_QT
 #include <QtWebKitWidgets/QWebView>
 #endif
@@ -43,6 +48,10 @@ void Wallets::setupWebPage(QWidget* parent, const QString& url)
 #ifndef __STATIC_QT
   QWebView* webView = new QWebView(parent);
 
+  connect(webView->page()->networkAccessManager(), 
+          SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
+          this, SLOT(handleAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
+
   webView->setObjectName(QStringLiteral("webView"));
   webView->setUrl(QUrl(url));
   ui->gridLayout->addWidget(webView, 0, 0, 1, 1);
@@ -65,7 +74,19 @@ void Wallets::setupWebPage(QWidget* parent, const QString& url)
   */
 
   webView->reload();
+
 #endif
+}
+
+void Wallets::handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator)
+{
+  QString userName, password;
+  LoginInputBox login(this, "Authentication", &userName, &password);
+  if (login.exec() == QDialog::Accepted)
+  {
+    authenticator->setUser(userName);
+    authenticator->setPassword(password);
+  }
 }
 
 /**
