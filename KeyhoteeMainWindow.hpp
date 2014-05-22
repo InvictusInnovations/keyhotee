@@ -69,8 +69,8 @@ public:
   void displayDiagnosticLog();
   void setEnabledAttachmentSaveOption(bool enable);
   void setEnabledDeleteOption( bool enable );
-  void setEnabledShareContactOption( bool enable );
-  void refreshMenuOptions() const;
+  void setEnabledContactOption( bool enable );
+  void refreshMenuOptions();
   void setEnabledMailActions(bool enable);
   ContactsTable* getContactsPage();
   void shareContact(QList<const Contact*>& contacts);
@@ -148,6 +148,9 @@ private slots:
   // Contact
   void onSetIcon();
   void onRequestAuthorization();
+  void onShowBlockedContacts();
+  void onBlockContact();
+  void onUnblockContact();
   void onShareContact();
   // Help
   void onDiagnostic();
@@ -189,7 +192,7 @@ private:
   */
   bool stopMailTransmission();
   bool checkSaving() const;
-  void showContacts() const;
+  void showContacts();
   void createAuthorizationItem(const TAuthorizationMessage& msg, const TStoredMailMessage& header);
   QTreeWidgetItem* findExistSenderItem(AuthorizationItem::TPublicKey from_key, bool &to_root);
   void showAuthorizationItem(AuthorizationItem *item);
@@ -197,6 +200,7 @@ private:
   void addContact();
   void processResponse(const TAuthorizationMessage& msg, const TStoredMailMessage& header);
   void loadStoredRequests(bts::bitchat::message_db_ptr request_db);
+  void enableBlockedContact(bool enable);
 
   /** Load wallets data from WalletsGui.xml file and initialize Wallets tree.
    * User can edit and add new wallets to WalletsGui.xml file.
@@ -243,6 +247,7 @@ private:
   bool                                    _isClosing;
   QList <QAction*>                        _actionsLang;
   std::unique_ptr<WalletsGui>             _walletsGui;
+  bool                                    _is_blocked_contact;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();

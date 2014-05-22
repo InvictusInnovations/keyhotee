@@ -95,6 +95,8 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
             return tr("Repute");
           case UserIcon:
             break;
+          default:
+            return QVariant();
         }
       }
     case Qt::TextAlignmentRole:
@@ -122,8 +124,8 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
   }
   else
   {
-	}
-	
+  }
+
   return QVariant();
 }
 
@@ -173,6 +175,10 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return current_contact.getRepute();
         case Ownership:
         case UserIcon:
+          return QVariant();
+        case Authorization:
+          return current_contact.isBlocked();
+        default:
           return QVariant();
       } //switch column in DisplayRole
     case Qt::UserRole:

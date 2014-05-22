@@ -21,7 +21,7 @@ OptionsDialog::OptionsDialog(QWidget *parent, QString profile_name) :
   _settings_file = "keyhotee_";
   _settings_file.append(profile_name);
   QSettings profile_settings("Invictus Innovations", _settings_file);
-
+  ui->enable_filter_blocked->setChecked(profile_settings.value("FilterBlocked", "").toBool());
   ui->chat_authorized->setChecked(profile_settings.value("AllowChat", "").toBool());
   ui->mail_authorized->setChecked(profile_settings.value("AllowMail", "").toBool());
   ui->save_spam->setChecked(profile_settings.value("SaveSpam", "").toBool());
@@ -69,6 +69,9 @@ void OptionsDialog::onSave()
   bool lang_changed = (_lang_id != index);
 
   QSettings profile_settings("Invictus Innovations", _settings_file);
+
+  // General
+  profile_settings.setValue("FilterBlocked", ui->enable_filter_blocked->isChecked());
 
   // Privacy
   if (ui->chat_authorized->isChecked())

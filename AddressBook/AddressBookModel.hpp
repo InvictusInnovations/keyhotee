@@ -25,6 +25,7 @@ public:
     Id,
     Age,
     Repute,
+    Authorization,
     NumColumns
     };
   //void storeContact( const bts::addressbook::contact& new_contact );
