@@ -45,6 +45,8 @@ public:
   float getMiningEffort() const;
   void setMiningEffort(float miningEffort);
 
+  bool isBlocked() const;
+
   bool operator<(const Contact& rhs) const { return wallet_index < rhs.wallet_index; }
 private:
   /// cache the icon we want to use.

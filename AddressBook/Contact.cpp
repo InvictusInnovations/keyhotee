@@ -149,3 +149,11 @@ int Contact::getAge(const bts::addressbook::contact& id)
     return 0;
   }
 
+bool Contact::isBlocked() const
+{
+  if(auth_status == bts::addressbook::blocked)
+    return true;
+  else
+    return false;
+}
+

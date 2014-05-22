@@ -21,10 +21,27 @@ public:
   ContactsSortFilterProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent)
     {
     setSortRole(Qt::UserRole);
+    setFilterBlocked(false);
     }
+
+  void setFilterBlocked(bool b = false)
+  {
+    _filter_blocked = b;
+    invalidateFilter();
+  }
+
+  void enableFilterBlocked(bool b)
+  {
+    _filter_blocked_on = b;
+    invalidateFilter();
+  }
 
 protected:
   bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+  bool filterBlocked(int sourceRow, const QModelIndex &sourceParent) const;
+
+  bool _filter_blocked;
+  bool _filter_blocked_on;
 };
 
 bool ContactsSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
@@ -32,10 +49,21 @@ bool ContactsSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelI
   QModelIndex first_name_index = sourceModel()->index(sourceRow, AddressBookModel::FirstName, sourceParent);
   QModelIndex last_name_index = sourceModel()->index(sourceRow, AddressBookModel::LastName, sourceParent);
   QModelIndex id_index = sourceModel()->index(sourceRow, AddressBookModel::Id, sourceParent);
-  return sourceModel()->data(first_name_index).toString().contains(filterRegExp()) ||
+  QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::Authorization, sourceParent);
+  return (sourceModel()->data(first_name_index).toString().contains(filterRegExp()) ||
          sourceModel()->data(last_name_index).toString().contains(filterRegExp()) ||
-         sourceModel()->data(id_index).toString().contains(filterRegExp());
+         sourceModel()->data(id_index).toString().contains(filterRegExp())) &&
+         filterBlocked(sourceRow, sourceParent);
   }
+
+bool ContactsSortFilterProxyModel::filterBlocked(int sourceRow, const QModelIndex &sourceParent) const
+{
+  if(!_filter_blocked_on)
+    return true;
+
+  QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::Authorization, sourceParent);
+  return sourceModel()->data(blocked_index).toBool() == _filter_blocked;
+}
 
 void ContactsTable::searchEditChanged(QString search_string)
   {
@@ -43,6 +71,12 @@ void ContactsTable::searchEditChanged(QString search_string)
   QRegExp                regex(search_string, Qt::CaseInsensitive, QRegExp::FixedString);
   model->setFilterRegExp(regex);
   }
+
+void ContactsTable::setShowBlocked(bool show)
+{
+  ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
+  model->setFilterBlocked(show);
+}
 
 ContactsTable::ContactsTable(QWidget* parent)
   : QWidget(parent),
@@ -76,9 +110,12 @@ void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
   ui->contact_table->setShowGrid(false);
   ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  ui->contact_table->setColumnHidden(AddressBookModel::Authorization, true); //this column is used only to filter blocked contacts
 
   QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
   connect(selection_model, &QItemSelectionModel::selectionChanged, this, &ContactsTable::onSelectionChanged);
+
+  updateOptions();
   }
 
 void ContactsTable::onSelectionChanged (const QItemSelection &selected, const QItemSelection &deselected)
@@ -331,4 +368,16 @@ void ContactsTable::getSelectedContacts (QList<const Contact*>& contacts)
     QModelIndex mapped_index = _sorted_addressbook_model->mapToSource(idx);
     contacts.push_back( &_addressbook_model->getContact(mapped_index) );
   }
+}
+
+void ContactsTable::updateOptions()
+{
+  auto profile = bts::get_profile();
+  QString profile_name = QString::fromStdWString(profile->get_name());
+  QString settings_file = "keyhotee_";
+  settings_file.append(profile_name);
+  QSettings settings("Invictus Innovations", settings_file);
+
+  ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
+  model->enableFilterBlocked(settings.value("FilterBlocked", "").toBool());
 }

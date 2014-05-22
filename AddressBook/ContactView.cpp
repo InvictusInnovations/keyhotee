@@ -660,6 +660,8 @@ void ContactView::checkAuthorizationStatus()
     status = bts::addressbook::authorization_status::unauthorized;
   }
 
+  _current_contact.auth_status = status;
+
   if(status == bts::addressbook::authorization_status::sent_request)
   {
     ui->authorization_status->setText( tr("Request sent") );

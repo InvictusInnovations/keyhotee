@@ -40,6 +40,8 @@ public:
   QWidget* getContactsTableWidget () const;
   void copy();
   void getSelectedContacts (QList<const Contact*>& contacts);
+  void setShowBlocked(bool show);
+  void updateOptions();
 
 private:
   /// \see IModificationsChecker interface description.

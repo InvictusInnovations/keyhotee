@@ -71,7 +71,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _connectionProcessor(*this, bts::application::instance()->get_profile()),
   _currentMailbox(nullptr),
   _isClosing(false),
-  _walletsGui(new WalletsGui(this))
+  _walletsGui(new WalletsGui(this)),
+  _is_blocked_contact(false)
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);   
@@ -83,7 +84,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   setEnabledAttachmentSaveOption(false);
   setEnabledDeleteOption(false);
   setEnabledMailActions(false);
-  setEnabledShareContactOption(false);
+  setEnabledContactOption(false);
 
   QString settings_file = "keyhotee_";
   settings_file.append(profileName);
@@ -154,6 +155,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   connect(ui->actionSet_Icon, &QAction::triggered, this, &KeyhoteeMainWindow::onSetIcon);
   connect(ui->actionShow_Contacts, &QAction::triggered, this, &KeyhoteeMainWindow::showContacts);
   connect(ui->actionRequest_authorization, &QAction::triggered, this, &KeyhoteeMainWindow::onRequestAuthorization);
+  connect(ui->actionShow_blocked_contacts, &QAction::triggered, this, &KeyhoteeMainWindow::onShowBlockedContacts);
+  connect(ui->actionBlock, &QAction::triggered, this, &KeyhoteeMainWindow::onBlockContact);
+  connect(ui->actionUnblock, &QAction::triggered, this, &KeyhoteeMainWindow::onUnblockContact);
   connect(ui->actionShare_contact, &QAction::triggered, this, &KeyhoteeMainWindow::onShareContact);
   // Help
   connect(ui->actionDiagnostic, &QAction::triggered, this, &KeyhoteeMainWindow::onDiagnostic);
@@ -428,7 +432,8 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     setEnabledDeleteOption (false);
     setEnabledAttachmentSaveOption(false);
     setEnabledMailActions(false);
-    setEnabledShareContactOption(false);
+    setEnabledContactOption(false);
+    enableBlockedContact(false);
     _currentMailbox = nullptr;
     ui->actionShow_details->setEnabled(true);
 
@@ -438,7 +443,6 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     {
       auto con_id = selected_items[0]->data(0, ContactIdRole).toInt();
       openContactGui(con_id);
-      ui->contacts_page->selectRow(con_id);
       connect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onRemoveContact()));
       connect(ui->actionShow_details, SIGNAL(toggled(bool)), ui->contacts_page, SLOT(on_actionShow_details_toggled(bool)));
       if(ui->contacts_page->isShowDetailsHidden())
@@ -447,6 +451,9 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
         ui->actionShow_details->setChecked(true);
 
       refreshMenuOptions();
+      bool blocked = getContactGui(con_id)->_view->getContact().isBlocked();
+      enableBlockedContact(blocked);
+      ui->contacts_page->selectRow(con_id);
     }
     else if (selectedItem->type() == IdentityItem)
     {
@@ -661,6 +668,54 @@ void KeyhoteeMainWindow::onRequestAuthorization()
   request->show();
 }
 
+void KeyhoteeMainWindow::onShowBlockedContacts()
+{
+  ui->side_bar->setCurrentItem(_contacts_root);
+  ui->widget_stack->setCurrentWidget(ui->contacts_page);
+
+  enableBlockedContact(true);
+}
+
+void KeyhoteeMainWindow::onBlockContact()
+{
+  QList<const Contact*> contacts;
+  ui->contacts_page->getSelectedContacts(contacts);
+
+  if(contacts.empty())
+    return;
+  if(QMessageBox::question(this, tr("Block Contact"), tr("Are you sure you want to block selected contact(s)?")) == QMessageBox::Button::No)
+    return;
+
+  foreach(const Contact* contact, contacts)
+  {
+    if(contact->isOwn())
+      continue;
+    Contact temp_contact = *contact;
+    temp_contact.auth_status = bts::addressbook::authorization_status::blocked;
+    _addressbook_model->storeContact(temp_contact);
+  }
+}
+
+void KeyhoteeMainWindow::onUnblockContact()
+{
+  QList<const Contact*> contacts;
+  ui->contacts_page->getSelectedContacts(contacts);
+
+  if(contacts.empty())
+    return;
+  if(QMessageBox::question(this, tr("Unblock Contact"), tr("Are you sure you want to unblock selected contact(s)?")) == QMessageBox::Button::No)
+    return;
+
+  foreach(const Contact* contact, contacts)
+  {
+    if(contact->isOwn() || contact->auth_status != bts::addressbook::blocked)
+      continue;
+    Contact temp_contact = *contact;
+    temp_contact.auth_status = bts::addressbook::authorization_status::unauthorized;
+    _addressbook_model->storeContact(temp_contact);
+  }
+}
+
 void KeyhoteeMainWindow::displayDiagnosticLog()
 {
   DiagnosticDialog diagnoslic_dialog;
@@ -722,10 +777,12 @@ void KeyhoteeMainWindow::onAbout()
   QMessageBox::about(this, title, text);
 }
 
-void KeyhoteeMainWindow::showContacts() const
+void KeyhoteeMainWindow::showContacts()
 {
   ui->side_bar->setCurrentItem(_contacts_root);
   ui->widget_stack->setCurrentWidget(ui->contacts_page);
+
+  enableBlockedContact(false);
 }
 
 void KeyhoteeMainWindow::newMailMessage()
@@ -1203,7 +1260,7 @@ void KeyhoteeMainWindow::enableMenu(bool enable)
   ui->actionNew_Contact->setEnabled (enable);
   ui->actionShow_Contacts->setEnabled (enable);
   _search_edit->setEnabled (enable);  
-  setEnabledShareContactOption(enable);
+  setEnabledContactOption(enable);
 }
 
 void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
@@ -1286,12 +1343,20 @@ void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable )
   ui->actionDelete->setEnabled (enable);
   }
 
-void KeyhoteeMainWindow::setEnabledShareContactOption( bool enable )
-  {
-  ui->actionShare_contact->setEnabled (enable);
-  }
+void KeyhoteeMainWindow::setEnabledContactOption( bool enable )
+{
+  ui->actionShare_contact->setEnabled(enable);
+  ui->actionBlock->setEnabled(enable && !_is_blocked_contact);
+  ui->actionUnblock->setEnabled(enable && _is_blocked_contact);
+}
 
-void KeyhoteeMainWindow::refreshMenuOptions() const
+void KeyhoteeMainWindow::enableBlockedContact(bool enable)
+{
+  ui->contacts_page->setShowBlocked(enable);
+  _is_blocked_contact = enable;
+}
+
+void KeyhoteeMainWindow::refreshMenuOptions()
 {
   bool isContactTableSelected = ui->contacts_page->isSelection();
   bool isContactTreeItemSelected = false;
@@ -1304,9 +1369,9 @@ void KeyhoteeMainWindow::refreshMenuOptions() const
 
   bool enabled = isContactTableSelected || isContactTreeItemSelected;
 
-  ui->actionCopy->setEnabled (isContactTableSelected);  
-  ui->actionCut->setEnabled (false);    
-  ui->actionShare_contact->setEnabled (isContactTableSelected);
+  ui->actionCopy->setEnabled (isContactTableSelected);
+  ui->actionCut->setEnabled (false);
+  setEnabledContactOption(isContactTableSelected);
   ui->actionDelete->setEnabled (enabled);
 }
 
@@ -1401,12 +1466,19 @@ void KeyhoteeMainWindow::onUpdateOptions(bool lang_changed)
       tr("Please restart application for the changes to take effect") );
 
   _connectionProcessor.updateOptions();
+
+  auto profile = bts::get_profile();
+  QString profile_name = QString::fromStdWString(profile->get_name());
+  QString settings_file = "keyhotee_";
+  settings_file.append(profile_name);
+  QSettings settings("Invictus Innovations", settings_file);
+  ui->actionShow_blocked_contacts->setEnabled(settings.value("FilterBlocked", "").toBool());
+  ui->contacts_page->updateOptions();
 }
 
 void KeyhoteeMainWindow::onOptions()
 {
-  auto app = bts::application::instance();
-  auto profile = app->get_profile();
+  auto profile = bts::get_profile();
   QString profile_name = QString::fromStdWString(profile->get_name());
 
   OptionsDialog* options_dialog = new OptionsDialog(this, profile_name);

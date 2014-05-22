@@ -416,9 +416,12 @@
     </property>
     <addaction name="actionNew_Contact"/>
     <addaction name="actionSet_Icon"/>
+    <addaction name="actionShare_contact"/>
     <addaction name="separator"/>
     <addaction name="actionRequest_authorization"/>
-    <addaction name="actionShare_contact"/>
+    <addaction name="actionShow_blocked_contacts"/>
+    <addaction name="actionBlock"/>
+    <addaction name="actionUnblock"/>
     <addaction name="separator"/>
     <addaction name="actionShow_Contacts"/>
    </widget>
@@ -685,57 +688,39 @@
     <string>Share contact...</string>
    </property>
   </action>
-  <action name="actionPolish">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Polish</string>
-   </property>
-  </action>
-  <action name="actionEnglish">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>English</string>
-   </property>
-  </action>
-  <action name="actionPortuguese">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Portuguese</string>
-   </property>
-  </action>
-  <action name="actionChinese">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Chinese</string>
-   </property>
-  </action>
-  <action name="actionSpanish">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Spanish</string>
-   </property>
-  </action>
-  <action name="actionSpanish_Chile">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Spanish (Chile)</string>
-   </property>
-  </action>
   <action name="actionOptions">
    <property name="text">
     <string>Options</string>
+   </property>
+  </action>
+  <action name="actionShow_blocked_contacts">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/address_blocked.png</normaloff>:/images/address_blocked.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show blocked contacts</string>
+   </property>
+  </action>
+  <action name="actionBlock">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/request_block.png</normaloff>:/images/request_block.png</iconset>
+   </property>
+   <property name="text">
+    <string>Block</string>
+   </property>
+   <property name="toolTip">
+    <string>Block current contact</string>
+   </property>
+  </action>
+  <action name="actionUnblock">
+   <property name="icon">
+    <iconset resource="Keyhotee.qrc">
+     <normaloff>:/images/request_unblock.png</normaloff>:/images/request_unblock.png</iconset>
+   </property>
+   <property name="text">
+    <string>Unblock</string>
    </property>
   </action>
  </widget>
