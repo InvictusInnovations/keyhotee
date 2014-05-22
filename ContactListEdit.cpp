@@ -432,8 +432,8 @@ void ContactListEdit::onTextChanged()
       auto aBook = bts::get_profile()->get_addressbook();
 
       auto contact = aBook->get_contact_by_display_name(textKey);
-      contactFound = contact;
-      if(contactFound == false)
+      contactFound = contact.valid();
+      if (!contactFound)
         contact = aBook->get_contact_by_dac_id(textKey);
 
       if(contact)

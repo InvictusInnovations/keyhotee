@@ -69,9 +69,7 @@ Q_SIGNALS:
   void currentState(CurrentState state);
 
 private slots:
-  void keyhoteeIdChanged(const QString& name);
   void keyhoteeIdEdited(const QString& keyhotee_id);
-  void publicKeyChanged(const QString& name);
   void publicKeyEdited(const QString& public_key_string);
 
   bool event(QEvent *e);
