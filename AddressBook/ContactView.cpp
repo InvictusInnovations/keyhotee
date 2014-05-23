@@ -682,9 +682,13 @@ void ContactView::checkAuthorizationStatus()
   {
     ui->authorization_status->setText( tr("Denied") );
   }
-  else if(status == bts::addressbook::authorization_status::blocked)
+  else if(status == bts::addressbook::authorization_status::i_block)
   {
     ui->authorization_status->setText( tr("Blocked") );
+  }
+  else if(status == bts::addressbook::authorization_status::blocked_me)
+  {
+    ui->authorization_status->setText(tr("Blocked me"));
   }
   else
   {
