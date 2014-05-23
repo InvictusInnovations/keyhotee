@@ -138,7 +138,7 @@ IF (NOT DEFINED KH_STATIC_QT)
   IF(WIN32 OR APPLE)
     SET(KH_STATIC_QT 0)
   ELSE()
-    SET(KH_STATIC_QT 1)
+    SET(KH_STATIC_QT 0)
   ENDIF(WIN32 OR APPLE)
 ENDIF(NOT DEFINED KH_STATIC_QT)
 
@@ -561,6 +561,8 @@ ELSE (KH_STATIC_QT EQUAL 1)
   )
 ENDIF (KH_STATIC_QT EQUAL 1)
 
+INSTALL(TARGETS Keyhotee RUNTIME DESTINATION . BUNDLE DESTINATION . COMPONENT Runtime)
+
 if (MSVC)
   message(STATUS "Setting up debug options for MSVC build")
 # Probably cmake has a bug and vcxproj generated for executable in Debug conf. has disabled debug info
@@ -575,12 +577,14 @@ IF(APPLE)
 else()
   SET(plugin_dest_dir .)
   SET(qtconf_dest_dir .)
-  GET_TARGET_PROPERTY(APPS Keyhotee LOCATION_RELWITHDEBINFO)
+  GET_TARGET_PROPERTY(_loc Keyhotee LOCATION_RELWITHDEBINFO)
+  get_filename_component(_binName ${_loc} NAME)  
+
+  SET(APPS "\${CMAKE_INSTALL_PREFIX}/${_binName}")
 ENDIF(APPLE)
 
 message(STATUS "KH output path: ${APPS}")
 message(STATUS "CMAKE_SHARED_LIBRARY_SUFFIX: ${CMAKE_SHARED_LIBRARY_SUFFIX}")
-INSTALL(TARGETS Keyhotee RUNTIME DESTINATION . BUNDLE DESTINATION . COMPONENT Runtime)
 
 IF(FC_SHARED_LIBRARIES_RELEASE)
   INSTALL(FILES ${FC_SHARED_LIBRARIES_RELEASE} DESTINATION . CONFIGURATIONS RelWithDebinfo)
@@ -592,12 +596,12 @@ foreach(plugin ${Qt5Gui_PLUGINS})
   get_filename_component(plugin_path ${_loc} DIRECTORY)
   get_filename_component(plugin_classification ${plugin_path} NAME)
 
-  message("Preparing a copy for plugin ${plugin} (${plugin_name}) at location ${_loc}")
+#  message(STATUS "Preparing a copy for plugin ${plugin} (${plugin_name}) at location ${_loc}")
   SET(POST_BUILD_STEP_COMMANDS ${POST_BUILD_STEP_COMMANDS}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_loc}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/${plugin_classification}/${plugin_name}")
 endforeach()
 
-if(APPLE OR WIN32)
+#if(APPLE OR WIN32)
   SET (QTPLUGINS )
   foreach(plugin ${Qt5Gui_PLUGINS})
     get_target_property(_loc ${plugin} LOCATION)
@@ -609,19 +613,19 @@ if(APPLE OR WIN32)
   endforeach()
 
   INSTALL(CODE "
-    INCLUDE(BundleUtilities)
-    FIXUP_BUNDLE(\"${APPS}\" \"${QTPLUGINS}\" \"${QT_LIB_DIR}\")
-    file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
+   file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
+   INCLUDE(BundleUtilities)
+    FIXUP_BUNDLE(\"${APPS}\" \"\${QTPLUGINS}\" \"\${QT_LIB_DIR}\")
       " COMPONENT Runtime)
-    INSTALL(DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/" DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo
-      FILES_MATCHING PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+#     INSTALL(DIRECTORY "${CMAKE_INSTALL_PREFIX}/" DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo
+#      FILES_MATCHING PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+#endif(APPLE OR WIN32)
 
+IF(WIN32)
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .) # copy the msvcrt files to the top-level directory instead of bin
   include(InstallRequiredSystemLibraries)
   INSTALL(FILES ${CRASHRPT_BINARIES_TO_INSTALL} DESTINATION . CONFIGURATIONS RelWithDebinfo COMPONENT Runtime)
-endif(APPLE OR WIN32)
 
-IF(WIN32)
   get_target_property(FC_INTERFACE_PDB_LIST_RELEASE fc INTERFACE_LINK_PDB_RELEASE)
 
   SET(TOTAL_PDB_LIST )
@@ -663,7 +667,7 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "Keyhotee ${CPACK_PACKAGE_VERSION}")
 
 if(WIN32)
  SET(CPACK_GENERATOR "ZIP;NSIS")
- set(CPACK_PACKAGE_NAME "Keyhotee") # override above
+set(CPACK_PACKAGE_NAME "Keyhotee") # override above
  set(CPACK_NSIS_CONTACT "contact.us@invictus-innovations.com")
  set(CPACK_NSIS_EXECUTABLES_DIRECTORY .)
  set(CPACK_NSIS_PACKAGE_NAME "Keyhotee v${CPACK_PACKAGE_VERSION}")
@@ -677,7 +681,6 @@ if(WIN32)
  # it seems like windows zip files usually don't have a single directory inside them, unix tgz frequently do
  SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
 
- include(CPack)
 endif(WIN32)
 
 if(APPLE)
@@ -685,11 +688,12 @@ if(APPLE)
   set(CPACK_PACKAGE_VENDOR "www.invictus.io")
 endif()
 
-if(LINUX)
+if(UNIX)
   # Linux gets a .tgz
   SET(CPACK_GENERATOR "TGZ")
   SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 1)
-endif(LINUX)
+endif(UNIX)
 
+include(CPack)
 
 
