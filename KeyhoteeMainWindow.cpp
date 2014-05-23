@@ -72,7 +72,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _currentMailbox(nullptr),
   _isClosing(false),
   _walletsGui(new WalletsGui(this)),
-  _is_blocked_contact(false)
+  _is_blocked_contact(false),
+  _is_filter_blocked_cont(false)
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);   
@@ -90,6 +91,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   settings_file.append(profileName);
   setSettingsFile(settings_file);
   readSettings();
+
+  QSettings settings("Invictus Innovations", settings_file);
+  _is_filter_blocked_cont = settings.value("FilterBlocked", "").toBool();
+  ui->actionShow_blocked_contacts->setEnabled(_is_filter_blocked_cont);
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
   connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
@@ -691,7 +696,7 @@ void KeyhoteeMainWindow::onBlockContact()
     if(contact->isOwn())
       continue;
     Contact temp_contact = *contact;
-    temp_contact.auth_status = bts::addressbook::authorization_status::blocked;
+    temp_contact.auth_status = bts::addressbook::authorization_status::i_block;
     _addressbook_model->storeContact(temp_contact);
   }
 }
@@ -708,7 +713,7 @@ void KeyhoteeMainWindow::onUnblockContact()
 
   foreach(const Contact* contact, contacts)
   {
-    if(contact->isOwn() || contact->auth_status != bts::addressbook::blocked)
+    if(contact->isOwn() || contact->auth_status != bts::addressbook::i_block)
       continue;
     Contact temp_contact = *contact;
     temp_contact.auth_status = bts::addressbook::authorization_status::unauthorized;
@@ -1011,7 +1016,10 @@ void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
   }
 
   if(_requests_root->childCount() == 0)
+  {
     _requests_root->setHidden(true);
+    showContacts();
+  }
 }
 
 void KeyhoteeMainWindow::processResponse(const TAuthorizationMessage& msg,
@@ -1222,7 +1230,7 @@ void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
 
 void KeyhoteeMainWindow::OnMessageSendingEnd()
 {
-  statusBar()->showMessage(tr("All mail messages sent."), 3000);
+  statusBar()->showMessage(tr("All messages sent."), 3000);
 }
 
 void KeyhoteeMainWindow::OnMissingSenderIdentity(const TRecipientPublicKey& senderId,
@@ -1261,6 +1269,7 @@ void KeyhoteeMainWindow::enableMenu(bool enable)
   ui->actionShow_Contacts->setEnabled (enable);
   _search_edit->setEnabled (enable);  
   setEnabledContactOption(enable);
+  ui->actionShow_blocked_contacts->setEnabled(enable && _is_filter_blocked_cont);
 }
 
 void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
@@ -1472,7 +1481,8 @@ void KeyhoteeMainWindow::onUpdateOptions(bool lang_changed)
   QString settings_file = "keyhotee_";
   settings_file.append(profile_name);
   QSettings settings("Invictus Innovations", settings_file);
-  ui->actionShow_blocked_contacts->setEnabled(settings.value("FilterBlocked", "").toBool());
+  _is_filter_blocked_cont = settings.value("FilterBlocked", "").toBool();
+  ui->actionShow_blocked_contacts->setEnabled(_is_filter_blocked_cont);
   ui->contacts_page->updateOptions();
 }
 

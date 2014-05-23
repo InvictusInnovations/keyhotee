@@ -1157,7 +1157,7 @@ void TConnectionProcessor::received_request(const bts::bitchat::decrypted_messag
       optContact = aBook->get_contact_by_public_key(*msg.from_key);
 
       if(!optContact ||
-        (optContact && (*optContact).auth_status != bts::addressbook::authorization_status::blocked))
+        (optContact && (*optContact).auth_status != bts::addressbook::authorization_status::i_block))
       {
         auto header = Profile->get_request_db()->store_message(msg, nullptr);
         auto req_msg = msg.as<bts::bitchat::private_contact_request_message>();

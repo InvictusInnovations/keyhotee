@@ -76,7 +76,10 @@ void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
       }
       break;
     case TAuthorizationStatus::block:
-      contact.auth_status = TContAuthoStatus::blocked;
+      if(_reqmsg.status == TAuthorizationStatus::request)
+        contact.auth_status = TContAuthoStatus::i_block;
+      else
+        contact.auth_status = TContAuthoStatus::blocked_me;
       break;
     case TAuthorizationStatus::deny:
       contact.auth_status = TContAuthoStatus::denied;
