@@ -72,7 +72,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _currentMailbox(nullptr),
   _isClosing(false),
   _walletsGui(new WalletsGui(this)),
-  _is_blocked_contact(false)
+  _is_blocked_contact(false),
+  _is_filter_blocked_cont(false)
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);   
@@ -90,6 +91,10 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   settings_file.append(profileName);
   setSettingsFile(settings_file);
   readSettings();
+
+  QSettings settings("Invictus Innovations", settings_file);
+  _is_filter_blocked_cont = settings.value("FilterBlocked", "").toBool();
+  ui->actionShow_blocked_contacts->setEnabled(_is_filter_blocked_cont);
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
   connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
@@ -1264,6 +1269,7 @@ void KeyhoteeMainWindow::enableMenu(bool enable)
   ui->actionShow_Contacts->setEnabled (enable);
   _search_edit->setEnabled (enable);  
   setEnabledContactOption(enable);
+  ui->actionShow_blocked_contacts->setEnabled(enable && _is_filter_blocked_cont);
 }
 
 void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
@@ -1475,7 +1481,8 @@ void KeyhoteeMainWindow::onUpdateOptions(bool lang_changed)
   QString settings_file = "keyhotee_";
   settings_file.append(profile_name);
   QSettings settings("Invictus Innovations", settings_file);
-  ui->actionShow_blocked_contacts->setEnabled(settings.value("FilterBlocked", "").toBool());
+  _is_filter_blocked_cont = settings.value("FilterBlocked", "").toBool();
+  ui->actionShow_blocked_contacts->setEnabled(_is_filter_blocked_cont);
   ui->contacts_page->updateOptions();
 }
 

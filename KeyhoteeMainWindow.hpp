@@ -248,6 +248,7 @@ private:
   QList <QAction*>                        _actionsLang;
   std::unique_ptr<WalletsGui>             _walletsGui;
   bool                                    _is_blocked_contact;
+  bool                                    _is_filter_blocked_cont;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();
