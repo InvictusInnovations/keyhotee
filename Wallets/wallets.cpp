@@ -12,7 +12,11 @@
 
 Wallets::Wallets(QWidget* parent) :
 QWidget(parent),
-ui(new Ui::Wallets)
+ui(new Ui::Wallets),
+_url("")
+#ifndef __STATIC_QT
+,_webView(nullptr)
+#endif
 {
   ui->setupUi(this);
 
@@ -21,8 +25,12 @@ ui(new Ui::Wallets)
 }
 
 Wallets::Wallets(QWidget* parent, const QString&  url) :
-    QWidget(parent),
-    ui(new Ui::Wallets)
+QWidget(parent),
+ui(new Ui::Wallets),
+_url(url)
+#ifndef __STATIC_QT
+,_webView(nullptr)
+#endif
 {
   ui->setupUi(this);
 
@@ -33,7 +41,6 @@ Wallets::Wallets(QWidget* parent, const QString&  url) :
 #else
   /// Hide text: "No support for Qt WebKit"
   ui->labelInfo->setVisible(false);
-  setupWebPage(parent, url);
 #endif
 
 }
@@ -43,26 +50,38 @@ Wallets::~Wallets()
   delete ui;
 }
 
-void Wallets::setupWebPage(QWidget* parent, const QString& url)
+
+void Wallets::loadPage()
+{
+  setupWebPage();
+}
+
+void Wallets::setupWebPage()
 {
 #ifndef __STATIC_QT
-  QWebView* webView = new QWebView(parent);
+  
+  if (_webView != nullptr)
+  {
+    /// Initialization has already been
+    return;
+  }
+   
+  /// First time initialization
+  _webView = new QWebView(this);
 
-  connect(webView->page()->networkAccessManager(), 
-          SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
-          this, SLOT(handleAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
+  connect(_webView->page()->networkAccessManager(),
+    SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
+    this, SLOT(handleAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 
-  webView->setObjectName(QStringLiteral("webView"));
-  webView->setUrl(QUrl(url));
-  ui->gridLayout->addWidget(webView, 0, 0, 1, 1);
-    
-  webView->settings()->setAttribute(QWebSettings::AutoLoadImages, true);
-  webView->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);  
-  webView->settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, false);
-  webView->settings()->setAttribute(QWebSettings::JavascriptCanAccessClipboard, false);
-  webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
-  webView->settings()->setAttribute(QWebSettings::PluginsEnabled, false);
-  webView->settings()->setAttribute(QWebSettings::WebGLEnabled, false);    
+  ui->gridLayout->addWidget(_webView, 0, 0, 1, 1);
+
+  _webView->settings()->setAttribute(QWebSettings::AutoLoadImages, true);
+  _webView->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
+  _webView->settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, false);
+  _webView->settings()->setAttribute(QWebSettings::JavascriptCanAccessClipboard, false);
+  _webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
+  _webView->settings()->setAttribute(QWebSettings::PluginsEnabled, false);
+  _webView->settings()->setAttribute(QWebSettings::WebGLEnabled, false);
 
   /*
   webView->settings()->setMaximumPagesInCache(0);
@@ -73,7 +92,8 @@ void Wallets::setupWebPage(QWidget* parent, const QString& url)
   webView->settings()->clearMemoryCaches();
   */
 
-  webView->reload();
+  /// load page
+  _webView->setUrl(QUrl(_url));
 
 #endif
 }

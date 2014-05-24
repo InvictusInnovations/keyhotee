@@ -96,9 +96,10 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>buttonBox</tabstop>
   <tabstop>userName</tabstop>
   <tabstop>password</tabstop>
+  <tabstop>showPassword</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections>
