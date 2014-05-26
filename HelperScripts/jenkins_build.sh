@@ -31,10 +31,9 @@ export INVICTUS_ROOT=$WORKSPACE
 cmake -DBUILD_VERSION_PATCH=$BUILD_NUMBER -DCMAKE_TOOLCHAIN_FILE=$INVICTUS_ROOT/toolchain.invictus/toolchain.invictus.cmake ../keyhotee
 make -j8
 
+strip $WORKSPACE/keyhotee/bin/Keyhotee
+cpack --verbose
 
-cd $WORKSPACE/keyhotee/bin
-strip Keyhotee
-cpack
 #tar -czf Keyhotee.tar.gz Keyhotee
 
 
