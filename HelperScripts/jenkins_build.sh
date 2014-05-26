@@ -24,16 +24,9 @@ rm -rf build
 mkdir build
 cd build
 
-export BOOST_ROOT=/opt/boost_1_55_0
-#export OPENSSL_ROOT=/opt/openssl
-export QTDIR=/opt/QT
-export DBROOTDIR=/opt/BerkeleyDB
-export ICUROOT=/opt/ICU
-#export PATH=/opt/toolchain/bin:$PATH
+../keyhotee/setenv.sh
 
-#'compat' version of toolchain should be used eventually instead of native
-#cmake -DCMAKE_TOOLCHAIN_FILE=/opt/toolchain/toolchain.cmake ../keyhotee
-cmake -DBUILD_VERSION_PATCH=$BUILD_NUMBER ../keyhotee
+cmake -DBUILD_VERSION_PATCH=$BUILD_NUMBER -DCMAKE_TOOLCHAIN_FILE=$INVICTUS_ROOT/toolchain.invictus/toolchain.invictus.cmake ../keyhotee
 make -j8
 
 
