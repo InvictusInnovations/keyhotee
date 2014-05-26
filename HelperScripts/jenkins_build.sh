@@ -34,7 +34,8 @@ make -j8
 
 cd $WORKSPACE/keyhotee/bin
 strip Keyhotee
-tar -czf Keyhotee.tar.gz Keyhotee
+cpack
+#tar -czf Keyhotee.tar.gz Keyhotee
 
 
 #
