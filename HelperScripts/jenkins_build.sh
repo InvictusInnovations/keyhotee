@@ -24,6 +24,8 @@ rm -rf build
 mkdir build
 cd build
 
+export INVICTUS_ROOT=$WORKSPACE
+
 . ../keyhotee/setenv.sh
 
 cmake -DBUILD_VERSION_PATCH=$BUILD_NUMBER -DCMAKE_TOOLCHAIN_FILE=$INVICTUS_ROOT/toolchain.invictus/toolchain.invictus.cmake ../keyhotee

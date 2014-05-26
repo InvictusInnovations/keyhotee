@@ -1,6 +1,6 @@
 #!/bin/bash
 pushd `dirname $0`/.. > /dev/null
-INVICTUS_ROOT=`pwd -P`
+: ${INVICTUS_ROOT:=`pwd -P`}
 popd > /dev/null
 
 export INVICTUS_ROOT
