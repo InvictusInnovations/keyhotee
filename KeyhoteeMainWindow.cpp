@@ -525,6 +525,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
           if (foundPos != _treeItem2Wallet.end())
           {
             Wallets* walletWeb = foundPos->second;
+            walletWeb->loadPage();
             ui->widget_stack->setCurrentWidget(walletWeb);
           }          
         }
