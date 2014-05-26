@@ -24,7 +24,7 @@ rm -rf build
 mkdir build
 cd build
 
-../keyhotee/setenv.sh
+. ../keyhotee/setenv.sh
 
 cmake -DBUILD_VERSION_PATCH=$BUILD_NUMBER -DCMAKE_TOOLCHAIN_FILE=$INVICTUS_ROOT/toolchain.invictus/toolchain.invictus.cmake ../keyhotee
 make -j8
