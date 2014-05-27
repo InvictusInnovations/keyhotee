@@ -31,9 +31,7 @@ export INVICTUS_ROOT=$WORKSPACE
 cmake -DBUILD_VERSION_PATCH=$BUILD_NUMBER -DCMAKE_TOOLCHAIN_FILE=$INVICTUS_ROOT/toolchain.invictus/toolchain.invictus.cmake ../keyhotee
 make -j8
 
-# Adding alias to use system-wide ldd for cpack
+# Lets put /usr/bin at the begining of PATH
+# to use system-wide ldd for cpack
 # instead of toolchain.invictus version
-alias ldd=/usr/bin/ldd
-cpack --verbose
-unalias ldd
-
+PATH=/usr/bin:$PATH cpack --verbose
