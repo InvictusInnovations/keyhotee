@@ -22,6 +22,8 @@ _url("")
 
   ui->labelInfo->setText(tr("Please select wallet"));
   ui->labelInfo->setVisible(true);
+  /// Hide the progress bar
+  ui->progressBar->setVisible(false);
 }
 
 Wallets::Wallets(QWidget* parent, const QString&  url) :
@@ -43,6 +45,8 @@ _url(url)
   ui->labelInfo->setVisible(false);
 #endif
 
+  /// Hide the progress bar
+  ui->progressBar->setVisible(false);
 }
 
 Wallets::~Wallets()
@@ -69,6 +73,10 @@ void Wallets::setupWebPage()
   /// First time initialization
   _webView = new QWebView(this);
 
+  /// connect signals
+  connect(_webView, SIGNAL(loadStarted()), this, SLOT(onLoadStarted()) );
+  connect(_webView, SIGNAL(loadProgress(int)), this, SLOT(onLoadProgress(int)));
+  connect(_webView, SIGNAL(loadFinished(bool)), this, SLOT(onLoadFinished(bool)));
   connect(_webView->page()->networkAccessManager(),
     SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
     this, SLOT(handleAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
@@ -109,10 +117,23 @@ void Wallets::handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authe
   }
 }
 
-/**
-TODO
-/// display some info about loading WebSite
-void onLoadStarted();
-/// hide info about loading WebSite
-void onLoadFinished(bool);
-*/
+void Wallets::onLoadStarted()
+{
+  ui->progressBar->reset();
+  /// Show the progress bar
+  ui->progressBar->setVisible(true);  
+}
+
+void Wallets::onLoadProgress(int progress)
+{
+  /** The current value is provided by progress and scales from 0 to 100, 
+      which is the default range of QProgressBar.
+  */
+  ui->progressBar->setValue(progress);
+}
+
+void Wallets::onLoadFinished(bool)
+{
+  /// Hide the progress bar
+  ui->progressBar->setVisible(false);
+}
