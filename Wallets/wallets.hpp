@@ -16,7 +16,9 @@ class Wallets : public QWidget
     Q_OBJECT
 
 public:
+  /// for root wallet item
   Wallets(QWidget* parent = nullptr);
+  /// for wallet item
   Wallets(QWidget* parent, const QString& url);
   ~Wallets();
 
@@ -26,6 +28,9 @@ public:
   void loadPage();
 
 private slots:
+  void onLoadStarted();
+  void onLoadProgress(int progress);
+  void onLoadFinished(bool);
   void handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator);
 
 private:
