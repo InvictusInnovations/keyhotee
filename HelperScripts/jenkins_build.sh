@@ -31,77 +31,9 @@ export INVICTUS_ROOT=$WORKSPACE
 cmake -DBUILD_VERSION_PATCH=$BUILD_NUMBER -DCMAKE_TOOLCHAIN_FILE=$INVICTUS_ROOT/toolchain.invictus/toolchain.invictus.cmake ../keyhotee
 make -j8
 
-strip $WORKSPACE/keyhotee/bin/Keyhotee
+# Adding alias to use system-wide ldd for cpack
+# instead of toolchain.invictus version
+alias ldd=/usr/bin/ldd
 cpack --verbose
+unalias ldd
 
-#tar -czf Keyhotee.tar.gz Keyhotee
-
-
-#
-# deb packages - currently disabled
-#
-#remove old packages
-#touch dummy.deb
-#rm *.deb
-#package keyhote
-#mkdir -p debian/usr/bin
-#mkdir -p debian/DEBIAN
-#FILE=Keyhotee
-#SIZE=`stat -c %s $WORKSPACE/keyhotee/bin/$FILE` 
-#DATE=`date +%Y%m%d`
-#DEPS="libboost1.54-all-dev"
-#TITLE="Invictus Innovations Keyhotee client"
-#TEXT="Client for Invictus Innovations Keyhotee cryptoservice"
-#NAME=keyhotee
-#
-#echo "Package: $NAME
-#Version: $DATE-nightly
-#Architecture: amd64
-#Maintainer: Invictus Innovations <contact.us@invictus-innovations.com>
-#Installed-Size: $SIZE
-#Depends: $DEPS
-#Section: office
-#Priority: optional
-#Homepage: http://invictus.io
-#Description: $TITLE
-# $TEXT
-#" > debian/DEBIAN/control
-#
-#cp $WORKSPACE/keyhotee/bin/$FILE debian/usr/bin
-#strip debian/usr/bin/$FILE
-#chmod 0755 -R debian
-#
-#fakeroot dpkg-deb -b debian ../$NAME-$DATE-nightly.deb
-#
-#cd $WORKSPACE/keyhotee/BitShares/bts_wallet
-
-#package bts_wallet
-#mkdir -p debian/usr/bin
-#mkdir -p debian/DEBIAN
-#
-#FILE=bts_wallet
-#SIZE=`stat -c %s $WORKSPACE/keyhotee/bin/$FILE` 
-#DATE=`date +%Y%m%d`
-#DEPS="libboost1.54-all-dev"
-#TITLE="Invictus Innovations BitShares wallet"
-#TEXT="Wallet-Client for Invictus Innovations BitShares cryptocurrency"
-#NAME=bts-wallet
-#
-#echo "Package: $NAME
-#Version: $DATE-nightly
-#Architecture: amd64
-#Maintainer: Invictus Innovations <contact.us@invictus-innovations.com>
-#Installed-Size: $SIZE
-#Depends: $DEPS
-#Section: office
-#Priority: optional
-#Homepage: http://invictus.io
-#Description: $TITLE
-# $TEXT
-#" > debian/DEBIAN/control
-#
-#cp $WORKSPACE/keyhotee/bin/$FILE debian/usr/bin
-#strip debian/usr/bin/$FILE
-#chmod 0755 -R debian
-#
-#fakeroot dpkg-deb -b debian ../../$NAME-$DATE-nightly.deb

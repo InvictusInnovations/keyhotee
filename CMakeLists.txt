@@ -688,6 +688,7 @@ if(UNIX)
   # Linux gets a .tgz
   SET(CPACK_GENERATOR "TGZ")
   SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 1)
+  SET(CPACK_STRIP_FILES 1)
 endif(UNIX)
 
 include(CPack)
