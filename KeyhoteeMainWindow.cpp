@@ -455,10 +455,10 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);
 
-      refreshMenuOptions();
       bool blocked = getContactGui(con_id)->_view->getContact().isBlocked();
       enableBlockedContact(blocked);
       ui->contacts_page->selectRow(con_id);
+      refreshMenuOptions();
     }
     else if (selectedItem->type() == IdentityItem)
     {
@@ -699,6 +699,12 @@ void KeyhoteeMainWindow::onBlockContact()
     Contact temp_contact = *contact;
     temp_contact.auth_status = bts::addressbook::authorization_status::i_block;
     _addressbook_model->storeContact(temp_contact);
+    if(!_is_filter_blocked_cont)
+    {
+      enableBlockedContact(true);
+      openContactGui(temp_contact.wallet_index);
+      setEnabledContactOption(true);
+    }
   }
 }
 
@@ -719,6 +725,12 @@ void KeyhoteeMainWindow::onUnblockContact()
     Contact temp_contact = *contact;
     temp_contact.auth_status = bts::addressbook::authorization_status::unauthorized;
     _addressbook_model->storeContact(temp_contact);
+    if(!_is_filter_blocked_cont)
+    {
+      enableBlockedContact(false);
+      openContactGui(temp_contact.wallet_index);
+      setEnabledContactOption(true);
+    }
   }
 }
 
