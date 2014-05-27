@@ -132,8 +132,17 @@ void Wallets::onLoadProgress(int progress)
   ui->progressBar->setValue(progress);
 }
 
-void Wallets::onLoadFinished(bool)
+void Wallets::onLoadFinished(bool loadOK)
 {
   /// Hide the progress bar
   ui->progressBar->setVisible(false);
+
+  if (loadOK == false)
+  {    
+    #ifndef __STATIC_QT
+    QString errorMsg("<html><body>" + tr("An error occurred while trying to load %1.").arg(_url) +
+                     "</body></html>");
+    _webView->setHtml(errorMsg);
+    #endif
+  }
 }

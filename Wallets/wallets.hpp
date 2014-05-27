@@ -28,9 +28,13 @@ public:
   void loadPage();
 
 private slots:
+  /// QWebPage load started
   void onLoadStarted();
   void onLoadProgress(int progress);
-  void onLoadFinished(bool);
+  /** QWebPage load finished
+      @param loadOK - is true when QWebPage load was successful
+  */
+  void onLoadFinished(bool loadOK);
   void handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator);
 
 private:
