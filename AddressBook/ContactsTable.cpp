@@ -19,10 +19,11 @@ class ContactsSortFilterProxyModel : public QSortFilterProxyModel
 {
 public:
   ContactsSortFilterProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent)
-    {
+  {
     setSortRole(Qt::UserRole);
+    setFilterRole(Qt::UserRole);
     setFilterBlocked(false);
-    }
+  }
 
   void setFilterBlocked(bool b = false)
   {
@@ -49,7 +50,6 @@ bool ContactsSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelI
   QModelIndex first_name_index = sourceModel()->index(sourceRow, AddressBookModel::FirstName, sourceParent);
   QModelIndex last_name_index = sourceModel()->index(sourceRow, AddressBookModel::LastName, sourceParent);
   QModelIndex id_index = sourceModel()->index(sourceRow, AddressBookModel::Id, sourceParent);
-  QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::Authorization, sourceParent);
   return (sourceModel()->data(first_name_index).toString().contains(filterRegExp()) ||
          sourceModel()->data(last_name_index).toString().contains(filterRegExp()) ||
          sourceModel()->data(id_index).toString().contains(filterRegExp())) &&
@@ -62,7 +62,7 @@ bool ContactsSortFilterProxyModel::filterBlocked(int sourceRow, const QModelInde
     return true;
 
   QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::Authorization, sourceParent);
-  return sourceModel()->data(blocked_index).toBool() == _filter_blocked;
+  return sourceModel()->data(blocked_index, filterRole()).toBool() == _filter_blocked;
 }
 
 void ContactsTable::searchEditChanged(QString search_string)
@@ -111,7 +111,15 @@ void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
   ui->contact_table->setShowGrid(false);
   ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  ui->contact_table->setColumnHidden(AddressBookModel::Authorization, true); //this column is used only to filter blocked contacts
+  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::UserIcon, QHeaderView::Fixed);
+  ui->contact_table->resizeColumnToContents(AddressBookModel::UserIcon);
+  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::Ownership, QHeaderView::Fixed);
+  ui->contact_table->resizeColumnToContents(AddressBookModel::Ownership);
+  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::Authorization, QHeaderView::Fixed);
+  ui->contact_table->resizeColumnToContents(AddressBookModel::Authorization);
+//  ui->contact_table->hideColumn(AddressBookModel::Authorization);
+//  ui->contact_table->setIconSize(QSize(24, 24));
+
 
   QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
   connect(selection_model, &QItemSelectionModel::selectionChanged, this, &ContactsTable::onSelectionChanged);
@@ -162,15 +170,19 @@ void ContactsTable::onDeleteContact()
 
   for (int i = indexes.count() - 1; i > -1; --i)
   {
-    auto contact_id = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).wallet_index;
-    if(profile->isIdentityPresent(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string))
+    auto contact = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i));
+    auto contact_id = contact.wallet_index;
+    if(profile->isIdentityPresent(contact.dac_id_string))
     {
-      auto priv_key = profile->get_keychain().get_identity_key(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
-      app->remove_receive_key(priv_key);
-      profile->removeIdentity(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
+      if(contact.public_key == profile->get_identity(contact.dac_id_string).public_key)
+      {
+        auto priv_key = profile->get_keychain().get_identity_key(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
+        app->remove_receive_key(priv_key);
+        profile->removeIdentity(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
 
-      /// notify identity observers
-      IdentityObservable::getInstance().notify();
+        /// notify identity observers
+        IdentityObservable::getInstance().notify();
+      }
     }
     sourceModel->removeRows(indexes.at(i).row(), 1);
     Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted

@@ -13,10 +13,11 @@
 #include <QToolBar>
 
 
-Authorization::Authorization(IAuthProcessor& auth_processor,
+Authorization::Authorization(IAuthProcessor& auth_processor, AddressBookModel* addressbook_model,
                              const TRequestMessage& msg, const THeaderStoredMsg& header) :
 _auth_processor(auth_processor)
 {
+  _addressbook_model = addressbook_model;
   _reqmsg = msg;
   _header = header;
 }
@@ -43,21 +44,24 @@ void Authorization::acceptExtendedPubKey() const
 {
   if(_reqmsg.request_param>>8 & 0x01)   // if Exchange of extended public keys
   {
-    auto addressbook = bts::get_profile()->get_addressbook();
-    TWalletContact contact;
-    if(!Utils::matchContact(_header.from_key, &contact))
+    TWalletContact contact_tmp;
+    if(!Utils::matchContact(_header.from_key, &contact_tmp))
       return;
+
+    auto contact = _addressbook_model->getContactById(contact_tmp.wallet_index);
+
     contact.send_trx_address = _reqmsg.extended_pub_key;
-    addressbook->store_contact(contact);
+    _addressbook_model->storeContact(contact);
   }
 }
 
 void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
 {
-  auto addressbook = bts::get_profile()->get_addressbook();
-  TWalletContact contact;
-  if(!Utils::matchContact(_header.from_key, &contact))
+  TWalletContact contact_tmp;
+  if(!Utils::matchContact(_header.from_key, &contact_tmp))
     return;
+
+  auto contact = _addressbook_model->getContactById(contact_tmp.wallet_index);
 
   switch(status)
   {
@@ -88,22 +92,21 @@ void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
       contact.auth_status = TContAuthoStatus::unauthorized;
       assert(false);
   }
-  addressbook->store_contact(contact);
+  _addressbook_model->storeContact(contact);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///                                    AuthorizationView                                        ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-AuthorizationView::AuthorizationView(IAuthProcessor& auth_processor, const TRequestMessage& msg,
-                                     const THeaderStoredMsg& header, QWidget *parent) :
+AuthorizationView::AuthorizationView(IAuthProcessor& auth_processor, AddressBookModel* addressbook_model,
+                    const TRequestMessage& msg, const THeaderStoredMsg& header, QWidget *parent) :
   QWidget(parent),
   ui(new Ui::AuthorizationView),
-  Authorization(auth_processor, msg, header)
+  Authorization(auth_processor, addressbook_model, msg, header)
 {
   ui->setupUi(this);
 
-  _address_book = nullptr;
   _owner_item = nullptr;
 
   ui->keyhoteeidpubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::AuthorizationView);
@@ -148,6 +151,7 @@ AuthorizationView::AuthorizationView(IAuthProcessor& auth_processor, const TRequ
   std::string public_key_string = public_key_address(_from_pub_key.serialize());
   ui->keyhoteeidpubkey->setPublicKey(public_key_string.c_str());
   ui->keyhoteeidpubkey->setKeyhoteeID(_reqmsg.from_keyhotee_id.c_str());
+  ui->keyhoteeidpubkey->setAddressBook(_addressbook_model);
 
   ui->first_name->setText(_reqmsg.from_first_name.c_str() );
   ui->last_name->setText(_reqmsg.from_last_name.c_str() );
@@ -164,18 +168,12 @@ AuthorizationView::~AuthorizationView()
   delete ui;
 }
 
-void AuthorizationView::setAddressBook(AddressBookModel* addressbook)
-{
-  _address_book = addressbook;
-  ui->keyhoteeidpubkey->setAddressBook(addressbook);
-}
-
 void AuthorizationView::setOwnerItem(AuthorizationItem* item)
 {
   _owner_item = item;
 }
 
-void AuthorizationView::updateView()
+void AuthorizationView::showEvent(QShowEvent * event)
 {
   std::string public_key_string = public_key_address(_from_pub_key.serialize());
   ui->keyhoteeidpubkey->setPublicKey(public_key_string.c_str());
@@ -213,18 +211,17 @@ void AuthorizationView::addAsNewContact()
 {
   if(ui->add_contact->isEnabled() && ui->add_contact->isChecked())
   {
-    bts::addressbook::wallet_contact new_wallet_contact;
-    new_wallet_contact.first_name       = ui->first_name->text().toStdString();
-    new_wallet_contact.last_name        = ui->last_name->text().toStdString();
-    new_wallet_contact.dac_id_string    = _reqmsg.from_keyhotee_id;
-    new_wallet_contact.public_key       = _from_pub_key;
-    new_wallet_contact.privacy_setting  = bts::addressbook::secret_contact;
+    bts::addressbook::wallet_contact contact_tmp;
+    contact_tmp.first_name = ui->first_name->text().toStdString();
+    contact_tmp.last_name = ui->last_name->text().toStdString();
+    contact_tmp.dac_id_string = _reqmsg.from_keyhotee_id;
+    contact_tmp.public_key = _from_pub_key;
+    contact_tmp.privacy_setting = bts::addressbook::secret_contact;
     if(_reqmsg.from_icon_png)
-      new_wallet_contact.icon_png       = *_reqmsg.from_icon_png;
+      contact_tmp.icon_png = *_reqmsg.from_icon_png;
 
-    Contact new_conntact = Contact(new_wallet_contact);
-    
-    _address_book->storeContact(new_conntact);
+    Contact new_conntact = Contact(contact_tmp);
+    _addressbook_model->storeContact(new_conntact);
   }
 }
 

@@ -516,7 +516,7 @@ IF(KH_STATIC_QT EQUAL 1)
 ENDIF()
 
 # Let's configure different target names for release and debug builds.
-set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME Keyhotee)
+set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME Keyhotee DEBUG_POSTFIX D )
 set_target_properties( Keyhotee PROPERTIES INSTALL_RPATH ".;")
 
 set (PDB_LIST_RELEASE)
@@ -590,13 +590,14 @@ ENDIF()
 
 foreach(plugin ${Qt5Gui_PLUGINS})
   get_target_property(_loc ${plugin} LOCATION)
-  get_filename_component(plugin_name ${_loc} NAME)
+  get_filename_component(plugin_name ${_loc} NAME_WE)
+  get_filename_component(plugin_ext ${_loc} EXT)
   get_filename_component(plugin_path ${_loc} DIRECTORY)
   get_filename_component(plugin_classification ${plugin_path} NAME)
 
 #  message(STATUS "Preparing a copy for plugin ${plugin} (${plugin_name}) at location ${_loc}")
   SET(POST_BUILD_STEP_COMMANDS ${POST_BUILD_STEP_COMMANDS}
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_loc}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/${plugin_classification}/${plugin_name}")
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${plugin_path}/${plugin_name}$<$<CONFIG:Debug>:$<TARGET_PROPERTY:Keyhotee,DEBUG_POSTFIX>>${plugin_ext}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/${plugin_classification}/${plugin_name}$<$<CONFIG:Debug>:$<TARGET_PROPERTY:Keyhotee,DEBUG_POSTFIX>>${plugin_ext}")
 endforeach()
 
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .) # copy the msvcrt files to the top-level directory instead of bin

@@ -24,7 +24,8 @@ public:
   typedef bts::addressbook::wallet_identity             TWalletIdentity;
   typedef bts::addressbook::authorization_status        TContAuthoStatus;
 
-  Authorization(IAuthProcessor& auth_processor, const TRequestMessage& msg, const THeaderStoredMsg& header);
+  Authorization(IAuthProcessor& auth_processor, AddressBookModel* _addressbook_model,
+    const TRequestMessage& msg, const THeaderStoredMsg& header);
   ~Authorization();
 
   void processResponse();
@@ -37,6 +38,7 @@ protected:
   IAuthProcessor&       _auth_processor;
   TRequestMessage       _reqmsg;
   THeaderStoredMsg      _header;
+  AddressBookModel*     _addressbook_model;
 };
 
 class AuthorizationView : public QWidget,
@@ -48,19 +50,19 @@ public:
   typedef fc::ecc::public_key                             TPublicKey;
   typedef bts::extended_public_key                        TExtendPubKey;
 
-  explicit AuthorizationView(IAuthProcessor& auth_processor, const TRequestMessage& msg,
-    const THeaderStoredMsg& header, QWidget *parent = 0);
+  explicit AuthorizationView(IAuthProcessor& auth_processor, AddressBookModel* _addressbook_model,
+    const TRequestMessage& msg, const THeaderStoredMsg& header, QWidget *parent = 0);
   virtual ~AuthorizationView();
 
-  void setAddressBook(AddressBookModel* addressbook);
-
   void setOwnerItem(AuthorizationItem* item);
-  void updateView();
 
 Q_SIGNALS:
   void itemAcceptRequest (AuthorizationItem* item);
   void itemBlockRequest (AuthorizationItem* item);
   void itemDenyRequest (AuthorizationItem* item);
+
+protected:
+  virtual void showEvent(QShowEvent *) override;
 
 public:
   void onAccept();
@@ -85,7 +87,6 @@ private:
   QAction*              _deny;
   QAction*              _block;
   AuthorizationItem*    _owner_item;
-  AddressBookModel*     _address_book;
 };
 
 #endif // AUTHORIZATION_H

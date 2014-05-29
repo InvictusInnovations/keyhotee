@@ -15,10 +15,8 @@ class RequestAuthorization : public QDialog
   Q_OBJECT
 
 public:
-  explicit RequestAuthorization(QWidget *parent, IAuthProcessor& auth_processor);
+  explicit RequestAuthorization(QWidget *parent, IAuthProcessor& auth_processor, AddressBookModel* addressbook_model);
   ~RequestAuthorization();
-
-  void setAddressBook(AddressBookModel* address_book);
 
   void setKeyhoteeID(const QString& name);
   void setPublicKey(const QString& name);
@@ -43,6 +41,6 @@ private slots:
 
 private:
   Ui::RequestAuthorization *ui;
-  AddressBookModel*         _address_book;
+  AddressBookModel*         _addressbook_model;
   IAuthProcessor&           _auth_processor;
 };
