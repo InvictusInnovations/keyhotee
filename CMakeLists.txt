@@ -512,10 +512,8 @@ IF(KH_STATIC_QT EQUAL 1)
 ENDIF()
 
 # Let's configure different target names for release and debug builds.
-set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME Keyhotee DEBUG_POSTFIX D)
-#set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_DEBUG KeyhoteeD )
-#set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELEASE Keyhotee )
-#set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME_RELWITHDEBINFO Keyhotee )
+set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME Keyhotee)
+set_target_properties( Keyhotee PROPERTIES INSTALL_RPATH ".;")
 
 set (PDB_LIST_RELEASE)
 set (PDB_LIST_DEBUG)
@@ -597,29 +595,30 @@ foreach(plugin ${Qt5Gui_PLUGINS})
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_loc}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/${plugin_classification}/${plugin_name}")
 endforeach()
 
-#if(APPLE OR WIN32)
-  SET (QTPLUGINS )
-  foreach(plugin ${Qt5Gui_PLUGINS})
-    get_target_property(_loc ${plugin} LOCATION)
-    get_filename_component(plugin_path ${_loc} DIRECTORY)
-    get_filename_component(plugin_classification ${plugin_path} NAME)
-    #message("Plugin ${plugin} is an ${plugin_classification} at location ${_loc}")
-    list(APPEND QTPLUGINS "${_loc}") 
-    INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins/${plugin_classification} COMPONENT Runtime) 
-  endforeach()
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .) # copy the msvcrt files to the top-level directory instead of bin
+include(InstallRequiredSystemLibraries)
 
-  INSTALL(CODE "
-   file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
-   INCLUDE(BundleUtilities)
-    FIXUP_BUNDLE(\"${APPS}\" \"\${QTPLUGINS}\" \"\${QT_LIB_DIR}\")
-      " COMPONENT Runtime)
-#     INSTALL(DIRECTORY "${CMAKE_INSTALL_PREFIX}/" DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo
-#      FILES_MATCHING PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}")
-#endif(APPLE OR WIN32)
+SET (QTPLUGINS )
+foreach(plugin ${Qt5Gui_PLUGINS})
+get_target_property(_loc ${plugin} LOCATION)
+get_filename_component(plugin_path ${_loc} DIRECTORY)
+get_filename_component(plugin_classification ${plugin_path} NAME)
+#message("Plugin ${plugin} is an ${plugin_classification} at location ${_loc}")
+list(APPEND QTPLUGINS "${_loc}") 
+INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins/${plugin_classification} COMPONENT Runtime) 
+endforeach()
+
+INSTALL(CODE "
+  file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
+  INCLUDE(BundleUtilities)
+  FIXUP_BUNDLE(\"${APPS}\" \"\${QTPLUGINS}\" \"\${QT_LIB_DIR}\")
+  " COMPONENT Runtime)
+
+# Create an empty qt.conf (similary to installation process) to avoid startup problems and looking for plugins dir.
+SET(POST_BUILD_STEP_COMMANDS ${POST_BUILD_STEP_COMMANDS}
+  COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qt.conf")
 
 IF(WIN32)
-  set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .) # copy the msvcrt files to the top-level directory instead of bin
-  include(InstallRequiredSystemLibraries)
   INSTALL(FILES ${CRASHRPT_BINARIES_TO_INSTALL} DESTINATION . CONFIGURATIONS RelWithDebinfo COMPONENT Runtime)
 
   get_target_property(FC_INTERFACE_PDB_LIST_RELEASE fc INTERFACE_LINK_PDB_RELEASE)
@@ -641,8 +640,18 @@ IF(WIN32)
       set(POST_BUILD_STEP_COMMANDS ${POST_BUILD_STEP_COMMANDS}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${pdb}" "${CMAKE_INSTALL_PREFIX}/")
     endforeach()
-  ENDIF()
-ENDIF()
+  ENDIF(TOTAL_PDB_LIST)
+ELSE(WIN32)
+  IF(NOT APPLE)
+    FIND_LIBRARY(_stdCPPLibrary libstdc++.so.6 libstdc++.so stdc++)
+    MESSAGE(STATUS "FOUND STDC++ LIBRARY: ${_stdCPPLibrary}")
+    INSTALL(FILES ${_stdCPPLibrary} DESTINATION . CONFIGURATIONS RelWithDebinfo COMPONENT Runtime)
+    FIND_LIBRARY(_stdCPPLibrary18 libstdc++.so.6.0.18)
+    MESSAGE(STATUS "FOUND STDC++ LIBRARY: ${_stdCPPLibrary18}")
+    INSTALL(FILES ${_stdCPPLibrary18} DESTINATION . CONFIGURATIONS RelWithDebinfo COMPONENT Runtime)
+
+  ENDIF(NOT APPLE)
+ENDIF(WIN32)
 
 ADD_CUSTOM_COMMAND(TARGET Keyhotee POST_BUILD ${POST_BUILD_STEP_COMMANDS} 
   COMMENT "Copying Qt plugins, binaries and other files into target directory."
@@ -688,6 +697,7 @@ if(UNIX)
   # Linux gets a .tgz
   SET(CPACK_GENERATOR "TGZ")
   SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 1)
+  SET(CPACK_STRIP_FILES 1)
 endif(UNIX)
 
 include(CPack)

@@ -1063,8 +1063,9 @@ void TFileAttachmentWidget::onImportContactTriggered()
         }
         else
         {
-          // Must be success because validation is checked in the above
-          assert (vCard.convert(&contact) == ContactvCard::ConvertStatus::SUCCESS);
+          ContactvCard::ConvertStatus status = vCard.convert(&contact);
+          /// Must be success because validation is checked in the above
+          assert(status == ContactvCard::ConvertStatus::SUCCESS);
           contacts.push_back(contact);
         }
       }
