@@ -19,10 +19,11 @@ class ContactsSortFilterProxyModel : public QSortFilterProxyModel
 {
 public:
   ContactsSortFilterProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent)
-    {
+  {
     setSortRole(Qt::UserRole);
+    setFilterRole(Qt::UserRole);
     setFilterBlocked(false);
-    }
+  }
 
   void setFilterBlocked(bool b = false)
   {
@@ -49,7 +50,6 @@ bool ContactsSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelI
   QModelIndex first_name_index = sourceModel()->index(sourceRow, AddressBookModel::FirstName, sourceParent);
   QModelIndex last_name_index = sourceModel()->index(sourceRow, AddressBookModel::LastName, sourceParent);
   QModelIndex id_index = sourceModel()->index(sourceRow, AddressBookModel::Id, sourceParent);
-  QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::Authorization, sourceParent);
   return (sourceModel()->data(first_name_index).toString().contains(filterRegExp()) ||
          sourceModel()->data(last_name_index).toString().contains(filterRegExp()) ||
          sourceModel()->data(id_index).toString().contains(filterRegExp())) &&
@@ -62,7 +62,7 @@ bool ContactsSortFilterProxyModel::filterBlocked(int sourceRow, const QModelInde
     return true;
 
   QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::Authorization, sourceParent);
-  return sourceModel()->data(blocked_index).toBool() == _filter_blocked;
+  return sourceModel()->data(blocked_index, filterRole()).toBool() == _filter_blocked;
 }
 
 void ContactsTable::searchEditChanged(QString search_string)
@@ -110,7 +110,15 @@ void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
   ui->contact_table->setShowGrid(false);
   ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  ui->contact_table->setColumnHidden(AddressBookModel::Authorization, true); //this column is used only to filter blocked contacts
+  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::UserIcon, QHeaderView::Fixed);
+  ui->contact_table->resizeColumnToContents(AddressBookModel::UserIcon);
+  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::Ownership, QHeaderView::Fixed);
+  ui->contact_table->resizeColumnToContents(AddressBookModel::Ownership);
+  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::Authorization, QHeaderView::Fixed);
+  ui->contact_table->resizeColumnToContents(AddressBookModel::Authorization);
+//  ui->contact_table->hideColumn(AddressBookModel::Authorization);
+//  ui->contact_table->setIconSize(QSize(24, 24));
+
 
   QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
   connect(selection_model, &QItemSelectionModel::selectionChanged, this, &ContactsTable::onSelectionChanged);

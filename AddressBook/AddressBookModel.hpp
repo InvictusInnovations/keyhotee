@@ -23,9 +23,9 @@ public:
     FirstName,
     LastName,
     Id,
+    Authorization,
     Age,
     Repute,
-    Authorization,
     NumColumns
     };
   //void storeContact( const bts::addressbook::contact& new_contact );

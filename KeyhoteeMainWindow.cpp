@@ -669,8 +669,7 @@ void KeyhoteeMainWindow::onSetIcon()
 
 void KeyhoteeMainWindow::onRequestAuthorization()
 {
-  RequestAuthorization *request = new RequestAuthorization(this, _connectionProcessor);
-  request->setAddressBook(_addressbook_model);
+  RequestAuthorization *request = new RequestAuthorization(this, _connectionProcessor, _addressbook_model);
   request->show();
 }
 
@@ -932,8 +931,7 @@ void KeyhoteeMainWindow::deleteContactGui(int contact_id)
 void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& msg,
                                                  const TStoredMailMessage& header)
 {
-  AuthorizationView *view = new AuthorizationView(_connectionProcessor, msg, header);
-  view->setAddressBook(_addressbook_model);
+  AuthorizationView *view = new AuthorizationView(_connectionProcessor, _addressbook_model, msg, header);
 
   bool add_to_root = false;
   QTreeWidgetItem *item = nullptr;
@@ -941,7 +939,7 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& ms
 
   if(add_to_root)
   {
-    AuthorizationView *view_root = new AuthorizationView(_connectionProcessor, msg, header);
+    AuthorizationView *view_root = new AuthorizationView(_connectionProcessor, _addressbook_model, msg, header);
 
     AuthorizationItem *authorization_root_item = new AuthorizationItem(view_root,
       item, (QTreeWidgetItem::ItemType)RequestItem);
@@ -1038,7 +1036,7 @@ void KeyhoteeMainWindow::deleteAuthorizationItem(AuthorizationItem *item)
 void KeyhoteeMainWindow::processResponse(const TAuthorizationMessage& msg,
                                          const TStoredMailMessage& header)
 {
-  Authorization *authorization = new Authorization(_connectionProcessor, msg, header);
+  Authorization *authorization = new Authorization(_connectionProcessor, _addressbook_model, msg, header);
   authorization->processResponse();
 
   statusBar()->showMessage(tr("Received a reply to a request for authorization..."), 3000);

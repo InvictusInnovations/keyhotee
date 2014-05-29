@@ -13,9 +13,10 @@
 
 #include <string>
 
-RequestAuthorization::RequestAuthorization(QWidget *parent, IAuthProcessor& auth_processor) :
+RequestAuthorization::RequestAuthorization(QWidget *parent, IAuthProcessor& auth_processor, AddressBookModel* addressbook_model) :
   QDialog(parent), ui(new Ui::RequestAuthorization),
-  _auth_processor(auth_processor)
+  _auth_processor(auth_processor),
+  _addressbook_model(addressbook_model)
 {
   ui->setupUi(this);
 
@@ -24,6 +25,7 @@ RequestAuthorization::RequestAuthorization(QWidget *parent, IAuthProcessor& auth
   ui->button_send->setEnabled(false);
   ui->keyhoteeidpubkey->showCopyToClipboard(false);
   ui->keyhoteeidpubkey->setFocus(Qt::ActiveWindowFocusReason);
+  ui->keyhoteeidpubkey->setAddressBook(_addressbook_model);
     
   ui->widget_Identity->addWidgetRelated(ui->line);
   /// add identity observer
@@ -38,12 +40,6 @@ RequestAuthorization::RequestAuthorization(QWidget *parent, IAuthProcessor& auth
 RequestAuthorization::~RequestAuthorization()
 {
   delete ui;
-}
-
-void RequestAuthorization::setAddressBook(AddressBookModel* address_book)
-{
-  _address_book = address_book;
-  ui->keyhoteeidpubkey->setAddressBook(address_book);
 }
 
 void RequestAuthorization::setKeyhoteeID(const QString& keyhotee_id)
@@ -83,7 +79,7 @@ void RequestAuthorization::addAsNewContact()
     new_conntact.privacy_setting  = bts::addressbook::secret_contact;
     new_conntact.setIcon(QIcon(":/images/user.png"));
 
-    _address_book->storeContact(new_conntact);
+    _addressbook_model->storeContact(new_conntact);
   }
 }
 
@@ -106,13 +102,14 @@ void RequestAuthorization::genExtendedPubKey(bts::extended_public_key &extended_
 
 void RequestAuthorization::setAuthorizationStatus()
 {
-  bts::addressbook::wallet_contact contact;
-  if(!Utils::matchContact(ui->keyhoteeidpubkey->getPublicKey(), &contact))
+  bts::addressbook::wallet_contact contact_tmp;
+  if(!Utils::matchContact(ui->keyhoteeidpubkey->getPublicKey(), &contact_tmp))
     return;
 
-  auto addressbook = bts::get_profile()->get_addressbook();
+  auto contact = _addressbook_model->getContactById(contact_tmp.wallet_index);
+
   contact.auth_status = bts::addressbook::authorization_status::sent_request;
-  addressbook->store_contact(contact);
+  _addressbook_model->storeContact(contact);
 }
 
 void RequestAuthorization::onExtendPubKey(bool checked)

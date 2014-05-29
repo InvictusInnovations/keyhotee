@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/">
+    <file>images/request_blocked_me.png</file>
+    <file>images/request_sent.png</file>
     <file>images/address_blocked.png</file>
     <file>images/mail_spam.png</file>
     <file>images/mail.png</file>
