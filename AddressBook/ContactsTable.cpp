@@ -169,15 +169,19 @@ void ContactsTable::onDeleteContact()
 
   for (int i = indexes.count() - 1; i > -1; --i)
   {
-    auto contact_id = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).wallet_index;
-    if(profile->isIdentityPresent(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string))
+    auto contact = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i));
+    auto contact_id = contact.wallet_index;
+    if(profile->isIdentityPresent(contact.dac_id_string))
     {
-      auto priv_key = profile->get_keychain().get_identity_key(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
-      app->remove_receive_key(priv_key);
-      profile->removeIdentity(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
+      if(contact.public_key == profile->get_identity(contact.dac_id_string).public_key)
+      {
+        auto priv_key = profile->get_keychain().get_identity_key(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
+        app->remove_receive_key(priv_key);
+        profile->removeIdentity(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
 
-      /// notify identity observers
-      IdentityObservable::getInstance().notify();
+        /// notify identity observers
+        IdentityObservable::getInstance().notify();
+      }
     }
     sourceModel->removeRows(indexes.at(i).row(), 1);
     Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted
