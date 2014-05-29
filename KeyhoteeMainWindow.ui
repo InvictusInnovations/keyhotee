@@ -42,7 +42,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <property name="handleWidth">
-       <number>5</number>
+       <number>0</number>
       </property>
       <widget class="TreeWidgetCustom" name="side_bar">
        <property name="sizePolicy">
@@ -164,7 +164,7 @@
           <string>Inbox</string>
          </property>
          <property name="icon">
-          <iconset resource="Keyhotee.qrc">
+          <iconset>
            <normaloff>:/images/inbox.png</normaloff>:/images/inbox.png</iconset>
          </property>
         </item>
@@ -173,7 +173,7 @@
           <string>Drafts</string>
          </property>
          <property name="icon">
-          <iconset resource="Keyhotee.qrc">
+          <iconset>
            <normaloff>:/images/drafts.png</normaloff>:/images/drafts.png</iconset>
          </property>
         </item>
@@ -182,7 +182,7 @@
           <string>Outbox</string>
          </property>
          <property name="icon">
-          <iconset resource="Keyhotee.qrc">
+          <iconset>
            <normaloff>:/images/outbox.png</normaloff>:/images/outbox.png</iconset>
          </property>
         </item>
@@ -191,7 +191,7 @@
           <string>Sent</string>
          </property>
          <property name="icon">
-          <iconset resource="Keyhotee.qrc">
+          <iconset>
            <normaloff>:/images/128x128/sent_items.png</normaloff>:/images/128x128/sent_items.png</iconset>
          </property>
         </item>
@@ -200,7 +200,7 @@
           <string>Spam</string>
          </property>
          <property name="icon">
-          <iconset resource="Keyhotee.qrc">
+          <iconset>
            <normaloff>:/images/mail_spam.png</normaloff>:/images/mail_spam.png</iconset>
          </property>
         </item>
@@ -492,7 +492,7 @@
   </action>
   <action name="actionNew_Contact">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/add_user.png</normaloff>:/images/add_user.png</iconset>
    </property>
    <property name="text">
@@ -501,7 +501,7 @@
   </action>
   <action name="actionNew_Message">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/email_compose.png</normaloff>:/images/email_compose.png</iconset>
    </property>
    <property name="text">
@@ -510,7 +510,7 @@
   </action>
   <action name="actionShow_Contacts">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/address_book.png</normaloff>:/images/address_book.png</iconset>
    </property>
    <property name="text">
@@ -535,7 +535,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/win/editcopy.png</normaloff>:/images/win/editcopy.png</iconset>
    </property>
    <property name="text">
@@ -547,7 +547,7 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/win/editcut.png</normaloff>:/images/win/editcut.png</iconset>
    </property>
    <property name="text">
@@ -559,7 +559,7 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/win/editpaste.png</normaloff>:/images/win/editpaste.png</iconset>
    </property>
    <property name="text">
@@ -579,7 +579,7 @@
   </action>
   <action name="actionDelete">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/delete_icon.png</normaloff>:/images/delete_icon.png</iconset>
    </property>
    <property name="text">
@@ -594,7 +594,7 @@
   </action>
   <action name="actionForward">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/mail_forward.png</normaloff>:/images/mail_forward.png</iconset>
    </property>
    <property name="text">
@@ -603,7 +603,7 @@
   </action>
   <action name="actionReply">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/mail_reply.png</normaloff>:/images/mail_reply.png</iconset>
    </property>
    <property name="text">
@@ -612,7 +612,7 @@
   </action>
   <action name="actionReply_all">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/mail_reply_all.png</normaloff>:/images/mail_reply_all.png</iconset>
    </property>
    <property name="text">
@@ -621,7 +621,7 @@
   </action>
   <action name="actionSave_attachement">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/win/filesave.png</normaloff>:/images/win/filesave.png</iconset>
    </property>
    <property name="text">
@@ -643,7 +643,7 @@
   </action>
   <action name="actionNew_identity">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/add_contact.png</normaloff>:/images/add_contact.png</iconset>
    </property>
    <property name="text">
@@ -663,7 +663,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/showDetails.png</normaloff>:/images/showDetails.png</iconset>
    </property>
    <property name="text">
@@ -672,7 +672,7 @@
   </action>
   <action name="actionRequest_authorization">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/128x128/contact_info_request_authorisation.png</normaloff>:/images/128x128/contact_info_request_authorisation.png</iconset>
    </property>
    <property name="text">
@@ -681,7 +681,7 @@
   </action>
   <action name="actionShare_contact">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/128x128/contact_share.png</normaloff>:/images/128x128/contact_share.png</iconset>
    </property>
    <property name="text">
@@ -695,7 +695,7 @@
   </action>
   <action name="actionShow_blocked_contacts">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/address_blocked.png</normaloff>:/images/address_blocked.png</iconset>
    </property>
    <property name="text">
@@ -704,7 +704,7 @@
   </action>
   <action name="actionBlock">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/request_block.png</normaloff>:/images/request_block.png</iconset>
    </property>
    <property name="text">
@@ -716,7 +716,7 @@
   </action>
   <action name="actionUnblock">
    <property name="icon">
-    <iconset resource="Keyhotee.qrc">
+    <iconset>
      <normaloff>:/images/request_unblock.png</normaloff>:/images/request_unblock.png</iconset>
    </property>
    <property name="text">

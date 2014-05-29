@@ -243,6 +243,7 @@ qt5_wrap_ui( UiFileAttachmentDialog            Mail/FileAttachmentDialog.ui )
 qt5_wrap_ui( UiWallets                         Wallets/wallets.ui )
 qt5_wrap_ui( UiOptionsDialog                   Options/OptionsDialog.ui )
 qt5_wrap_ui( UiLoginInputBox                   qtreusable/LoginInputBox.ui )
+qt5_wrap_ui( UiHeaderWidget                    qtreusable/HeaderWidget.ui )
 
 set( sources  
         qtreusable/selfsizingmainwindow.h
@@ -256,6 +257,9 @@ set( sources
         qtreusable/LoginInputBox.ui
         qtreusable/LoginInputBox.hpp
         qtreusable/LoginInputBox.cpp
+        qtreusable/HeaderWidget.ui
+        qtreusable/HeaderWidget.hpp
+        qtreusable/HeaderWidget.cpp
 
         profile_wizard/ProfileEditPage.ui
         profile_wizard/ProfileIntroPage.ui

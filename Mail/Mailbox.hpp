@@ -20,6 +20,8 @@ class QTextEdit;
 class Mailbox : public QWidget
 {
   Q_OBJECT
+  /// Register enums for name use at runtime
+  Q_ENUMS(InboxType)
 public:
   enum InboxType
     {

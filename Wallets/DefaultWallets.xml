@@ -5,7 +5,7 @@
     <icon>:images/bitcoin.png</icon>   <!-- path to icon -->
   </wallet>
   <wallet name="BitShares">
-    <url>about:blank</url>
+    <url>https://github.com/InvictusInnovations/BitShares/wiki</url>
     <icon>:images/bitshares.png</icon>
   </wallet>
   <wallet name="Litecoin">

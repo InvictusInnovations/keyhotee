@@ -7,10 +7,13 @@
 #include "KeyhoteeMainWindow.hpp"
 #include "maileditorwindow.hpp"
 
+#include "../qtreusable/HeaderWidget.hpp"
+
 #include <bts/profile.hpp>
 #include <fc/reflect/variant.hpp>
 
 #include <QMessageBox>
+#include <QMetaEnum>
 #include <QTextEdit>
 #include <QToolBar>
 
@@ -149,6 +152,11 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
   _mailProcessor = &mailProcessor;
   _mainWindow = parentKehoteeMainW;
 
+  /// convert enum InboxType to string
+  const QMetaObject &metaObject = Mailbox::staticMetaObject;
+  QMetaEnum metaEnum = metaObject.enumerator(0);
+  ui->header->initial(tr(metaEnum.key(_type)));
+
   MailTable::InitialSettings settings;
   readSettings(&settings);
 
@@ -200,7 +208,7 @@ void Mailbox::initial(IMailProcessor& mailProcessor, MailboxModel* model, InboxT
 
 void Mailbox::setupActions()
   {
-  //add actions to MailViewer toolbar
+  /// Add actions to MailViewer toolbar
   QToolBar* message_tools = ui->current_message->message_tools;
   auto app = bts::application::instance();
   auto profile = app->get_profile();
