@@ -512,7 +512,7 @@ IF(KH_STATIC_QT EQUAL 1)
 ENDIF()
 
 # Let's configure different target names for release and debug builds.
-set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME Keyhotee)
+set_target_properties( Keyhotee PROPERTIES OUTPUT_NAME Keyhotee DEBUG_POSTFIX D )
 set_target_properties( Keyhotee PROPERTIES INSTALL_RPATH ".;")
 
 set (PDB_LIST_RELEASE)
