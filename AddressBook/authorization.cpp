@@ -173,7 +173,7 @@ void AuthorizationView::setOwnerItem(AuthorizationItem* item)
   _owner_item = item;
 }
 
-void AuthorizationView::updateView()
+void AuthorizationView::showEvent(QShowEvent * event)
 {
   std::string public_key_string = public_key_address(_from_pub_key.serialize());
   ui->keyhoteeidpubkey->setPublicKey(public_key_string.c_str());

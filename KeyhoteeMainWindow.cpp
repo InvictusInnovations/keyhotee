@@ -1008,7 +1008,6 @@ KeyhoteeMainWindow::findExistSenderItem(AuthorizationItem::TPublicKey from_key, 
 
 void KeyhoteeMainWindow::showAuthorizationItem(AuthorizationItem *item)
 {
-  item->getView()->updateView();
   ui->widget_stack->setCurrentWidget(item->getView());
 }
 

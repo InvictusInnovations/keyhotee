@@ -55,12 +55,14 @@ public:
   virtual ~AuthorizationView();
 
   void setOwnerItem(AuthorizationItem* item);
-  void updateView();
 
 Q_SIGNALS:
   void itemAcceptRequest (AuthorizationItem* item);
   void itemBlockRequest (AuthorizationItem* item);
   void itemDenyRequest (AuthorizationItem* item);
+
+protected:
+  virtual void showEvent(QShowEvent *) override;
 
 public:
   void onAccept();
