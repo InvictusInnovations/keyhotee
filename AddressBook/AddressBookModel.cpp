@@ -18,6 +18,10 @@ class AddressBookModelImpl
     QIcon                             _default_icon;
     QIcon                             _ownership_yes;
     QIcon                             _ownership_no;
+    QIcon                             _authorized;
+    QIcon                             _blocked;
+    QIcon                             _autho_sent;
+    QIcon                             _blocked_me;
     std::vector<Contact>              _contacts;
     bts::addressbook::addressbook_ptr _address_book;
 //    std::vector<int>                  _completion_row_to_wallet_index;
@@ -33,6 +37,11 @@ AddressBookModel::AddressBookModel(QObject* parent, bts::addressbook::addressboo
 
   my->_ownership_yes.addFile(QStringLiteral(":/images/ownership.png"), QSize(), QIcon::Normal, QIcon::Off);
   my->_ownership_no.addFile(QStringLiteral(":/images/blank.png"), QSize(), QIcon::Normal, QIcon::Off);
+
+  my->_blocked.addFile(QStringLiteral(":/images/request_block.png"), QSize(), QIcon::Normal, QIcon::Off);
+  my->_authorized.addFile(QStringLiteral(":/images/request_accept.png"), QSize(), QIcon::Normal, QIcon::Off);
+  my->_autho_sent.addFile(QStringLiteral(":/images/request_sent.png"), QSize(), QIcon::Normal, QIcon::Off);
+  my->_blocked_me.addFile(QStringLiteral(":/images/request_blocked_me.png"), QSize(), QIcon::Normal, QIcon::Off);
 
   reloadContacts();
 }
@@ -119,7 +128,17 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
         return QSize(32, 16);
       default:
         return QVariant();
-      }
+      } // switch column in SizeHintRole
+    case Qt::ToolTipRole:
+      switch((Columns)section)
+      {
+      case Ownership:
+        return tr("Ownership");
+      case Authorization:
+        return tr("Authorization status");
+      default:
+        return QVariant();
+      } //switch column in ToolTipRole
     }
   }
   else
@@ -140,9 +159,9 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
       switch ( (Columns)index.column() )
       {
         case UserIcon:
-          return QSize(48, 48);
         case Ownership:
-          return QSize(32, 32);
+        case Authorization:
+          return QSize(48, 48);
         default:
           return QVariant();
       } //switch column in SizeHintRole
@@ -153,6 +172,19 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return current_contact.getIcon();
         case Ownership:
           return current_contact.isOwn() ? my->_ownership_yes : my->_ownership_no;
+        case Authorization:
+          if(current_contact.auth_status == bts::addressbook::i_block)
+            return my->_blocked;
+          else if(current_contact.auth_status == bts::addressbook::accepted ||
+                  current_contact.auth_status == bts::addressbook::accepted_chat ||
+                  current_contact.auth_status == bts::addressbook::accepted_mail)
+            return my->_authorized;
+          else if(current_contact.auth_status == bts::addressbook::sent_request)
+            return my->_autho_sent;
+          else if(current_contact.auth_status == bts::addressbook::blocked_me)
+            return my->_blocked_me;
+          else
+            return QVariant();
         default:
           return QVariant();
       } //switch column in DecorationRole
@@ -175,9 +207,8 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return current_contact.getRepute();
         case Ownership:
         case UserIcon:
-          return QVariant();
         case Authorization:
-          return current_contact.isBlocked();
+          return QVariant();
         default:
           return QVariant();
       } //switch column in DisplayRole
@@ -191,11 +222,17 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
         case LastName:
           return current_contact.last_name.c_str();
         case Id:
-          return current_contact.dac_id_string.c_str();
+          if(current_contact.dac_id_string.empty() &&
+            current_contact.first_name.empty() && current_contact.last_name.empty())
+            return current_contact.get_trim_pk().c_str();
+          else
+            return current_contact.dac_id_string.c_str();
         case Age:
           return current_contact.getAge();
         case Repute:
           return current_contact.getRepute();
+        case Authorization:
+          return current_contact.isBlocked();
         default:
           return QVariant();
       } //switch column in UserRole
@@ -225,7 +262,22 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
       switch ( (Columns)index.column() )
       {
         case Ownership:
-          return tr("Ownership");
+          return current_contact.isOwn() ? tr("Ownership") : QVariant();
+        case Authorization:
+          if(current_contact.auth_status == bts::addressbook::i_block)
+            return tr("Blocked");
+          else if(current_contact.auth_status == bts::addressbook::accepted)
+            return tr("Authorized");
+          else if(current_contact.auth_status == bts::addressbook::accepted_chat)
+            return tr("Authorized chat");
+          else if(current_contact.auth_status == bts::addressbook::accepted_mail)
+            return tr("Authorized mail");
+          else if(current_contact.auth_status == bts::addressbook::sent_request)
+            return tr("Request sent");
+          else if(current_contact.auth_status == bts::addressbook::blocked_me)
+            return tr("Blocked me");
+          else
+            return QVariant();
         default:
           return QVariant();
       } //switch column in ToolTipRole

@@ -309,7 +309,8 @@ void ContactView::onShareContact()
 
 void ContactView::onRequestContact()
 {
-  RequestAuthorization *request = new RequestAuthorization(this, *getKeyhoteeWindow()->getConnectionProcessor());
+  RequestAuthorization *request = new RequestAuthorization(this,
+    *getKeyhoteeWindow()->getConnectionProcessor(), _address_book);
   if(ui->khid_pubkey->getKeyhoteeID().isEmpty() == false && gMiningIsPossible)
     request->setKeyhoteeID(_current_contact.dac_id_string.c_str());
   else
@@ -318,7 +319,6 @@ void ContactView::onRequestContact()
     request->setPublicKey(public_key_string.c_str());
   }
   request->enableAddContact(false);
-  request->setAddressBook(_address_book);
   request->show();
 }
 
