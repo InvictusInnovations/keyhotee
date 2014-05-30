@@ -1,7 +1,5 @@
 <RCC>
   <qresource prefix="/">
-    <file>images/request_blocked_me.png</file>
-    <file>images/request_sent.png</file>
     <file>images/address_blocked.png</file>
     <file>images/mail_spam.png</file>
     <file>images/mail.png</file>
@@ -76,6 +74,9 @@
     <file>images/request_accept.png</file>
     <file>images/request_block.png</file>
     <file>images/request_deny.png</file>
+    <file>images/request_blocked_me.png</file>
+    <file>images/request_sent.png</file>
+    <file>images/request_unauthorized.png</file>
     <file>images/24x24/mailconnectionstatus.png</file>
     <file>images/24x24/no_mailconnectionstatus.png</file>
     <file>images/request_unblock.png</file>

@@ -670,6 +670,7 @@ void KeyhoteeMainWindow::onSetIcon()
 void KeyhoteeMainWindow::onRequestAuthorization()
 {
   RequestAuthorization *request = new RequestAuthorization(this, _connectionProcessor, _addressbook_model);
+  connect(request, &RequestAuthorization::authorizationStatus, this, &KeyhoteeMainWindow::onUpdateAuthoStatus);
   request->show();
 }
 
@@ -701,7 +702,7 @@ void KeyhoteeMainWindow::onBlockContact()
     if(!_is_filter_blocked_cont)
     {
       enableBlockedContact(true);
-      openContactGui(temp_contact.wallet_index);
+      onUpdateAuthoStatus(temp_contact.wallet_index);
       setEnabledContactOption(true);
     }
   }
@@ -727,7 +728,7 @@ void KeyhoteeMainWindow::onUnblockContact()
     if(!_is_filter_blocked_cont)
     {
       enableBlockedContact(false);
-      openContactGui(temp_contact.wallet_index);
+      onUpdateAuthoStatus(temp_contact.wallet_index);
       setEnabledContactOption(true);
     }
   }
@@ -874,7 +875,6 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
   // signal emitted when registration occurs for a displayed KeyhoteeId.
   contact_gui->_view->checkKeyhoteeIdStatus();
 
-  contact_gui->_view->checkAuthorizationStatus();
   contact_gui->_view->checkSendMailButton();
   if(nullptr != _currentMailbox)
     _currentMailbox->checksendmailbuttons();
@@ -932,6 +932,7 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& ms
                                                  const TStoredMailMessage& header)
 {
   AuthorizationView *view = new AuthorizationView(_connectionProcessor, _addressbook_model, msg, header);
+  connect(view, &AuthorizationView::authorizationStatus, this, &KeyhoteeMainWindow::onUpdateAuthoStatus);
 
   bool add_to_root = false;
   QTreeWidgetItem *item = nullptr;
@@ -940,6 +941,7 @@ void KeyhoteeMainWindow::createAuthorizationItem(const TAuthorizationMessage& ms
   if(add_to_root)
   {
     AuthorizationView *view_root = new AuthorizationView(_connectionProcessor, _addressbook_model, msg, header);
+    connect(view_root, &AuthorizationView::authorizationStatus, this, &KeyhoteeMainWindow::onUpdateAuthoStatus);
 
     AuthorizationItem *authorization_root_item = new AuthorizationItem(view_root,
       item, (QTreeWidgetItem::ItemType)RequestItem);
@@ -1036,6 +1038,8 @@ void KeyhoteeMainWindow::processResponse(const TAuthorizationMessage& msg,
                                          const TStoredMailMessage& header)
 {
   Authorization *authorization = new Authorization(_connectionProcessor, _addressbook_model, msg, header);
+  connect(authorization, &Authorization::authorizationStatus, this, &KeyhoteeMainWindow::onUpdateAuthoStatus);
+
   authorization->processResponse();
 
   statusBar()->showMessage(tr("Received a reply to a request for authorization..."), 3000);
@@ -1507,6 +1511,13 @@ void KeyhoteeMainWindow::onOptions()
     this, SLOT(onUpdateOptions(bool)));
 
   options_dialog->show();
+}
+
+void KeyhoteeMainWindow::onUpdateAuthoStatus(int contact_id)
+{
+  ContactGui* contact_gui = getContactGui(contact_id);
+  if(contact_gui)
+    contact_gui->_view->checkAuthorizationStatus();
 }
 
 void KeyhoteeMainWindow::setupWallets()

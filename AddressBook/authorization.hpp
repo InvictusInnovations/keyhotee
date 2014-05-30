@@ -14,8 +14,10 @@ class QToolBar;
 class AuthorizationItem;
 class AddressBookModel;
 
-class Authorization
+class Authorization : public QWidget
 {
+  Q_OBJECT
+
 public:
   typedef bts::bitchat::private_contact_request_message TRequestMessage;
   typedef bts::bitchat::message_header                  THeaderStoredMsg;
@@ -25,10 +27,13 @@ public:
   typedef bts::addressbook::authorization_status        TContAuthoStatus;
 
   Authorization(IAuthProcessor& auth_processor, AddressBookModel* _addressbook_model,
-    const TRequestMessage& msg, const THeaderStoredMsg& header);
+    const TRequestMessage& msg, const THeaderStoredMsg& header, QWidget *parent = 0);
   ~Authorization();
 
   void processResponse();
+
+Q_SIGNALS:
+  void authorizationStatus(int wallet_index);
 
 protected:
   void acceptExtendedPubKey() const;
@@ -41,8 +46,7 @@ protected:
   AddressBookModel*     _addressbook_model;
 };
 
-class AuthorizationView : public QWidget,
-                          public Authorization
+class AuthorizationView : public Authorization
 {
   Q_OBJECT
 
@@ -51,7 +55,7 @@ public:
   typedef bts::extended_public_key                        TExtendPubKey;
 
   explicit AuthorizationView(IAuthProcessor& auth_processor, AddressBookModel* _addressbook_model,
-    const TRequestMessage& msg, const THeaderStoredMsg& header, QWidget *parent = 0);
+    const TRequestMessage& msg, const THeaderStoredMsg& header);
   virtual ~AuthorizationView();
 
   void setOwnerItem(AuthorizationItem* item);

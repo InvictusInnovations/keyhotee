@@ -110,6 +110,8 @@ void RequestAuthorization::setAuthorizationStatus()
 
   contact.auth_status = bts::addressbook::authorization_status::sent_request;
   _addressbook_model->storeContact(contact);
+
+  emit authorizationStatus(contact.wallet_index);
 }
 
 void RequestAuthorization::onExtendPubKey(bool checked)

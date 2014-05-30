@@ -61,7 +61,7 @@ bool ContactsSortFilterProxyModel::filterBlocked(int sourceRow, const QModelInde
   if(!_filter_blocked_on)
     return true;
 
-  QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::Authorization, sourceParent);
+  QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::ContactStatus, sourceParent);
   return sourceModel()->data(blocked_index, filterRole()).toBool() == _filter_blocked;
 }
 
@@ -113,11 +113,8 @@ void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::UserIcon, QHeaderView::Fixed);
   ui->contact_table->resizeColumnToContents(AddressBookModel::UserIcon);
-  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::Ownership, QHeaderView::Fixed);
-  ui->contact_table->resizeColumnToContents(AddressBookModel::Ownership);
-  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::Authorization, QHeaderView::Fixed);
-  ui->contact_table->resizeColumnToContents(AddressBookModel::Authorization);
-//  ui->contact_table->hideColumn(AddressBookModel::Authorization);
+  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::ContactStatus, QHeaderView::Fixed);
+  ui->contact_table->resizeColumnToContents(AddressBookModel::ContactStatus);
 //  ui->contact_table->setIconSize(QSize(24, 24));
 
 
@@ -168,7 +165,7 @@ void ContactsTable::onDeleteContact()
   auto app = bts::application::instance();
   auto profile = app->get_profile();
 
-  for (int i = indexes.count() - 1; i > -1; --i)
+  for(int i = indexes.count() - 1; i > -1; --i)
   {
     auto contact = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i));
     auto contact_id = contact.wallet_index;
@@ -176,9 +173,9 @@ void ContactsTable::onDeleteContact()
     {
       if(contact.public_key == profile->get_identity(contact.dac_id_string).public_key)
       {
-        auto priv_key = profile->get_keychain().get_identity_key(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
+        auto priv_key = profile->get_keychain().get_identity_key(contact.dac_id_string);
         app->remove_receive_key(priv_key);
-        profile->removeIdentity(((AddressBookModel*)sourceModel)->getContact(indexes.at(i)).dac_id_string);
+        profile->removeIdentity(contact.dac_id_string);
 
         /// notify identity observers
         IdentityObservable::getInstance().notify();

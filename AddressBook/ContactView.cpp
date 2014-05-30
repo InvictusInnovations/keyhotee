@@ -311,6 +311,8 @@ void ContactView::onRequestContact()
 {
   RequestAuthorization *request = new RequestAuthorization(this,
     *getKeyhoteeWindow()->getConnectionProcessor(), _address_book);
+  connect(request, &RequestAuthorization::authorizationStatus, getKeyhoteeWindow(), &KeyhoteeMainWindow::onUpdateAuthoStatus);
+
   if(ui->khid_pubkey->getKeyhoteeID().isEmpty() == false && gMiningIsPossible)
     request->setKeyhoteeID(_current_contact.dac_id_string.c_str());
   else
@@ -653,7 +655,10 @@ void ContactView::checkAuthorizationStatus()
   try
   {
     auto contact = bts::get_profile()->get_addressbook()->get_contact_by_public_key(_current_contact.public_key);
-    status = contact->auth_status;
+    if(contact)
+      status = contact->auth_status;
+    else
+      status = bts::addressbook::authorization_status::unauthorized;
   }
   catch (const fc::exception&)
   {
@@ -723,4 +728,5 @@ void ContactView::refreshDialog(const Contact &contact)
   //DLNFIX TODO: add check to see if we are synced on blockchain. If not synched,
   //             display "Keyhotee ledger not accessible"
   checkKeyhoteeIdStatus();
+  checkAuthorizationStatus();
 }

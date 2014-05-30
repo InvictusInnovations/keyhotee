@@ -23,6 +23,9 @@ public:
 
   void enableAddContact(bool active);
 
+Q_SIGNALS:
+  void authorizationStatus(int wallet_index);
+
 private:
   void checkAddAsNewContact();
   void addAsNewContact();

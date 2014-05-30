@@ -78,6 +78,8 @@ public:
   AddressBookModel* getAddressBookModel() const { return _addressbook_model; }
   TConnectionProcessor* getConnectionProcessor() { return &_connectionProcessor; }
 
+  void onUpdateAuthoStatus(int contact_id);
+
 signals:
   void checkSendMailSignal();
 protected:

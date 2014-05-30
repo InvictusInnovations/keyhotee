@@ -14,8 +14,9 @@
 
 
 Authorization::Authorization(IAuthProcessor& auth_processor, AddressBookModel* addressbook_model,
-                             const TRequestMessage& msg, const THeaderStoredMsg& header) :
-_auth_processor(auth_processor)
+                  const TRequestMessage& msg, const THeaderStoredMsg& header, QWidget *parent) :
+  QWidget(parent),
+  _auth_processor(auth_processor)
 {
   _addressbook_model = addressbook_model;
   _reqmsg = msg;
@@ -93,6 +94,8 @@ void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
       assert(false);
   }
   _addressbook_model->storeContact(contact);
+
+  emit authorizationStatus(contact.wallet_index);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,8 +103,7 @@ void Authorization::setAuthorizationStatus(TAuthorizationStatus status)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 AuthorizationView::AuthorizationView(IAuthProcessor& auth_processor, AddressBookModel* addressbook_model,
-                    const TRequestMessage& msg, const THeaderStoredMsg& header, QWidget *parent) :
-  QWidget(parent),
+                    const TRequestMessage& msg, const THeaderStoredMsg& header) :
   ui(new Ui::AuthorizationView),
   Authorization(auth_processor, addressbook_model, msg, header)
 {

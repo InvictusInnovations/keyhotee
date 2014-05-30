@@ -17,11 +17,11 @@ class AddressBookModelImpl
   public:
     QIcon                             _default_icon;
     QIcon                             _ownership_yes;
-    QIcon                             _ownership_no;
     QIcon                             _authorized;
     QIcon                             _blocked;
     QIcon                             _autho_sent;
     QIcon                             _blocked_me;
+    QIcon                             _unauthorized;
     std::vector<Contact>              _contacts;
     bts::addressbook::addressbook_ptr _address_book;
 //    std::vector<int>                  _completion_row_to_wallet_index;
@@ -36,12 +36,12 @@ AddressBookModel::AddressBookModel(QObject* parent, bts::addressbook::addressboo
   my->_default_icon.addFile(QStringLiteral(":/images/user.png"), QSize(), QIcon::Normal, QIcon::Off);
 
   my->_ownership_yes.addFile(QStringLiteral(":/images/ownership.png"), QSize(), QIcon::Normal, QIcon::Off);
-  my->_ownership_no.addFile(QStringLiteral(":/images/blank.png"), QSize(), QIcon::Normal, QIcon::Off);
-
+  
   my->_blocked.addFile(QStringLiteral(":/images/request_block.png"), QSize(), QIcon::Normal, QIcon::Off);
   my->_authorized.addFile(QStringLiteral(":/images/request_accept.png"), QSize(), QIcon::Normal, QIcon::Off);
   my->_autho_sent.addFile(QStringLiteral(":/images/request_sent.png"), QSize(), QIcon::Normal, QIcon::Off);
   my->_blocked_me.addFile(QStringLiteral(":/images/request_blocked_me.png"), QSize(), QIcon::Normal, QIcon::Off);
+  my->_unauthorized.addFile(QStringLiteral(":/images/request_unauthorized.png"), QSize(), QIcon::Normal, QIcon::Off);
 
   reloadContacts();
 }
@@ -92,8 +92,6 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
         {
           case FirstName:
             return tr("First Name");
-          case Ownership:
-            return tr(" ");  // Ownership
           case LastName:
             return tr("Last Name");
           case Id:
@@ -102,8 +100,6 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
             return tr("Age");
           case Repute:
             return tr("Repute");
-          case UserIcon:
-            break;
           default:
             return QVariant();
         }
@@ -132,10 +128,8 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
     case Qt::ToolTipRole:
       switch((Columns)section)
       {
-      case Ownership:
-        return tr("Ownership");
-      case Authorization:
-        return tr("Authorization status");
+      case ContactStatus:
+        return tr("Contact status");
       default:
         return QVariant();
       } //switch column in ToolTipRole
@@ -159,8 +153,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
       switch ( (Columns)index.column() )
       {
         case UserIcon:
-        case Ownership:
-        case Authorization:
+        case ContactStatus:
           return QSize(48, 48);
         default:
           return QVariant();
@@ -170,10 +163,10 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
       {
         case UserIcon:
           return current_contact.getIcon();
-        case Ownership:
-          return current_contact.isOwn() ? my->_ownership_yes : my->_ownership_no;
-        case Authorization:
-          if(current_contact.auth_status == bts::addressbook::i_block)
+        case ContactStatus:
+          if(current_contact.isOwn())
+            return my->_ownership_yes;
+          else if(current_contact.auth_status == bts::addressbook::i_block)
             return my->_blocked;
           else if(current_contact.auth_status == bts::addressbook::accepted ||
                   current_contact.auth_status == bts::addressbook::accepted_chat ||
@@ -183,6 +176,9 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
             return my->_autho_sent;
           else if(current_contact.auth_status == bts::addressbook::blocked_me)
             return my->_blocked_me;
+          else if(current_contact.auth_status == bts::addressbook::unauthorized ||
+                  current_contact.auth_status == bts::addressbook::denied)
+            return my->_unauthorized;
           else
             return QVariant();
         default:
@@ -205,9 +201,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return current_contact.getAge();
         case Repute:
           return current_contact.getRepute();
-        case Ownership:
-        case UserIcon:
-        case Authorization:
+        case ContactStatus:
           return QVariant();
         default:
           return QVariant();
@@ -215,8 +209,8 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
     case Qt::UserRole:
       switch ( (Columns)index.column() )
       {
-        case Ownership:
-          return current_contact.isOwn() ? true : false;
+        case ContactStatus:
+          return current_contact.isBlocked();
         case FirstName:
           return current_contact.first_name.c_str();
         case LastName:
@@ -231,8 +225,6 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
           return current_contact.getAge();
         case Repute:
           return current_contact.getRepute();
-        case Authorization:
-          return current_contact.isBlocked();
         default:
           return QVariant();
       } //switch column in UserRole
@@ -261,10 +253,10 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
     case Qt::ToolTipRole:
       switch ( (Columns)index.column() )
       {
-        case Ownership:
-          return current_contact.isOwn() ? tr("Ownership") : QVariant();
-        case Authorization:
-          if(current_contact.auth_status == bts::addressbook::i_block)
+        case ContactStatus:
+          if(current_contact.isOwn())
+            return tr("Ownership");
+          else if(current_contact.auth_status == bts::addressbook::i_block)
             return tr("Blocked");
           else if(current_contact.auth_status == bts::addressbook::accepted)
             return tr("Authorized");
@@ -276,6 +268,10 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const
             return tr("Request sent");
           else if(current_contact.auth_status == bts::addressbook::blocked_me)
             return tr("Blocked me");
+          else if(current_contact.auth_status == bts::addressbook::unauthorized)
+            return tr("Unauthorized");
+          else if(current_contact.auth_status == bts::addressbook::denied)
+            return tr("Denied");
           else
             return QVariant();
         default:

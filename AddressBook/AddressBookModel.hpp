@@ -19,11 +19,10 @@ public:
   enum Columns
     {
     UserIcon,
-    Ownership,
+    ContactStatus,
     FirstName,
     LastName,
     Id,
-    Authorization,
     Age,
     Repute,
     NumColumns
