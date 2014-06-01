@@ -65,19 +65,6 @@ bool ContactsSortFilterProxyModel::filterBlocked(int sourceRow, const QModelInde
   return sourceModel()->data(blocked_index, filterRole()).toBool() == _filter_blocked;
 }
 
-void ContactsTable::searchEditChanged(QString search_string)
-  {
-  QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->contact_table->model());
-  QRegExp                regex(search_string, Qt::CaseInsensitive, QRegExp::FixedString);
-  model->setFilterRegExp(regex);
-  }
-
-void ContactsTable::setShowBlocked(bool show)
-{
-  ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
-  model->setFilterBlocked(show);
-}
-
 ContactsTable::ContactsTable(QWidget* parent)
   : QWidget(parent),
   ui(new Ui::ContactsTable() ),
@@ -96,6 +83,27 @@ ContactsTable::ContactsTable(QWidget* parent)
 ContactsTable::~ContactsTable()
 {
   delete ui;
+}
+
+void ContactsTable::searchEditChanged(QString search_string)
+{
+  QSortFilterProxyModel* model = dynamic_cast<QSortFilterProxyModel*>(ui->contact_table->model());
+  QRegExp                regex(search_string, Qt::CaseInsensitive, QRegExp::FixedString);
+  model->setFilterRegExp(regex);
+}
+
+void ContactsTable::setShowBlocked(bool showBlocked)
+{
+  ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
+  model->setFilterBlocked(showBlocked);
+
+  /// Notifies about changed header title 
+  QString headerTitle;
+  if (showBlocked == true)
+    headerTitle = tr("Blocked contacts list");
+  else
+    headerTitle = tr("Contact list");
+  ui->header->onHeaderChanged(headerTitle);
 }
 
 void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)

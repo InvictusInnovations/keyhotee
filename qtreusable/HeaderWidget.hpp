@@ -19,6 +19,11 @@ public:
     ~HeaderWidget();
     void initial(QString title);
 
+    /** Notifies about changed header title
+        @param newTitle - new title to set
+    */
+    virtual void onHeaderChanged(QString newTitle);
+
 private:
     Ui::HeaderWidget *ui;
 };

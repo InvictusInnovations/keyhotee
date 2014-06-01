@@ -17,3 +17,8 @@ void HeaderWidget::initial(QString title)
 {
   ui->title->setText(title);
 }
+
+void HeaderWidget::onHeaderChanged(QString newTitle)
+{
+  ui->title->setText(newTitle);
+}
