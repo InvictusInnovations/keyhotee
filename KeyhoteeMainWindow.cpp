@@ -701,10 +701,10 @@ void KeyhoteeMainWindow::onBlockContact()
     Contact temp_contact = *contact;
     temp_contact.auth_status = bts::addressbook::authorization_status::i_block;
     _addressbook_model->storeContact(temp_contact);
+    onUpdateAuthoStatus(temp_contact.wallet_index);
     if(!_is_filter_blocked_cont)
     {
       enableBlockedContact(true);
-      onUpdateAuthoStatus(temp_contact.wallet_index);
       setEnabledContactOption(true);
     }
   }
@@ -727,10 +727,10 @@ void KeyhoteeMainWindow::onUnblockContact()
     Contact temp_contact = *contact;
     temp_contact.auth_status = bts::addressbook::authorization_status::unauthorized;
     _addressbook_model->storeContact(temp_contact);
+    onUpdateAuthoStatus(temp_contact.wallet_index);
     if(!_is_filter_blocked_cont)
     {
       enableBlockedContact(false);
-      onUpdateAuthoStatus(temp_contact.wallet_index);
       setEnabledContactOption(true);
     }
   }
