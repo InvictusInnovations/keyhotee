@@ -479,7 +479,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     else if(selectedItem == _requests_root)
     {
     }
-    if (selectedItem->type() == RequestItem)
+    else if (selectedItem->type() == RequestItem)
     {
       showAuthorizationItem(static_cast<AuthorizationItem*>(selectedItem));
       connect(ui->actionDelete, SIGNAL(triggered()), this, SLOT(onDeleteAuthorizationItem()));
@@ -513,9 +513,11 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     else if (selectedItem == _wallets_root)
     {
       ui->widget_stack->setCurrentWidget(ui->wallets);
+      ui->actionShow_details->setEnabled(false);
     }
     else
     {
+      ui->actionShow_details->setEnabled(false);
       for (const auto& walletItem : _walletItems)
       {
         if (selectedItem == walletItem)

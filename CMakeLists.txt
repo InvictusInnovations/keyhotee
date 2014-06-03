@@ -559,14 +559,20 @@ ELSE (KH_STATIC_QT EQUAL 1)
   )
 ENDIF (KH_STATIC_QT EQUAL 1)
 
-INSTALL(TARGETS Keyhotee RUNTIME DESTINATION . BUNDLE DESTINATION . COMPONENT Runtime)
+INSTALL(TARGETS Keyhotee RUNTIME DESTINATION . BUNDLE DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo)
 
 if (MSVC)
   message(STATUS "Setting up debug options for MSVC build")
 # Probably cmake has a bug and vcxproj generated for executable in Debug conf. has disabled debug info
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
-#INSTALL ( FILES ${PROJECT_BINARY_DIR}/Bin/Debug/file.pdb DIRECTORY lib CONFIGURATIONS Debug )
 endif(MSVC)
+
+GET_TARGET_PROPERTY(_loc Keyhotee LOCATION_RELWITHDEBINFO)
+get_filename_component(_binName ${_loc} NAME)
+get_filename_component(_binPath ${_loc} PATH)
+
+INSTALL(FILES "${_loc}" DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo)
+INSTALL(FILES "${_binPath}/openssl.cnf" DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo)
 
 IF(APPLE)
   SET(plugin_dest_dir Keyhotee.app/Contents/MacOS)
@@ -575,13 +581,12 @@ IF(APPLE)
 else()
   SET(plugin_dest_dir .)
   SET(qtconf_dest_dir .)
-  GET_TARGET_PROPERTY(_loc Keyhotee LOCATION_RELWITHDEBINFO)
-  get_filename_component(_binName ${_loc} NAME)  
 
   SET(APPS "\${CMAKE_INSTALL_PREFIX}/${_binName}")
 ENDIF(APPLE)
 
 message(STATUS "KH output path: ${APPS}")
+message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "CMAKE_SHARED_LIBRARY_SUFFIX: ${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
 IF(FC_SHARED_LIBRARIES_RELEASE)
@@ -605,12 +610,12 @@ include(InstallRequiredSystemLibraries)
 
 SET (QTPLUGINS )
 foreach(plugin ${Qt5Gui_PLUGINS})
-get_target_property(_loc ${plugin} LOCATION)
-get_filename_component(plugin_path ${_loc} DIRECTORY)
-get_filename_component(plugin_classification ${plugin_path} NAME)
-#message("Plugin ${plugin} is an ${plugin_classification} at location ${_loc}")
-list(APPEND QTPLUGINS "${_loc}") 
-INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins/${plugin_classification} COMPONENT Runtime) 
+  get_target_property(_loc ${plugin} LOCATION)
+  get_filename_component(plugin_path ${_loc} DIRECTORY)
+  get_filename_component(plugin_classification ${plugin_path} NAME)
+  #message("Plugin ${plugin} is an ${plugin_classification} at location ${_loc}")
+  list(APPEND QTPLUGINS "${_loc}") 
+  INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins/${plugin_classification} COMPONENT Runtime) 
 endforeach()
 
 INSTALL(CODE "

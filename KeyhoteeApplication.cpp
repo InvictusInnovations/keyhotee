@@ -8,6 +8,7 @@
 
 #include "profile_wizard/ProfileWizard.hpp"
 
+#include <fc/crypto/openssl.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/thread/thread.hpp>
@@ -223,6 +224,14 @@ int TKeyhoteeApplication::run(int& argc, char** argv)
   fprintf(stderr, "testing stderr\n");
 #endif
 
+  auto strAppDir = applicationDirPath().toStdWString();
+  fc::path appDir(strAppDir);
+  fc::path openSSLConf = appDir / "openssl.cnf";
+  if(fc::exists(openSSLConf))
+    fc::store_configuration_path(openSSLConf);
+
+  fc::init_openssl();
+
   if (argc > 1)
     app._loaded_profile_name = app.arguments().at(1);
 
@@ -264,8 +273,6 @@ std::string TKeyhoteeApplication::getVersionNumberString() const
 {
   return _keyhoteeVersionNumber;
 }
-
-
 
 TKeyhoteeApplication::TKeyhoteeApplication(int& argc, char** argv) 
 :QApplication(argc, argv),
