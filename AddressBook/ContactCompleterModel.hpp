@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 
 class AddressBookModel;
+class FilterBlockedModel;
 class Contact;
 
 /** Dedicated data model for contact completer directly operating on AddressBookModel.
@@ -23,9 +24,13 @@ class TContactCompletionModel : public QAbstractListModel
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual QVariant data( const QModelIndex& index, int role ) const override;
 
+  private:
+    void setFiltredModel();
+
   /// Class atrributes:
   private:
-    const AddressBookModel* _dataSource;
+    AddressBookModel*   _dataSource;
+    FilterBlockedModel* _filtred_data_source;
   };
 
 

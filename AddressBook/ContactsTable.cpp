@@ -15,34 +15,16 @@
 #include <QHeaderView>
 #include <QMessageBox>
 
-class ContactsSortFilterProxyModel : public QSortFilterProxyModel
+class ContactsSortFilterProxyModel : public FilterBlockedModel
 {
 public:
-  ContactsSortFilterProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent)
+  ContactsSortFilterProxyModel(QObject *parent = 0) : FilterBlockedModel(parent)
   {
     setSortRole(Qt::UserRole);
-    setFilterRole(Qt::UserRole);
-    setFilterBlocked(false);
-  }
-
-  void setFilterBlocked(bool b = false)
-  {
-    _filter_blocked = b;
-    invalidateFilter();
-  }
-
-  void enableFilterBlocked(bool b)
-  {
-    _filter_blocked_on = b;
-    invalidateFilter();
   }
 
 protected:
   bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
-  bool filterBlocked(int sourceRow, const QModelIndex &sourceParent) const;
-
-  bool _filter_blocked;
-  bool _filter_blocked_on;
 };
 
 bool ContactsSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
@@ -53,17 +35,8 @@ bool ContactsSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelI
   return (sourceModel()->data(first_name_index).toString().contains(filterRegExp()) ||
          sourceModel()->data(last_name_index).toString().contains(filterRegExp()) ||
          sourceModel()->data(id_index).toString().contains(filterRegExp())) &&
-         filterBlocked(sourceRow, sourceParent);
+         FilterBlockedModel::filterAcceptsRow(sourceRow, sourceParent);
   }
-
-bool ContactsSortFilterProxyModel::filterBlocked(int sourceRow, const QModelIndex &sourceParent) const
-{
-  if(!_filter_blocked_on)
-    return true;
-
-  QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::ContactStatus, sourceParent);
-  return sourceModel()->data(blocked_index, filterRole()).toBool() == _filter_blocked;
-}
 
 ContactsTable::ContactsTable(QWidget* parent)
   : QWidget(parent),
@@ -95,7 +68,7 @@ void ContactsTable::searchEditChanged(QString search_string)
 void ContactsTable::setShowBlocked(bool showBlocked)
 {
   ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
-  model->setFilterBlocked(showBlocked);
+  model->setFilterBlocked(!showBlocked);
 
   /// Notifies about changed header title 
   QString headerTitle;
@@ -395,5 +368,5 @@ void ContactsTable::updateOptions()
   QSettings settings("Invictus Innovations", settings_file);
 
   ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
-  model->enableFilterBlocked(settings.value("FilterBlocked", "").toBool());
+  model->setEnableFilter(settings.value("FilterBlocked", "").toBool());
 }

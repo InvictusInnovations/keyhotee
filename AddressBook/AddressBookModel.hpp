@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QAbstractTableModel>
+#include <QSortFilterProxyModel>
 #include <bts/addressbook/addressbook.hpp>
 
 namespace Detail { class AddressBookModelImpl; }
@@ -52,3 +53,41 @@ private:
 /// Class members:
   std::unique_ptr<Detail::AddressBookModelImpl> my;
 };
+
+
+class FilterBlockedModel : public QSortFilterProxyModel
+{
+public:
+  FilterBlockedModel(QObject *parent = 0) : QSortFilterProxyModel(parent)
+  {
+    setFilterRole(Qt::UserRole);
+    setFilterBlocked(true);
+  }
+
+  void setEnableFilter(bool b)
+  {
+    _is_filter_on = b;
+    invalidateFilter();
+  }
+
+  void setFilterBlocked(bool b = true)
+  {
+    _is_filter_blocked = b;
+    invalidateFilter();
+  }
+
+protected:
+  bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+  {
+    if(!_is_filter_on)
+      return true;
+
+    QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::ContactStatus, sourceParent);
+    return sourceModel()->data(blocked_index, filterRole()).toBool() != _is_filter_blocked;
+  }
+
+private:
+  bool _is_filter_blocked;
+  static bool _is_filter_on;
+};
+

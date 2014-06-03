@@ -9,6 +9,8 @@
 #include <fc/log/logger.hpp>
 #include <fc/io/raw.hpp>
 
+bool FilterBlockedModel::_is_filter_on = false;
+
 namespace Detail
 {
 
