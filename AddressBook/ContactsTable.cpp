@@ -72,10 +72,19 @@ void ContactsTable::setShowBlocked(bool showBlocked)
 
   /// Notifies about changed header title 
   QString headerTitle;
-  if (showBlocked == true)
+  if (showBlocked == true &&
+     /** Check also the availability of the blocked filter
+         Because setShowBlocked(...) method set filter blocked
+         although "Enable filter blocked contacts" options is disabled
+     */
+     model->isFilterAvailable() == true)
+  {
     headerTitle = tr("Blocked contacts list");
+  }
   else
+  {
     headerTitle = tr("Contact list");
+  }
   ui->header->onHeaderChanged(headerTitle);
 }
 
