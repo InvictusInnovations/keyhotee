@@ -73,6 +73,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _isClosing(false),
   _walletsGui(new WalletsGui(this)),
   _is_curr_contact_blocked(false),
+  _is_curr_contact_own(false),
   _is_filter_blocked_on(false),
   _is_show_blocked_contacts(false)
 {
@@ -439,7 +440,6 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
     setEnabledAttachmentSaveOption(false);
     setEnabledMailActions(false);
     setEnabledContactOption(false);
-//    enableBlockedContact(false);
     _currentMailbox = nullptr;
     ui->actionShow_details->setEnabled(true);
 
@@ -456,8 +456,6 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
       else
         ui->actionShow_details->setChecked(true);
 
-//      bool blocked = getContactGui(con_id)->_view->getContact().isBlocked();
-//      enableBlockedContact(blocked);
       if(_is_filter_blocked_on && _is_show_blocked_contacts && !_is_curr_contact_blocked)
         enableBlockedContact(false);
       ui->contacts_page->selectRow(con_id);
@@ -865,6 +863,7 @@ void KeyhoteeMainWindow::openContactGui(int contact_id)
     contact_gui->updateTreeItemDisplay();
 
     _is_curr_contact_blocked = contact_gui->_view->getContact().isBlocked();
+    _is_curr_contact_own = contact_gui->_view->getContact().isOwn();
   }
 }
 
@@ -1096,8 +1095,6 @@ void KeyhoteeMainWindow::onItemContextAcceptRequest(QTreeWidgetItem *item)
   }
   else
     static_cast<AuthorizationItem*>(item)->getView()->onAccept();
-
-//  deleteAuthorizationItem(static_cast<AuthorizationItem*>(item));
 }
 
 void KeyhoteeMainWindow::onItemContextDenyRequest(QTreeWidgetItem *item)
@@ -1380,8 +1377,16 @@ void KeyhoteeMainWindow::setEnabledDeleteOption( bool enable )
 void KeyhoteeMainWindow::setEnabledContactOption( bool enable )
 {
   ui->actionShare_contact->setEnabled(enable);
-  ui->actionBlock->setEnabled(enable && !_is_curr_contact_blocked);
-  ui->actionUnblock->setEnabled(enable && _is_curr_contact_blocked);
+  if(_is_curr_contact_own)
+  {
+    ui->actionBlock->setEnabled(false);
+    ui->actionUnblock->setEnabled(false);
+  }
+  else
+  {
+    ui->actionBlock->setEnabled(enable && !_is_curr_contact_blocked);
+    ui->actionUnblock->setEnabled(enable && _is_curr_contact_blocked);
+  }
 }
 
 void KeyhoteeMainWindow::enableBlockedContact(bool enable)

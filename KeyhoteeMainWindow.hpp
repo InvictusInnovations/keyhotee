@@ -250,6 +250,7 @@ private:
   QList <QAction*>                        _actionsLang;
   std::unique_ptr<WalletsGui>             _walletsGui;
   bool                                    _is_curr_contact_blocked;
+  bool                                    _is_curr_contact_own;
   bool                                    _is_filter_blocked_on;
   bool                                    _is_show_blocked_contacts;
 }; //KeyhoteeMainWindow
