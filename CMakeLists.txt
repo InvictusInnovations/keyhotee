@@ -571,8 +571,12 @@ GET_TARGET_PROPERTY(_loc Keyhotee LOCATION_RELWITHDEBINFO)
 get_filename_component(_binName ${_loc} NAME)
 get_filename_component(_binPath ${_loc} PATH)
 
-INSTALL(FILES "${_loc}" DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo)
-INSTALL(FILES "${_binPath}/openssl.cnf" DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo)
+IF(WIN32)
+  #Warning Looks like windows NSIS has some problem related to proper detecting target binary while installing it
+  #and it is missing in the target package location, what leads bundle verification to fail.
+  INSTALL(FILES "${_loc}" DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo)
+  INSTALL(FILES "${_binPath}/openssl.cnf" DESTINATION . COMPONENT Runtime CONFIGURATIONS RelWithDebinfo)
+ENDIF(WIN32)
 
 IF(APPLE)
   SET(plugin_dest_dir Keyhotee.app/Contents/MacOS)

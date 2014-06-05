@@ -76,6 +76,14 @@ public:
     invalidateFilter();
   }
 
+  /** Returns true if "Enable filter blocked contacts" 
+      parameter of menu option settings is active, else returns false
+  */
+  bool isFilterAvailable() const
+  {
+    return _is_filter_on;
+  }
+
 protected:
   bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
   {
