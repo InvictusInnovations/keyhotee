@@ -249,8 +249,9 @@ private:
   bool                                    _isClosing;
   QList <QAction*>                        _actionsLang;
   std::unique_ptr<WalletsGui>             _walletsGui;
-  bool                                    _is_blocked_contact;
-  bool                                    _is_filter_blocked_cont;
+  bool                                    _is_curr_contact_blocked;
+  bool                                    _is_filter_blocked_on;
+  bool                                    _is_show_blocked_contacts;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();

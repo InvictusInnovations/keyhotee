@@ -27,12 +27,17 @@ void ContactGui::receiveChatMessage(const QString& from, const QString& msg, con
 
 void ContactGui::updateTreeItemDisplay()
 {
-  QString display_text;
-  QString name = _view->getContact().getLabel();
-  if (_unread_msg_count)
-    display_text = QString("%1 (%2)").arg(name).arg(_unread_msg_count);
+  if(_view->getContact().isBlocked())
+    _tree_item->setHidden(true);
   else
-    display_text = name;
-  _tree_item->setText(0, display_text);
-  _tree_item->setHidden (false);
+  {
+    QString display_text;
+    QString name = _view->getContact().getLabel();
+    if(_unread_msg_count)
+      display_text = QString("%1 (%2)").arg(name).arg(_unread_msg_count);
+    else
+      display_text = name;
+    _tree_item->setText(0, display_text);
+    _tree_item->setHidden(false);
+  }
 }
