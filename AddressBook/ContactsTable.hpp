@@ -49,7 +49,11 @@ private:
 
   ContactView* getCurrentView() const;
   void showContactsTable (bool visible) const;
-  void selectNextRow(int idx, int deletedRowCount) const;  
+  void selectNextRow(int idx, int deletedRowCount) const;
+  /** Update header title.
+      Display "Contact list" or "Blocked contacts list"
+  */
+  void updateHeader();
 
 Q_SIGNALS:
   void contactOpened(int contact_id);

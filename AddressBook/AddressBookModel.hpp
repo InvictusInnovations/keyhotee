@@ -72,7 +72,7 @@ public:
 
   void setFilterBlocked(bool b = true)
   {
-    _is_filter_blocked = b;
+    _is_filter_blocked_disable = b;
     invalidateFilter();
   }
 
@@ -83,6 +83,13 @@ public:
   {
     return _is_filter_on;
   }
+  /** Returns true if 'Show blocked contacts' Contact menu is enabled
+      otherwise returns false
+  */
+  bool isFilterBlockedEnable() const
+  {
+    return (_is_filter_blocked_disable == false);
+  }
 
 protected:
   bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
@@ -91,11 +98,10 @@ protected:
       return true;
 
     QModelIndex blocked_index = sourceModel()->index(sourceRow, AddressBookModel::ContactStatus, sourceParent);
-    return sourceModel()->data(blocked_index, filterRole()).toBool() != _is_filter_blocked;
+    return sourceModel()->data(blocked_index, filterRole()).toBool() != _is_filter_blocked_disable;
   }
 
 private:
-  bool _is_filter_blocked;
+  bool _is_filter_blocked_disable;
   static bool _is_filter_on;
 };
-

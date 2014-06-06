@@ -70,22 +70,7 @@ void ContactsTable::setShowBlocked(bool showBlocked)
   ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
   model->setFilterBlocked(!showBlocked);
 
-  /// Notifies about changed header title 
-  QString headerTitle;
-  if (showBlocked == true &&
-     /** Check also the availability of the blocked filter
-         Because setShowBlocked(...) method set filter blocked
-         although "Enable filter blocked contacts" options is disabled
-     */
-     model->isFilterAvailable() == true)
-  {
-    headerTitle = tr("Blocked contacts list");
-  }
-  else
-  {
-    headerTitle = tr("Contact list");
-  }
-  ui->header->onHeaderChanged(headerTitle);
+  updateHeader();
 }
 
 void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
@@ -378,4 +363,28 @@ void ContactsTable::updateOptions()
 
   ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
   model->setEnableFilter(settings.value("FilterBlocked", "").toBool());
+
+  updateHeader();
+}
+
+
+void ContactsTable::updateHeader()
+{
+  ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
+
+  /// Notifies about changed header title 
+  QString headerTitle;
+  if (model->isFilterBlockedEnable() == true &&
+    /** Check also the availability of the blocked filter
+        Because "Enable filter blocked contacts" options can be disabled
+    */
+    model->isFilterAvailable() == true)
+  {
+    headerTitle = tr("Blocked contacts list");
+  }
+  else
+  {
+    headerTitle = tr("Contact list");
+  }
+  ui->header->onHeaderChanged(headerTitle);
 }
