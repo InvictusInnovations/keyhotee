@@ -70,26 +70,11 @@ void ContactsTable::setShowBlocked(bool showBlocked)
   ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
   model->setFilterBlocked(!showBlocked);
 
-  /// Notifies about changed header title 
-  QString headerTitle;
-  if (showBlocked == true &&
-     /** Check also the availability of the blocked filter
-         Because setShowBlocked(...) method set filter blocked
-         although "Enable filter blocked contacts" options is disabled
-     */
-     model->isFilterAvailable() == true)
-  {
-    headerTitle = tr("Blocked contacts list");
-  }
-  else
-  {
-    headerTitle = tr("Contact list");
-  }
-  ui->header->onHeaderChanged(headerTitle);
+  updateHeader();
 }
 
 void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
-  {
+{
   _addressbook_model = addressbook_model;
   if (_addressbook_model)
     {
@@ -98,21 +83,24 @@ void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
     _sorted_addressbook_model->setDynamicSortFilter(true);
     ui->contact_table->setModel(_sorted_addressbook_model);
     }
+
   ui->contact_table->setShowGrid(false);
   ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::UserIcon, QHeaderView::Fixed);
   ui->contact_table->resizeColumnToContents(AddressBookModel::UserIcon);
-  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::ContactStatus, QHeaderView::Fixed);
+  /** Sometimes "contact status" column becomes too small and is the icons are not visible clearly (on Debian).
+      So the "contact status" column should be resized.
+  */
+  //ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::ContactStatus, QHeaderView::Fixed);
   ui->contact_table->resizeColumnToContents(AddressBookModel::ContactStatus);
-//  ui->contact_table->setIconSize(QSize(24, 24));
 
 
   QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
   connect(selection_model, &QItemSelectionModel::selectionChanged, this, &ContactsTable::onSelectionChanged);
 
   updateOptions();
-  }
+}
 
 void ContactsTable::onSelectionChanged (const QItemSelection &selected, const QItemSelection &deselected)
   {
@@ -433,4 +421,28 @@ void ContactsTable::updateOptions()
 
   ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
   model->setEnableFilter(settings.value("FilterBlocked", "").toBool());
+
+  updateHeader();
+}
+
+
+void ContactsTable::updateHeader()
+{
+  ContactsSortFilterProxyModel* model = dynamic_cast<ContactsSortFilterProxyModel*>(ui->contact_table->model());
+
+  /// Notifies about changed header title 
+  QString headerTitle;
+  if (model->isFilterBlockedEnable() == true &&
+    /** Check also the availability of the blocked filter
+        Because "Enable filter blocked contacts" options can be disabled
+    */
+    model->isFilterAvailable() == true)
+  {
+    headerTitle = tr("Blocked contacts list");
+  }
+  else
+  {
+    headerTitle = tr("Contact list");
+  }
+  ui->header->onHeaderChanged(headerTitle);
 }

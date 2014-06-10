@@ -69,7 +69,7 @@ void LoginDialog::onLogin()
       accept();
     }
   }
-  catch (const fc::db_in_use_exception& e)
+  catch (const db_in_use_exception& e)
   {
     elog("error ${w}", ("w", e.to_detail_string()) );
     QMessageBox::warning(this,tr("Keyhotee login"), tr("Unable to load profile: ") +
