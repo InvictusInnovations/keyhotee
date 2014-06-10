@@ -152,27 +152,28 @@ void ContactsTable::onDeleteContact()
     indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
   auto sourceModel = model->sourceModel();
-  auto app = bts::application::instance();
-  auto profile = app->get_profile();
+  auto profile = bts::get_profile();
 
   for(int i = indexes.count() - 1; i > -1; --i)
   {
     auto contact = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i));
     auto contact_id = contact.wallet_index;
+
+    bool is_to_delete = true;
     if(profile->isIdentityPresent(contact.dac_id_string))
     {
-      if(contact.public_key == profile->get_identity(contact.dac_id_string).public_key)
+      auto identity = profile->get_identity(contact.dac_id_string);
+      if(contact.public_key == identity.public_key)
       {
-        auto priv_key = profile->get_keychain().get_identity_key(contact.dac_id_string);
-        app->remove_receive_key(priv_key);
-        profile->removeIdentity(contact.dac_id_string);
-
-        /// notify identity observers
-        IdentityObservable::getInstance().notify();
+        is_to_delete = deleteIdentity(&identity);
       }
     }
-    sourceModel->removeRows(indexes.at(i).row(), 1);
-    Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted
+
+    if(is_to_delete)
+    {
+      sourceModel->removeRows(indexes.at(i).row(), 1);
+      Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted
+    }
   }
   //model->setUpdatesEnabled(true);
   //TODO Remove fullname/bitname for deleted contacts from QCompleter
@@ -180,6 +181,60 @@ void ContactsTable::onDeleteContact()
   qSort(sortFilterIndexes);
   selectNextRow(sortFilterIndexes.takeLast().row(), indexes.count());
   }
+
+bool ContactsTable::deleteIdentity(bts::addressbook::wallet_identity* identity)
+{
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+  auto Outbox = profile->get_pending_db();
+
+  auto pendingMsgHeaders = Outbox->fetch_headers(bts::bitchat::private_email_message::type);
+  auto pendingAuthHeaders = Outbox->fetch_headers(bts::bitchat::private_contact_request_message::type);
+
+  bool is_pending_msg_from_identity = false;
+  if(!pendingMsgHeaders.empty())
+  {
+    foreach(const bts::bitchat::message_header msg_header, pendingMsgHeaders)
+    {
+      if(msg_header.from_key == identity->public_key)
+        is_pending_msg_from_identity = true;
+    }
+  }
+
+  if(QMessageBox::question(this, tr("Delete Identity"),
+        tr("Are you sure you want to delete selected identity?\nUsing this identity created messages that are currently in the outbox.\nAfter removing the identity, messages will be moved to the Draft."))
+        == QMessageBox::Button::No)
+    return false;
+
+  foreach(const bts::bitchat::message_header msg_header, pendingMsgHeaders)
+  {
+    if(msg_header.from_key == identity->public_key)
+    {
+      Outbox->remove_message(msg_header);
+      auto rawData = Outbox->fetch_data(msg_header.digest);
+      auto mail_msg = fc::raw::unpack<bts::bitchat::private_email_message>(rawData);
+      getKeyhoteeWindow()->getConnectionProcessor()->Save(*identity, mail_msg, IMailProcessor::TMsgType::Normal, nullptr);
+    }
+  }
+
+  if(!pendingAuthHeaders.empty())
+  {
+    foreach(const bts::bitchat::message_header msg_header, pendingAuthHeaders)
+    {
+      if(msg_header.from_key == identity->public_key)
+        Outbox->remove_message(msg_header);
+    }
+  }
+
+  auto priv_key = profile->get_keychain().get_identity_key(identity->dac_id_string);
+  app->remove_receive_key(priv_key);
+  profile->removeIdentity(identity->dac_id_string);
+
+  /// notify identity observers
+  IdentityObservable::getInstance().notify();
+
+  return true;
+}
 
 bool ContactsTable::isShowDetailsHidden()
   {
