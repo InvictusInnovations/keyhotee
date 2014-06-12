@@ -153,7 +153,7 @@ void ContactsTable::onDeleteContact()
       auto identity = profile->get_identity(contact.dac_id_string);
       if(contact.public_key == identity.public_key)
       {
-        is_to_delete = deleteIdentity(&identity);
+        is_to_delete = deleteIdentity(identity);
       }
     }
 
@@ -170,53 +170,24 @@ void ContactsTable::onDeleteContact()
   selectNextRow(sortFilterIndexes.takeLast().row(), indexes.count());
   }
 
-bool ContactsTable::deleteIdentity(bts::addressbook::wallet_identity* identity)
+bool ContactsTable::deleteIdentity(bts::addressbook::wallet_identity& identity)
 {
   auto app = bts::application::instance();
   auto profile = app->get_profile();
-  auto Outbox = profile->get_pending_db();
 
-  auto pendingMsgHeaders = Outbox->fetch_headers(bts::bitchat::private_email_message::type);
-  auto pendingAuthHeaders = Outbox->fetch_headers(bts::bitchat::private_contact_request_message::type);
+  bool is_continue = IdentityObservable::getInstance().notifyDelIntent(identity);
 
-  bool is_pending_msg_from_identity = false;
-  if(!pendingMsgHeaders.empty())
-  {
-    foreach(const bts::bitchat::message_header msg_header, pendingMsgHeaders)
-    {
-      if(msg_header.from_key == identity->public_key)
-        is_pending_msg_from_identity = true;
-    }
-  }
-
-  if(QMessageBox::question(this, tr("Delete Identity"),
-        tr("Are you sure you want to delete selected identity?\nUsing this identity created messages that are currently in the outbox.\nAfter removing the identity, messages will be moved to the Draft."))
-        == QMessageBox::Button::No)
+  if(!is_continue)
     return false;
 
-  foreach(const bts::bitchat::message_header msg_header, pendingMsgHeaders)
-  {
-    if(msg_header.from_key == identity->public_key)
-    {
-      Outbox->remove_message(msg_header);
-      auto rawData = Outbox->fetch_data(msg_header.digest);
-      auto mail_msg = fc::raw::unpack<bts::bitchat::private_email_message>(rawData);
-      getKeyhoteeWindow()->getConnectionProcessor()->Save(*identity, mail_msg, IMailProcessor::TMsgType::Normal, nullptr);
-    }
-  }
+  is_continue = IdentityObservable::getInstance().notifyDelete(identity);
 
-  if(!pendingAuthHeaders.empty())
-  {
-    foreach(const bts::bitchat::message_header msg_header, pendingAuthHeaders)
-    {
-      if(msg_header.from_key == identity->public_key)
-        Outbox->remove_message(msg_header);
-    }
-  }
+  if(!is_continue)
+    return false;
 
-  auto priv_key = profile->get_keychain().get_identity_key(identity->dac_id_string);
+  auto priv_key = profile->get_keychain().get_identity_key(identity.dac_id_string);
   app->remove_receive_key(priv_key);
-  profile->removeIdentity(identity->dac_id_string);
+  profile->removeIdentity(identity.dac_id_string);
 
   /// notify identity observers
   IdentityObservable::getInstance().notify();

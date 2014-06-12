@@ -16,6 +16,8 @@
 #include "AddressBook/NewIdentityDialog.hpp"
 #include "AddressBook/RequestAuthorization.hpp"
 
+#include "Identity/IdentityObservable.hpp"
+
 #include "BitShares/GitSHA2.h"
 #include <fc/git_revision.hpp>
 
@@ -299,6 +301,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
    }
    */
 
+  // add identity observer
+  IdentityObservable::getInstance().addObserver(this);
+
   QAction* actionMenu = new QAction(tr("Keyhotee"), this);
   actionMenu->setCheckable(true);
   this->setMenuWindow(ui->menuWindow);
@@ -308,6 +313,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
   {
+  IdentityObservable::getInstance().deleteObserver(this);
   delete menuEdit;
   delete ui;
   }
@@ -1573,4 +1579,95 @@ void KeyhoteeMainWindow::setupWallets()
     _walletItems.push_back(walletItem);
     _wallets_root->addChild(walletItem);
   }
+}
+
+bool KeyhoteeMainWindow::onIdentityDelIntent(const TIdentity&  identity)
+{
+  auto profile = bts::get_profile();
+
+  auto identites = profile->identities();
+  if(identites.size() == 1)
+  {
+    QString text;
+    text = tr("Identity: ");
+    text += identity.get_display_name().c_str();
+    text += tr(" is the last in the profile, you can not remove it.");
+
+    QMessageBox::warning(this, tr("Delete Identity"), text);
+    return false;
+  }
+
+  int i;
+  for(i = 0; i < identites.size(); i++)
+  {
+    if(identites[i].public_key == identity.public_key)
+      break;
+  }
+  i++;
+  if(i >= identites.size())
+    i = 0;
+
+  _identity_replace = identites[i];
+
+  bool is_pending_msg_from_identity = false;
+
+  QString identity_name = Utils::toString(identity.public_key, Utils::FULL_CONTACT_DETAILS);
+  for(int row = 0; row < _pending_model->rowCount(); ++row)
+  {
+    QModelIndex index = _pending_model->index(row, MailboxModel::From);
+    QString from = _pending_model->data(index, Qt::DisplayRole).toString();
+    if(from == identity_name)
+    {
+      is_pending_msg_from_identity = true;
+      break;
+    }
+  }
+
+  if(is_pending_msg_from_identity)
+  {
+    QString identity_replace_name = Utils::toString(_identity_replace.public_key, Utils::FULL_CONTACT_DETAILS);
+
+    QString text;
+    text = tr("Are you sure you want to delete identity: ");
+    text += identity_name;
+    text += "?\n";
+    text += tr("Using this identity created messages that are currently in the outbox.");
+    text += "\n";
+    text += tr("After removing the identity, messages will be moved to the Draft. Sender will be replaced by: ");
+    text += identity_replace_name;
+    text += ".";
+
+    if(QMessageBox::question(this, tr("Delete Identity"), text) == QMessageBox::Button::No)
+      return false;
+  }
+
+  return true;
+}
+
+bool KeyhoteeMainWindow::onIdentityDelete(const TIdentity&  identity)
+{
+  QString identity_name = Utils::toString(identity.public_key, Utils::FULL_CONTACT_DETAILS);
+  for(int row = _pending_model->rowCount()-1; row > -1; --row)
+  {
+    QModelIndex index = _pending_model->index(row, MailboxModel::From);
+    QString from = _pending_model->data(index, Qt::DisplayRole).toString();
+    if(from == identity_name)
+    {
+      bts::bitchat::private_email_message mail_msg;
+      bts::bitchat::message_header        header;
+      _pending_model->getMessageData(index, &header, &mail_msg);
+      _connectionProcessor.Save(_identity_replace, mail_msg, IMailProcessor::TMsgType::Normal, nullptr);
+      _pending_model->removeRows(row, 1);
+    }
+  }
+
+  auto Outbox = bts::get_profile()->get_pending_db();
+  auto pendingAuthHeaders = Outbox->fetch_headers(bts::bitchat::private_contact_request_message::type);
+  foreach(const bts::bitchat::message_header msg_header, pendingAuthHeaders)
+  {
+    if(msg_header.from_key == identity.public_key)
+      Outbox->remove_message(msg_header);
+  }
+
+  return true;
 }

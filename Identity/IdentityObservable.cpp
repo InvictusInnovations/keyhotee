@@ -91,3 +91,23 @@ void IdentityObservable::reloadIdentities()
     }
   } 
 }
+
+bool IdentityObservable::notifyDelIntent(const IIdentitiesUpdate::TIdentity& identity)
+{
+  bool b = true;
+  for(const auto& identityObserver : _identObservers)
+  {
+    b &= identityObserver->onIdentityDelIntent(identity);
+  }
+  return b;
+}
+
+bool IdentityObservable::notifyDelete(const IIdentitiesUpdate::TIdentity& identity)
+{
+  bool b = true;
+  for(const auto& identityObserver : _identObservers)
+  {
+    b &= identityObserver->onIdentityDelete(identity);
+  }
+  return b;
+}

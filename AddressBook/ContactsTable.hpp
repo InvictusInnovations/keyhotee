@@ -55,7 +55,7 @@ private:
       Display "Contact list" or "Blocked contacts list"
   */
   void updateHeader();
-  bool deleteIdentity(bts::addressbook::wallet_identity* contact);
+  bool deleteIdentity(bts::addressbook::wallet_identity& contact);
   
 Q_SIGNALS:
   void contactOpened(int contact_id);

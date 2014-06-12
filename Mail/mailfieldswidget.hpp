@@ -82,6 +82,8 @@ class MailFieldsWidget : public QWidget,
   protected:
     /// \see IIdentitiesUpdate interface description.
     virtual void onIdentitiesChanged(const TIdentities& identities) override;
+    virtual bool onIdentityDelIntent(const TIdentity&  identity) override { return true; }
+    virtual bool onIdentityDelete(const TIdentity&  identity) override { return true; }
 
   private:
     /** Helper function to trim subject text and avoid crashes since looks like QT Line edit has
