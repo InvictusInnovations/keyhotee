@@ -1215,7 +1215,10 @@ void KeyhoteeMainWindow::OnMessagePending(const TStoredMailMessage& msg,
   const TStoredMailMessage* savedDraftMsg)
 {
   if(savedDraftMsg != nullptr)
+  {
     ui->draft_box_page->removeMessage(*savedDraftMsg);
+    _pending_model->addMailHeader(msg);
+  }
   else
     _pending_model->addMailHeader(msg);
 
