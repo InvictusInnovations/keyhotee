@@ -2,12 +2,24 @@
 
 #include "qtreusable/MimeDataChecker.hpp"
 
+#include <fc/log/logger.hpp>
+
+#include <QDir>
+#include <QEventLoop>
+#include <QImageReader>
+#include <QMimeData>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QStandardPaths>
 #include <QUrl>
 
 TMessageEdit::TMessageEdit(QWidget *parent) :
   QTextBrowser(parent),
  _imageLoadAllowed(false),
- _anyBlockedImage(false) {}
+ _anyBlockedImage(false) 
+{
+  
+}
 
 void TMessageEdit::insertFromMimeData(const QMimeData *source)
 {
@@ -21,10 +33,57 @@ void TMessageEdit::insertFromMimeData(const QMimeData *source)
 
 QVariant TMessageEdit::loadResource(int type, const QUrl& url)
 {
-  if(_imageLoadAllowed == false && type == QTextDocument::ImageResource && url.isLocalFile() == false)
+  if (_imageLoadAllowed == false && type == QTextDocument::ImageResource && url.isLocalFile() == false)
   {
     _anyBlockedImage = true;
+
     return QVariant(QPixmap(":/qt-project.org/styles/commonstyle/images/filecontents-32.png"));
+  }
+  else if (type == QTextDocument::ImageResource && url.isLocalFile() == false &&
+           url.toString().startsWith("http://"))
+  {
+    QString remoteUrl = url.toString();
+
+    QByteArray extension;
+    extension.append(getFileExtension(remoteUrl));
+
+    /// Check if image format is supported
+    if (QImageReader::supportedImageFormats().contains(extension) == false)
+    {
+      return false;
+    }
+
+    /// Get local path for remote image
+    QString localPath = getCachedImagePath(remoteUrl);
+
+    bool fileExistLocally = false;
+    if (QFile::exists(localPath) == false)
+    {
+      /// Download remote image
+      if (downloadImage(remoteUrl) == false)
+      {
+        ilog("Failed to fetch remote image ${path}", ("path", remoteUrl.toStdString()));
+        return false;
+      }
+      else
+      {
+        /// Check again is file exist locally after download
+        if (QFile::exists(localPath) == true)
+        {
+          fileExistLocally = true;
+        }
+      }
+    }
+    else 
+    {
+      fileExistLocally = true;
+    }
+
+    if (fileExistLocally == true)
+    {
+      ilog("Local file exists ${path}", ("path", localPath.toStdString()));
+      return QVariant(QPixmap(localPath));
+    }
   }
 
   return QTextBrowser::loadResource(type, url);
@@ -83,3 +142,91 @@ void TMessageEdit::loadBlockedImages()
     }
   }
 
+QString TMessageEdit::getCachedImagePath(const QString &remoteUrl)
+{
+  static const QRegExp regexp("[^a-z0-9]+");
+  QString url = remoteUrl.toLower();
+  
+  QString extension = getFileExtension(remoteUrl);  
+
+  url.replace(regexp, "_");
+  
+  /// Get cache location
+  QString cachePath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+  cachePath += "/images";  
+
+  /// Check if an images directory exist if not create it
+  QDir dir(cachePath);
+  if (dir.exists() == false)
+  {
+    if (dir.mkpath(cachePath) == false)
+    {
+      ilog("Could not create image cache path ${path}", ("path", cachePath.toStdString()));
+      assert(false);
+    }
+  }
+
+  return cachePath + "/" + url + "." + extension;
+}
+
+
+bool TMessageEdit::downloadImage(const QString &remoteUrl)
+{
+  //for test
+  //QString remoteUrl = "http://wewewfwfdata/products/26809662/f-airpressaaaaaa-hl-425-100-400v.jpg";
+
+  QString localPath = getCachedImagePath(remoteUrl);
+
+  QNetworkAccessManager manager(this);
+  QNetworkRequest request(remoteUrl);
+  QNetworkReply *reply = manager.get(request);
+
+  ilog("Start download of ${path}", ("path", remoteUrl.toStdString()));
+
+  /// Wait for downloading an image
+  QEventLoop loop;
+  loop.connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+  loop.connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), &loop, SLOT(quit()));
+  loop.exec();
+
+  ilog("End download of ${path}", ("path", remoteUrl.toStdString()));
+
+  /// Check downloading errors
+  if (reply->error() != 0)
+  {
+    ilog("Download error: ${err}", ("err", reply->errorString().toStdString()));
+    return false;
+  }
+
+  /// Save remote image to local cache directory
+  QFile localFile(localPath);
+  if (localFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    localFile.write(reply->readAll());
+    localFile.close();
+    reply->deleteLater();
+  }
+  else
+  {
+    /// Can't open file
+    reply->deleteLater();
+    return false;
+  }
+
+  return true;  
+}
+
+
+QString TMessageEdit::getFileExtension(const QString &fileName)
+{
+  QString extension = "";
+  int dot_pos = fileName.lastIndexOf('.');
+
+  if (dot_pos != -1) 
+  {
+    /// +1 without dot
+    extension = fileName.mid(dot_pos + 1);
+  }
+
+  return extension;
+}

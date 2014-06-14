@@ -76,6 +76,7 @@ void MailViewer::displayMailMessage(Mailbox* mailbox, const QModelIndex& index, 
   ui->subject_label->setText(msg.subject);
 
   ui->message_content->loadContents (msg.body, msg.attachments);
+  /// Scroll mail window to the top
   ui->message_content->moveCursor (QTextCursor::Start);  
   }
 

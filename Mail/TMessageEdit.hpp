@@ -43,10 +43,17 @@ protected:
   /// Reimplemented to support control over inline images/http links loading to improve security.
   virtual QVariant loadResource(int type, const QUrl& url) override;
 
+private:
+  /// Get unique local path to remote an image
+  QString getCachedImagePath(const QString &remoteUrl);
+  /// DownloadImage remote an image form a url
+  bool downloadImage(const QString &remoteUrl);
+  QString getFileExtension(const QString &fileName);
+
 /// Class attributes:
 private:
-  bool _imageLoadAllowed;
-  bool _anyBlockedImage;
+  bool                  _imageLoadAllowed;
+  bool                  _anyBlockedImage;  
 };
 
 #endif // TMESSAGEEDIT_HPP
