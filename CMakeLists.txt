@@ -67,7 +67,7 @@ endif(APPLE)
 
 set(CMAKE_INSTALL_PREFIX "${INVICTUS_ROOT}/packages" CACHE PATH "Keyhotee install prefix" FORCE)
 
-add_subdirectory(../bitshares_toolkit bitshares_toolkit.bin)
+#add_subdirectory(../bitshares_toolkit bitshares_toolkit.bin)
 add_subdirectory(BitShares)
 add_subdirectory(miner)
 
