@@ -11,6 +11,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QStandardPaths>
+#include <QTextBlockFormat>
 #include <QUrl>
 
 TMessageEdit::TMessageEdit(QWidget *parent) :
@@ -84,6 +85,8 @@ QVariant TMessageEdit::loadResource(int type, const QUrl& url)
       ilog("Local file exists ${path}", ("path", localPath.toStdString()));
       return QVariant(QPixmap(localPath));
     }
+
+    return false;
   }
 
   return QTextBrowser::loadResource(type, url);
@@ -112,12 +115,20 @@ void TMessageEdit::loadContents (const QString& body, const TAttachmentContainer
     bool loadOk = image.loadFromData(imageData, imageSize);
     if (loadOk)
     {
-      /// FIXME Why QTextDocument API is not used here to create an image entry ?
-      doc->addResource( QTextDocument::ImageResource, QUrl( imageName ), image);
       QString attachmentFileName = "<br/><hr/><font color=""grey"">" + 
                                     QString(attachment.filename.c_str()) + 
                                     "</font><br/>";
-      append(attachmentFileName +  "<center><img src='" + imageName + "'></center>");
+      /// Insert horizontal line
+      textCursor().insertHtml(attachmentFileName);
+      
+      doc->addResource(QTextDocument::ImageResource, QUrl(imageName), image);
+
+      // Insert Block
+      QTextBlockFormat centerFormat;
+      centerFormat.setAlignment(Qt::AlignHCenter);
+      textCursor().insertBlock(centerFormat);
+      // Insert image
+      textCursor().insertImage(imageName);
     }
     ++i;
   }
