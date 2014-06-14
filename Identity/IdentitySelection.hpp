@@ -37,6 +37,8 @@ protected:
 /// IIdentitiesUpdate interface implementation:
   /// \see IIdentitiesUpdate interface description.
   virtual void onIdentitiesChanged(const TIdentities& identities) override;
+  virtual bool onIdentityDelIntent(const TIdentity&  identity) override { return true; }
+  virtual bool onIdentityDelete(const TIdentity&  identity) override { return true; }
 
 private:
   Ui::IdentitySelection*  ui;

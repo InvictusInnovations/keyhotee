@@ -74,7 +74,7 @@ void ContactsTable::setShowBlocked(bool showBlocked)
 }
 
 void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
-  {
+{
   _addressbook_model = addressbook_model;
   if (_addressbook_model)
     {
@@ -83,21 +83,24 @@ void ContactsTable::setAddressBook(AddressBookModel* addressbook_model)
     _sorted_addressbook_model->setDynamicSortFilter(true);
     ui->contact_table->setModel(_sorted_addressbook_model);
     }
+
   ui->contact_table->setShowGrid(false);
   ui->contact_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   ui->contact_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::UserIcon, QHeaderView::Fixed);
   ui->contact_table->resizeColumnToContents(AddressBookModel::UserIcon);
-  ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::ContactStatus, QHeaderView::Fixed);
+  /** Sometimes "contact status" column becomes too small and is the icons are not visible clearly (on Debian).
+      So the "contact status" column should be resized.
+  */
+  //ui->contact_table->horizontalHeader()->setSectionResizeMode(AddressBookModel::ContactStatus, QHeaderView::Fixed);
   ui->contact_table->resizeColumnToContents(AddressBookModel::ContactStatus);
-//  ui->contact_table->setIconSize(QSize(24, 24));
 
 
   QItemSelectionModel* selection_model = ui->contact_table->selectionModel();
   connect(selection_model, &QItemSelectionModel::selectionChanged, this, &ContactsTable::onSelectionChanged);
 
   updateOptions();
-  }
+}
 
 void ContactsTable::onSelectionChanged (const QItemSelection &selected, const QItemSelection &deselected)
   {
@@ -137,27 +140,28 @@ void ContactsTable::onDeleteContact()
     indexes.append(model->mapToSource(sortFilterIndex));
   qSort(indexes);
   auto sourceModel = model->sourceModel();
-  auto app = bts::application::instance();
-  auto profile = app->get_profile();
+  auto profile = bts::get_profile();
 
   for(int i = indexes.count() - 1; i > -1; --i)
   {
     auto contact = ((AddressBookModel*)sourceModel)->getContact(indexes.at(i));
     auto contact_id = contact.wallet_index;
+
+    bool is_to_delete = true;
     if(profile->isIdentityPresent(contact.dac_id_string))
     {
-      if(contact.public_key == profile->get_identity(contact.dac_id_string).public_key)
+      auto identity = profile->get_identity(contact.dac_id_string);
+      if(contact.public_key == identity.public_key)
       {
-        auto priv_key = profile->get_keychain().get_identity_key(contact.dac_id_string);
-        app->remove_receive_key(priv_key);
-        profile->removeIdentity(contact.dac_id_string);
-
-        /// notify identity observers
-        IdentityObservable::getInstance().notify();
+        is_to_delete = deleteIdentity(identity);
       }
     }
-    sourceModel->removeRows(indexes.at(i).row(), 1);
-    Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted
+
+    if(is_to_delete)
+    {
+      sourceModel->removeRows(indexes.at(i).row(), 1);
+      Q_EMIT contactDeleted(contact_id); //emit signal so that ContactGui is also deleted
+    }
   }
   //model->setUpdatesEnabled(true);
   //TODO Remove fullname/bitname for deleted contacts from QCompleter
@@ -165,6 +169,31 @@ void ContactsTable::onDeleteContact()
   qSort(sortFilterIndexes);
   selectNextRow(sortFilterIndexes.takeLast().row(), indexes.count());
   }
+
+bool ContactsTable::deleteIdentity(bts::addressbook::wallet_identity& identity)
+{
+  auto app = bts::application::instance();
+  auto profile = app->get_profile();
+
+  bool is_continue = IdentityObservable::getInstance().notifyDelIntent(identity);
+
+  if(!is_continue)
+    return false;
+
+  is_continue = IdentityObservable::getInstance().notifyDelete(identity);
+
+  if(!is_continue)
+    return false;
+
+  auto priv_key = profile->get_keychain().get_identity_key(identity.dac_id_string);
+  app->remove_receive_key(priv_key);
+  profile->removeIdentity(identity.dac_id_string);
+
+  /// notify identity observers
+  IdentityObservable::getInstance().notify();
+
+  return true;
+}
 
 bool ContactsTable::isShowDetailsHidden()
   {

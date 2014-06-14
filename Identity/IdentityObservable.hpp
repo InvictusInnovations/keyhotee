@@ -24,7 +24,9 @@ public:
       identities but just change alias in the identity
   */
   void notify(const bts::addressbook::wallet_contact& contact);
-  
+
+  bool notifyDelIntent(const IIdentitiesUpdate::TIdentity& identity);
+  bool notifyDelete(const IIdentitiesUpdate::TIdentity& identity);
 
 private:
   IdentityObservable() {};

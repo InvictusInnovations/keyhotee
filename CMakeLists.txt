@@ -67,6 +67,7 @@ endif(APPLE)
 
 set(CMAKE_INSTALL_PREFIX "${INVICTUS_ROOT}/packages" CACHE PATH "Keyhotee install prefix" FORCE)
 
+#add_subdirectory(../bitshares_toolkit bitshares_toolkit.bin)
 add_subdirectory(BitShares)
 add_subdirectory(miner)
 
@@ -542,7 +543,11 @@ IF (KH_STATIC_QT EQUAL 1)
     debug ${Qt5Platform_LIBRARIES_DEBUG} optimized ${Qt5Platform_LIBRARIES_RELEASE}
     debug ${Qt5SvgIcon_LIBRARIES_DEBUG} optimized ${Qt5SvgIcon_LIBRARIES_RELEASE} 
     Qt5::Svg Qt5::Widgets Qt5::Gui Qt5::PrintSupport Qt5::Network
+    # Warning this is old Bitshares module
     bshare 
+    # Warning this is a bitshare_toolkit module
+    #bts_blockchain
+    #bts_wallet
 # Since we would like to build KH against static versions of ICU, it is needed to specify them in
 # valid order (DT must be at the end)
     ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES} ${ICU_DT_LIBRARY}
@@ -553,7 +558,11 @@ ELSE (KH_STATIC_QT EQUAL 1)
   target_link_libraries( Keyhotee
     Qt5::Svg Qt5::Widgets Qt5::Gui Qt5::PrintSupport
     ${CrashRpt_LIBRARIES}
+    # Warning this is old Bitshares module
     bshare 
+    # Warning this is a bitshare_toolkit module
+    #bts_blockchain
+    #bts_wallet
     ${PLATFORM_SPECIFIC_LIBS} ${QtMacExtras} ${QT_DEPENDENCY_LIBRARIES} ${ICU_LIBRARIES}
     ${APPKIT_LIBRARY} ${CMAKE_DL_LIBS} 
   )

@@ -4,6 +4,7 @@
 
 #include "ch/ModificationsChecker.hpp"
 
+#include <bts/addressbook/contact.hpp>
 #include <QList>
 
 namespace Ui { class ContactsTable; }
@@ -49,12 +50,13 @@ private:
 
   ContactView* getCurrentView() const;
   void showContactsTable (bool visible) const;
-  void selectNextRow(int idx, int deletedRowCount) const;
+  void selectNextRow(int idx, int deletedRowCount) const;  
   /** Update header title.
       Display "Contact list" or "Blocked contacts list"
   */
   void updateHeader();
-
+  bool deleteIdentity(bts::addressbook::wallet_identity& contact);
+  
 Q_SIGNALS:
   void contactOpened(int contact_id);
   void contactDeleted(int contact_id);

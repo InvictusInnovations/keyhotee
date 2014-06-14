@@ -12,6 +12,7 @@
 
 #include "ch/GuiUpdateSink.hpp"
 #include "ch/ModificationsChecker.hpp"
+#include "Identity/IdentitiesUpdate.hpp"
 
 #include "qtreusable/selfsizingmainwindow.h"
 
@@ -43,7 +44,8 @@ class QTreeWidgetItem;
 
 class KeyhoteeMainWindow  : public ATopLevelWindowsContainer,
                             protected IModificationsChecker,
-                            protected IGuiUpdateSink
+                            protected IGuiUpdateSink,
+                            protected IIdentitiesUpdate
 {
   Q_OBJECT
 public:
@@ -130,6 +132,12 @@ private:
 
   /// \see IModificationsChecker interface description.
   virtual bool canContinue() const override;
+
+protected:
+  /// \see IIdentitiesUpdate interface description.
+  virtual void onIdentitiesChanged(const TIdentities& identities) override {}
+  virtual bool onIdentityDelIntent(const TIdentity&  identity) override;
+  virtual bool onIdentityDelete(const TIdentity&  identity) override;
 
 private slots:
   // ---------- MenuBar
@@ -253,6 +261,7 @@ private:
   bool                                    _is_curr_contact_own;
   bool                                    _is_filter_blocked_on;
   bool                                    _is_show_blocked_contacts;
+  TIdentity                               _identity_replace;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();
