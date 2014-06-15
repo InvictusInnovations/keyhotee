@@ -21,6 +21,11 @@ public:
   */
   void displayMailMessage(Mailbox*, const QModelIndex& index, MailboxModel* mailbox);
 
+private slots:
+  /// Display blocked remote images
+  void onShowRemoteContent();
+
+public:
   QToolBar* message_tools;
 private:
   Ui::MailViewer* ui;

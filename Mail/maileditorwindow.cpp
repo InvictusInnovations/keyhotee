@@ -518,7 +518,11 @@ void MailEditorMainWindow::loadContents(const TRecipientPublicKey& senderId,
   {
   MailFields->LoadContents(senderId, srcMsg);
   FileAttachment->LoadAttachedFiles(srcMsg.attachments);
-  ui->messageEdit->loadContents(srcMsg.body.c_str(), srcMsg.attachments);
+
+  bool anyBlockedImage = false;
+  ui->messageEdit->loadContents(srcMsg.body.c_str(), srcMsg.attachments, &anyBlockedImage);
+  /// Show alert if any remote image is blocked
+  //ui->remoteContentAlert->setVisible(anyBlockedImage);
   }
 
 void MailEditorMainWindow::transformRecipientList(const TRecipientPublicKey& senderId,

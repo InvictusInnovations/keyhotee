@@ -22,6 +22,8 @@ MailViewer::MailViewer(QWidget* parent)
   grid_layout->addWidget(message_tools, 0, 0);  
   ui->message_content->setOpenExternalLinks (true);
   ui->message_content->setReadOnly(true);
+
+  connect(ui->showRemoteContent, SIGNAL(clicked()), this, SLOT(onShowRemoteContent()));
   }
 
 MailViewer::~MailViewer()
@@ -75,8 +77,20 @@ void MailViewer::displayMailMessage(Mailbox* mailbox, const QModelIndex& index, 
   //TODO: add to and cc lists
   ui->subject_label->setText(msg.subject);
 
-  ui->message_content->loadContents (msg.body, msg.attachments);
+  bool anyBlockedImage = false;
+  ui->message_content->loadContents(msg.body, msg.attachments, &anyBlockedImage);
+  /// Show alert if any remote image is blocked
+
+  /// comment for now (in progress)
+  ///ui->remoteContentAlert->setVisible(anyBlockedImage);
+  ui->remoteContentAlert->setVisible(false);
+
   /// Scroll mail window to the top
   ui->message_content->moveCursor (QTextCursor::Start);  
   }
 
+void MailViewer::onShowRemoteContent()
+{
+  ui->remoteContentAlert->hide();
+  ui->message_content->loadBlockedImages();
+}

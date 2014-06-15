@@ -92,8 +92,11 @@ QVariant TMessageEdit::loadResource(int type, const QUrl& url)
   return QTextBrowser::loadResource(type, url);
 }
 
-void TMessageEdit::loadContents (const QString& body, const TAttachmentContainer& attachments)
+void TMessageEdit::loadContents(const QString& body, const TAttachmentContainer& attachments, bool* anyBlockedImage)
 {
+  _imageLoadAllowed = false;
+  _anyBlockedImage = false;
+
   QTextDocument *doc = document();
   doc->clear();
 
@@ -135,6 +138,8 @@ void TMessageEdit::loadContents (const QString& body, const TAttachmentContainer
 
   _imageLoadAllowed = imageLoadAllowed;
 
+  *anyBlockedImage = _anyBlockedImage;
+
   //no set modified flag when is loading contents
   doc->setModified(false);
 }
@@ -149,7 +154,8 @@ void TMessageEdit::loadBlockedImages()
       QTextDocument* sourceDoc = document();
       QTextDocument* copy = sourceDoc->clone(this);
       setDocument(copy);
-      delete sourceDoc;
+      /// FIXME - crashes after calling 'delete sourceDoc'
+      ///delete sourceDoc;
     }
   }
 

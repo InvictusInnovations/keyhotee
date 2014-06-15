@@ -26,8 +26,10 @@ public:
       \param body        - mail message body
       \param attachments - checks attachments and if it contains images displays it by inlining
                            them at the end of document.
+      \param anyBlockedImage - returns true if any remote image is blocked
   */
-  void loadContents (const QString& body, const TAttachmentContainer& attachments);
+  void loadContents (const QString& body, const TAttachmentContainer& attachments,
+                    bool* anyBlockedImage);
 
   /// Allows to load blocked images (if any).
   void loadBlockedImages();
