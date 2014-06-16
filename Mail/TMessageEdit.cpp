@@ -1,4 +1,5 @@
 #include "TMessageEdit.hpp"
+#include "BlockerDelegate.hpp"
 
 #include "qtreusable/MimeDataChecker.hpp"
 
@@ -17,9 +18,9 @@
 TMessageEdit::TMessageEdit(QWidget *parent) :
   QTextBrowser(parent),
  _imageLoadAllowed(false),
- _anyBlockedImage(false) 
+ _anyBlockedImage(false)
 {
-  
+
 }
 
 void TMessageEdit::insertFromMimeData(const QMimeData *source)
@@ -36,7 +37,14 @@ QVariant TMessageEdit::loadResource(int type, const QUrl& url)
 {
   if (_imageLoadAllowed == false && type == QTextDocument::ImageResource && url.isLocalFile() == false)
   {
-    _anyBlockedImage = true;
+    /// note: call initial() method
+    Q_ASSERT(_blocker != nullptr);
+
+    /// notify once when _anyBlockedImage is changed
+    if (_anyBlockedImage == false)
+      _blocker->onBlockedImage();
+
+    _anyBlockedImage = true;    
 
     return QVariant(QPixmap(":/qt-project.org/styles/commonstyle/images/filecontents-32.png"));
   }
@@ -92,7 +100,7 @@ QVariant TMessageEdit::loadResource(int type, const QUrl& url)
   return QTextBrowser::loadResource(type, url);
 }
 
-void TMessageEdit::loadContents(const QString& body, const TAttachmentContainer& attachments, bool* anyBlockedImage)
+void TMessageEdit::loadContents(const QString& body, const TAttachmentContainer& attachments)
 {
   _imageLoadAllowed = false;
   _anyBlockedImage = false;
@@ -138,8 +146,6 @@ void TMessageEdit::loadContents(const QString& body, const TAttachmentContainer&
 
   _imageLoadAllowed = imageLoadAllowed;
 
-  *anyBlockedImage = _anyBlockedImage;
-
   //no set modified flag when is loading contents
   doc->setModified(false);
 }
@@ -148,6 +154,8 @@ void TMessageEdit::loadBlockedImages()
   {
     if(_anyBlockedImage)
     {
+      bool saveModified = document()->isModified();
+
       _anyBlockedImage = false;
 
       _imageLoadAllowed = true;
@@ -156,6 +164,8 @@ void TMessageEdit::loadBlockedImages()
       setDocument(copy);
       /// FIXME - crashes after calling 'delete sourceDoc'
       ///delete sourceDoc;
+
+      document()->setModified(saveModified);
     }
   }
 
@@ -212,6 +222,7 @@ bool TMessageEdit::downloadImage(const QString &remoteUrl)
   if (reply->error() != 0)
   {
     ilog("Download error: ${err}", ("err", reply->errorString().toStdString()));
+    delete reply;
     return false;
   }
 
@@ -221,12 +232,12 @@ bool TMessageEdit::downloadImage(const QString &remoteUrl)
   {
     localFile.write(reply->readAll());
     localFile.close();
-    reply->deleteLater();
+    delete reply;
   }
   else
   {
     /// Can't open file
-    reply->deleteLater();
+    delete reply;
     return false;
   }
 
@@ -246,4 +257,9 @@ QString TMessageEdit::getFileExtension(const QString &fileName)
   }
 
   return extension;
+}
+
+void TMessageEdit::initial(IBlockerDelegate* blocker)
+{
+  _blocker = blocker;
 }

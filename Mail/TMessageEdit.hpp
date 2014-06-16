@@ -7,6 +7,8 @@
 
 #include <vector>
 
+class IBlockerDelegate;
+
 /** QTextBrowser subclass dedicated to notify client code about pasting/dropping some file attachment
     items into document body. Then attachmentAdded signal is emitted, pasted contents is ignored and
     client can decide where save received content to.
@@ -22,14 +24,15 @@ public:
   TMessageEdit(QWidget *parent = 0);
   virtual ~TMessageEdit() {}
 
+  void initial(IBlockerDelegate* blocker);
+
   /** Loads mail message and images
       \param body        - mail message body
       \param attachments - checks attachments and if it contains images displays it by inlining
                            them at the end of document.
       \param anyBlockedImage - returns true if any remote image is blocked
   */
-  void loadContents (const QString& body, const TAttachmentContainer& attachments,
-                    bool* anyBlockedImage);
+  void loadContents (const QString& body, const TAttachmentContainer& attachments);
 
   /// Allows to load blocked images (if any).
   void loadBlockedImages();
@@ -55,7 +58,8 @@ private:
 /// Class attributes:
 private:
   bool                  _imageLoadAllowed;
-  bool                  _anyBlockedImage;  
+  bool                  _anyBlockedImage;
+  IBlockerDelegate*     _blocker;
 };
 
 #endif // TMESSAGEEDIT_HPP

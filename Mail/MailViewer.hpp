@@ -2,13 +2,15 @@
 #include <memory>
 #include <bts/bitchat/bitchat_private_message.hpp>
 #include "MessageHeader.hpp"
+#include "BlockerDelegate.hpp"
 
 namespace Ui { class MailViewer; }
 class QToolBar;
 class MailboxModel;
 class Mailbox;
 
-class MailViewer : public QWidget
+class MailViewer : public QWidget,
+                   protected IBlockerDelegate
 {
   Q_OBJECT
 public:
@@ -21,9 +23,12 @@ public:
   */
   void displayMailMessage(Mailbox*, const QModelIndex& index, MailboxModel* mailbox);
 
-private slots:
-  /// Display blocked remote images
-  void onShowRemoteContent();
+private:
+  /// IBlockerDelegate interface description:
+  /// \see IBlockerDelegate interface description.
+  virtual void onBlockedImage() override;
+  /// \see IBlockerDelegate interface description.
+  virtual void onLoadBlockedImages() override;
 
 public:
   QToolBar* message_tools;

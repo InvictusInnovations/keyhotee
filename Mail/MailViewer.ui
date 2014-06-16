@@ -325,7 +325,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="remoteContentAlert" native="true">
+    <widget class="BlockedContentAlert" name="remoteContentAlert" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -338,19 +338,6 @@ p, li { white-space: pre-wrap; }
        <height>30</height>
       </size>
      </property>
-     <widget class="QPushButton" name="showRemoteContent">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>5</y>
-        <width>141</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Show remote content</string>
-      </property>
-     </widget>
     </widget>
    </item>
    <item>
@@ -371,6 +358,12 @@ p, li { white-space: pre-wrap; }
    <slots>
     <slot>onCompleterRequest()</slot>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>BlockedContentAlert</class>
+   <extends>QWidget</extends>
+   <header>Mail/BlockedContentAlert.hpp</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

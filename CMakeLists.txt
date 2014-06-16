@@ -234,6 +234,7 @@ qt5_wrap_ui( UiRequestAuthorization            AddressBook/RequestAuthorization.
 qt5_wrap_ui( UiKeyhoteeIDPubKeyWidget          AddressBook/keyhoteeidpubkeywidget.ui )
 qt5_wrap_ui( UiAuthorization                   AddressBook/authorization.ui )
 qt5_wrap_ui( UiIdentitySelection               Identity/IdentitySelection.ui )
+qt5_wrap_ui( UiBlockedContentAlert             Mail/BlockedContentAlert.ui )
 qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
 qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
 qt5_wrap_ui( UiMailEditor                      Mail/maileditorwindow.ui )
@@ -308,49 +309,45 @@ set( sources
         Identity/IdentityObservable.hpp
         Identity/IdentityObservable.cpp
 
-        Mail/MailboxModel.hpp
-        Mail/MailboxModel.cpp
-
-        Mail/MailboxModelRoot.hpp
-        Mail/MailboxModelRoot.cpp
-
-        Mail/Mailbox.ui
-        Mail/Mailbox.hpp
-        Mail/Mailbox.cpp
-
-        Mail/MailViewer.ui
-        Mail/MailViewer.hpp
-        Mail/MailViewer.cpp
-
-        Mail/maileditorwindow.ui
-        Mail/maileditorwindow.hpp
-        Mail/maileditorwindow.cpp
-        Mail/RepliedMailPattern.html
-
-        Mail/mailfieldswidget.ui
-        Mail/mailfieldswidget.hpp
-        Mail/mailfieldswidget.cpp
-
-        Mail/moneyattachementwidget.ui
-        Mail/moneyattachementwidget.hpp
-        Mail/moneyattachementwidget.cpp
-
-        Mail/MessageHeader.hpp
-        Mail/fileattachmentwidget.ui
-        Mail/fileattachmentwidget.hpp
-        Mail/fileattachmentwidget.cpp
+	    Mail/BlockerDelegate.hpp
+        Mail/BlockedContentAlert.ui
+        Mail/BlockedContentAlert.hpp
+        Mail/BlockedContentAlert.cpp
         Mail/FileAttachmentDialog.ui
         Mail/FileAttachmentDialog.hpp
         Mail/FileAttachmentDialog.cpp
+        Mail/fileattachmentwidget.ui
+        Mail/fileattachmentwidget.hpp
+        Mail/fileattachmentwidget.cpp
+        Mail/Mailbox.ui
+        Mail/Mailbox.hpp
+        Mail/Mailbox.cpp
+        Mail/MailboxModel.hpp
+        Mail/MailboxModel.cpp
+        Mail/MailboxModelRoot.hpp
+        Mail/MailboxModelRoot.cpp
+        Mail/maileditorwindow.ui
+        Mail/maileditorwindow.hpp
+        Mail/maileditorwindow.cpp
+        Mail/mailfieldswidget.ui
+        Mail/mailfieldswidget.hpp
+        Mail/mailfieldswidget.cpp
+        Mail/MailTable.hpp
+        Mail/MailTable.cpp
+        Mail/MailViewer.ui
+        Mail/MailViewer.hpp
+        Mail/MailViewer.cpp
+        Mail/MessageHeader.hpp
+        Mail/moneyattachementwidget.ui
+        Mail/moneyattachementwidget.hpp
+        Mail/moneyattachementwidget.cpp
+        Mail/RepliedMailPattern.html
+        Mail/ShowColumnAction.hpp
+        Mail/ShowColumnAction.cpp
         Mail/TableWidgetAttachments.hpp
         Mail/TableWidgetAttachments.cpp
         Mail/TMessageEdit.hpp
         Mail/TMessageEdit.cpp
-
-        Mail/MailTable.hpp
-        Mail/MailTable.cpp
-        Mail/ShowColumnAction.hpp
-        Mail/ShowColumnAction.cpp
 
         KeyhoteeApplication.hpp
         KeyhoteeApplication.cpp
