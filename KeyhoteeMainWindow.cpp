@@ -1243,10 +1243,15 @@ void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
   {
     TMailMsgIndex src_msg = _mail_model_root->findSrcMail(*src_msg_id);
 
-    if(pendingMsg.isTempReply())
-      src_msg.first->markMessageAsReplied(src_msg.second);
-    else if(pendingMsg.isTempForwa())
-      src_msg.first->markMessageAsForwarded(src_msg.second);
+    if(src_msg.first != nullptr)
+    {
+      // The source message is not marked as replied, because after moving messages
+      // eg from Outbox to Sent folder is changing its identifier(digest)
+      if(pendingMsg.isTempReply())
+        src_msg.first->markMessageAsReplied(src_msg.second);
+      else if(pendingMsg.isTempForwa())
+        src_msg.first->markMessageAsForwarded(src_msg.second);
+    }
   }
 
   ui->out_box_page->removeMessage(pendingMsg);
