@@ -73,7 +73,8 @@ public:
   void setEnabledDeleteOption( bool enable );
   void setEnabledContactOption( bool enable );
   void refreshMenuOptions();
-  void setEnabledMailActions(bool enable);
+  /// Called from Mailbox::CheckSendMailButtons()
+  void onEnableMailButtons(bool enable);
   ContactsTable* getContactsPage();
   void shareContact(QList<const Contact*>& contacts);
 
