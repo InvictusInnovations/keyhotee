@@ -1238,10 +1238,15 @@ void KeyhoteeMainWindow::OnMessageSent(const TStoredMailMessage& pendingMsg,
   {
     TMailMsgIndex src_msg = _mail_model_root->findSrcMail(*src_msg_id);
 
-    if(pendingMsg.isTempReply())
-      src_msg.first->markMessageAsReplied(src_msg.second);
-    else if(pendingMsg.isTempForwa())
-      src_msg.first->markMessageAsForwarded(src_msg.second);
+    if(src_msg.first != nullptr)
+    {
+      // The source message is not marked as replied, because after moving messages
+      // eg from Outbox to Sent folder is changing its identifier(digest)
+      if(pendingMsg.isTempReply())
+        src_msg.first->markMessageAsReplied(src_msg.second);
+      else if(pendingMsg.isTempForwa())
+        src_msg.first->markMessageAsForwarded(src_msg.second);
+    }
   }
 
   ui->out_box_page->removeMessage(pendingMsg);
@@ -1625,7 +1630,20 @@ bool KeyhoteeMainWindow::onIdentityDelIntent(const TIdentity&  identity)
     }
   }
 
-  if(is_pending_msg_from_identity)
+  bool is_draft_msg_from_identity = false;
+
+  for(int row = 0; row < _draft_model->rowCount(); ++row)
+  {
+    QModelIndex index = _draft_model->index(row, MailboxModel::From);
+    QString from = _draft_model->data(index, Qt::DisplayRole).toString();
+    if(from == identity_name)
+    {
+      is_draft_msg_from_identity = true;
+      break;
+    }
+  }
+
+  if(is_pending_msg_from_identity || is_draft_msg_from_identity)
   {
     QString identity_replace_name = Utils::toString(_identity_replace.public_key, Utils::FULL_CONTACT_DETAILS);
 
@@ -1633,7 +1651,7 @@ bool KeyhoteeMainWindow::onIdentityDelIntent(const TIdentity&  identity)
     text = tr("Are you sure you want to delete identity: ");
     text += identity_name;
     text += "?\n";
-    text += tr("Using this identity created messages that are currently in the outbox.");
+    text += tr("Using this identity created messages that are currently in the Outbox or Drafts.");
     text += "\n";
     text += tr("After removing the identity, messages will be moved to the Draft. Sender will be replaced by: ");
     text += identity_replace_name;
@@ -1649,7 +1667,19 @@ bool KeyhoteeMainWindow::onIdentityDelIntent(const TIdentity&  identity)
 bool KeyhoteeMainWindow::onIdentityDelete(const TIdentity&  identity)
 {
   QString identity_name = Utils::toString(identity.public_key, Utils::FULL_CONTACT_DETAILS);
-  for(int row = _pending_model->rowCount()-1; row > -1; --row)
+  for(int row = 0; row < _draft_model->rowCount(); ++row)
+  {
+    QModelIndex index = _draft_model->index(row, MailboxModel::From);
+    QString from = _draft_model->data(index, Qt::DisplayRole).toString();
+    if(from == identity_name)
+    {
+      bts::bitchat::private_email_message mail_msg;
+      bts::bitchat::message_header        header;
+      _draft_model->getMessageData(index, &header, &mail_msg);
+      _connectionProcessor.Save(_identity_replace, mail_msg, IMailProcessor::TMsgType::Normal, &header);
+    }
+  }
+  for(int row = _pending_model->rowCount() - 1; row > -1; --row)
   {
     QModelIndex index = _pending_model->index(row, MailboxModel::From);
     QString from = _pending_model->data(index, Qt::DisplayRole).toString();

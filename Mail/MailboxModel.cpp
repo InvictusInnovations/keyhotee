@@ -148,8 +148,9 @@ void MailboxModel::replaceMessage(const TStoredMailMessage& overwrittenMsg,
       if(fillMailHeader(msg, helper))
       {
         hdr = helper;
-        
-        _unread_msg_count++;
+
+        if(overwrittenMsg.isRead())
+          _unread_msg_count++;
         updateTreeItemDisplay();
       }
 

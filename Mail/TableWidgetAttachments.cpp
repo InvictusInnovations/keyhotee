@@ -61,6 +61,11 @@ void TableWidgetAttachments::dropEvent(QDropEvent *event)
   }
 }
 
+void TableWidgetAttachments::focusInEvent(QFocusEvent * event)
+{
+  emit itemSelectionChanged();
+}
+
 QStringList TableWidgetAttachments::getFilesPathFromClipboard()
 {
   MimeDataChecker mime( QApplication::clipboard()->mimeData() );
