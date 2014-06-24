@@ -48,7 +48,10 @@ public:
   bool isSelection () const;
   bool isOneEmailSelected() const;
   void selectAll ();
-  void checksendmailbuttons();
+  /** Disable/enable actionReply, actionReply_All, actionForward buttons
+      depending on one email is selected and identity exist
+  */
+  void checkSendMailButtons();
   /** Write mail box settings to the system registry
       when application is closing
   */

@@ -88,7 +88,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   setWindowTitle(title);
   setEnabledAttachmentSaveOption(false);
   setEnabledDeleteOption(false);
-  setEnabledMailActions(false);
+  onEnableMailButtons(false);
   setEnabledContactOption(false);
 
   QString settings_file = "keyhotee_";
@@ -262,9 +262,6 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   {
       ui->actionNew_Message->setEnabled(false);
       ui->actionRequest_authorization->setEnabled(false);
-      ui->actionReply->setEnabled(false);
-      ui->actionReply_all->setEnabled(false);
-      ui->actionForward->setEnabled(false);
   }
 
   for (size_t i = 0; i < idents.size(); ++i)
@@ -330,11 +327,9 @@ void KeyhoteeMainWindow::activateMailboxPage(Mailbox* mailBox)
   ui->actionShow_details->setChecked(checked);
 
   _currentMailbox = mailBox;
-  if(nullptr != _currentMailbox)
-    _currentMailbox->checksendmailbuttons();
+  _currentMailbox->checkSendMailButtons();
   setEnabledAttachmentSaveOption(_currentMailbox->isAttachmentSelected());
-  setEnabledDeleteOption (_currentMailbox->isSelection());
-  setEnabledMailActions(_currentMailbox->isOneEmailSelected());
+  setEnabledDeleteOption (_currentMailbox->isSelection());  
   }
 
 void KeyhoteeMainWindow::addContact()
@@ -444,7 +439,7 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
 
     setEnabledDeleteOption (false);
     setEnabledAttachmentSaveOption(false);
-    setEnabledMailActions(false);
+    onEnableMailButtons(false);
     setEnabledContactOption(false);
     _currentMailbox = nullptr;
     ui->actionShow_details->setEnabled(true);
@@ -645,16 +640,16 @@ bool KeyhoteeMainWindow::isIdentityPresent()
 
 void KeyhoteeMainWindow::enableNewMessageIcon()
 {
-    if(isIdentityPresent() == true ) {
-         ui->actionNew_Message->setEnabled(true);
-         ui->actionRequest_authorization->setEnabled(true);
-         ui->actionReply->setEnabled(true);
-         ui->actionReply_all->setEnabled(true);
-         ui->actionForward->setEnabled(true);
-         emit checkSendMailSignal();
-         if(nullptr != _currentMailbox)
-           _currentMailbox->checksendmailbuttons();
+  if(isIdentityPresent() == true ) 
+  {
+    ui->actionNew_Message->setEnabled(true);
+    ui->actionRequest_authorization->setEnabled(true);
+    emit checkSendMailSignal();
+    if (_currentMailbox != nullptr)
+    {
+      _currentMailbox->checkSendMailButtons();
     }
+  }
 }
 
 void KeyhoteeMainWindow::onEnableMining(bool enabled)
@@ -888,8 +883,8 @@ ContactGui* KeyhoteeMainWindow::createContactGuiIfNecessary(int contact_id)
   contact_gui->_view->checkKeyhoteeIdStatus();
 
   contact_gui->_view->checkSendMailButton();
-  if(nullptr != _currentMailbox)
-    _currentMailbox->checksendmailbuttons();
+  if(_currentMailbox != nullptr)
+    _currentMailbox->checkSendMailButtons();
   return contact_gui;
 }
 
@@ -933,8 +928,8 @@ void KeyhoteeMainWindow::deleteContactGui(int contact_id)
     {
     _contacts_root->removeChild(contact_gui->_tree_item);
     _contact_guis.erase(contact_id);
-    if(nullptr != _currentMailbox)
-      _currentMailbox->checksendmailbuttons();
+    if (_currentMailbox != nullptr)
+      _currentMailbox->checkSendMailButtons();
     }
 
   assert(_contact_guis.find(contact_id) == _contact_guis.end());
@@ -1300,12 +1295,16 @@ void KeyhoteeMainWindow::enableMenu(bool enable)
 {
   ui->actionShow_details->setEnabled (enable);
   setEnabledDeleteOption (enable);
-  setEnabledMailActions(enable);
   ui->actionNew_Contact->setEnabled (enable);
   ui->actionShow_Contacts->setEnabled (enable);
   _search_edit->setEnabled (enable);  
   setEnabledContactOption(enable);
   ui->actionShow_blocked_contacts->setEnabled(enable && _is_filter_blocked_on);
+
+  if (enable == false)
+  {
+    onEnableMailButtons(false);
+  }
 }
 
 void KeyhoteeMainWindow::closeEvent(QCloseEvent *closeEvent)
@@ -1428,7 +1427,7 @@ void KeyhoteeMainWindow::refreshMenuOptions()
   ui->actionDelete->setEnabled (enabled);
 }
 
-void KeyhoteeMainWindow::setEnabledMailActions(bool enable)
+void KeyhoteeMainWindow::onEnableMailButtons(bool enable)
   {
     ui->actionReply->setEnabled(enable);
     ui->actionReply_all->setEnabled(enable);
@@ -1469,15 +1468,15 @@ void KeyhoteeMainWindow::onRemoveContact()
   }
 
   refreshMenuOptions();
-  if(isIdentityPresent() == false ){
-       ui->actionNew_Message->setEnabled(false);
-       ui->actionRequest_authorization->setEnabled(false);
-       ui->actionReply->setEnabled(false);
-       ui->actionReply_all->setEnabled(false);
-       ui->actionForward->setEnabled(false);
-       if(nullptr != _currentMailbox)
-         _currentMailbox->checksendmailbuttons();
-       emit checkSendMailSignal();
+  if(isIdentityPresent() == false )
+  {
+    ui->actionNew_Message->setEnabled(false);
+    ui->actionRequest_authorization->setEnabled(false);
+    if (_currentMailbox != nullptr)
+    {
+      _currentMailbox->checkSendMailButtons();
+    }
+    emit checkSendMailSignal();
   }
 }
 
@@ -1605,7 +1604,7 @@ bool KeyhoteeMainWindow::onIdentityDelIntent(const TIdentity&  identity)
     return false;
   }
 
-  int i;
+  size_t i;
   for(i = 0; i < identites.size(); i++)
   {
     if(identites[i].public_key == identity.public_key)
