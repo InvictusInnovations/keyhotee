@@ -67,7 +67,7 @@ endif(APPLE)
 
 set(CMAKE_INSTALL_PREFIX "${INVICTUS_ROOT}/packages" CACHE PATH "Keyhotee install prefix" FORCE)
 
-#add_subdirectory(../bitshares_toolkit bitshares_toolkit.bin)
+add_subdirectory(../bitshares_toolkit bitshares_toolkit.bin)
 add_subdirectory(BitShares)
 add_subdirectory(miner)
 
@@ -126,7 +126,7 @@ SET( BUILD_SHARED_LIBS OFF )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CmakeModules/")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/CMakeModules")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/fc/GitVersionGen")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../bitshares_toolkit/libraries/fc/GitVersionGen")
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)

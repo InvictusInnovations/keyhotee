@@ -3,25 +3,17 @@ setlocal
 call "%~dp0\..\setenv.bat"
 
 rem goto doBld
-pushd "%INVICTUS_ROOT%\keyhotee"
-echo Updating Bitshares sources...
+pushd "%INVICTUS_ROOT%"
+echo Updating bitshares_toolkit sources...
 
-If exist BitShares ( 
-    pushd BitShares
+If exist bitshares_toolkit ( 
+    pushd bitshares_toolkit
     git pull || exit /b 1
 ) else (
-    git clone https://www.github.com/InvictusInnovations/BitShares.git || exit /b 2
-    pushd BitShares
-)
-
-echo Updating fc sources...
-
-if exist fc ( 
-    pushd fc
-    git pull || exit /b 3
-    popd
-) else (
-    git clone https://www.github.com/InvictusInnovations/fc.git || exit /b 4
+    git clone https://github.com/BitShares/bitshares_toolkit.git || exit /b 2
+    pushd bitshares_toolkit
+	git submodule init
+	git submodule update
 )
 
 echo Updating leveldb-win sources...
@@ -29,16 +21,28 @@ echo Updating leveldb-win sources...
 pushd vendor
 if exist leveldb-win/.git ( 
     pushd leveldb-win
-    git pull || exit /b 5
+    git pull || exit /b 3
     popd
 ) else (
-    git clone https://www.github.com/InvictusInnovations/leveldb-win.git || exit /b 6
+    git clone https://www.github.com/InvictusInnovations/leveldb-win.git || exit /b 4
 )
 
-rem popd to be in Bitshares
-popd 
-rem popd to be in keyhotee
-popd 
+rem popd to be in bitshares_toolkit
+popd
+rem popd to be in INVICTUS_ROOT dir
+popd
+
+pushd "keyhotee"
+echo Updating Bitshares sources...
+
+If exist BitShares ( 
+    pushd BitShares
+    git pull || exit /b 5
+	popd
+) else (
+    git clone https://www.github.com/InvictusInnovations/BitShares.git || exit /b 6
+)
+
 rem popd to be in startup dir
 popd
 

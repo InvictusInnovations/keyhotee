@@ -88,17 +88,19 @@ void Mailbox::showCurrentMail(const QModelIndex &selected,
                               const QModelIndex &deselected)
   {}
 
-void Mailbox::checksendmailbuttons()
+void Mailbox::checkSendMailButtons()
 {
     QItemSelectionModel* selection_model = ui->inbox_table->selectionModel();
     QModelIndexList      indexes = selection_model->selectedRows();
 
-    bool                 oneEmailSelected = (indexes.size() == 1);
+    bool  oneEmailSelected = (indexes.size() == 1);
+    bool  identity = isIdentity();
 
-    bool                  identity = isIdentity();
     ui->actionReply->setEnabled(oneEmailSelected && identity);
     ui->actionReply_All->setEnabled(oneEmailSelected && identity);
     ui->actionForward->setEnabled(oneEmailSelected && identity);
+
+    getKeyhoteeWindow()->onEnableMailButtons(oneEmailSelected && identity);
 }
 
 void Mailbox::onSelectionChanged(const QItemSelection &selected,
@@ -108,21 +110,17 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
   QModelIndexList      indexes = selection_model->selectedRows();
   //disable reply buttons if more than one email selected
   bool                 oneEmailSelected = (indexes.size() == 1);
-  bool                  identity = isIdentity();
 
   ui->actionOpen->setEnabled(oneEmailSelected);
   ui->actionMark_as_unread->setEnabled(indexes.size() > 0);
   ui->actionDelete->setEnabled(indexes.size() > 0);
-  ui->actionReply->setEnabled(oneEmailSelected && identity);
 
-  ui->actionReply_All->setEnabled(oneEmailSelected && identity);
-  ui->actionForward->setEnabled(oneEmailSelected && identity);
+  checkSendMailButtons();
 
   //display selected email(s) in message preview window
   if (oneEmailSelected)
     {
-    refreshMessageViewer();
-    getKeyhoteeWindow()->setEnabledMailActions(true);
+    refreshMessageViewer();    
     }
   else
     {
@@ -132,7 +130,6 @@ void Mailbox::onSelectionChanged(const QItemSelection &selected,
       ui->mail_viewer->setCurrentWidget(ui->info_1);
     //TODO: not implemented ui->current_message->displayMailMessages(indexes,selection_model);
 
-    getKeyhoteeWindow()->setEnabledMailActions(false);
     getKeyhoteeWindow()->setEnabledAttachmentSaveOption( _attachmentSelected = false );
     }
 
