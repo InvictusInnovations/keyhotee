@@ -13,7 +13,7 @@ export PKG_CONFIG_PATH=$TOOLCHAIN_ROOT/x86_64-unknown-linux-gnu/sysroot/usr/lib/
 export QTDIR=$INVICTUS_ROOT/QT
 echo "Using: "$QTDIR "as QTDIR"
 
-export PATH=$TOOLCHAIN_ROOT/bin:$QTDIR/bin:$PATH
+export PATH=$TOOLCHAIN_ROOT/bin:$QTDIR/bin:$INVICTUS_ROOT/bin:$PATH
 
 export OPENSSL_ROOT=$INVICTUS_ROOT/openssl
 export OPENSSL_ROOT_DIR=$OPENSSL_ROOT
