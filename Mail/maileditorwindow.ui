@@ -33,13 +33,29 @@
     <property name="spacing">
      <number>0</number>
     </property>
-    <item row="0" column="0">
+    <item row="1" column="0">
      <widget class="TMessageEdit" name="messageEdit">
       <property name="undoRedoEnabled">
        <bool>true</bool>
       </property>
       <property name="textInteractionFlags">
        <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextEditorInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="BlockedContentAlert" name="remoteContentAlert" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
       </property>
      </widget>
     </item>
@@ -594,6 +610,12 @@
    <class>TMessageEdit</class>
    <extends>QTextBrowser</extends>
    <header>Mail/TMessageEdit.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>BlockedContentAlert</class>
+   <extends>QWidget</extends>
+   <header>Mail/BlockedContentAlert.hpp</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

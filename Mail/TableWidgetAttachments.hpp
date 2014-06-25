@@ -19,6 +19,8 @@ protected:
     virtual void dragLeaveEvent(QDragLeaveEvent *event);
     virtual void dropEvent(QDropEvent *event);
 
+    virtual void focusInEvent(QFocusEvent * event) override;
+
 signals:
   void dropEvent(QStringList);
 public slots:

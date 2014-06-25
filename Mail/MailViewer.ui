@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>799</width>
-    <height>351</height>
+    <height>365</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,16 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -316,11 +325,32 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
+    <widget class="BlockedContentAlert" name="remoteContentAlert" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="TMessageEdit" name="message_content"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>TMessageEdit</class>
+   <extends>QTextBrowser</extends>
+   <header>Mail/TMessageEdit.hpp</header>
+  </customwidget>
   <customwidget>
    <class>ContactListEdit</class>
    <extends>QTextEdit</extends>
@@ -330,9 +360,10 @@ p, li { white-space: pre-wrap; }
    </slots>
   </customwidget>
   <customwidget>
-   <class>TMessageEdit</class>
-   <extends>QTextBrowser</extends>
-   <header>Mail/TMessageEdit.hpp</header>
+   <class>BlockedContentAlert</class>
+   <extends>QWidget</extends>
+   <header>Mail/BlockedContentAlert.hpp</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

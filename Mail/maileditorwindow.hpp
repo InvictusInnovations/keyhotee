@@ -6,6 +6,7 @@
 #include <bts/bitchat/bitchat_message_db.hpp>
 
 #include "ATopLevelWindow.hpp"
+#include "BlockerDelegate.hpp"
 
 #include <QMainWindow>
 
@@ -35,7 +36,8 @@ class Mailbox;
       (contact)
     - with explicit recipient list when reply/reply-all options are in action.
 */
-class MailEditorMainWindow : public ATopLevelWindow
+class MailEditorMainWindow : public ATopLevelWindow,
+                             protected IBlockerDelegate
   {
   Q_OBJECT
   public:
@@ -128,6 +130,13 @@ class MailEditorMainWindow : public ATopLevelWindow
     QString transformMailBody(TLoadForm loadForm, const TStoredMailMessage& msgHeader,
       const TPhysicalMailMessage& srcMsg);
     void toggleReadOnlyMode();
+
+  private:
+    /// IBlockerDelegate interface description:
+    /// \see IBlockerDelegate interface description.
+    virtual void onBlockedImage() override;
+    /// \see IBlockerDelegate interface description.
+    virtual void onLoadBlockedImages() override;
 
   private slots:
     /// Actual implementation of save operation.

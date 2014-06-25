@@ -67,7 +67,7 @@ endif(APPLE)
 
 set(CMAKE_INSTALL_PREFIX "${INVICTUS_ROOT}/packages" CACHE PATH "Keyhotee install prefix" FORCE)
 
-#add_subdirectory(../bitshares_toolkit bitshares_toolkit.bin)
+add_subdirectory(../bitshares_toolkit bitshares_toolkit.bin)
 add_subdirectory(BitShares)
 add_subdirectory(miner)
 
@@ -126,7 +126,7 @@ SET( BUILD_SHARED_LIBS OFF )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CmakeModules/")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/CMakeModules")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/BitShares/fc/GitVersionGen")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../bitshares_toolkit/libraries/fc/GitVersionGen")
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
@@ -234,6 +234,7 @@ qt5_wrap_ui( UiRequestAuthorization            AddressBook/RequestAuthorization.
 qt5_wrap_ui( UiKeyhoteeIDPubKeyWidget          AddressBook/keyhoteeidpubkeywidget.ui )
 qt5_wrap_ui( UiAuthorization                   AddressBook/authorization.ui )
 qt5_wrap_ui( UiIdentitySelection               Identity/IdentitySelection.ui )
+qt5_wrap_ui( UiBlockedContentAlert             Mail/BlockedContentAlert.ui )
 qt5_wrap_ui( UiMailbox                         Mail/Mailbox.ui )
 qt5_wrap_ui( UiMailViewer                      Mail/MailViewer.ui )
 qt5_wrap_ui( UiMailEditor                      Mail/maileditorwindow.ui )
@@ -308,49 +309,45 @@ set( sources
         Identity/IdentityObservable.hpp
         Identity/IdentityObservable.cpp
 
-        Mail/MailboxModel.hpp
-        Mail/MailboxModel.cpp
-
-        Mail/MailboxModelRoot.hpp
-        Mail/MailboxModelRoot.cpp
-
-        Mail/Mailbox.ui
-        Mail/Mailbox.hpp
-        Mail/Mailbox.cpp
-
-        Mail/MailViewer.ui
-        Mail/MailViewer.hpp
-        Mail/MailViewer.cpp
-
-        Mail/maileditorwindow.ui
-        Mail/maileditorwindow.hpp
-        Mail/maileditorwindow.cpp
-        Mail/RepliedMailPattern.html
-
-        Mail/mailfieldswidget.ui
-        Mail/mailfieldswidget.hpp
-        Mail/mailfieldswidget.cpp
-
-        Mail/moneyattachementwidget.ui
-        Mail/moneyattachementwidget.hpp
-        Mail/moneyattachementwidget.cpp
-
-        Mail/MessageHeader.hpp
-        Mail/fileattachmentwidget.ui
-        Mail/fileattachmentwidget.hpp
-        Mail/fileattachmentwidget.cpp
+	    Mail/BlockerDelegate.hpp
+        Mail/BlockedContentAlert.ui
+        Mail/BlockedContentAlert.hpp
+        Mail/BlockedContentAlert.cpp
         Mail/FileAttachmentDialog.ui
         Mail/FileAttachmentDialog.hpp
         Mail/FileAttachmentDialog.cpp
+        Mail/fileattachmentwidget.ui
+        Mail/fileattachmentwidget.hpp
+        Mail/fileattachmentwidget.cpp
+        Mail/Mailbox.ui
+        Mail/Mailbox.hpp
+        Mail/Mailbox.cpp
+        Mail/MailboxModel.hpp
+        Mail/MailboxModel.cpp
+        Mail/MailboxModelRoot.hpp
+        Mail/MailboxModelRoot.cpp
+        Mail/maileditorwindow.ui
+        Mail/maileditorwindow.hpp
+        Mail/maileditorwindow.cpp
+        Mail/mailfieldswidget.ui
+        Mail/mailfieldswidget.hpp
+        Mail/mailfieldswidget.cpp
+        Mail/MailTable.hpp
+        Mail/MailTable.cpp
+        Mail/MailViewer.ui
+        Mail/MailViewer.hpp
+        Mail/MailViewer.cpp
+        Mail/MessageHeader.hpp
+        Mail/moneyattachementwidget.ui
+        Mail/moneyattachementwidget.hpp
+        Mail/moneyattachementwidget.cpp
+        Mail/RepliedMailPattern.html
+        Mail/ShowColumnAction.hpp
+        Mail/ShowColumnAction.cpp
         Mail/TableWidgetAttachments.hpp
         Mail/TableWidgetAttachments.cpp
         Mail/TMessageEdit.hpp
         Mail/TMessageEdit.cpp
-
-        Mail/MailTable.hpp
-        Mail/MailTable.cpp
-        Mail/ShowColumnAction.hpp
-        Mail/ShowColumnAction.cpp
 
         KeyhoteeApplication.hpp
         KeyhoteeApplication.cpp
@@ -475,6 +472,7 @@ ENDIF(NOT WIN32)
 # Configure dependencies of keyhotee main application module
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} ${resources} )
 add_dependencies (Keyhotee translations_target)
+add_dependencies(Keyhotee bitshares_client)
 
 get_target_property(FC_SHARED_LIBRARIES_DEBUG fc SHARED_LIBRARIES_DEBUG)
 get_target_property(FC_SHARED_LIBRARIES_RELEASE fc SHARED_LIBRARIES_RELEASE)
@@ -618,6 +616,10 @@ foreach(plugin ${Qt5Gui_PLUGINS})
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${plugin_path}/${plugin_name}$<$<CONFIG:Debug>:$<TARGET_PROPERTY:Keyhotee,DEBUG_POSTFIX>>${plugin_ext}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/${plugin_classification}/${plugin_name}$<$<CONFIG:Debug>:$<TARGET_PROPERTY:Keyhotee,DEBUG_POSTFIX>>${plugin_ext}")
 endforeach()
 
+get_target_property(_loc bitshares_client LOCATION_RELWITHDEBINFO)
+SET(POST_BUILD_STEP_COMMANDS ${POST_BUILD_STEP_COMMANDS}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_loc}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
+
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .) # copy the msvcrt files to the top-level directory instead of bin
 include(InstallRequiredSystemLibraries)
 
@@ -630,6 +632,9 @@ foreach(plugin ${Qt5Gui_PLUGINS})
   list(APPEND QTPLUGINS "${_loc}") 
   INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins/${plugin_classification} COMPONENT Runtime) 
 endforeach()
+
+get_target_property(_loc bitshares_client LOCATION_RELWITHDEBINFO)
+INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins COMPONENT Runtime)
 
 INSTALL(CODE "
   file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")

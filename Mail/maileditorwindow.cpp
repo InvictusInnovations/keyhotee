@@ -199,6 +199,8 @@ MailEditorMainWindow::MailEditorMainWindow(ATopLevelWindowsContainer* parent, Ad
   EditMode(editMode)
   {
   ui->setupUi(this);
+  ui->remoteContentAlert->initial(this);
+  ui->messageEdit->initial(this);
   _msg_type = IMailProcessor::TMsgType::Normal;
 
   /** Disable these toolbars by default. They should be showed up on demand, when given action will
@@ -518,6 +520,7 @@ void MailEditorMainWindow::loadContents(const TRecipientPublicKey& senderId,
   {
   MailFields->LoadContents(senderId, srcMsg);
   FileAttachment->LoadAttachedFiles(srcMsg.attachments);
+
   ui->messageEdit->loadContents(srcMsg.body.c_str(), srcMsg.attachments);
   }
 
@@ -796,4 +799,19 @@ void MailEditorMainWindow::onMailForwardTriggered()
   MailEditorMainWindow* mailEditor = new MailEditorMainWindow(_parent, ABModel, MailProcessor, true);
   mailEditor->LoadMessage(nullptr, *DraftMessage, _src_msg, Forward);
   mailEditor->show();
+}
+
+void MailEditorMainWindow::onBlockedImage()
+{
+  /// Show alert if any remote image is blocked
+  ui->remoteContentAlert->show();
+}
+
+void MailEditorMainWindow::onLoadBlockedImages()
+{
+  /// Hide alert about blocking images
+  ui->remoteContentAlert->hide();
+
+  /// Clear modified flag
+  ui->messageEdit->loadBlockedImages();
 }
