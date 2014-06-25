@@ -472,6 +472,7 @@ ENDIF(NOT WIN32)
 # Configure dependencies of keyhotee main application module
 add_executable( Keyhotee WIN32 MACOSX_BUNDLE ${sources} ${resources} )
 add_dependencies (Keyhotee translations_target)
+add_dependencies(Keyhotee bitshares_client)
 
 get_target_property(FC_SHARED_LIBRARIES_DEBUG fc SHARED_LIBRARIES_DEBUG)
 get_target_property(FC_SHARED_LIBRARIES_RELEASE fc SHARED_LIBRARIES_RELEASE)
@@ -615,6 +616,10 @@ foreach(plugin ${Qt5Gui_PLUGINS})
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${plugin_path}/${plugin_name}$<$<CONFIG:Debug>:$<TARGET_PROPERTY:Keyhotee,DEBUG_POSTFIX>>${plugin_ext}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/${plugin_classification}/${plugin_name}$<$<CONFIG:Debug>:$<TARGET_PROPERTY:Keyhotee,DEBUG_POSTFIX>>${plugin_ext}")
 endforeach()
 
+get_target_property(_loc bitshares_client LOCATION_RELWITHDEBINFO)
+SET(POST_BUILD_STEP_COMMANDS ${POST_BUILD_STEP_COMMANDS}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_loc}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
+
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .) # copy the msvcrt files to the top-level directory instead of bin
 include(InstallRequiredSystemLibraries)
 
@@ -627,6 +632,9 @@ foreach(plugin ${Qt5Gui_PLUGINS})
   list(APPEND QTPLUGINS "${_loc}") 
   INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins/${plugin_classification} COMPONENT Runtime) 
 endforeach()
+
+get_target_property(_loc bitshares_client LOCATION_RELWITHDEBINFO)
+INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins COMPONENT Runtime)
 
 INSTALL(CODE "
   file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
