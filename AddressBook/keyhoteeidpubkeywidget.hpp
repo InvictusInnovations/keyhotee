@@ -71,7 +71,7 @@ Q_SIGNALS:
 private slots:
   void keyhoteeIdEdited(const QString& keyhotee_id);
   void publicKeyEdited(const QString& public_key_string);
+  void on_private_key_button_clicked();
 
   bool event(QEvent *e);
 };
-

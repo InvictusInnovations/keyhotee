@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "keyhoteeidpubkeywidget.hpp"
 #include "ui_keyhoteeidpubkeywidget.h"
 
@@ -5,6 +7,7 @@
 #include "public_key_address.hpp"
 
 #include <bts/application.hpp>
+#include <bts/keychain.hpp>
 #include <fc/thread/thread.hpp>
 
 #include <QClipboard>
@@ -264,6 +267,7 @@ void KeyhoteeIDPubKeyWidget::setContact(const Contact& current_contact)
     std::string public_key_string = public_key_address(_current_contact.public_key.serialize());
     ui->public_key->setText(public_key_string.c_str());
     ui->public_key->setEnabled( !isOwner );
+    ui->private_key_button->setVisible(isOwner);
 }
 
 void KeyhoteeIDPubKeyWidget::onPublicKeyToClipboard()
@@ -400,4 +404,20 @@ QString KeyhoteeIDPubKeyWidget::getKeyhoteeID()
 void KeyhoteeIDPubKeyWidget::setFocus(Qt::FocusReason reason)
 {
   ui->keyhotee_id->setFocus(reason);
+}
+void KeyhoteeIDPubKeyWidget::on_private_key_button_clicked()
+{
+  //Performing the WIF conversion inline, since I don't see bts::utilities in this repository.
+  //If this is available somewhere in this repository, please change it.
+  fc::sha256 secret = bts::application::instance()->get_profile()->get_keychain().get_identity_key(_current_contact.dac_id_string).priv_key;
+  const size_t size_of_data_to_hash = sizeof(secret) + 1;
+  const size_t size_of_hash_bytes = 4;
+  char data[size_of_data_to_hash + size_of_hash_bytes];
+  data[0] = (char)0x80;
+  memcpy(&data[1], (char*)&secret, sizeof(secret));
+  fc::sha256 digest = fc::sha256::hash(data, size_of_data_to_hash);
+  digest = fc::sha256::hash(digest);
+  memcpy(data + size_of_data_to_hash, (char*)&digest, size_of_hash_bytes);
+
+  QApplication::clipboard()->setText(fc::to_base58(data, sizeof(data)).c_str());
 }
