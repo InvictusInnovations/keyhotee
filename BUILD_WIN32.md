@@ -156,7 +156,7 @@ run_cmake.bat
  hit **Generate**.
 
 #### Build Keyhotee ####
-* Launch *Visual Studio* and load `E:\Invictus\keyhotee\keyhotee.sln`
+* Launch *Visual Studio* and load `E:\Invictus\vs12\keyhotee.sln`
 * set *Keyhotee* as the startup project
 * *Build Solution*
 
