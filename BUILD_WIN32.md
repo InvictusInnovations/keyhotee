@@ -1,7 +1,7 @@
 Windows
 =======
 #### Prerequisites ####
-* Microsoft Visual C++ 2012 Update 3 (the free Express edition will work)
+* Microsoft Visual C++ 2013 Update 2 (the free Express edition will work)
 
 #### Set up the directory structure####
 * Create a base directory for all projects.  I'm putting everything in 
@@ -17,8 +17,11 @@ cd E:\Invictus
 git clone https://github.com/InvictusInnovations/keyhotee.git
 cd keyhotee
 git clone https://github.com/InvictusInnovations/BitShares.git
-cd BitShares
-git clone https://github.com/InvictusInnovations/fc.git
+cd ..
+git clone https://github.com/bitshares/bitshares_toolkit.git
+cd bitshares_toolkit
+git submodule init
+git submodule update
 cd vendor
 git clone https://github.com/InvictusInnovations/leveldb-win.git
 ```
@@ -83,6 +86,7 @@ At the end of this, your base directory should look like this:
 ```
 E:\Invictus
 +- BerkeleyDB
++- bitshares_toolkit
 +- boost
 +- CMake
 +- ICU
@@ -144,10 +148,10 @@ run_cmake.bat
  This pops up the cmake gui, but if you've used CMake before it will probably be
  showing the wrong data, so fix that:
  * Where is the source code: `E:\Invictus\keyhotee`
- * Where to build the binaries: `E:\Invictus\vs11`
+ * Where to build the binaries: `E:\Invictus\vs12`
  
  Then hit **Configure**.  It may ask you to specify a generator for this 
- project; if it does, choose **Visual Studio 11** and select **Use default 
+ project; if it does, choose **Visual Studio 12** and select **Use default 
  native compilers**.  Look through the output and fix any errors.  Then 
  hit **Generate**.
 
