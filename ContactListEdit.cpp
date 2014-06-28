@@ -105,7 +105,8 @@ void ContactListEdit::insertCompletion(const QModelIndex& completionIndex)
 void ContactListEdit::onCompleterRequest()
   {
   setFocus();
-  showCompleter(QString());
+  initCompleter(QString());
+  showCompleter();
   if(_completerModel->rowCount() == 0)
     {
     QRect pos = cursorRect();
@@ -349,13 +350,17 @@ void ContactListEdit::setAddressBookModel(AddressBookModel& abModel)
            this, SLOT(insertCompletion(const QModelIndex&)));
   }
 
-void ContactListEdit::showCompleter(const QString& completionPrefix)
-  {
+void ContactListEdit::initCompleter(const QString& completionPrefix)
+{
   if (completionPrefix != _completer->completionPrefix())
-    {
+  {
     _completer->setCompletionPrefix(completionPrefix);
     _completer->popup()->setCurrentIndex(_completer->completionModel()->index(0, 0));
-    }
+  }
+}
+
+void ContactListEdit::showCompleter()
+  {
   QRect cr = cursorRect();
   cr.setWidth(_completer->popup()->sizeHintForColumn(0)
               + _completer->popup()->verticalScrollBar()->sizeHint().width());
@@ -421,34 +426,45 @@ void ContactListEdit::onTextChanged()
      text.isEmpty() == false)
     {
     TAutoSkipCompletion asc(this);
-
+    
     std::string textKey = text.toStdString();
 
     bts::addressbook::wallet_contact matchedContact;
 
     bool contactFound = false;
-    try
+    /// Initializing _completer
+    initCompleter(text);
+    /** \warning Before checking _completer->completionCount() 
+        initCompleter method should be called.
+        Find the contact only when one completion exist,
+        (so contact will not be replaced with image control holding contact info)
+        because autocompletion didn't give suggestion if there were 2 contacts of same id
+    */
+    if (_completer->completionCount() == 1)
+    {
+      try
       {
-      auto aBook = bts::get_profile()->get_addressbook();
+        auto aBook = bts::get_profile()->get_addressbook();
 
-      auto contact = aBook->get_contact_by_display_name(textKey);
-      contactFound = contact.valid();
-      if (!contactFound)
-        contact = aBook->get_contact_by_dac_id(textKey);
+        auto contact = aBook->get_contact_by_display_name(textKey);
+        contactFound = contact.valid();
+        if (contactFound == false)
+          contact = aBook->get_contact_by_dac_id(textKey);
 
-      if(contact)
+        if (contact)
         {
-        contactFound = true;
-        matchedContact = *contact;
+          contactFound = true;
+          matchedContact = *contact;
         }
       }
-    catch(const fc::exception& e)
+      catch (const fc::exception& e)
       {
-      wlog( "${e}", ("e",e.to_detail_string()) );
+        wlog("${e}", ("e", e.to_detail_string()));
       }
+    }
 
     bool semanticallyValidKey = false;
-    if(contactFound)
+    if (contactFound)
       {
       /// Delete previously entered text - will be replaced with image control holding contact info
       deleteEnteredText();
@@ -490,7 +506,7 @@ void ContactListEdit::onTextChanged()
       fmt.setToolTip(tr("Unknown contact - can be <b>ignored</b> while sending message"));
       _activeCursor.mergeCharFormat(fmt);
 
-      showCompleter(text);
+      showCompleter();
       }
     }
 

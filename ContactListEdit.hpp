@@ -28,10 +28,6 @@ public:
   */
   void setAddressBookModel(AddressBookModel& abModel);
 
-  /** Allows to explicitly show completer control and start search with given completion prefix.
-  */
-  void showCompleter(const QString& completionPrefix);
-
   /// Allows to fill control with previously collected list of contacts.
   void SetCollectedContacts(const IMailProcessor::TRecipientPublicKeys& storage);
   /// Allows to get all collected contacts
@@ -65,6 +61,15 @@ protected:
   virtual bool focusNextPrevChild(bool) override;
 
 private:
+  /** Allows to explicitly show completer control and start search with given completion prefix.
+      \warning Call initCompleter method before calling this method;
+  */
+  void showCompleter();
+  /** Initializing completer.
+      Set completion prefix and set popup current index
+      Shoud be call before showCompleter();
+  */
+  void initCompleter(const QString& completionPrefix);
   QString textUnderCursor(QTextCursor* filledCursor = nullptr) const;
   //// Allows to delete entered text (pointed by text cursor position hold in _activeCursor).
   void    deleteEnteredText();
