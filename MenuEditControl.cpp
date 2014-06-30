@@ -296,6 +296,10 @@ void MenuEditControl::onFocusChanged(QWidget *old, QWidget *now)
   bool rCanCut = false;
   
   selectedText = isSelected(now, rCanCut);
+
+  if (_actionCopy == nullptr || _actionCut == nullptr || _actionPaste == nullptr)
+    return;
+
   _actionCopy->setEnabled(selectedText);
   _actionCut->setEnabled(rCanCut);
   _actionPaste->setEnabled(false);

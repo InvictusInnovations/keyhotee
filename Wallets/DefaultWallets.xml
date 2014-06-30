@@ -2,14 +2,23 @@
 <wallets version="1.0">
   <wallet name="Bitcoin">
     <url>http://www.bitcoin.com/</url>
-    <icon>:images/bitcoin.png</icon>   <!-- path to icon -->
+    <!-- path to icon -->
+    <icon>:images/bitcoin.png</icon>
+    <!-- enum type server: bitshares, other -->
+    <serverType>bitshares</serverType>
+    <!-- path to server program -->
+    <serverPath>/plugins/bitshares_client.exe</serverPath>
   </wallet>
   <wallet name="BitShares">
     <url>https://github.com/InvictusInnovations/BitShares/wiki</url>
     <icon>:images/bitshares.png</icon>
+    <serverType>bitshares</serverType>
+    <serverPath>/plugins/bitshares_client.exe</serverPath>
   </wallet>
   <wallet name="Litecoin">
     <url>https://litecoin.org/</url>
     <icon>:images/litecoin128.png</icon>
+    <serverType>bitshares</serverType>
+    <serverPath>/plugins/bitshares_client.exe</serverPath>
   </wallet>
 </wallets>
