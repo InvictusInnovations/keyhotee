@@ -32,10 +32,13 @@
 
 #include <fc/reflect/variant.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/thread/thread.hpp>
+#include <fc/interprocess/process.hpp>
 
 /// QT headers:
 #include <QAction>
 #include <QCompleter>
+#include <QApplication>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -77,7 +80,8 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   _is_curr_contact_blocked(false),
   _is_curr_contact_own(false),
   _is_filter_blocked_on(false),
-  _is_show_blocked_contacts(false)
+  _is_show_blocked_contacts(false),
+  _bitshares_client_on_startup(true)
 {
   ui = new Ui::KeyhoteeMainWindow;
   ui->setupUi(this);   
@@ -306,6 +310,9 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   this->setMenuWindow(ui->menuWindow);
   this->registration(actionMenu);
   actionMenu->setVisible(false);
+
+  if(_bitshares_client_on_startup)
+    fc::async([=](){startBitsharesClient(); });
 }
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
@@ -1706,3 +1713,57 @@ bool KeyhoteeMainWindow::onIdentityDelete(const TIdentity&  identity)
 
   return true;
 }
+
+void KeyhoteeMainWindow::startBitsharesClient()
+{
+  auto str_app_dir = QApplication::applicationDirPath().toStdWString();
+  fc::path app_dir(str_app_dir);
+  fc::path plugins_dir = app_dir / "plugins";
+#ifdef WIN32
+  fc::path client_path = plugins_dir / "bitshares_client.exe";
+#else
+  fc::path client_path = plugins_dir / "bitshares_client";
+#endif
+
+  fc::process* bitshares_client = new fc::process();
+  std::vector<std::string> args;
+  
+  try
+  {
+    ilog("start bitshares_client: ${client_path}", ("client_path", client_path));
+    statusBar()->showMessage(tr("Starting Bitshares Client..."), 1000);
+    bitshares_client->exec(client_path, args, plugins_dir);
+
+    auto in_stream = bitshares_client->in_stream();
+    auto out_stream = bitshares_client->out_stream();
+    auto err_stream = bitshares_client->err_stream();
+
+    char out_buf[4096] = { 0 };
+    int ret;
+    ret = out_stream->readsome(out_buf, 4096);
+    statusBar()->showMessage(tr("Bitshares Client launched."), 3000);
+    ilog("read from bitshares_client:\n${out_buf}", ("out_buf", out_buf));
+
+    writeToStream(in_stream, "rpc_set_username ala");
+    writeToStream(in_stream, "rpc_set_password kot");
+    writeToStream(in_stream, "http_start_server 65012");
+
+    memset(out_buf, 0, ret);
+    ret = out_stream->readsome(out_buf, 4096);
+    ilog("read from bitshares_client:\n ${out_buf}", ("out_buf", out_buf));
+  }
+  catch(...)
+  {
+    wlog("Bitshares Client NOT launched");
+  }
+}
+
+int KeyhoteeMainWindow::writeToStream(fc::buffered_ostream_ptr stream, std::string str)
+{
+  str.append("\r\n");
+  ilog("write to bitshares_client: ${str}", ("str", str));
+  int ret = stream->writesome(str.data(), str.size());
+  stream->flush();
+  return ret;
+}
+
