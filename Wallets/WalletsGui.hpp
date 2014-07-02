@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QList>
+#include <QObject>
 #include <QString>
 
 class QWidget;
@@ -9,14 +10,21 @@ class QWidget;
   * WalletsGui stores GUI data displayed in the wallets tree 
   * in the KeyhoteeMainWindow
   */
-class WalletsGui 
+class WalletsGui : public QObject
 {
+  Q_OBJECT
+  /// Register enums for name use at runtime
+  Q_ENUMS(ServerType)
 public:
+  enum ServerType { bitshares, other };
+
   struct Data
   {
     QString name;
     QString iconPath;
     QString url;
+    QString serverPath;
+    ServerType serverType;
   };
 
   WalletsGui(QWidget* parent);

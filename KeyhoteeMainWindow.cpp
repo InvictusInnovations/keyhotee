@@ -1563,7 +1563,7 @@ void KeyhoteeMainWindow::onUpdateAuthoStatus(int contact_id)
 
 void KeyhoteeMainWindow::setupWallets()
 {
-  const QList<WalletsGui::Data>& _walletsData = _walletsGui->getData();
+  const QList<WalletsGui::Data>& _walletsData = _walletsGui->getData();  
 
   _wallets_root->setExpanded(true);
   for (int  i = 0; i < _walletsData.size(); i++)
@@ -1582,6 +1582,9 @@ void KeyhoteeMainWindow::setupWallets()
     ui->widget_stack->addWidget(walletWeb);
     /// map QTreeWidgetItem with Wallets WebSite
     _treeItem2Wallet.insert(TTreeItem2WalletWebSite::value_type(walletItem, walletWeb));
+
+    //_walletsData[i].serverPath;
+    //_walletsData[i].serverType;
 
     _walletItems.push_back(walletItem);
     _wallets_root->addChild(walletItem);

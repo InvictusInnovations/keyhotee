@@ -16,7 +16,9 @@ private:
   /// fill _data wllets structure
   bool parseXML(const QString& fileName);
   /// @returns WalletsGui data from XML file
-  WalletsGui::Data parseWallet(QXmlStreamReader& xml, const QString& fileName);  
+  WalletsGui::Data parseWallet(QXmlStreamReader& xml, const QString& fileName); 
+  /// @returns empty string if attribute not found
+  QString readAttribute(QXmlStreamReader& xml, QStringRef attributem, const QString& fileName);
 
 private:
   QWidget* _parent;

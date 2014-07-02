@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QMetaEnum>
 #include <QString>
 #include <QXmlStreamReader>
 
@@ -42,7 +43,8 @@ XmlWalletsReader::XmlWalletsReader(QWidget* parent, QList<WalletsGui::Data>* dat
   /// if any error exists,  parse default xml file from resource
   if (xmlFileError == true)
   {
-    Q_ASSERT (parseXML(xmlDefault) == true);
+    bool parseOK = parseXML(xmlDefault);
+    Q_ASSERT(parseOK == true);
   }
 }
 
@@ -97,6 +99,7 @@ bool XmlWalletsReader::parseXML(const QString& fileName)
     QString lineNumber = 
       QObject::tr("\n(Line number: %1)").arg(QString::number(xml.lineNumber()));
     QMessageBox::critical(_parent, QObject::tr("Wallets reading ..."),
+      QObject::tr("Error reading file: %1.\n").arg(fileName) +
       xml.errorString() + lineNumber);
     return false;
   }
@@ -132,32 +135,48 @@ WalletsGui::Data XmlWalletsReader::parseWallet(QXmlStreamReader& xml, const QStr
 
     if (xml.tokenType() == QXmlStreamReader::StartElement) 
     {
-      if (xml.name() == "url") 
+
+      QStringRef attributeName = xml.name();
+      if (attributeName == "url")
       {
         /// read attribute from element
-        xml.readNext();
-        if (xml.tokenType() == QXmlStreamReader::Characters)
+        QString attribute = readAttribute(xml, attributeName, fileName);
+        if (attribute.isEmpty() != true)
         {
-          wallet.url = xml.text().toString();
-        }
-        else
-        {
-          xml.raiseError(QObject::tr("Attribute ""url"" not found in the file: %1\n").arg(fileName));
-          return wallet;
+          wallet.url = attribute;
         }
       }
-      else if (xml.name() == "icon")
+      else if (attributeName == "icon")
       {
-        /// read attribute from element
-        xml.readNext();
-        if (xml.tokenType() == QXmlStreamReader::Characters)
+        QString attribute = readAttribute(xml, attributeName, fileName);
+        if (attribute.isEmpty() != true)
         {
-          wallet.iconPath = xml.text().toString();
+          wallet.iconPath = attribute;
         }
-        else
+      }
+      else if (attributeName == "serverType")
+      {
+        QString attribute = readAttribute(xml, attributeName, fileName);
+        if (attribute.isEmpty() != true)
         {
-          xml.raiseError(QObject::tr("Attribute ""icon"" not found in the file: %1\n").arg(fileName));
-          return wallet;
+          /// convert string to enum WalletsGui::ServerType
+          const QMetaObject &metaObject = WalletsGui::staticMetaObject;
+          QMetaEnum metaEnum = metaObject.enumerator(0);
+          int indexOfEnum = metaEnum.keyToValue(attribute.toStdString().c_str());
+          wallet.serverType = static_cast<WalletsGui::ServerType>(indexOfEnum);
+          /// if not found set default bitshares server type
+          if (wallet.serverType == -1)
+          {
+            wallet.serverType = WalletsGui::bitshares;
+          }
+        }
+      }
+      else if (attributeName == "serverPath")
+      {
+        QString attribute = readAttribute(xml, attributeName, fileName);
+        if (attribute.isEmpty() != true)
+        {
+          wallet.serverPath = attribute;
         }
       }
     }
@@ -165,4 +184,20 @@ WalletsGui::Data XmlWalletsReader::parseWallet(QXmlStreamReader& xml, const QStr
     xml.readNext();
   }
   return wallet;
+}
+
+
+QString XmlWalletsReader::readAttribute(QXmlStreamReader& xml, QStringRef attribute, const QString& fileName)
+{
+  xml.readNext();
+  if (xml.tokenType() == QXmlStreamReader::Characters)
+  {
+    return xml.text().toString();
+  }
+  else
+  {
+    xml.raiseError(QObject::tr("Attribute ""%1"" not found in the file: %2\n").arg(attribute.toString(),
+                                                                                   fileName));
+    return nullptr;
+  }
 }
