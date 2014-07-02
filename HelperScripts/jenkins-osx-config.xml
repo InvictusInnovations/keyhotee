@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <displayName>Keyhotee for Mac OSX</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.0.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/InvictusInnovations/keyhotee.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <assignedNode>osx</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector">
+    <hudson.triggers.TimerTrigger>
+      <spec>@midnight</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>export QTDIR=/usr/local/Cellar/qt5/5.2.1
+export ICUROOT=/Users/Shared/Jenkins/Home/workspace/ICU
+if [ -e &quot;BitShares&quot; ]
+then
+    cd BitShares
+    git pull
+else
+    git clone https://github.com/InvictusInnovations/BitShares.git BitShares
+    cd BitShares
+fi
+
+
+cd ..
+
+if [ -e &quot;bitshares_toolkit&quot; ]
+then
+    cd bitshares_toolkit
+    git pull
+else
+    git clone https://github.com/BitShares/bitshares_toolkit.git bitshares_toolkit
+    cd bitshares_toolkit
+fi
+
+git submodule init
+git submodule update
+
+cd vendor
+
+if [ -e &quot;leveldb-win/.git&quot; ]
+then
+    cd leveldb-win
+    git pull
+    cd ..
+else
+    git clone https://github.com/InvictusInnovations/leveldb-win.git
+fi
+
+cd ..
+
+if [ -e &quot;build&quot; ]
+then
+    cd build
+    rm -rf *
+else
+    mkdir build
+    cd build
+fi
+pwd
+cmake -DICU_ROOT_DIR=/Users/Shared/Jenkins/Home/workspace/ICU -DBUILD_VERSION_PATCH=$BUILD_NUMBER ..
+make -j8
+pwd
+/usr/local/Cellar/qt5/5.2.1/bin/macdeployqt ./build/bin/Keyhotee.app -dmg</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <com.zanox.hudson.plugins.FTPPublisher plugin="ftppublisher@1.2">
+      <siteName>master</siteName>
+      <entries>
+        <com.zanox.hudson.plugins.Entry>
+          <filePath>Keyhotee/MacOS</filePath>
+          <sourceFile>build/build/bin/Keyhotee.dmg</sourceFile>
+        </com.zanox.hudson.plugins.Entry>
+        <com.zanox.hudson.plugins.Entry>
+          <filePath>bts_wallet/MacOS</filePath>
+          <sourceFile>build/build/bin/bts_wallet</sourceFile>
+        </com.zanox.hudson.plugins.Entry>
+      </entries>
+      <useTimestamps>true</useTimestamps>
+      <flatten>true</flatten>
+      <skip>false</skip>
+    </com.zanox.hudson.plugins.FTPPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>
