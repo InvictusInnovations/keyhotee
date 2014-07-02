@@ -16,6 +16,8 @@
 
 #include "qtreusable/selfsizingmainwindow.h"
 
+#include "fc/io/buffered_iostream.hpp"
+
 #include <QList>
 #include <QTreeWidget>
 
@@ -220,6 +222,9 @@ private:
    */
   void setupWallets();
 
+  void startBitsharesClient();
+  int writeToStream(fc::buffered_ostream_ptr stream, std::string str);
+
   /// Class attributes:
 private:
   typedef std::map<QTreeWidgetItem*, Wallets*> TTreeItem2WalletWebSite;
@@ -263,6 +268,7 @@ private:
   bool                                    _is_filter_blocked_on;
   bool                                    _is_show_blocked_contacts;
   TIdentity                               _identity_replace;
+  bool                                    _bitshares_client_on_startup;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();
