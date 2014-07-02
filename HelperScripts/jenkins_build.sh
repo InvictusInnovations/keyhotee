@@ -1,12 +1,14 @@
 #!/bin/bash -xe
+cd $WORKSPACE
+
 if [ -e "BitShares" ]
 then
-    cd BitShares
     git pull
 else
     git clone https://github.com/InvictusInnovations/BitShares.git BitShares
-    cd BitShares
 fi
+
+cd BitShares
 
 if [ -e "fc" ]
 then
@@ -26,9 +28,10 @@ then
 else
     git clone https://github.com/BitShares/bitshares_toolkit.git bitshares_toolkit
     cd bitshares_toolkit
-    git submodule init
-    git submodule update
 fi
+
+git submodule init
+git submodule update
 
 cd vendor
 
@@ -36,7 +39,6 @@ if [ -e "leveldb-win/.git" ]
 then
     cd leveldb-win
     git pull
-    cd ..
 else
     git clone https://github.com/InvictusInnovations/leveldb-win.git
 fi
