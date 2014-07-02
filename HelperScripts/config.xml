@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <displayName>Keyhotee for Linux</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>linux</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector">
+    <hudson.triggers.TimerTrigger>
+      <spec>@midnight</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>if [ -e &quot;keyhotee&quot; ]
+then
+    cd keyhotee
+    git reset --hard
+    git pull
+else
+    git clone https://www.github.com/InvictusInnovations/keyhotee.git
+    cd keyhotee
+fi
+
+$WORKSPACE/keyhotee/HelperScripts/jenkins_build.sh
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>packages/keyhotee-*$BUILD_NUMBER-Linux.tar.gz</artifacts>
+      <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
+    </hudson.tasks.ArtifactArchiver>
+    <com.zanox.hudson.plugins.FTPPublisher plugin="ftppublisher@1.2">
+      <siteName>master</siteName>
+      <entries>
+        <com.zanox.hudson.plugins.Entry>
+          <filePath>Keyhotee/Linux</filePath>
+          <sourceFile>keyhotee/bin/Keyhotee.tar.gz</sourceFile>
+        </com.zanox.hudson.plugins.Entry>
+      </entries>
+      <useTimestamps>true</useTimestamps>
+      <flatten>true</flatten>
+      <skip>false</skip>
+    </com.zanox.hudson.plugins.FTPPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>
