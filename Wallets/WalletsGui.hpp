@@ -3,6 +3,7 @@
 #include <QList>
 #include <QObject>
 #include <QString>
+#include <QVector>
 
 class QWidget;
 
@@ -16,15 +17,20 @@ class WalletsGui : public QObject
   /// Register enums for name use at runtime
   Q_ENUMS(ServerType)
 public:
-  enum ServerType { bitshares, other };
-
+  enum ServerType { BitsharesClient, other };
+  struct Server
+  {
+    ServerType        type;    
+    uint              port;
+    QString           path;
+    QVector<QString>  arg; ///command line arguments
+  };
   struct Data
   {
     QString name;
     QString iconPath;
     QString url;
-    QString serverPath;
-    ServerType serverType;
+    Server  server;
   };
 
   WalletsGui(QWidget* parent);

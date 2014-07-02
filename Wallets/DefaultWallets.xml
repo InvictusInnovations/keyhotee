@@ -4,21 +4,21 @@
     <url>http://www.bitcoin.com/</url>
     <!-- path to icon -->
     <icon>:images/bitcoin.png</icon>
-    <!-- enum type server: bitshares, other -->
-    <serverType>bitshares</serverType>
-    <!-- path to server program -->
-    <serverPath>/plugins/bitshares_client.exe</serverPath>
+    <!-- type: server enumeration type: BitsharesClient, other -->
+    <server type="BitsharesClient" path="./plugins/bitshares_client.exe" port="80">
+      <!-- optional command line arguments  -->
+      <!-- <arg>command-line-arg1</arg>  -->
+      <!-- <arg>command-line-arg2</arg>  -->
+    </server>    
   </wallet>
   <wallet name="BitShares">
     <url>https://github.com/InvictusInnovations/BitShares/wiki</url>
     <icon>:images/bitshares.png</icon>
-    <serverType>bitshares</serverType>
-    <serverPath>/plugins/bitshares_client.exe</serverPath>
+    <server type="BitsharesClient" path="./plugins/bitshares_client.exe" port="80"/>
   </wallet>
   <wallet name="Litecoin">
     <url>https://litecoin.org/</url>
     <icon>:images/litecoin128.png</icon>
-    <serverType>bitshares</serverType>
-    <serverPath>/plugins/bitshares_client.exe</serverPath>
+    <server type="BitsharesClient" path="./plugins/bitshares_client.exe" port="80"/>
   </wallet>
 </wallets>
