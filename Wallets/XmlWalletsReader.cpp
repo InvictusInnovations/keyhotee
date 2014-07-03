@@ -13,20 +13,36 @@ XmlWalletsReader::XmlWalletsReader(QWidget* parent, QList<WalletsGui::Data>* dat
 {
   bool xmlFileError = false;
   QString xmlDefault = ":Wallets/DefaultWallets.xml";
-  QString xmlFileName = "WalletsGui.xml";  
+  QString xmlFileName = "Wallets.xml";
 
-  QFileInfo fileInfo(xmlFileName);
-  /// Display absolute file path
-  xmlFileName = fileInfo.absoluteFilePath();
-
+  /// Create Wallets.xml file if not exist
   if (QFile::exists(xmlFileName) == false)
   {
     /// copy default xml file to Keyhotee.exe path
     if (QFile::copy(xmlDefault, xmlFileName) == false)
     {
+      QFileInfo fileInfo(xmlFileName);
+      /// Display absolute file path
+      xmlFileName = fileInfo.absoluteFilePath();
       QMessageBox::critical(_parent, QObject::tr("Wallets reading ..."),
         QObject::tr("Can't copy file from ""%1"" \nto ""%2"" ").arg(xmlDefault, xmlFileName));
       xmlFileError = true;
+    }
+  }
+
+  /// Create Wallets.xsd file if not exist
+  QString xsdDefault = ":Wallets/Wallets.xsd";
+  QString xsdFileName = "Wallets.xsd";
+  if (QFile::exists(xsdFileName) == false)
+  {
+    /// copy default xsd file to Keyhotee.exe path
+    if (QFile::copy(xsdDefault, xsdFileName) == false)
+    {
+      QFileInfo fileInfo(xsdFileName);
+      /// Display absolute file path
+      xsdFileName = fileInfo.absoluteFilePath();
+      QMessageBox::critical(_parent, QObject::tr("Wallets reading ..."),
+        QObject::tr("Can't copy file from ""%1"" \nto ""%2"" ").arg(xsdDefault, xsdFileName));
     }
   }
  
