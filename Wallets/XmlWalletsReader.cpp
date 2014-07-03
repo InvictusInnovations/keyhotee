@@ -135,49 +135,21 @@ WalletsGui::Data XmlWalletsReader::parseWallet(QXmlStreamReader& xml, const QStr
 
     if (xml.tokenType() == QXmlStreamReader::StartElement) 
     {
-
-      QStringRef attributeName = xml.name();
-      if (attributeName == "url")
+      QStringRef sectionName = xml.name();
+      if (sectionName == "url")
       {
         /// read attribute from element
-        QString attribute = readAttribute(xml, attributeName, fileName);
-        if (attribute.isEmpty() != true)
-        {
-          wallet.url = attribute;
-        }
+        QString attribute = readAttribute(xml, sectionName, fileName);
+        wallet.url = attribute;
       }
-      else if (attributeName == "icon")
+      else if (sectionName == "icon")
       {
-        QString attribute = readAttribute(xml, attributeName, fileName);
-        if (attribute.isEmpty() != true)
-        {
-          wallet.iconPath = attribute;
-        }
+        QString attribute = readAttribute(xml, sectionName, fileName);
+        wallet.iconPath = attribute;
       }
-      else if (attributeName == "serverType")
+      else if (sectionName == "server")
       {
-        QString attribute = readAttribute(xml, attributeName, fileName);
-        if (attribute.isEmpty() != true)
-        {
-          /// convert string to enum WalletsGui::ServerType
-          const QMetaObject &metaObject = WalletsGui::staticMetaObject;
-          QMetaEnum metaEnum = metaObject.enumerator(0);
-          int indexOfEnum = metaEnum.keyToValue(attribute.toStdString().c_str());
-          wallet.serverType = static_cast<WalletsGui::ServerType>(indexOfEnum);
-          /// if not found set default bitshares server type
-          if (wallet.serverType == -1)
-          {
-            wallet.serverType = WalletsGui::bitshares;
-          }
-        }
-      }
-      else if (attributeName == "serverPath")
-      {
-        QString attribute = readAttribute(xml, attributeName, fileName);
-        if (attribute.isEmpty() != true)
-        {
-          wallet.serverPath = attribute;
-        }
+        readServerSection(xml, fileName, &wallet);
       }
     }
 
@@ -187,7 +159,7 @@ WalletsGui::Data XmlWalletsReader::parseWallet(QXmlStreamReader& xml, const QStr
 }
 
 
-QString XmlWalletsReader::readAttribute(QXmlStreamReader& xml, QStringRef attribute, const QString& fileName)
+QString XmlWalletsReader::readAttribute(QXmlStreamReader& xml, QStringRef section, const QString& fileName)
 {
   xml.readNext();
   if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -196,8 +168,61 @@ QString XmlWalletsReader::readAttribute(QXmlStreamReader& xml, QStringRef attrib
   }
   else
   {
-    xml.raiseError(QObject::tr("Attribute ""%1"" not found in the file: %2\n").arg(attribute.toString(),
+    xml.raiseError(QObject::tr("Section ""%1"" not found in the file: %2\n").arg(section.toString(),
                                                                                    fileName));
     return nullptr;
+  }
+}
+
+void XmlWalletsReader::readServerSection(QXmlStreamReader& xml, const QString& fileName, WalletsGui::Data* wallet)
+{
+  /// Get the attributes for wallet
+  QXmlStreamAttributes attributes = xml.attributes();
+  if (attributes.hasAttribute("type"))
+  {
+    QString attribute = attributes.value("type").toString();
+
+    /// convert string to enum WalletsGui::ServerType
+    const QMetaObject &metaObject = WalletsGui::staticMetaObject;
+    QMetaEnum metaEnum = metaObject.enumerator(0);
+    int indexOfEnum = metaEnum.keyToValue(attribute.toStdString().c_str());
+    if (indexOfEnum < 0)
+    {
+      /// if not found set default first element of ServerType
+      indexOfEnum = 0;
+    }
+    wallet->server.type = static_cast<WalletsGui::ServerType>(indexOfEnum);
+  }
+
+  if (attributes.hasAttribute("path"))
+  {
+    wallet->server.path = attributes.value("path").toString();
+  }
+
+  if (attributes.hasAttribute("port"))
+  {
+    wallet->server.port = attributes.value("port").toUInt();
+  }
+
+  /** Continue the loop until we hit an EndElement named server.
+      Read <arg> elements
+  */
+  while ((xml.tokenType() == QXmlStreamReader::EndElement &&  
+         xml.name() == "server") == false)
+  {
+    if (xml.atEnd() == true || xml.hasError() == true)
+      return;
+
+    if (xml.tokenType() == QXmlStreamReader::StartElement)
+    {
+      QStringRef sectionName = xml.name();
+      if (sectionName == "arg")
+      {
+        QString attribute = readAttribute(xml, sectionName, fileName);
+        wallet->server.arg.push_back (attribute);
+      }
+    }
+
+    xml.readNext();
   }
 }

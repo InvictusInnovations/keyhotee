@@ -1590,8 +1590,10 @@ void KeyhoteeMainWindow::setupWallets()
     /// map QTreeWidgetItem with Wallets WebSite
     _treeItem2Wallet.insert(TTreeItem2WalletWebSite::value_type(walletItem, walletWeb));
 
-    //_walletsData[i].serverPath;
-    //_walletsData[i].serverType;
+    //_walletsData[i].server.path;
+    //_walletsData[i].server.port;
+    //_walletsData[i].server.type;
+    //_walletsData[i].server.arg[...];
 
     _walletItems.push_back(walletItem);
     _wallets_root->addChild(walletItem);

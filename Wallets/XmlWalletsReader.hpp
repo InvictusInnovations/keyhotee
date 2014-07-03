@@ -19,6 +19,8 @@ private:
   WalletsGui::Data parseWallet(QXmlStreamReader& xml, const QString& fileName); 
   /// @returns empty string if attribute not found
   QString readAttribute(QXmlStreamReader& xml, QStringRef attributem, const QString& fileName);
+  /// read <server> section from XML file and add data to 'wallet' structure
+  void readServerSection(QXmlStreamReader& xml, const QString& fileName, WalletsGui::Data* wallet);
 
 private:
   QWidget* _parent;
