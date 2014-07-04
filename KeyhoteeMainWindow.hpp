@@ -218,7 +218,7 @@ private:
   /** Load wallets data from WalletsGui.xml file and initialize Wallets tree.
    * User can edit and add new wallets to WalletsGui.xml file.
    * WalletsGui.xml file exists in the ../Keyhotee.exe directory.
-   * If WalletsGui.xml file doesn't exist Application copy it from resource ":Wallets/DefaultWallets.xml"
+   * If Wallets.xml file doesn't exist Application copy it from resource ":Wallets/DefaultWallets.xml"
    */
   void setupWallets();
 

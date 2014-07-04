@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.w3schools.com"
+           attributeFormDefault="unqualified" 
+           elementFormDefault="qualified">
+ 
+  <xs:element name="wallets">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="wallet">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="url" type="xs:string" />
+              <xs:element name="icon" type="xs:string" />
+              <xs:element name="server">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0">
+                    <xs:element name="arg" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="type" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="BitsharesClient"/>
+                        <xs:enumeration value="other"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="path" type="xs:string" use="required" />
+                  <xs:attribute name="port" type="xs:unsignedShort" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:decimal" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
