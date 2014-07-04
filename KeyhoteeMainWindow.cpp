@@ -8,6 +8,7 @@
 #include "KeyhoteeApplication.hpp"
 #include "MenuEditControl.hpp"
 #include "public_key_address.hpp"
+#include "managed_stream.hpp"
 
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/authorization.hpp"
@@ -47,7 +48,8 @@
 //#include <qmacnativetoolbar.h>
 #endif
 
-extern bool        gMiningIsPossible;
+extern bool           gMiningIsPossible;
+extern QTemporaryFile gLogFile;
 
 KeyhoteeMainWindow* getKeyhoteeWindow()
 {
@@ -1727,37 +1729,40 @@ void KeyhoteeMainWindow::startBitsharesClient()
   fc::path client_path = plugins_dir / "bitshares_client";
 #endif
 
-  fc::process* bitshares_client = new fc::process();
+  fc::process bitshares_client;
   std::vector<std::string> args;
-  
+  managed_stream out_err_stream(bitshares_client);
+
+  fc::path logpath = gLogFile.fileName().toStdWString();
+ 
   try
   {
     ilog("start bitshares_client: ${client_path}", ("client_path", client_path));
     statusBar()->showMessage(tr("Starting Bitshares Client..."), 1000);
-    bitshares_client->exec(client_path, args, plugins_dir);
+    bitshares_client.exec(client_path, args, plugins_dir,
+      static_cast<fc::iprocess::exec_opts>(fc::iprocess::open_all | fc::iprocess::suppress_console));
 
-    auto in_stream = bitshares_client->in_stream();
-    auto out_stream = bitshares_client->out_stream();
-    auto err_stream = bitshares_client->err_stream();
+    out_err_stream.log_stdout_stderr_to_file(logpath);
 
-    char out_buf[4096] = { 0 };
-    int ret;
-    ret = out_stream->readsome(out_buf, 4096);
+    auto in_stream = bitshares_client.in_stream();
+
     statusBar()->showMessage(tr("Bitshares Client launched."), 3000);
-    ilog("read from bitshares_client:\n${out_buf}", ("out_buf", out_buf));
+
 
     writeToStream(in_stream, "rpc_set_username ala");
     writeToStream(in_stream, "rpc_set_password kot");
     writeToStream(in_stream, "http_start_server 65012");
 
-    memset(out_buf, 0, ret);
-    ret = out_stream->readsome(out_buf, 4096);
-    ilog("read from bitshares_client:\n ${out_buf}", ("out_buf", out_buf));
+//    memset(out_buf, 0, ret);
+//    ret = out_stream->readsome(out_buf, 4096);
+//    ilog("read from bitshares_client:\n ${out_buf}", ("out_buf", out_buf));
   }
   catch(...)
   {
     wlog("Bitshares Client NOT launched");
   }
+
+  bitshares_client.result();
 }
 
 int KeyhoteeMainWindow::writeToStream(fc::buffered_ostream_ptr stream, std::string str)

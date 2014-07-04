@@ -309,7 +309,7 @@ set( sources
         Identity/IdentityObservable.hpp
         Identity/IdentityObservable.cpp
 
-	    Mail/BlockerDelegate.hpp
+        Mail/BlockerDelegate.hpp
         Mail/BlockedContentAlert.ui
         Mail/BlockedContentAlert.hpp
         Mail/BlockedContentAlert.cpp
@@ -418,6 +418,9 @@ set( sources
         Options/OptionsDialog.ui
         Options/OptionsDialog.h
         Options/OptionsDialog.cpp
+
+        managed_stream.hpp
+        managed_stream.cpp
 
         main.cpp )
 
