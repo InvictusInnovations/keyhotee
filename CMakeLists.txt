@@ -376,6 +376,8 @@ set( sources
         Wallets/WalletsGui.cpp
         Wallets/XmlWalletsReader.hpp
         Wallets/XmlWalletsReader.cpp
+        Wallets/XmlMessageHandler.hpp
+        Wallets/XmlMessageHandler.cpp
 
         ATopLevelWindowsContainer.hpp
         ATopLevelWindowsContainer.cpp
