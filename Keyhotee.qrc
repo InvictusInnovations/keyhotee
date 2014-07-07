@@ -85,5 +85,6 @@
     <file>images/mail_replied_forwarded.png</file>
     <file>Wallets/DefaultWallets.xml</file>
     <file>Wallets/Wallets.xsd</file>
+    <file>images/private_key.png</file>
   </qresource>
 </RCC>

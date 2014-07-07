@@ -41,7 +41,7 @@ public:
 
   void setKeyhoteeID(const QString& keyhotee_id);
   void setPublicKey(const QString& public_key_string);
-  void showCopyToClipboard(bool visible);
+  void hideCopyKeysToClipboard();
   void setMode(ModeWidget mode = ShowContact) {_my_mode = mode;};
   void setEditable(bool editable);
 
@@ -71,7 +71,7 @@ Q_SIGNALS:
 private slots:
   void keyhoteeIdEdited(const QString& keyhotee_id);
   void publicKeyEdited(const QString& public_key_string);
-  void on_private_key_button_clicked();
+  void on_private_key_to_clipboard_clicked();
 
   bool event(QEvent *e);
 };

@@ -267,7 +267,7 @@ void KeyhoteeIDPubKeyWidget::setContact(const Contact& current_contact)
     std::string public_key_string = public_key_address(_current_contact.public_key.serialize());
     ui->public_key->setText(public_key_string.c_str());
     ui->public_key->setEnabled( !isOwner );
-    ui->private_key_button->setVisible(isOwner);
+    ui->private_key_to_clipboard->setVisible(isOwner);
 }
 
 void KeyhoteeIDPubKeyWidget::onPublicKeyToClipboard()
@@ -334,9 +334,10 @@ bool KeyhoteeIDPubKeyWidget::existContactWithPublicKey (const std::string& publi
   return false;
 }
 
-void KeyhoteeIDPubKeyWidget::showCopyToClipboard(bool visible)
+void KeyhoteeIDPubKeyWidget::hideCopyKeysToClipboard()
 {
-  ui->public_key_to_clipboard->setVisible(visible);
+  ui->public_key_to_clipboard->setVisible(false);
+  ui->private_key_to_clipboard->setVisible(false);
 }
 
 void KeyhoteeIDPubKeyWidget::setEditable(bool editable)
@@ -405,7 +406,7 @@ void KeyhoteeIDPubKeyWidget::setFocus(Qt::FocusReason reason)
 {
   ui->keyhotee_id->setFocus(reason);
 }
-void KeyhoteeIDPubKeyWidget::on_private_key_button_clicked()
+void KeyhoteeIDPubKeyWidget::on_private_key_to_clipboard_clicked()
 {
   //Performing the WIF conversion inline, since I don't see bts::utilities in this repository.
   //If this is available somewhere in this repository, please change it.
