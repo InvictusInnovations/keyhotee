@@ -187,6 +187,7 @@ find_package( Qt5PrintSupport )
 find_package( Qt5Svg )
 find_package( Qt5Widgets )
 find_package( Qt5Network )
+find_package( Qt5XmlPatterns )
 
 IF(KH_STATIC_QT EQUAL 0)
   find_package( Qt5WebKit )
@@ -375,6 +376,8 @@ set( sources
         Wallets/WalletsGui.cpp
         Wallets/XmlWalletsReader.hpp
         Wallets/XmlWalletsReader.cpp
+        Wallets/XmlMessageHandler.hpp
+        Wallets/XmlMessageHandler.cpp
 
         ATopLevelWindowsContainer.hpp
         ATopLevelWindowsContainer.cpp
@@ -526,9 +529,9 @@ get_target_property(PDB_LIST_DEBUG fc INTERFACE_LINK_PDB_DEBUG)
 
 # Use the Widgets module from Qt 5.
 IF(KH_STATIC_QT EQUAL 0)
-  qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport WebKitWidgets)
+  qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport XmlPatterns WebKitWidgets)
 ELSE()
-  qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport Network)
+  qt5_use_modules(Keyhotee Svg Widgets Gui Core PrintSupport XmlPatterns Network)
 ENDIF()
 
 set(CMAKE_STATIC_TYPE true)

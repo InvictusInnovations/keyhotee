@@ -113,7 +113,7 @@ AuthorizationView::AuthorizationView(IAuthProcessor& auth_processor, AddressBook
 
   ui->keyhoteeidpubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::AuthorizationView);
   ui->keyhoteeidpubkey->setEditable(false);
-  ui->keyhoteeidpubkey->showCopyToClipboard(false);
+  ui->keyhoteeidpubkey->hideCopyKeysToClipboard();
 
   _toolbar = new QToolBar(ui->toolbar_container);
   QGridLayout* grid_layout = new QGridLayout(ui->toolbar_container);

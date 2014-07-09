@@ -1,4 +1,5 @@
 #include "XmlWalletsReader.hpp"
+#include "XmlMessageHandler.hpp"
 
 #include <QIODevice>
 #include <QFile>
@@ -7,41 +8,92 @@
 #include <QMetaEnum>
 #include <QString>
 #include <QXmlStreamReader>
+#include <QtXmlPatterns/QXmlSchema>
+#include <QtXmlPatterns/QXmlSchemaValidator>
 
 XmlWalletsReader::XmlWalletsReader(QWidget* parent, QList<WalletsGui::Data>* data)
 : _parent(parent), _data(data)
 {
-  bool xmlFileError = false;
+  bool xmlFileCopyError = false;
   QString xmlDefault = ":Wallets/DefaultWallets.xml";
-  QString xmlFileName = "WalletsGui.xml";  
+  QFileInfo xmlfileInfo("Wallets.xml");
+  QString xmlFilePathAbsolute = xmlfileInfo.absoluteFilePath();
 
-  QFileInfo fileInfo(xmlFileName);
-  /// Display absolute file path
-  xmlFileName = fileInfo.absoluteFilePath();
-
-  if (QFile::exists(xmlFileName) == false)
+  /// Create Wallets.xml file if not exist
+  if (QFile::exists(xmlFilePathAbsolute) == false)
   {
     /// copy default xml file to Keyhotee.exe path
-    if (QFile::copy(xmlDefault, xmlFileName) == false)
-    {
+    if (QFile::copy(xmlDefault, xmlFilePathAbsolute) == false)
+    {      
       QMessageBox::critical(_parent, QObject::tr("Wallets reading ..."),
-        QObject::tr("Can't copy file from ""%1"" \nto ""%2"" ").arg(xmlDefault, xmlFileName));
-      xmlFileError = true;
+        QObject::tr("Can't copy file from ""%1"" \nto ""%2"" ").arg(xmlDefault, xmlFilePathAbsolute));
+      xmlFileCopyError = true;
     }
   }
- 
+  
+  /// Create Wallets.xsd file if not exist
+  QString xsdDefault = ":Wallets/Wallets.xsd";
+  QFileInfo xsdfileInfo("Wallets.xsd");
+  QString xsdFilePathAbsolute = xsdfileInfo.absoluteFilePath();
 
-  if (xmlFileError == false)
+  bool xsdFileCopyError = false;
+  if (QFile::exists(xsdFilePathAbsolute) == false)
   {
-    if (parseXML(xmlFileName) == false)
+    /// copy default xsd file to Keyhotee.exe path
+    if (QFile::copy(xsdDefault, xsdFilePathAbsolute) == false)
+    {
+      QMessageBox::critical(_parent, QObject::tr("Wallets reading ..."),
+        QObject::tr("Can't copy file from ""%1"" \nto ""%2"" ").arg(xsdDefault, xsdFilePathAbsolute));
+      xsdFileCopyError = true;
+    }
+  }
+
+  if (xmlFileCopyError == false && xsdFileCopyError == false)
+  {
+    /// Validate Wallets.xml
+
+    XmlMessageHandler messageHandler;
+    QXmlSchema schema;
+    schema.setMessageHandler(&messageHandler);
+    schema.load(QUrl("file:///" + xsdFilePathAbsolute));
+
+    bool errorValidating = false;
+    if (schema.isValid() == false)
+    {
+      errorValidating = true;
+    }
+    else
+    {
+      QXmlSchemaValidator validator(schema);
+      if (validator.validate(QUrl("file:///" + xmlFilePathAbsolute)) == false)
+      {
+        errorValidating = true;
+      }
+    }
+
+    if (errorValidating == true)
+    {
+      QString errorMsg = QObject::tr("Wallets file: %1 \nis not consistent with the scheme: %2."
+        ).arg(xmlFilePathAbsolute, xsdFilePathAbsolute);
+      QString lineErrorMsg = QObject::tr("\n\nLine error: %1.").arg(QString::number(messageHandler.line() ));
+      QString validateErrorMsg = QObject::tr("\n\n%1.").arg(messageHandler.statusMessage());
+
+      QMessageBox::critical(_parent, QObject::tr("Wallets validation ..."),
+        errorMsg + lineErrorMsg + validateErrorMsg);
+    }
+  }
+
+  if (xmlFileCopyError == false)
+  {
+    if (parseXML(xmlFilePathAbsolute) == false)
     {
       /// error parsing user wallets xml file
-      xmlFileError = true;
+      xmlFileCopyError = true;
     }
   }
 
   /// if any error exists,  parse default xml file from resource
-  if (xmlFileError == true)
+  if (xmlFileCopyError == true)
   {
     bool parseOK = parseXML(xmlDefault);
     Q_ASSERT(parseOK == true);
