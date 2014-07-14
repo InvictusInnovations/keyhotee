@@ -234,6 +234,27 @@
      </property>
     </widget>
    </widget>
+   <widget class="QWidget" name="bitshares_wallet">
+    <attribute name="title">
+     <string>BitShares Wallet</string>
+    </attribute>
+    <widget class="QCheckBox" name="wallets_client_on_startup">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>331</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Start wallets client on startup Keyhotee</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
   </widget>
  </widget>
  <resources/>

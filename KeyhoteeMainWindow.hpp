@@ -30,13 +30,13 @@ class ContactGui;
 class ContactView;
 class ContactsTable;
 class InboxView;
+class IManageWallet;
 class Mailbox;
 class MailboxModel;
 class MailboxModelRoot;
 class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
-class Wallets;
 class WalletsGui;
 
 class QAction;
@@ -227,7 +227,7 @@ private:
 
   /// Class attributes:
 private:
-  typedef std::map<QTreeWidgetItem*, Wallets*> TTreeItem2WalletWebSite;
+  typedef std::map<QTreeWidgetItem*, IManageWallet*> TTreeItem2ManageWallet;
 
   QTreeWidgetItem*                        _identities_root;
   QTreeWidgetItem*                        _mailboxes_root;
@@ -241,7 +241,7 @@ private:
   QTreeWidgetItem*                        _spam_root;
   QList<QTreeWidgetItem*>                 _walletItems;
   /// map tree item widget to wallet web site
-  TTreeItem2WalletWebSite                 _treeItem2Wallet;
+  TTreeItem2ManageWallet                  _tree_item_2_wallet;
 
   MailboxModel*                           _inbox_model;
   MailboxModel*                           _draft_model;

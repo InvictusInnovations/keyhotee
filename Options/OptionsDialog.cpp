@@ -25,6 +25,7 @@ OptionsDialog::OptionsDialog(QWidget *parent, QString profile_name) :
   ui->chat_authorized->setChecked(profile_settings.value("AllowChat", "").toBool());
   ui->mail_authorized->setChecked(profile_settings.value("AllowMail", "").toBool());
   ui->save_spam->setChecked(profile_settings.value("SaveSpam", "").toBool());
+  ui->wallets_client_on_startup->setChecked(profile_settings.value("BitSharesClientOnStartup", "").toBool());
 
   connect(this, &QDialog::accepted, this, &OptionsDialog::onSave);
 }
@@ -88,6 +89,12 @@ void OptionsDialog::onSave()
     profile_settings.setValue("SaveSpam", true);
   else
     profile_settings.setValue("SaveSpam", false);
+
+  // Wallets
+  if(ui->wallets_client_on_startup->isChecked())
+    profile_settings.setValue("BitSharesClientOnStartup", true);
+  else
+    profile_settings.setValue("BitSharesClientOnStartup", false);
   
   emit optionsSaved(lang_changed);
 }

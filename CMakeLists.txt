@@ -369,6 +369,10 @@ set( sources
         KeyhoteeMainWindow.hpp
         KeyhoteeMainWindow.cpp
 
+        Wallets/ManagedStream.hpp
+        Wallets/ManagedStream.cpp
+        Wallets/ManageWallet.hpp
+        Wallets/ManageWallet.cpp
         Wallets/wallets.ui
         Wallets/wallets.hpp
         Wallets/wallets.cpp
@@ -419,9 +423,6 @@ set( sources
         Options/OptionsDialog.ui
         Options/OptionsDialog.h
         Options/OptionsDialog.cpp
-
-        managed_stream.hpp
-        managed_stream.cpp
 
         main.cpp )
 

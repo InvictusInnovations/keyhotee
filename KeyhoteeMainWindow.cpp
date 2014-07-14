@@ -8,7 +8,6 @@
 #include "KeyhoteeApplication.hpp"
 #include "MenuEditControl.hpp"
 #include "public_key_address.hpp"
-#include "managed_stream.hpp"
 
 #include "AddressBook/AddressBookModel.hpp"
 #include "AddressBook/authorization.hpp"
@@ -28,6 +27,7 @@
 
 #include "Options/OptionsDialog.h"
 
+#include "Wallets/ManageWallet.hpp"
 #include "Wallets/wallets.hpp"
 #include "Wallets/WalletsGui.hpp"
 
@@ -105,6 +105,7 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   QSettings settings("Invictus Innovations", settings_file);
   _is_filter_blocked_on = settings.value("FilterBlocked", "").toBool();
   ui->actionShow_blocked_contacts->setEnabled(_is_filter_blocked_on);
+  _bitshares_client_on_startup = settings.value("BitSharesClientOnStartup", "").toBool();
 
   connect(ui->contacts_page, &ContactsTable::contactOpened, this, &KeyhoteeMainWindow::openContactGui);
   connect(ui->contacts_page, &ContactsTable::contactDeleted, this, &KeyhoteeMainWindow::deleteContactGui);
@@ -312,13 +313,13 @@ KeyhoteeMainWindow::KeyhoteeMainWindow(const TKeyhoteeApplication& mainApp) :
   this->setMenuWindow(ui->menuWindow);
   this->registration(actionMenu);
   actionMenu->setVisible(false);
-
-  if(_bitshares_client_on_startup)
-    fc::async([=](){startBitsharesClient(); });
 }
 
 KeyhoteeMainWindow::~KeyhoteeMainWindow()
   {
+  foreach(TTreeItem2ManageWallet::value_type wallet, _tree_item_2_wallet)
+    wallet.second->shutdown();
+
   IdentityObservable::getInstance().deleteObserver(this);
   delete menuEdit;
   delete ui;
@@ -534,13 +535,16 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
         if (selectedItem == walletItem)
         {
           /// Find and show wallet WebSite
-          TTreeItem2WalletWebSite::const_iterator foundPos = _treeItem2Wallet.find(selectedItem);
-          if (foundPos != _treeItem2Wallet.end())
+          TTreeItem2ManageWallet::const_iterator foundPos = _tree_item_2_wallet.find(selectedItem);
+          if(foundPos != _tree_item_2_wallet.end())
           {
-            Wallets* walletWeb = foundPos->second;
+            Wallets* walletWeb = foundPos->second->getWebWallet();
             walletWeb->loadPage();
             ui->widget_stack->setCurrentWidget(walletWeb);
-          }          
+            if(foundPos->second->isServerType(WalletsGui::ServerType::BitsharesClient) &&
+              ! foundPos->second->isLaunched())
+              foundPos->second->start();
+          }
         }
       }
     }
@@ -1589,13 +1593,20 @@ void KeyhoteeMainWindow::setupWallets()
     
     Wallets* walletWeb = new Wallets(this, _walletsData[i].url);
     ui->widget_stack->addWidget(walletWeb);
-    /// map QTreeWidgetItem with Wallets WebSite
-    _treeItem2Wallet.insert(TTreeItem2WalletWebSite::value_type(walletItem, walletWeb));
 
-    //_walletsData[i].server.path;
-    //_walletsData[i].server.port;
-    //_walletsData[i].server.type;
-    //_walletsData[i].server.arg[...];
+    IManageWallet* manage_wallet;
+
+    if(_walletsData[i].server.type == WalletsGui::BitsharesClient)
+    {
+      manage_wallet = new ManageBitShares(walletWeb, _walletsData[i].server);
+      if(_bitshares_client_on_startup)
+        manage_wallet->start();
+    }
+    else
+      manage_wallet = new ManageOtherWallet(walletWeb, _walletsData[i].server);
+
+    /// map QTreeWidgetItem with Wallets WebSite
+    _tree_item_2_wallet.insert(TTreeItem2ManageWallet::value_type(walletItem, manage_wallet));
 
     _walletItems.push_back(walletItem);
     _wallets_root->addChild(walletItem);
@@ -1716,61 +1727,5 @@ bool KeyhoteeMainWindow::onIdentityDelete(const TIdentity&  identity)
   }
 
   return true;
-}
-
-void KeyhoteeMainWindow::startBitsharesClient()
-{
-  auto str_app_dir = QApplication::applicationDirPath().toStdWString();
-  fc::path app_dir(str_app_dir);
-  fc::path plugins_dir = app_dir / "plugins";
-#ifdef WIN32
-  fc::path client_path = plugins_dir / "bitshares_client.exe";
-#else
-  fc::path client_path = plugins_dir / "bitshares_client";
-#endif
-
-  fc::process bitshares_client;
-  std::vector<std::string> args;
-  managed_stream out_err_stream(bitshares_client);
-
-  fc::path logpath = gLogFile.fileName().toStdWString();
- 
-  try
-  {
-    ilog("start bitshares_client: ${client_path}", ("client_path", client_path));
-    statusBar()->showMessage(tr("Starting Bitshares Client..."), 1000);
-    bitshares_client.exec(client_path, args, plugins_dir,
-      static_cast<fc::iprocess::exec_opts>(fc::iprocess::open_all | fc::iprocess::suppress_console));
-
-    out_err_stream.log_stdout_stderr_to_file(logpath);
-
-    auto in_stream = bitshares_client.in_stream();
-
-    statusBar()->showMessage(tr("Bitshares Client launched."), 3000);
-
-
-    writeToStream(in_stream, "rpc_set_username ala");
-    writeToStream(in_stream, "rpc_set_password kot");
-    writeToStream(in_stream, "http_start_server 65012");
-
-//    memset(out_buf, 0, ret);
-//    ret = out_stream->readsome(out_buf, 4096);
-//    ilog("read from bitshares_client:\n ${out_buf}", ("out_buf", out_buf));
-  }
-  catch(...)
-  {
-    wlog("Bitshares Client NOT launched");
-  }
-
-  bitshares_client.result();
-}
-
-int KeyhoteeMainWindow::writeToStream(fc::buffered_ostream_ptr stream, std::string str)
-{
-  str.append("\r\n");
-  ilog("write to bitshares_client: ${str}", ("str", str));
-  int ret = stream->writesome(str.data(), str.size());
-  stream->flush();
-  return ret;
 }
 
