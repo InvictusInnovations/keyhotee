@@ -52,6 +52,14 @@ bool ContactView::isChatSelected()
 
 void ContactView::sendChatMessage()
 {
+  if (getKeyhoteeWindow()->getConnectionProcessor()->GetPeerConnectionCount() == 0)
+  {
+    QMessageBox::warning(this, tr("Application"), 
+      tr("No connection to send chat message."), QMessageBox::Ok);
+    
+    return;
+  }
+
   auto msg = ui->chat_input->toPlainText();
   if (msg.size() != 0)
   {

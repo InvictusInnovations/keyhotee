@@ -1,4 +1,5 @@
 #include "XmlWalletsReader.hpp"
+#include "XmlMessageHandler.hpp"
 
 #include <QIODevice>
 #include <QFile>
@@ -50,19 +51,35 @@ XmlWalletsReader::XmlWalletsReader(QWidget* parent, QList<WalletsGui::Data>* dat
   if (xmlFileCopyError == false && xsdFileCopyError == false)
   {
     /// Validate Wallets.xml
+
+    XmlMessageHandler messageHandler;
     QXmlSchema schema;
+    schema.setMessageHandler(&messageHandler);
     schema.load(QUrl("file:///" + xsdFilePathAbsolute));
 
-    if (schema.isValid()) 
+    bool errorValidating = false;
+    if (schema.isValid() == false)
+    {
+      errorValidating = true;
+    }
+    else
     {
       QXmlSchemaValidator validator(schema);
       if (validator.validate(QUrl("file:///" + xmlFilePathAbsolute)) == false)
       {
-        /// TODO Display detailed message (line numer, etc) about validation error
-        QMessageBox::critical(_parent, QObject::tr("Wallets validation ..."),
-          QObject::tr("Wallets file ""%1"" \nis not consistent with the scheme \n""%2"" ").arg(xmlFilePathAbsolute,
-                      xsdFilePathAbsolute));
+        errorValidating = true;
       }
+    }
+
+    if (errorValidating == true)
+    {
+      QString errorMsg = QObject::tr("Wallets file: %1 \nis not consistent with the scheme: %2."
+        ).arg(xmlFilePathAbsolute, xsdFilePathAbsolute);
+      QString lineErrorMsg = QObject::tr("\n\nLine error: %1.").arg(QString::number(messageHandler.line() ));
+      QString validateErrorMsg = QObject::tr("\n\n%1.").arg(messageHandler.statusMessage());
+
+      QMessageBox::critical(_parent, QObject::tr("Wallets validation ..."),
+        errorMsg + lineErrorMsg + validateErrorMsg);
     }
   }
 

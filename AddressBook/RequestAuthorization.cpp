@@ -23,7 +23,7 @@ RequestAuthorization::RequestAuthorization(QWidget *parent, IAuthProcessor& auth
   ui->keyhoteeidpubkey->setMode(KeyhoteeIDPubKeyWidget::ModeWidget::RequestAuthorization);
   ui->keyhoteeidpubkey->setEditable(true);
   ui->button_send->setEnabled(false);
-  ui->keyhoteeidpubkey->showCopyToClipboard(false);
+  ui->keyhoteeidpubkey->hideCopyKeysToClipboard();
   ui->keyhoteeidpubkey->setFocus(Qt::ActiveWindowFocusReason);
   ui->keyhoteeidpubkey->setAddressBook(_addressbook_model);
     

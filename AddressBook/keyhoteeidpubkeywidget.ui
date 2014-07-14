@@ -26,7 +26,7 @@
       </size>
      </property>
      <property name="toolTip">
-      <string>Copy to clipboard</string>
+      <string>Copy Public Key to the clipboard</string>
      </property>
      <property name="text">
       <string>...</string>
@@ -95,9 +95,22 @@
     </widget>
    </item>
    <item row="3" column="3">
-    <widget class="QPushButton" name="private_key_button">
+    <widget class="QToolButton" name="private_key_to_clipboard">
+     <property name="maximumSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Copy Private Key to the clipboard</string>
+     </property>
      <property name="text">
       <string>Copy Private Key</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../Keyhotee.qrc">
+       <normaloff>:/images/private_key.png</normaloff>:/images/private_key.png</iconset>
      </property>
     </widget>
    </item>
