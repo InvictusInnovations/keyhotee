@@ -218,8 +218,12 @@ IF( APPLE )
     SET( MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ) 
     SET( MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ) 
     SET( MACOSX_BUNDLE_COPYRIGHT "(C) 2014 Invictus Innovations" ) 
-  
-ENDIF( APPLE )
+
+ELSEIF( UNIX )
+
+    SET(CMAKE_CXX_FLAGS "-Wall -std=c++11")
+
+ENDIF( UNIX )
 
 qt5_wrap_ui( profile_wizard/UiProfileEditPage  profile_wizard/ProfileEditPage.ui )
 qt5_wrap_ui( profile_wizard/UiProfileIntroPage profile_wizard/ProfileIntroPage.ui )
