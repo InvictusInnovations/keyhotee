@@ -221,7 +221,7 @@ IF( APPLE )
 
 ELSEIF( UNIX )
 
-    SET(CMAKE_CXX_FLAGS "-Wall -std=c++11")
+    SET(CMAKE_CXX_FLAGS "-Wall -std=gnu++11")
 
 ENDIF( UNIX )
 
