@@ -1,22 +1,11 @@
 #!/bin/bash -xe
-cd $WORKSPACE
+cd $WORKSPACE/keyhotee
 
 if [ -e "BitShares" ]
 then
     git pull
 else
     git clone https://github.com/InvictusInnovations/BitShares.git BitShares
-fi
-
-cd BitShares
-
-if [ -e "fc" ]
-then
-    cd fc
-    git pull
-    cd ..
-else
-    git clone https://github.com/InvictusInnovations/fc.git fc
 fi
 
 cd $WORKSPACE
