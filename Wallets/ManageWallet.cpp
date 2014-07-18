@@ -101,7 +101,7 @@ void ManageBitShares::startBitsharesClient()
   try
   {
     ilog("start bitshares_client: ${_app_path}", ("_app_path", _app_path));
-//    statusBar()->showMessage(tr("Starting Bitshares Client..."), 1000);  /////////////////////**********************
+    emit notification(tr("Starting Bitshares Client..."));
     _bitshares_client.exec(_app_path, _args, _app_path.parent_path(),
       fc::iprocess::open_all | fc::iprocess::suppress_console);
 
@@ -121,15 +121,17 @@ void ManageBitShares::startBitsharesClient()
     sendCommand(command, "http_server_port: ");
     ilog("http server OK");
 
-//    statusBar()->showMessage(tr("Bitshares Client launched."), 3000);  /////////////////////**********************
+    emit notification(tr("Bitshares Client launched."));
   }
   catch(...)
   {
     wlog("Bitshares Client NOT launched");
+    emit notification(tr("Bitshares Client NOT launched."));
   }
 
   _bitshares_client.result();
   ilog("Bitshares Client shutdown");
+  emit notification(tr("Bitshares Client shutdown."));
 }
 
 bool ManageBitShares::waitFor(const std::string& str)
@@ -151,6 +153,7 @@ bool ManageBitShares::waitFor(const std::string& str)
   catch(fc::eof_exception&)
   {
     wlog("eof - ${str}", ("str", str));
+    emit notification(tr("Bitshares Client error."));
   }
 
   return false;

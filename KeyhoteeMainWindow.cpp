@@ -1284,6 +1284,11 @@ void KeyhoteeMainWindow::OnMissingSenderIdentity(const TRecipientPublicKey& send
     QString(pkAddressText.c_str()));
 }
 
+void KeyhoteeMainWindow::onWalletsNotification(const QString& str)
+{
+  statusBar()->showMessage(str, 3000);
+}
+
 void KeyhoteeMainWindow::notSupported()
 {
   QMessageBox::warning(this, "Warning", "Not supported");
@@ -1604,6 +1609,9 @@ void KeyhoteeMainWindow::setupWallets()
     }
     else
       manage_wallet = new ManageOtherWallet(walletWeb, _walletsData[i].server);
+
+    connect(manage_wallet, &IManageWallet::notification, this, &KeyhoteeMainWindow::onWalletsNotification,
+      Qt::QueuedConnection);
 
     /// map QTreeWidgetItem with Wallets WebSite
     _tree_item_2_wallet.insert(TTreeItem2ManageWallet::value_type(walletItem, manage_wallet));

@@ -136,6 +136,9 @@ private:
   /// \see IModificationsChecker interface description.
   virtual bool canContinue() const override;
 
+
+  void onWalletsNotification(const QString& str);
+
 protected:
   /// \see IIdentitiesUpdate interface description.
   virtual void onIdentitiesChanged(const TIdentities& identities) override {}

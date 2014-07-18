@@ -10,8 +10,10 @@
 class ManagedStream;
 class Wallets;
 
-class IManageWallet
+class IManageWallet : public QObject
 {
+  Q_OBJECT
+
 protected:
   virtual ~IManageWallet() {}
 
@@ -24,6 +26,9 @@ public:
   virtual bool isLaunched() const = 0;
   virtual Wallets* getWebWallet() const = 0;
   virtual bool isServerType(WalletsGui::ServerType type) const = 0;
+
+signals:
+  void notification(const QString& str);
 };
 
 class AManageWallet : public IManageWallet
