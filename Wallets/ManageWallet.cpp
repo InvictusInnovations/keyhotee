@@ -121,10 +121,10 @@ void ManageBitShares::startBitsharesClient()
     waitFor("(wallet closed) >>>");
 
     ilog("config bitshares_client");
-    std::string arg1 = "rpc_set_username" + _rpc_username.toStdString();
+    std::string arg1 = "rpc_set_username " + _rpc_username.toStdString();
     sendCommand(arg1, "rpc_set_username(");
 
-    std::string arg2 = "rpc_set_password" + _rpc_password.toStdString();
+    std::string arg2 = "rpc_set_password " + _rpc_password.toStdString();
     sendCommand(arg2, "rpc_set_password(");
 
     ilog("starting http server");

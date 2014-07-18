@@ -1603,8 +1603,8 @@ void KeyhoteeMainWindow::setupWallets()
 
     if(_walletsData[i].server.type == WalletsGui::BitsharesClient)
     {
-      _rpc_username = QUuid::createUuid().toString();
-      _rpc_password = QUuid::createUuid().toString();
+      _rpc_username = QUuid::createUuid().toString().mid(1, 36);
+      _rpc_password = QUuid::createUuid().toString().mid(1, 36);
       manage_wallet = new ManageBitShares(walletWeb, _walletsData[i].server, _rpc_username, _rpc_password);
       if(_bitshares_client_on_startup)
         manage_wallet->start();
