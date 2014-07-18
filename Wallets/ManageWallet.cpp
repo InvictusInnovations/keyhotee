@@ -26,6 +26,14 @@ ManageBitShares::ManageBitShares(Wallets* walletWeb, const WalletsGui::Server& s
     _args.push_back(arg.toStdString());
 }
 
+ManageBitShares::ManageBitShares(Wallets* walletWeb, const WalletsGui::Server& server,
+  const QString& username, const QString& password) :
+  ManageBitShares(walletWeb, server)
+{
+  _rpc_username = username;
+  _rpc_password = password;
+}
+
 ManageBitShares::~ManageBitShares()
 {
   delete _out_err_stream;
@@ -93,6 +101,7 @@ bool ManageBitShares::shutdown()
     }
   }
 
+  emit notification(tr("Bitshares Client shutdown."));
   return true;
 }
 
@@ -112,8 +121,11 @@ void ManageBitShares::startBitsharesClient()
     waitFor("(wallet closed) >>>");
 
     ilog("config bitshares_client");
-    sendCommand("rpc_set_username ala", "rpc_set_username(");
-    sendCommand("rpc_set_password kot", "rpc_set_password(");
+    std::string arg1 = "rpc_set_username" + _rpc_username.toStdString();
+    sendCommand(arg1, "rpc_set_username(");
+
+    std::string arg2 = "rpc_set_password" + _rpc_password.toStdString();
+    sendCommand(arg2, "rpc_set_password(");
 
     ilog("starting http server");
     std::string command = "http_start_server ";
@@ -131,7 +143,6 @@ void ManageBitShares::startBitsharesClient()
 
   _bitshares_client.result();
   ilog("Bitshares Client shutdown");
-  emit notification(tr("Bitshares Client shutdown."));
 }
 
 bool ManageBitShares::waitFor(const std::string& str)

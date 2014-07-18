@@ -272,6 +272,8 @@ private:
   bool                                    _is_show_blocked_contacts;
   TIdentity                               _identity_replace;
   bool                                    _bitshares_client_on_startup;
+  QString                                 _rpc_username;
+  QString                                 _rpc_password;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();

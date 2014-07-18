@@ -49,6 +49,8 @@ class ManageBitShares : public AManageWallet
 {
 public:
   ManageBitShares(Wallets* walletWeb, const WalletsGui::Server& server);
+  ManageBitShares(Wallets* walletWeb, const WalletsGui::Server& server,
+    const QString& username, const QString& password);
   ~ManageBitShares();
   
   virtual void start() override;
@@ -70,6 +72,9 @@ private:
 
   fc::process               _bitshares_client;
   ManagedStream*            _out_err_stream;
+
+  QString                   _rpc_username;
+  QString                   _rpc_password;
 };
 
 class ManageOtherWallet : public AManageWallet
