@@ -8,10 +8,12 @@ echo Updating bitshares_toolkit sources...
 
 If exist bitshares_toolkit ( 
     pushd bitshares_toolkit
+    git checkout develop
     git pull || exit /b 1
 ) else (
     git clone https://github.com/BitShares/bitshares_toolkit.git || exit /b 2
     pushd bitshares_toolkit
+    git checkout develop
 )
 
 git submodule init || exit /b 3

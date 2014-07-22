@@ -13,10 +13,12 @@ cd $WORKSPACE
 if [ -e "bitshares_toolkit" ]
 then
     cd bitshares_toolkit
+    git checkout develop
     git pull
 else
     git clone https://github.com/BitShares/bitshares_toolkit.git bitshares_toolkit
     cd bitshares_toolkit
+    git checkout develop
 fi
 
 git submodule init
