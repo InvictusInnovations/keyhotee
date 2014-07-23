@@ -3,6 +3,7 @@ cd $WORKSPACE/keyhotee
 
 if [ -e "BitShares" ]
 then
+    cd BitShares
     git pull
 else
     git clone https://github.com/InvictusInnovations/BitShares.git BitShares
