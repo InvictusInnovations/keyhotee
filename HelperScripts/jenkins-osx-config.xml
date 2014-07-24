@@ -51,10 +51,12 @@ cd ..
 if [ -e &quot;bitshares_toolkit&quot; ]
 then
     cd bitshares_toolkit
+    git checkout develop
     git pull
 else
     git clone https://github.com/BitShares/bitshares_toolkit.git bitshares_toolkit
     cd bitshares_toolkit
+    git checkout develop
 fi
 
 git submodule init

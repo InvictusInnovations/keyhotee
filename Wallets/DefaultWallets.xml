@@ -8,7 +8,7 @@
     <!-- path to icon -->
     <icon>:images/bitcoin.png</icon>
     <!-- type: server enumeration type: BitsharesClient, other -->
-    <server type="BitsharesClient" path="./plugins/bitshares_client.exe" port="80">
+    <server type="other" path="./plugins/bitshares_client.exe" port="80">
       <!-- optional command line arguments  -->
       <!-- <arg>command-line-arg1</arg>  -->
       <!-- <arg>command-line-arg2</arg>  -->
@@ -22,6 +22,6 @@
   <wallet name="Litecoin">
     <url>https://litecoin.org/</url>
     <icon>:images/litecoin128.png</icon>
-    <server type="BitsharesClient" path="./plugins/bitshares_client.exe" port="80"/>
+    <server type="other" path="./plugins/bitshares_client.exe" port="80"/>
   </wallet>
 </wallets>

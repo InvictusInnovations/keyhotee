@@ -1,22 +1,12 @@
 #!/bin/bash -xe
-cd $WORKSPACE
+cd $WORKSPACE/keyhotee
 
 if [ -e "BitShares" ]
 then
+    cd BitShares
     git pull
 else
     git clone https://github.com/InvictusInnovations/BitShares.git BitShares
-fi
-
-cd BitShares
-
-if [ -e "fc" ]
-then
-    cd fc
-    git pull
-    cd ..
-else
-    git clone https://github.com/InvictusInnovations/fc.git fc
 fi
 
 cd $WORKSPACE
@@ -24,10 +14,12 @@ cd $WORKSPACE
 if [ -e "bitshares_toolkit" ]
 then
     cd bitshares_toolkit
+    git checkout develop
     git pull
 else
     git clone https://github.com/BitShares/bitshares_toolkit.git bitshares_toolkit
     cd bitshares_toolkit
+    git checkout develop
 fi
 
 git submodule init

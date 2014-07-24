@@ -30,13 +30,13 @@ class ContactGui;
 class ContactView;
 class ContactsTable;
 class InboxView;
+class IManageWallet;
 class Mailbox;
 class MailboxModel;
 class MailboxModelRoot;
 class MenuEditControl;
 class KeyhoteeMainWindow;
 class TKeyhoteeApplication;
-class Wallets;
 class WalletsGui;
 
 class QAction;
@@ -136,6 +136,9 @@ private:
   /// \see IModificationsChecker interface description.
   virtual bool canContinue() const override;
 
+
+  void onWalletsNotification(const QString& str);
+
 protected:
   /// \see IIdentitiesUpdate interface description.
   virtual void onIdentitiesChanged(const TIdentities& identities) override {}
@@ -227,7 +230,7 @@ private:
 
   /// Class attributes:
 private:
-  typedef std::map<QTreeWidgetItem*, Wallets*> TTreeItem2WalletWebSite;
+  typedef std::map<QTreeWidgetItem*, IManageWallet*> TTreeItem2ManageWallet;
 
   QTreeWidgetItem*                        _identities_root;
   QTreeWidgetItem*                        _mailboxes_root;
@@ -241,7 +244,7 @@ private:
   QTreeWidgetItem*                        _spam_root;
   QList<QTreeWidgetItem*>                 _walletItems;
   /// map tree item widget to wallet web site
-  TTreeItem2WalletWebSite                 _treeItem2Wallet;
+  TTreeItem2ManageWallet                  _tree_item_2_wallet;
 
   MailboxModel*                           _inbox_model;
   MailboxModel*                           _draft_model;
@@ -269,6 +272,8 @@ private:
   bool                                    _is_show_blocked_contacts;
   TIdentity                               _identity_replace;
   bool                                    _bitshares_client_on_startup;
+  QString                                 _rpc_username;
+  QString                                 _rpc_password;
 }; //KeyhoteeMainWindow
 
 KeyhoteeMainWindow* getKeyhoteeWindow();

@@ -61,22 +61,24 @@ void ContactView::sendChatMessage()
   }
 
   auto msg = ui->chat_input->toPlainText();
-  if (msg.size() != 0)
+  if (msg.isEmpty())
   {
-    auto identity = ui->widget_Identity->currentIdentity();
-    if (identity != nullptr)
-    {
-      auto                               app = bts::application::instance();
-      auto                               profile = app->get_profile();
-      bts::bitchat::private_text_message text_msg(msg.toUtf8().constData() );
-
-      fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key( identity->dac_id_string );
-      app->send_text_message(text_msg, _current_contact.public_key, my_priv_key);
-      appendChatMessage("me", msg);
-    }
-
-    ui->chat_input->setPlainText(QString());
+    return;
   }
+    
+  auto identity = ui->widget_Identity->currentIdentity();
+  if (identity != nullptr)
+  {
+    auto                               app = bts::application::instance();
+    auto                               profile = app->get_profile();
+    bts::bitchat::private_text_message text_msg(msg.toUtf8().constData());
+
+    fc::ecc::private_key my_priv_key = profile->get_keychain().get_identity_key(identity->dac_id_string);
+    app->send_text_message(text_msg, _current_contact.public_key, my_priv_key);
+    appendChatMessage("me", msg);
+  }
+
+  ui->chat_input->setPlainText(QString());
 }
 
 void ContactView::appendChatMessage(const QString& from, const QString& msg, const QDateTime& date_time) //DLNFIX2 improve formatting later
