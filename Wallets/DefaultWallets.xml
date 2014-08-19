@@ -15,13 +15,16 @@
     </server>    
   </wallet>
   <wallet name="BitShares">
-    <url>https://github.com/InvictusInnovations/BitShares/wiki</url>
+    <url>http://127.0.0.1/</url>
     <icon>:images/bitshares.png</icon>
-    <server type="BitsharesClient" path="./plugins/bitshares_client.exe" port="80"/>
+    <server type="BitsharesClient" path="./plugins/bitshares_client.exe" port="9987">
+		<arg>--data-dir</arg>
+		<arg>$keyhotee_profile/BitSharesXT</arg>
+	</server>
   </wallet>
   <wallet name="Litecoin">
     <url>https://litecoin.org/</url>
     <icon>:images/litecoin128.png</icon>
-    <server type="other" path="./plugins/bitshares_client.exe" port="80"/>
+    <server type="other" path="./plugins/bitshares_client.exe" port="443"/>
   </wallet>
 </wallets>

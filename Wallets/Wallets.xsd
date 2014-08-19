@@ -15,8 +15,8 @@
               <xs:element name="icon" type="xs:string" />
               <xs:element name="server">
                 <xs:complexType>
-                  <xs:sequence minOccurs="0">
-                    <xs:element name="arg" type="xs:string" />
+                  <xs:sequence>
+                    <xs:element name="arg" type="xs:string" minOccurs ="0" maxOccurs="unbounded" />
                   </xs:sequence>
                   <xs:attribute name="type" use="required">
                     <xs:simpleType>
