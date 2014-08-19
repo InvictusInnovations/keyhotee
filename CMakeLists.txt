@@ -223,7 +223,7 @@ ELSEIF( UNIX )
 
     SET(CMAKE_CXX_FLAGS "-Wall -std=gnu++11")
 
-ENDIF( UNIX )
+ENDIF()
 
 qt5_wrap_ui( profile_wizard/UiProfileEditPage  profile_wizard/ProfileEditPage.ui )
 qt5_wrap_ui( profile_wizard/UiProfileIntroPage profile_wizard/ProfileIntroPage.ui )
