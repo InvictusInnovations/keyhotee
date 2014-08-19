@@ -228,8 +228,7 @@ public:
       tcp_serv.close();
       if (accept_loop_complete.valid() )
         {
-        accept_loop_complete.cancel();
-        accept_loop_complete.wait();
+        accept_loop_complete.cancel_and_wait();
         }
       }
     catch (const fc::canceled_exception&)
