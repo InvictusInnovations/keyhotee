@@ -286,8 +286,7 @@ void KeyhoteeIDPubKeyWidget::cancelLookupThread()
   {
   if(isLookupThreadActive())
     {
-    _lookupThreadState.cancel();
-    _lookupThreadState.wait();
+    _lookupThreadState.cancel_and_wait();
     }
   }
 

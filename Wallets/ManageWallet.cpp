@@ -3,10 +3,13 @@
 #include "ManagedStream.hpp"
 #include "wallets.hpp"
 
+#include <bts/application.hpp>
+
 #include "fc/thread/thread.hpp"
 
 #include <QCoreApplication>
 #include <QTemporaryFile>
+#include <QUuid>
 
 extern QTemporaryFile gLogFile;
 
@@ -22,16 +25,38 @@ ManageBitShares::ManageBitShares(Wallets* walletWeb, const WalletsGui::Server& s
   fc::path app_dir(str_app_dir);
   _app_path = app_dir / server.path.toStdWString();
 
-  foreach(QString arg, server.arg)
-    _args.push_back(arg.toStdString());
-}
+  auto app = bts::application::instance();
+  fc::path profile_dir = app->get_configuration().data_dir.parent_path();
 
-ManageBitShares::ManageBitShares(Wallets* walletWeb, const WalletsGui::Server& server,
-  const QString& username, const QString& password) :
-  ManageBitShares(walletWeb, server)
-{
-  _rpc_username = username;
-  _rpc_password = password;
+  foreach(QString arg, server.arg)
+  {
+    if(arg.contains("$keyhotee_profile"))
+    {
+      QString arg_new = profile_dir.string().c_str();
+      arg_new.append(arg.remove("$keyhotee_profile"));
+      _args.push_back(arg_new.toStdString());
+    }
+    else
+      _args.push_back(arg.toStdString());
+  }
+
+  // On Windows it doesn't pass http basic auth credentials to rpc server
+  // The problem the same as in the project qt_wallet: issue #5
+  // https://github.com/BitShares/qt_wallet/issues/5
+  if(1)
+  {
+    _rpc_username = "";
+    _rpc_password = "";
+  }
+  else
+  {
+    _rpc_username = QUuid::createUuid().toString().mid(1, 36);
+    _rpc_password = QUuid::createUuid().toString().mid(1, 36);
+  }
+
+  _wallet_web->setAuthentication(_rpc_username, _rpc_password);
+
+  _server_ready = false;
 }
 
 ManageBitShares::~ManageBitShares()
@@ -50,6 +75,14 @@ bool ManageBitShares::isLaunched() const
     return true;
   else
     return false;
+}
+
+void ManageBitShares::loadPage()
+{
+  getWebWallet()->loadPage();
+  if(!isLaunched())
+    start();
+  fc::async([=](){this->waitAndLoadPage(); });
 }
 
 bool ManageBitShares::sendCommand(const std::string& command, const std::string& expected_resp)
@@ -133,12 +166,16 @@ void ManageBitShares::startBitsharesClient()
     sendCommand(command, "http_server_port: ");
     ilog("http server OK");
 
+    _server_ready = true;
+
     emit notification(tr("Bitshares Client launched."));
   }
   catch(...)
   {
+    _server_ready = false;
     wlog("Bitshares Client NOT launched");
     emit notification(tr("Bitshares Client NOT launched."));
+    return;
   }
 
   _bitshares_client.result();
@@ -163,6 +200,7 @@ bool ManageBitShares::waitFor(const std::string& str)
   }
   catch(fc::eof_exception&)
   {
+    _server_ready = false;
     wlog("eof - ${str}", ("str", str));
     emit notification(tr("Bitshares Client error."));
   }
@@ -170,9 +208,26 @@ bool ManageBitShares::waitFor(const std::string& str)
   return false;
 }
 
+void ManageBitShares::waitAndLoadPage()
+{
+  if(!_server_ready)
+    getWebWallet()->onWaitingForServer();
+
+  while(isLaunched() && !_server_ready)
+    fc::usleep(fc::milliseconds(500));
+
+  if(isLaunched() && _server_ready)
+    getWebWallet()->loadPage();
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ManageOtherWallet::ManageOtherWallet(Wallets* walletWeb, const WalletsGui::Server& server)
 {
   _wallet_web = walletWeb;
   _server = server;
+}
+
+void ManageOtherWallet::loadPage()
+{
+  getWebWallet()->loadPage();
 }

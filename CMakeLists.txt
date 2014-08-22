@@ -223,7 +223,7 @@ ELSEIF( UNIX )
 
     SET(CMAKE_CXX_FLAGS "-Wall -std=gnu++11")
 
-ENDIF( UNIX )
+ENDIF()
 
 qt5_wrap_ui( profile_wizard/UiProfileEditPage  profile_wizard/ProfileEditPage.ui )
 qt5_wrap_ui( profile_wizard/UiProfileIntroPage profile_wizard/ProfileIntroPage.ui )
@@ -631,6 +631,9 @@ get_target_property(_loc bitshares_client LOCATION_RELWITHDEBINFO)
 SET(POST_BUILD_STEP_COMMANDS ${POST_BUILD_STEP_COMMANDS}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_loc}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
 
+SET(POST_BUILD_STEP_COMMANDS ${POST_BUILD_STEP_COMMANDS}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/../bitshares_toolkit/programs/qt_wallet/htdocs" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/htdocs")
+
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .) # copy the msvcrt files to the top-level directory instead of bin
 include(InstallRequiredSystemLibraries)
 
@@ -646,6 +649,8 @@ endforeach()
 
 get_target_property(_loc bitshares_client LOCATION_RELWITHDEBINFO)
 INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins COMPONENT Runtime)
+
+INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/htdocs DESTINATION ${plugin_dest_dir}/plugins COMPONENT Runtime)
 
 INSTALL(CODE "
   file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")

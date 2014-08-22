@@ -24,6 +24,7 @@ public:
   virtual bool shutdown() = 0;
 
   virtual bool isLaunched() const = 0;
+  virtual void loadPage() = 0;
   virtual Wallets* getWebWallet() const = 0;
   virtual bool isServerType(WalletsGui::ServerType type) const = 0;
 
@@ -49,8 +50,6 @@ class ManageBitShares : public AManageWallet
 {
 public:
   ManageBitShares(Wallets* walletWeb, const WalletsGui::Server& server);
-  ManageBitShares(Wallets* walletWeb, const WalletsGui::Server& server,
-    const QString& username, const QString& password);
   ~ManageBitShares();
   
   virtual void start() override;
@@ -58,10 +57,13 @@ public:
   virtual bool shutdown() override;
 
   virtual bool isLaunched() const override;
+  virtual void loadPage() override;
 
 private:
   void startBitsharesClient();
   bool waitFor(const std::string& str);
+
+  void waitAndLoadPage();
 
 private:
   fc::path                  _app_path;
@@ -72,6 +74,8 @@ private:
 
   fc::process               _bitshares_client;
   ManagedStream*            _out_err_stream;
+
+  bool                      _server_ready;
 
   QString                   _rpc_username;
   QString                   _rpc_password;
@@ -87,6 +91,7 @@ public:
   virtual bool sendCommand(const std::string& str, const std::string& expected_resp) override { return false; }
   virtual bool shutdown() override { return true; }
 
-  virtual bool isLaunched() const override { return false; }
+  virtual bool isLaunched() const override { return true; }
+  virtual void loadPage() override;
 };
 

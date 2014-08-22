@@ -521,14 +521,12 @@ class TConnectionProcessor::TOutboxQueue
 
         if(ConnectionCheckComplete.valid())
           {
-          ConnectionCheckComplete.cancel();
-          ConnectionCheckComplete.wait();
+          ConnectionCheckComplete.cancel_and_wait();
           }
 
         if(TransferLoopComplete.valid())
           {
-          TransferLoopComplete.cancel();
-          TransferLoopComplete.wait();
+          TransferLoopComplete.cancel_and_wait();
           }
         }
       }

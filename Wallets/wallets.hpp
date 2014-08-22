@@ -19,13 +19,15 @@ public:
   /// for root wallet item
   Wallets(QWidget* parent = nullptr);
   /// for wallet item
-  Wallets(QWidget* parent, const QString& url);
+  Wallets(QWidget* parent, const QString& url, const uint port);
   ~Wallets();
 
   /** QWebView initialization and load page from _url variable
       Is called when a user select the wallet on the treeitem
   */
   void loadPage();
+  void onWaitingForServer();
+  void setAuthentication(QString username, QString password);
 
 private slots:
   /// QWebPage load started
@@ -48,7 +50,10 @@ private:
 private:
     Ui::Wallets *ui;
     QString     _url;
+    uint        _port;
     QWebView*   _webView;
+    QString     _username;
+    QString     _password;
 };
 
 #endif // WALLETS_HPP

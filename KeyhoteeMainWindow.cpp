@@ -538,12 +538,8 @@ void KeyhoteeMainWindow::onSidebarSelectionChanged()
           TTreeItem2ManageWallet::const_iterator foundPos = _tree_item_2_wallet.find(selectedItem);
           if(foundPos != _tree_item_2_wallet.end())
           {
-            Wallets* walletWeb = foundPos->second->getWebWallet();
-            walletWeb->loadPage();
-            ui->widget_stack->setCurrentWidget(walletWeb);
-            if(foundPos->second->isServerType(WalletsGui::ServerType::BitsharesClient) &&
-              ! foundPos->second->isLaunched())
-              foundPos->second->start();
+            foundPos->second->loadPage();
+            ui->widget_stack->setCurrentWidget(foundPos->second->getWebWallet());
           }
         }
       }
@@ -1596,16 +1592,14 @@ void KeyhoteeMainWindow::setupWallets()
     path.replace("\"", "");
     walletItem->setIcon(0, QIcon(path));
     
-    Wallets* walletWeb = new Wallets(this, _walletsData[i].url);
+    Wallets* walletWeb = new Wallets(this, _walletsData[i].url, _walletsData[i].server.port);
     ui->widget_stack->addWidget(walletWeb);
 
     IManageWallet* manage_wallet;
 
     if(_walletsData[i].server.type == WalletsGui::BitsharesClient)
     {
-      _rpc_username = QUuid::createUuid().toString().mid(1, 36);
-      _rpc_password = QUuid::createUuid().toString().mid(1, 36);
-      manage_wallet = new ManageBitShares(walletWeb, _walletsData[i].server, _rpc_username, _rpc_password);
+      manage_wallet = new ManageBitShares(walletWeb, _walletsData[i].server);
       if(_bitshares_client_on_startup)
         manage_wallet->start();
     }
