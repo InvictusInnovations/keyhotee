@@ -45,7 +45,7 @@ export INVICTUS_ROOT=$WORKSPACE
 
 . ../keyhotee/setenv.sh
 
-cmake -DBUILD_VERSION_PATCH=$BUILD_NUMBER -DCMAKE_TOOLCHAIN_FILE=$INVICTUS_ROOT/toolchain.invictus/toolchain.invictus.cmake ../keyhotee
+cmake -DINCLUDE_QT_WALLET=TRUE -DBUILD_VERSION_PATCH=$BUILD_NUMBER -DCMAKE_TOOLCHAIN_FILE=$INVICTUS_ROOT/toolchain.invictus/toolchain.invictus.cmake ../keyhotee
 make -j8
 
 # Lets put /usr/bin at the begining of PATH
