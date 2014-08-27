@@ -650,7 +650,7 @@ endforeach()
 get_target_property(_loc bitshares_client LOCATION_RELWITHDEBINFO)
 INSTALL(FILES ${_loc} DESTINATION ${plugin_dest_dir}/plugins COMPONENT Runtime)
 
-INSTALL(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/htdocs" DESTINATION "${plugin_dest_dir}/plugins" COMPONENT Runtime)
+INSTALL(DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/htdocs" DESTINATION "${plugin_dest_dir}/plugins" COMPONENT Runtime)
 
 INSTALL(CODE "
   file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
