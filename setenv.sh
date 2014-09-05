@@ -5,6 +5,7 @@ popd > /dev/null
 
 export INVICTUS_ROOT
 echo "Using: "$INVICTUS_ROOT "as INVICTUS_ROOT"
+export BITSHARES_ROOT=$INVICTUS_ROOT
 
 export TOOLCHAIN_ROOT=$INVICTUS_ROOT/toolchain.invictus
 export PKG_CONFIG_SYSROOT_DIR=$TOOLCHAIN_ROOT/x86_64-unknown-linux-gnu/sysroot
